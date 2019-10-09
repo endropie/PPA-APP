@@ -193,13 +193,14 @@ export default {
         apiUrl += '?mode=validation&nodata=true'
         this.$axios.put(apiUrl, {})
         .then((response) => {
-          let message = response.data.number + ' - #' + response.data.id
-          this.VIEW.response.success({message:message})
-          this.VIEW.toView(response.data.id)
+          this.$app.notify.success({
+            message: this.$tc('messages.success_validated').toUpperCase(),
+            detail: this.$tc('messages.form_has_validated',1, {v:response.data.number})
+          })
+          this.init()
         })
         .catch((error) => {
-          this.VIEW.response.error(error.response || error, 'UPDATE FAILED');
-          this.VIEW.response.fields(error.response);
+          this.$app.response.error(error.response || error, 'UPDATE FAILED');
         })
         .finally(()=>{
           setTimeout(() => {

@@ -21,7 +21,7 @@
       <q-input class="col-12 col-sm-6"
         name="reference"
         stack-label :label="$tc('label.reference')"
-        v-model="rsForm.reference_number"
+        v-model="rsForm.reference"
         v-validate="'required'"
         :dark="LAYOUT.isDark"
         :error="errors.has('reference')"
@@ -256,13 +256,10 @@ export default {
       }
     },
     setItemReference(index, val, opt) {
-      // console.warn('action', val, opt)
-      // return false
       this.rsForm.opname_stock_items[index].stockist = null
       this.rsForm.opname_stock_items[index].init_amount = null
       this.rsForm.opname_stock_items[index].final_amount = null
 
-      console.warn('setItemReference',index,val,opt)
       if(!val) {
         this.rsForm.opname_stock_items[index].unit_id = null
         this.rsForm.opname_stock_items[index].unit_rate = 1
@@ -293,7 +290,6 @@ export default {
     },
     setStockistReference(index, val) {
       const totals = this.rsForm.opname_stock_items[index].item.totals || {}
-      console.warn('init_amount',totals[val], totals)
       this.rsForm.opname_stock_items[index].init_amount = Number(totals[val] || 0)
     },
 
