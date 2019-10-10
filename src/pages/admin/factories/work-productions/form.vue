@@ -159,7 +159,7 @@
       </q-card-section>
       <q-separator :dark="LAYOUT.isDark" />
       <q-card-actions >
-        <q-btn :label="$tc('form.list')" icon="list" color="dark" :to="`${VIEW.resource.uri}?return`"/>
+        <q-btn :label="$tc('form.list')" icon="list" color="dark" :to="`${FORM.resource.uri}?return`"/>
         <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
         <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()"
           :disabled="FORM.has_relationship.length > 0">
