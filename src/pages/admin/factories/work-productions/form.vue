@@ -159,11 +159,11 @@
       </q-card-section>
       <q-separator :dark="LAYOUT.isDark" />
       <q-card-actions >
-        <q-btn :label="$tc('form.list')" icon="list" color="dark" :to="`${FORM.resource.uri}?return`"/>
-        <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
         <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()"
           :disabled="FORM.has_relationship.length > 0">
         </q-btn>
+        <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
+        <q-btn :label="$tc('form.list')" icon="list" color="dark" class="on-right" :to="`${FORM.resource.uri}?return`"/>
       </q-card-actions>
     </q-card>
       <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
