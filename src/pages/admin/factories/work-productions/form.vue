@@ -49,8 +49,7 @@
           </div>
         </div>
         <div class="col-12">
-          <q-table dense hide-bottom
-            class="bordered no-shadow th-uppercase no-highlight"
+          <q-table dense hide-bottom grid
             separator="vertical"
             :dark="LAYOUT.isDark"
             :data="rsForm.work_production_items"
@@ -64,88 +63,78 @@
               { name: 'quantity', label: $tc('label.quantity'), align: 'center'},
             ]"
             :pagination=" {sortBy: null, descending: false, page: null, rowsPerPage: 0}">
-            <template slot="body" slot-scope="rsItem">
-              <q-tr>
-                <q-td key="prefix" style="width:50px">
-                  <q-btn dense flat round icon="clear" color="negative" tabindex="100"
-                    @click="removeItem(rsItem.row.__index)"/>
-                </q-td>
-                <q-td key="item_id" width="30%" >
-                  <ux-select-filter autofocus
-                    :name="`work_production_items.${rsItem.row.__index}.item_id`"
-                    :dark="LAYOUT.isDark"
-                    v-model="rsItem.row.item_id"
-                    v-validate="'required'"
-                    outlined dense color="blue-grey-4"
-                    hide-bottom-space hide-dropdown-icon
-                    :disable="!rsForm.line_id"
-                    :options="ItemOptions" clearable
-                    @input="(val) => setItemReference(rsItem.row.__index, val)"
-                    :error="errors.has(`work_production_items.${rsItem.row.__index}.item_id`)"
-                    :loading="SHEET['items'].loading">
-                  </ux-select-filter>
-                </q-td>
-                <q-td key="part_number" width="30%" style="min-width:150px">
-                  <q-input readonly
-                    :value="rsItem.row.item ? rsItem.row.item.part_number : null"
-                    outlined dense hide-bottom-space color="blue-grey-5"
-                    :dark="LAYOUT.isDark" />
-                </q-td>
-                <q-td key="work_order_item_line_id" width="30%" >
-                  <ux-select-filter
-                    :name="`work_production_items.${rsItem.row.__index}.work_order_item_line_id`"
-                    :dark="LAYOUT.isDark"
-                    v-model="rsItem.row.work_order_item_line_id"
-                    v-validate="'required'"
-                    outlined dense color="blue-grey-4"
-                    no-error-icon hide-bottom-space hide-dropdown-icon
-                    :disable="!rsForm.line_id"
-                    :options="WorkOrderItemLineOptions.filter(x => x.item_id === rsItem.row.item.id)" clearable
-                    :error="errors.has(`work_production_items.${rsItem.row.__index}.work_order_item_line_id`)"
-                    :loading="SHEET['work_orders'].loading"
-                  >
-                    <q-badge slot="prepend" color="grey-5"
-                      :label="'#'+rsItem.row.work_order_item_line_id"
-                      v-show="Boolean(rsItem.row.work_order_item_line_id)" />
-                  </ux-select-filter>
 
-                </q-td>
-                <q-td key="unit_id"  width="15%">
-                  <q-select
-                    :name="`work_production_items.${rsItem.row.__index}.unit_id`"
-                    :dark="LAYOUT.isDark"
-                    v-model="rsItem.row.unit_id"
-                    outlined dense hide-bottom-space color="blue-grey-4"
-                    :options="ItemUnitOptions[rsItem.row.__index]"
-                    map-options  emit-value
-                    v-validate="rsItem.row.item_id ? 'required' : ''"
-                    :error="errors.has(`work_production_items.${rsItem.row.__index}.unit_id`)"
-                    :disable="!rsForm.line_id || !rsItem.row.item_id"
-                    @input="(val) => setUnitReference(rsItem.row.__index, val)"
-                  />
-                </q-td>
-                <q-td key="quantity"  width="15%">
-                  <q-input type="number" style="min-width:120px"
-                    :name="`work_production_items.${rsItem.row.__index}.quantity`"
-                    :dark="LAYOUT.isDark" color="blue-grey-6"
-                    v-model="rsItem.row.quantity"
-                    outlined dense hide-bottom-space no-error-icon align="right"
-                    v-validate="`required|gt_value:0|max_value:${MaxStock[rsItem.row.__index]}`"
-                    :error="errors.has(`work_production_items.${rsItem.row.__index}.quantity`)"
-                    :suffix="' / '+ $app.number_format(MaxStock[rsItem.row.__index] / (rsItem.row.unit_rate||1))" />
-                </q-td>
-              </q-tr>
+            <template slot="item" slot-scope="rsItem">
+              <div class="q-pa-xs col-12 col-sm-6">
+                <q-card>
+                  <q-btn dense flat round icon="clear" color="negative" tabindex="100" @click="removeItem(rsItem.row.__index)"/>
+                  <q-card-section class="row q-col-gutter-sm">
+
+                    <ux-select-filter class="col-12 col-md-6" autofocus
+                      :name="`work_production_items.${rsItem.row.__index}.item_id`"
+                      :label="$tc('items.part_name')"
+                      :dark="LAYOUT.isDark"
+                      v-model="rsItem.row.item_id"
+                      v-validate="'required'"
+                      outlined color="blue-grey-4"
+                      hide-bottom-space hide-dropdown-icon
+                      :disable="!rsForm.line_id"
+                      :options="ItemOptions" clearable
+                      @input="(val) => setItemReference(rsItem.row.__index, val)"
+                      :error="errors.has(`work_production_items.${rsItem.row.__index}.item_id`)"
+                      :loading="SHEET['items'].loading">
+                    </ux-select-filter>
+
+                    <ux-select-filter class="col-12 col-md-6"
+                      :name="`work_production_items.${rsItem.row.__index}.work_order_item_line_id`"
+                      :label="$tc('general.work_production')"
+                      :dark="LAYOUT.isDark"
+                      v-model="rsItem.row.work_order_item_line_id"
+                      v-validate="'required'"
+                      outlined color="blue-grey-4"
+                      no-error-icon hide-bottom-space hide-dropdown-icon
+                      :disable="!rsForm.line_id"
+                      :options="WorkOrderItemLineOptions.filter(x => x.item_id === rsItem.row.item.id)" clearable
+                      :error="errors.has(`work_production_items.${rsItem.row.__index}.work_order_item_line_id`)"
+                      :loading="SHEET['work_orders'].loading" />
+
+                    <q-input readonly tabindex="100" class="col-12 col-md-6"
+                      :label="$tc('items.part_number')"
+                      :value="rsItem.row.item ? rsItem.row.item.part_number : null"
+                      outlined hide-bottom-space color="blue-grey-5"
+                      :dark="LAYOUT.isDark" />
+
+                    <q-input type="number" class="col-12 col-md-4" style="min-width:120px"
+                      :name="`work_production_items.${rsItem.row.__index}.quantity`"
+                      :label="$tc('label.quantity')"
+                      :dark="LAYOUT.isDark" color="blue-grey-6"
+                      v-model="rsItem.row.quantity"
+                      outlined hide-bottom-space no-error-icon align="right"
+                      v-validate="`required|gt_value:0|max_value:${MaxStock[rsItem.row.__index]}`"
+                      :error="errors.has(`work_production_items.${rsItem.row.__index}.quantity`)"
+                      :suffix="' / '+ $app.number_format(MaxStock[rsItem.row.__index] / (rsItem.row.unit_rate||1))" />
+
+                    <q-select class="col-12 col-md-2"
+                      :name="`work_production_items.${rsItem.row.__index}.unit_id`"
+                      :dark="LAYOUT.isDark"
+                      v-model="rsItem.row.unit_id"
+                      outlined hide-bottom-space color="blue-grey-4"
+                      :options="ItemUnitOptions[rsItem.row.__index]"
+                      map-options  emit-value
+                      v-validate="rsItem.row.item_id ? 'required' : ''"
+                      :error="errors.has(`work_production_items.${rsItem.row.__index}.unit_id`)"
+                      :disable="!rsForm.line_id || !rsItem.row.item_id"
+                      @input="(val) => setUnitReference(rsItem.row.__index, val)"
+                    />
+                  </q-card-section>
+                </q-card>
+              </div>
             </template>
-            <q-tr slot="bottom-row" class="border-top">
-              <q-td> </q-td>
-              <q-td>
-                <q-btn outline dense color="positive" class="full-width"
-                  :label="$tc('form.add')" icon-right="add"
-                  @click="addNewItem()" />
-                </q-td>
-              <q-td colspan="100%"></q-td>
-            </q-tr>
           </q-table>
+
+          <q-btn outline dense color="positive" class="q-mt-md full-width"
+            :label="$tc('form.add_new', 1)" icon-right="add"
+            @click="addNewItem()" />
         </div>
         <!-- COLUMN::4th Description -->
         <div class="col-12 cloumn q-mt-md">
@@ -159,11 +148,10 @@
       </q-card-section>
       <q-separator :dark="LAYOUT.isDark" />
       <q-card-actions >
-        <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()"
-          :disabled="FORM.has_relationship.length > 0">
-        </q-btn>
-        <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
-        <q-btn :label="$tc('form.list')" icon="list" color="dark" class="on-right" :to="`${FORM.resource.uri}?return`"/>
+        <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()" />
+        <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)" />
+        <q-space />
+        <q-btn :label="$tc('form.list')" icon-right="list" color="dark" :to="`${FORM.resource.uri}?return`"/>
       </q-card-actions>
     </q-card>
       <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
@@ -334,7 +322,7 @@ export default {
 
 
       this.FORM.data.work_production_items.map(detail => {
-        if (stockItem.hasOwnProperty(detail.work_order_item_line_id)) {
+        if (this.ROUTE.meta.mode !== 'create' && stockItem.hasOwnProperty(detail.work_order_item_line_id)) {
           stockItem[detail.work_order_item_line_id] += Number(detail.unit_amount)
         }
       })
@@ -368,7 +356,29 @@ export default {
   methods: {
     init() {
       this.FORM.load((data) => {
-        this.setForm(data || this.setDefault())
+        if (this.ROUTE.meta.mode === 'create' && this.ROUTE.query && this.ROUTE.query.clone)
+        {
+          this.FORM.show = false
+          this.FORM.loading = true
+
+          let apiUrl = `${this.FORM.resource.api}/${this.ROUTE.query.clone}`
+          this.$axios.get(apiUrl)
+            .then((response) => {
+              data = Object.assign(response.data, {number:null})
+              this.FORM.data = JSON.parse(JSON.stringify(data))
+              this.setForm(data)
+              setTimeout(() => this.FORM.show = true, 500)
+            })
+            .catch(error => {
+              this.FORM.response.error(error.response || error, this.$tc('messages.fail', 1, {v:this.$tc('form.clone')}).toUpperCase())
+              this.setForm(this.setDefault())
+              setTimeout(() => this.FORM.show = true, 500)
+            })
+            .finally(() => {
+              setTimeout(() => this.FORM.loading = false, 500)
+            })
+        }
+        else this.setForm(data || this.setDefault())
       })
     },
     setForm(data) {
@@ -385,7 +395,7 @@ export default {
           ok: 'Direct to Detail Page',
           cancel: 'Continue'
         }).then(() => {
-          this.$router.push(`${this.FORM.resource.uri}/${data.id}`)
+          this.$router.replace(`${this.FORM.resource.uri}/${data.id}`)
         }).catch(() => {
           //
         })
@@ -482,26 +492,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus">
-.border-top td
-  border-top-width 1px
-
-.suffix-floating
-  margin-right 2px
-  .q-btn--round
-    min-height: unset
-    min-width: unset
-  .q-btn--fab
-    height: 26px
-    width: 26px
-    .q-icon
-      font-size 20px
-  .q-btn--fab-mini
-    height: 24px
-    width: 24px
-    .q-icon
-      font-size 18px
-
-</style>
-

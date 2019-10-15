@@ -210,8 +210,9 @@
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
     <q-card-actions class="q-mx-lg">
-      <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()"></q-btn>
-      <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
+      <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()" />
+      <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)" />
+      <q-space />
       <q-btn :label="$tc('form.list')" icon="list" color="dark" class="on-right" :to="`${FORM.resource.uri}?return`"/>
     </q-card-actions>
   </q-card>

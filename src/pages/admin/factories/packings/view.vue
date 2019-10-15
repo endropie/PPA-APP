@@ -81,38 +81,39 @@
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
             <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
         </div>
-        <div class="col-12 q-gutter-xs print-hide " style="padding-top:50px">
-          <q-btn :label="$tc('form.back')" icon="cancel" color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
-          <q-btn :label="$tc('form.edit')" icon="edit" color="green" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`" v-if="IS_EDITABLE && $app.can('packings-update')"></q-btn>
-          <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
-          <!-- <q-btn :label="$tc('form.delete')" :icon="btnIcon('delete')" color="negative" outline @click="VIEW.delete" v-if="IS_EDITABLE"></q-btn> -->
-          <ux-btn-dropdown split color="blue-grey" no-caps class="float-right"
-            :label="IS_EDITABLE ?  $tc('form.add_new') : $tc('label.others')"
-            @click="IS_EDITABLE ? $router.push(`${VIEW.resource.uri}/create`) : false"
-            :options="[
-              { label: $tc('form.add_new'), color:'green', icon: 'add',
-                detail: $tc('messages.process_create'),
-                hidden: !IS_EDITABLE || !$app.can('packings-create'),
-                actions: () => {
-                  $router.push(`${VIEW.resource.uri}/create`)
-                }
-              },
-              { label: 'Delete', color:'red', icon: 'delete',
-                detail: $tc('messages.process_delete'),
-                hidden: !IS_EDITABLE || !$app.can('packings-delete'),
-                actions: () => {
-                  VIEW.delete()
-                }
-              },
-              { label: 'VOID', color:'red', icon: 'block',
-                detail: $tc('messages.process_void'),
-                hidden: !IS_VOID || !$app.can('packings-create'),
-                actions: () => {
-                  VIEW.void(()=> init() )
-                }
-              },
-          ]"/>
-        </div>
+      </div>
+      <div class="row q-gutter-sm">
+        <q-btn :label="$tc('form.edit')" icon="edit" color="green" outline :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`" v-if="IS_EDITABLE" />
+        <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" />
+        <q-space />
+        <q-btn :label="$tc('form.list')" icon-right="list" color="dark" :to="`${VIEW.resource.uri}?return`"/>
+        <!-- <q-btn :label="$tc('form.delete')" :icon="btnIcon('delete')" color="negative" outline @click="VIEW.delete" v-if="IS_EDITABLE"></q-btn> -->
+        <ux-btn-dropdown split color="blue-grey" no-caps class="float-right"
+          :label="IS_EDITABLE ?  $tc('form.add_new') : $tc('label.others')"
+          @click="IS_EDITABLE ? $router.push(`${VIEW.resource.uri}/create`) : false"
+          :options="[
+            { label: $tc('form.add_new'), color:'green', icon: 'add',
+              detail: $tc('messages.process_create'),
+              hidden: !IS_EDITABLE || !$app.can('packings-create'),
+              actions: () => {
+                $router.push(`${VIEW.resource.uri}/create`)
+              }
+            },
+            { label: 'Delete', color:'red', icon: 'delete',
+              detail: $tc('messages.process_delete'),
+              hidden: !IS_EDITABLE || !$app.can('packings-delete'),
+              actions: () => {
+                VIEW.delete()
+              }
+            },
+            { label: 'VOID', color:'red', icon: 'block',
+              detail: $tc('messages.process_void'),
+              hidden: !IS_VOID || !$app.can('packings-create'),
+              actions: () => {
+                VIEW.void(()=> init() )
+              }
+            },
+        ]"/>
       </div>
     </page-print>
 

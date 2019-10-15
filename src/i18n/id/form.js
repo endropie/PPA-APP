@@ -1,9 +1,10 @@
 export default {
   add: 'Tambah',
-  add_new: 'Tambah Baru',
+  add_new: 'Tambah Baru | Tambahan | Tambahkan',
   add_clone: 'Tambah Clone',
   back: 'Kembali',
   cancel: 'Batal',
+  clone: 'Salin',
   create: 'Buat | Dibuat',
   confirm: 'Konfirmasi {v}|{v} dikonfirmasi',
   close: 'Tutup | Ditutup',

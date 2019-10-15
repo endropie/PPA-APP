@@ -1,6 +1,6 @@
 <template>
-  <q-page padding class="row justify-center" :dark="LAYOUT.isDark" style="min-width:210mm;">
-    <page-print v-if="VIEW.show" class="q-ma-md shadow-2" style="max-width:210mm;">
+  <q-page padding class="row justify-center" :dark="LAYOUT.isDark">
+    <page-print v-if="VIEW.show" class="q-ma-md shadow-2">
       <div slot="header-tags">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
@@ -64,45 +64,37 @@
             <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
         </div>
       </div>
-      <div class="row q-col-gutter-xs" >
-        <div class="col-12 q-gutter-xs print-hide " style="padding-top:50px">
-          <q-btn :label="$tc('form.list')" icon="list" color="dark" :to="`${VIEW.resource.uri}?return`"/>
-          <q-btn :label="$tc('form.edit')" icon="edit" color="green" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`" v-if="IS_EDITABLE"></q-btn>
-          <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="$router.push(`${VIEW.resource.uri}/${ROUTE.params.id}/prelines`)" ></q-btn>
-
-          <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" no-caps class="float-right"
-            :options="[
-              { label: $tc('form.add_new'), color:'primary', icon: 'add',
-                detail: $tc('messages.process_create'),
-                hidden: !$app.can('work-orders-create'),
-                actions: () => {
-                  $router.push(`${VIEW.resource.uri}/create`)
-                }
-              },
-              { label: $tc('form.add_clone'), color:'primary', icon: 'add',
-                detail: $tc('messages.process_create'),
-                hidden: !$app.can('work-orders-create'),
-                actions: () => {
-                  $router.push(`${VIEW.resource.uri}/create?clone=${ROUTE.params.id}`)
-                }
-              },
-              { label: 'DELETE', color:'red', icon: 'delete',
-                detail: $tc('messages.process_delete'),
-                hidden: !IS_EDITABLE || !$app.can('work-orders-delete'),
-                actions: () => {
-                  VIEW.delete()
-                }
-              },
-              { label: 'VOID', color:'red', icon: 'block',
-                detail: $tc('messages.process_void'),
-                hidden: !IS_EDITABLE || !$app.can('work-orders-void'),
-                actions: () => {
-                  VIEW.void(()=> init() )
-                }
-              },
-            ]">
-          </ux-btn-dropdown>
-        </div>
+      <div class="row q-gutter-sm print-hide">
+        <q-btn :label="$tc('form.edit')" icon="edit" color="green" outline :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`" v-if="IS_EDITABLE"></q-btn>
+        <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
+        <q-space />
+        <q-btn :label="$tc('form.list')" icon-right="list" color="dark" :to="`${VIEW.resource.uri}?return`"/>
+        <q-btn :label="$tc('form.clone')" icon-right="add_circle" color="positive" outline align="right" @click.native="$router.push(`${VIEW.resource.uri}/create?clone=${ROUTE.params.id}`)" ></q-btn>
+        <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" no-caps
+          :options="[
+            { label: $tc('form.add_new'), color:'primary', icon: 'add',
+              detail: $tc('messages.process_create'),
+              hidden: !$app.can('work-orders-create'),
+              actions: () => {
+                $router.push(`${VIEW.resource.uri}/create`)
+              }
+            },
+            { label: 'DELETE', color:'red', icon: 'delete',
+              detail: $tc('messages.process_delete'),
+              hidden: !IS_EDITABLE || !$app.can('work-orders-delete'),
+              actions: () => {
+                VIEW.delete()
+              }
+            },
+            { label: 'VOID', color:'red', icon: 'block',
+              detail: $tc('messages.process_void'),
+              hidden: !IS_EDITABLE || !$app.can('work-orders-void'),
+              actions: () => {
+                VIEW.void(()=> init() )
+              }
+            },
+          ]">
+        </ux-btn-dropdown>
       </div>
     </page-print>
 
