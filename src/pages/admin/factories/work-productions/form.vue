@@ -110,7 +110,7 @@
                       :dark="LAYOUT.isDark" color="blue-grey-6"
                       v-model="rsItem.row.quantity"
                       outlined hide-bottom-space no-error-icon align="right"
-                      v-validate="`required|gt_value:0|max_value:${MaxStock[rsItem.row.__index]}`"
+                      v-validate="`required|gt_value:0|max_value:${MaxStock[rsItem.row.__index] / (rsItem.row.unit_rate||1)}`"
                       :error="errors.has(`work_production_items.${rsItem.row.__index}.quantity`)"
                       :suffix="' / '+ $app.number_format(MaxStock[rsItem.row.__index] / (rsItem.row.unit_rate||1))" />
 

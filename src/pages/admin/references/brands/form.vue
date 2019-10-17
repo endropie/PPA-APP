@@ -24,7 +24,6 @@
           :label="$tc('label.name')"
           v-model="rsForm.name"
           v-validate="'required'"
-          v-validate-name:my-name
           :dark="LAYOUT.isDark"
           :error="errors.has('name')"
           :error-message="errors.first('name')"/>
