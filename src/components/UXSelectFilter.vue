@@ -148,10 +148,15 @@ export default {
           }
 
           if(!v.hasOwnProperty('sublabel')) v.sublabel = ''
-          return String(v.label).toLowerCase().includes(needle) || String(v.sublabel).toLowerCase().includes(needle)
-        })
 
-        // console.warn('select->filterFn', this.options, this.injectFilter )
+          let needles = String(needle).split(' ')
+          for (let i = 0; i < needles.length; i++) {
+            if (needles[i] && !String(v.label + v.sublabel).toLowerCase().includes(needles[i])) return false
+          }
+
+          return true
+          // return String(v.label).toLowerCase().includes(needle) || String(v.sublabel).toLowerCase().includes(needle)
+        })
       })
     },
     filterFunc (v, u, a) {
