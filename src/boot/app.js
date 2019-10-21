@@ -2,6 +2,8 @@ import { Dialog, Notify, date } from 'quasar'
 import _lodash from 'lodash'
 import moment from 'moment'
 
+moment.locale('id')
+
 // leave the export, even if you don't use it
 export default async ({ app, store, router, Vue }) => {
   Vue.prototype.$_ = _lodash
