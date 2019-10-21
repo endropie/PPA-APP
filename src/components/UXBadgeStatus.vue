@@ -46,6 +46,9 @@ export default {
         return this.row[this.name]
       },
       Label() {
+        if(this.$attrs['label']) {
+          return this.$attrs['label']
+        }
         if(this.labelOptions && this.labelOptions[this.Value]) {
           return this.labelOptions[this.Value]
         }

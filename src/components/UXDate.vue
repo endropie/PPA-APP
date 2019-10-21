@@ -5,9 +5,8 @@
     v-on="$listeners"
     input-class="no-option-date"
     >
-
       <template v-slot:append v-if="!$attrs.disable && !$attrs.readonly">
-        <q-icon name="event" class="self-end q-mb-sm cursor-pointer">
+        <q-btn flat dense icon="event" class="self-end q-mb-sm cursor-pointer">
           <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
             <q-date :mask="valueFormat"
               v-model="value"
@@ -15,7 +14,7 @@
               :options="dateOptions"
               @input="() => $refs.qDateProxy.hide()" />
           </q-popup-proxy>
-        </q-icon>
+        </q-btn>
       </template>
 
       <template slot="before">

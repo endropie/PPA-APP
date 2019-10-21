@@ -81,17 +81,15 @@ export default {
   name: 'ux-select-filter',
   inheritAttrs: false,
   props: {
-    // initFilter: Function,
-    // injectFilter: Function,
     source: {type: String, default:null},
     sourceKeys: {type: Array, default: () => []},
-    filterSkip: {type: Number, default:3},
+    filterSkip: {type: Number, default:0},
     filterSelf: {type: Boolean, default: true },
-    useInput: {type: Boolean, default: false },
-    fillInput: {type: Boolean, default: false },
-    emitValue: {type: Boolean, default: false },
-    mapOptions: {type: Boolean, default: false },
-    hideSelected: {type: Boolean, default: false },
+    useInput: {type: Boolean, default: true },
+    fillInput: {type: Boolean, default: true },
+    hideSelected: {type: Boolean, default: true },
+    emitValue: {type: Boolean, default: true },
+    mapOptions: {type: Boolean, default: true },
     inputDebounce: {type: Number, default: 600 }
   },
   data () {
@@ -99,7 +97,8 @@ export default {
       value: this.$attrs.value,
       options: this.$attrs.options || [],
       defaultOptions: [],
-      isFilterSkip: false
+      isFilterSkip: false,
+      isFiltering: false
     }
   },
   created() {
@@ -168,13 +167,15 @@ export default {
       }
 
       // if (abort) return update()
-
-      if (this.source) {
+      if (this.filterSkip ) {
         if (String(val).length < this.filterSkip) {
           this.isFilterSkip = true
           return update()
         }
         this.isFilterSkip = false
+      }
+
+      if (this.source) {
         const separator = String(this.source).indexOf('?') < 0 ? '?' : '&'
         const fields = this.sourceKeys || []
         const search = fields
@@ -187,10 +188,10 @@ export default {
             this.options = response.data
           })
           .catch(error => {
-            console.error(error)
+            console.error(error || error.response)
           })
           .finally(() => {
-            update()
+            return update()
           })
       }
 
@@ -217,7 +218,6 @@ export default {
           }
         }
 
-        console.warn('emit::selected', this.value, innerValue)
         this.$emit('selected', this.value, innerValue)
       })
     }
