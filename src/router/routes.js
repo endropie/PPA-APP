@@ -1,4 +1,5 @@
 import RouteAdmin from './route-admin'
+import RouteGuest from './route-guest'
 
 const routes = [
   {
@@ -10,6 +11,10 @@ const routes = [
     component: () => import('pages/login.vue')
   }
 ]
+
+RouteGuest.forEach(link => {
+  routes.push(link)
+})
 
 RouteAdmin.forEach(link => {
   routes.push(link)

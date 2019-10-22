@@ -4,7 +4,7 @@
       PPA
     </div>
     <div class="text-center">
-      <div class="card bg-white shadow-4 column no-wrap flex-center group">
+      <div class="card bg-white shadow-4 column no-wrap flex-center group q-gutter-xs">
         <!-- <img src="~assets/quasar-play-logo-full.svg"> -->
         <q-icon name="widgets" class="text-h2" color="blue-7" />
           <p class="text-h4 text-orange-14 text-weight-bolder" style="font: courier">
@@ -21,6 +21,15 @@
           no-ripple
         />
 
+        <q-btn outline
+          label="Schedule Board"
+          to="/schedule-boards"
+          color="primary"
+          class="full-width"
+          icon="launch"
+          no-ripple
+        />
+
         <q-btn
           color="grey-7"
           label="Read Privacy Policy"
@@ -29,13 +38,6 @@
           rounded
           no-caps
           class="q-mt-sm"
-        />
-
-        <q-btn :label="`Server: ${$axios.defaults.baseURL}`"
-          flat rounded no-caps color="grey-7"
-          class="absolute-bottom-right q-mt-sm"
-          @XXclick.native="openSetURL()"
-
         />
 
         <privacy-policy ref="privacy" />

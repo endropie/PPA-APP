@@ -7,52 +7,55 @@
     </q-card-section>
     <q-card-section>
       <div class="row q-col-gutter-md">
-        <q-input class="col-12 col-sm-6"
-          name="number"
-          :label="$tc('label.number')"
-          icon="code"
-          autocomplete="off"
-          v-model="rsForm.number"
+        <ux-select class="col-12 col-sm-6"
+          name="vehicle_id"
+          :label="$tc('general.vehicle')"
+          v-model="rsForm.vehicle_id"
           v-validate="'required'"
+          :options="VehicleOptions"
           :dark="LAYOUT.isDark"
-          :error="errors.has('number')"
-          :error-message="errors.first('number')"
+          :error="errors.has('vehicle_id')"
+          :error-message="errors.first('vehicle_id')"
         />
 
-        <q-select class="col-12 col-sm-6"
-          name="owner"
-          :label="$tc('label.owner', 3)"
-          v-model="rsForm.owner"
-          :options="CONFIG.references.vehicle_owner"
+        <ux-select class="col-12 col-sm-6"
+          name="operator_id"
+          :label="$tc('general.operator')"
+          v-model="rsForm.operator_id"
+          v-validate="'required'"
+          :options="OperatorOptions"
+          :dark="LAYOUT.isDark"
+          :error="errors.has('operator_id')"
+          :error-message="errors.first('operator_id')"
+        />
+
+        <ux-date name="date" type="date" class="col-8 col-sm-4"
+          :label="$tc('label.date')" stack-label
+          v-model="rsForm.date"
+          v-validate="`required|date_format:yyyy-MM-dd${ROUTE.meta.mode === 'create' ? '|after:'+$app.moment().add(-1,'days').format('YYYY-MM-DD') : '' }`"
+          :date-options="(date) => date >= $app.moment().format('YYYY/MM/DD')"
+          :dark="LAYOUT.isDark"
+          :error="errors.has('date')"
+          :error-message="errors.first('date')" >
+        </ux-date>
+
+        <q-input name="time" type="time" class="col-4 col-sm-2"
+          :label="$tc('label.time')" stack-label
+          v-model="rsForm.time"
+          v-validate="`required`"
+          :dark="LAYOUT.isDark"
+          :error="errors.has('time')"
+          :error-message="errors.first('time')" />
+
+        <q-input class="col-12 col-sm-6"
+          name="destination"
+          :label="$tc('transports.destination')"
+          v-model="rsForm.destination"
           v-validate="'required'"
           :dark="LAYOUT.isDark"
-          :error="errors.has('owner')"
-          :error-message="errors.first('owner')"/>
+          :error="errors.has('destination')"
+          :error-message="errors.first('destination')"/>
 
-        <q-select class="col-12 col-sm-6"
-          name="type"
-          :label="$tc('label.mode')"
-          v-model="rsForm.type"
-          :options="CONFIG.references.vehicle_type"
-          v-validate="'required'"
-          :dark="LAYOUT.isDark"
-          :error="errors.has('type')"
-          :error-message="errors.first('type')"/>
-
-        <q-select class="col-12 col-sm-6"
-          name="department_id"
-          :label="$tc('general.department')"
-          v-model="rsForm.department_id"
-          :options="DepartmentOptions"
-          emit-value map-options
-          :dark="LAYOUT.isDark"
-          :error="errors.has('department_id')"
-          :error-message="errors.first('department_id')"/>
-        <div class="col-12">
-          <q-toggle :label="$tc('form.show', 1, {v:'Shedule'})"
-            v-model="rsForm.is_scheduled"
-            :true-value="1" :false-value="0"/>
-        </div>
         <q-input class="col-12"
           v-model="rsForm.description"
           type="textarea"
@@ -64,7 +67,7 @@
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
     <q-card-actions class="group">
-      <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()"></q-btn>
+      <!-- <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()"></q-btn> -->
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="FORM.reset()"></q-btn>
       <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()"></q-btn>
     </q-card-actions>
@@ -83,23 +86,23 @@ export default {
   data () {
     return {
       SHEET: {
-        departments: {api : '/api/v1/references/departments?mode=all'}
+        vehicles: {data:[], api:'/api/v1/references/vehicles?mode=all&is_scheduled=1'},
+        operators: {data:[], api:'/api/v1/common/employees?mode=all'}
       },
       FORM: {
         resource: {
-          uri: '/admin/references/vehicles',
-          api: '/api/v1/references/vehicles',
+          uri: '/admin/deliveries/schedule-boards',
+          api: '/api/v1/transports/schedule-boards',
         },
       },
       rsForm: {},
       setDefault:()=>{
         return {
-          id:null,
           number:null,
-          type:null,
-          owner:null,
-          department_id:null,
-          is_scheduled:null,
+          vehicle_id: null,
+          operator_id: null,
+          schedule: null,
+          destination: null,
           description:null,
         }
       }
@@ -111,8 +114,11 @@ export default {
 
   },
   computed: {
-    DepartmentOptions() {
-      return (this.SHEET['departments'].data.map(item => ({label: item.name, value: item.id})) || [])
+    VehicleOptions() {
+      return (this.SHEET.vehicles.data.map(item => ({label: item.number, value: item.id})) || [])
+    },
+    OperatorOptions() {
+      return (this.SHEET.operators.data.map(item => ({label: item.name, sublabel:item.code, value: item.id})) || [])
     },
   },
   watch: {
@@ -134,7 +140,6 @@ export default {
       });
     },
     onSave() {
-
       this.$validator.validate().then(result => {
         if (!result) {
           this.$q.notify({

@@ -44,6 +44,12 @@
           <span v-else-if="rs.row.department_id" v-text="rs.row.department_id" />
           <span v-else>-</span>
         </q-td>
+        <q-td slot="body-cell-is_scheduled" slot-scope="rs" :props="rs" class="no-padding" style="width:35px">
+          <q-avatar>
+            <q-icon name="check_circle" color="positive" v-if="rs.row.is_scheduled"/>
+            <q-icon name="remove" color="light" v-else/>
+          </q-avatar>
+        </q-td>
       </q-table>
     </q-pull-to-refresh>
   </q-page>
@@ -71,7 +77,7 @@ export default {
           { name: 'type', field: 'type', label: this.$tc('label.mode'), align: 'left', sortable: true},
           { name: 'department', field: 'department_id', label: this.$tc('general.department'), align: 'left', sortable: true},
           { name: 'owner', field: 'owner', label: this.$tc('label.owner',3), align: 'left', sortable: true},
-          { name: 'description', field: 'description', label: this.$tc('label.description'), align: 'left'},
+          { name: 'is_scheduled', field: 'is_scheduled', label: 'Schedule', align: 'center'},
         ],
         rowData:[],
         resData:[],

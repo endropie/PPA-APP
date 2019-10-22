@@ -188,6 +188,18 @@ const deliveries = [
       { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'sj-delivery-orders-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'sj-delivery-orders-read' } }
     ]
+  },
+  {
+    name: 'Schedule Board',
+    icon: 'work',
+    path: 'schedule-boards',
+    lang: 'general.schedule_board',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'schedule-boards-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'schedule-boards-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'schedule-boards-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'schedule-boards-read' } }
+    ]
   }
 ]
 
@@ -492,7 +504,7 @@ export default [
     lang: 'general.preference',
     children: references
   },
-  { // References
+  { // Configuration
     name: 'Configuration',
     icon: 'settings',
     path: 'configuration',
