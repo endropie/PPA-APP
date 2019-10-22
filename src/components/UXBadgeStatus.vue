@@ -14,7 +14,8 @@ export default {
       colorOptions: Object,
       row: {
         type: Object,
-        required: true
+        default: () => ({})
+        // required: true
       },
       name: {
         type: String,
@@ -55,6 +56,9 @@ export default {
         return this.Value
       },
       Color() {
+        if(this.$attrs['color']) {
+          return this.$attrs['color']
+        }
         if(this.colorOptions && this.colorOptions[this.Value]) {
           return this.colorOptions[this.Value]
         }
