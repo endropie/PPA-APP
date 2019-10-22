@@ -30,6 +30,7 @@ export default {
 
   pre_delivery: 'Pre Delivery | Permintaan Pengiriman',
   sj_delivery: 'Delivery (SJDO) | Surat Jalan Pengiriman',
+  schedule_board: 'Penjadwalan |Jadwal Pengiriman & Penjemputan',
 
   work_order: 'SPK | Surat Perintah Kerja',
   work_process: 'SPK Konfirmasi | Konfirmasi Perintah Kerja',
@@ -39,6 +40,7 @@ export default {
   forecast: 'Forecast',
   request_order: 'Sales Order | Pemesanan Penjualan',
 
+  operator: 'Operator',
   brand: 'Brand',
   specification: 'Spesifikasi',
   line: 'Line produksi',

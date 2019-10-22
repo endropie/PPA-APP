@@ -26,6 +26,7 @@ export default {
   submit: 'Submit | Submit',
   print: 'Print',
   revision: 'Revisi',
+  tag: 'Tandai {v} | Ditandai {v}',
   update: 'Perubahan | dirubah',
   validation: 'Validasi {v}| Ter-validasi',
   void: 'Pembatal'

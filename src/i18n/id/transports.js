@@ -1,7 +1,10 @@
 
 export default {
-  title: 'Transport',
+  arrived: 'Kedatangan',
+  departed: 'Keberangkatan',
+  destination: 'Tujuan',
   number: 'No. Transport',
   seri: 'No. Polisi',
-  trip: 'Trip'
+  trip: 'Trip',
+  schedule: 'Jadwal {v}'
 }
