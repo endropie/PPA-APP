@@ -294,6 +294,7 @@ export default {
 
               unit_id: null,
               unit_rate: 1,
+              note: null,
             }
           ],
           exclude_items: []
