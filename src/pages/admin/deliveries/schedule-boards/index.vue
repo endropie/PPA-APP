@@ -192,11 +192,12 @@ export default {
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},
+          { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'vehicle_id', label: this.$tc('general.vehicle'), field: 'vehicle_id', align: 'left', sortable: true },
           { name: 'schedule', label: this.$tc('transports.schedule'), align: 'center', sortable: true},
           { name: 'operator_id', label: this.$tc('general.operator'), field: 'operator_id', align: 'left', sortable: true },
           { name: 'status', label: this.$tc('label.state'), field: 'status', align: 'center'},
-          { name: 'destination', label: this.$tc('transports.destination'), field: 'destination', align: 'left', style:'width:40%' },
+          { name: 'destination', label: this.$tc('transports.destination'), field: 'destination', align: 'left', style:'width:30%' },
         ]
       },
     }
