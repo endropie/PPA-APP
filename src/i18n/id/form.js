@@ -4,7 +4,7 @@ export default {
   add_clone: 'Tambah Clone',
   back: 'Kembali',
   cancel: 'Batal',
-  clone: 'Salin',
+  clone: 'Salin | Salinan',
   create: 'Buat | Dibuat',
   confirm: 'Konfirmasi {v}|{v} dikonfirmasi',
   close: 'Tutup | Ditutup',

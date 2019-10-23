@@ -65,14 +65,22 @@
             :pagination=" {sortBy: null, descending: false, page: null, rowsPerPage: 0}">
 
             <template slot="item" slot-scope="rsItem">
-              <div class="q-pa-xs col-12 col-sm-6">
+              <div class="q-pa-xs col-12 col-sm-12">
                 <q-card>
-                  <q-btn dense flat round icon="clear" color="negative" tabindex="100" @click="removeItem(rsItem.row.__index)"/>
+                  <q-card-section class="row items-center no-wrap q-py-xs">
+                      <div class="col">
+                        <div class="text-subtitle2">{{$tc('general.item')}}
+                          <q-badge :label="rsItem.row.__index+1" color="blue-grey" v-if="rsItem.row.__index>0" />
+                        </div>
+                      </div>
+                      <div class="col-auto">
+                        <q-btn dense flat round color="negative" icon="clear" tabindex="100" @click="removeItem(rsItem.row.__index)"/>
+                      </div>
+                  </q-card-section>
                   <q-card-section class="row q-col-gutter-sm">
-
                     <ux-select-filter class="col-12 col-md-6" autofocus
                       :name="`work_production_items.${rsItem.row.__index}.item_id`"
-                      :label="$tc('items.part_name')"
+                      :label="$tc('items.part_name')" stack-label
                       :dark="LAYOUT.isDark"
                       v-model="rsItem.row.item_id"
                       v-validate="'required'"
@@ -87,7 +95,7 @@
 
                     <ux-select-filter class="col-12 col-md-6"
                       :name="`work_production_items.${rsItem.row.__index}.work_order_item_line_id`"
-                      :label="$tc('general.work_production')"
+                      :label="$tc('general.work_production')" stack-label
                       :dark="LAYOUT.isDark"
                       v-model="rsItem.row.work_order_item_line_id"
                       v-validate="'required'"
@@ -99,23 +107,24 @@
                       :loading="SHEET['work_orders'].loading" />
 
                     <q-input readonly tabindex="100" class="col-12 col-md-6"
-                      :label="$tc('items.part_number')"
+                      :label="$tc('items.part_number')" stack-label
                       :value="rsItem.row.item ? rsItem.row.item.part_number : null"
                       outlined hide-bottom-space color="blue-grey-5"
                       :dark="LAYOUT.isDark" />
 
-                    <q-input type="number" class="col-12 col-md-4" style="min-width:120px"
+                    <q-input type="number" class="col-12 col-sm-8 col-md-4" style="min-width:120px"
                       :name="`work_production_items.${rsItem.row.__index}.quantity`"
-                      :label="$tc('label.quantity')"
+                      :label="$tc('label.quantity')" stack-label
                       :dark="LAYOUT.isDark" color="blue-grey-6"
-                      v-model="rsItem.row.quantity"
+                      v-model="rsItem.row.quantity" min="0"
                       outlined hide-bottom-space no-error-icon align="right"
                       v-validate="`required|gt_value:0|max_value:${MaxStock[rsItem.row.__index] / (rsItem.row.unit_rate||1)}`"
                       :error="errors.has(`work_production_items.${rsItem.row.__index}.quantity`)"
                       :suffix="' / '+ $app.number_format(MaxStock[rsItem.row.__index] / (rsItem.row.unit_rate||1))" />
 
-                    <q-select class="col-12 col-md-2"
+                    <q-select class="col-12 col-sm-4 col-md-2"
                       :name="`work_production_items.${rsItem.row.__index}.unit_id`"
+                      :label="$tc('label.unit')" stack-label
                       :dark="LAYOUT.isDark"
                       v-model="rsItem.row.unit_id"
                       outlined hide-bottom-space color="blue-grey-4"
@@ -137,13 +146,30 @@
             @click="addNewItem()" />
         </div>
         <!-- COLUMN::4th Description -->
-        <div class="col-12 cloumn q-mt-md">
+        <div class="col-12 column q-gutter-md q-pt-md">
           <q-input name="description" type="textarea" rows="3"
             stack-label :label="$tc('label.description')"
             filled
             :dark="LAYOUT.isDark"
             v-model="rsForm.description"/>
 
+
+          <q-field borderless dense v-if="ROUTE.meta.mode === 'create'"
+            :error="errors.has('multiple')"
+            :error-message="errors.first('multiple')">
+            <q-checkbox slot="prepend" v-model="rsForm.isMultiple"  />
+            <span slot="prepend" class="text-caption">Multiple Hanger / Barel</span>
+            <template slot="prepend">
+              <q-input  type="number" class="q-mx-md"
+                input-style="width:60px;text-align:center"
+                name="multiple"
+                v-model="rsForm.multiple"
+                dense no-error-icon
+                v-validate="`required|gt_value:1|${ValidMultiple}`"
+                v-if="rsForm.isMultiple"
+                :error="errors.has('multiple')" />
+            </template>
+          </q-field>
         </div>
       </q-card-section>
       <q-separator :dark="LAYOUT.isDark" />
@@ -183,6 +209,8 @@ export default {
       rsForm: {},
       setDefault: () => {
         return {
+          isMultiple: false,
+          multiple: null,
           number: null,
           line_id: null,
           date: this.$app.moment().format('YYYY-MM-DD'),
@@ -303,6 +331,15 @@ export default {
         }
       }
       return vars
+    },
+    ValidMultiple() {
+      if (!this.rsForm.multiple) return ''
+
+      let failed = this.rsForm.work_production_items.some((x,i,a) => {
+        return (x.quantity * this.rsForm.multiple) > this.MaxStock[i]
+        // console.warn('WARN', x.quantity, this.MaxStock[i], a)
+      })
+      return failed ? `is_not:${this.rsForm.multiple}` : ``
     },
     MaxStock() {
       let stockItem =  {}
