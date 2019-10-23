@@ -10,7 +10,6 @@ function setUrl (base, link) {
 
 function parseMenuNode (node, __path) {
   const prefix = setUrl(__path, node.path)
-  console.warn('prefix =>', prefix)
   if (node.children !== void 0) {
     node.children.forEach(node => parseMenuNode(node, prefix))
   } else if (node.tabs !== void 0) {

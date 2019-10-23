@@ -13,7 +13,12 @@
             :loading="TABLE.loading"
             :hide-bottom="noBottom">
 
-            <template slot="top-right">
+            <template v-slot:top-right="props">
+              <q-btn flat round dense
+                :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+                @click="props.toggleFullscreen"
+                class="q-ml-md"
+              />
               <q-btn dense flat round color="faded" icon="more_horiz">
                 <q-menu :content-class="{'q-menu--dark': ScreenMode}">
                   <q-list :dark="ScreenMode" style="min-width: 240px">
