@@ -7,7 +7,7 @@
     </q-card-section>
     <q-card-section>
       <div class="row q-col-gutter-md">
-        <ux-select class="col-12 col-sm-6"
+        <ux-select class="col-12 col-md-4 col-sm-6"
           name="vehicle_id"
           :label="$tc('general.vehicle')"
           v-model="rsForm.vehicle_id"
@@ -18,7 +18,7 @@
           :error-message="errors.first('vehicle_id')"
         />
 
-        <ux-select class="col-12 col-sm-6"
+        <ux-select class="col-12 col-md-4 col-sm-6"
           name="operator_id"
           :label="$tc('general.operator')"
           v-model="rsForm.operator_id"
@@ -29,7 +29,7 @@
           :error-message="errors.first('operator_id')"
         />
 
-        <ux-date name="date" type="date" class="col-8 col-sm-4"
+        <ux-date name="date" type="date" class="col-12 col-md-4 col-sm-12"
           :label="$tc('label.date')" stack-label
           v-model="rsForm.date"
           v-validate="`required|date_format:yyyy-MM-dd${ROUTE.meta.mode === 'create' ? '|after:'+$app.moment().add(-1,'days').format('YYYY-MM-DD') : '' }`"
@@ -37,24 +37,37 @@
           :dark="LAYOUT.isDark"
           :error="errors.has('date')"
           :error-message="errors.first('date')" >
+          <div slot="after">
+            <q-input  class="no-padding" input-style="width:80px"
+              name="time" type="time"
+              :label="$tc('label.time')" stack-label
+              v-model="rsForm.time"
+              v-validate="`required`"
+              :dark="LAYOUT.isDark"
+              :error="errors.has('time')"
+              :error-message="errors.first('time')" />
+          </div>
         </ux-date>
 
-        <q-input name="time" type="time" class="col-4 col-sm-2"
-          :label="$tc('label.time')" stack-label
-          v-model="rsForm.time"
-          v-validate="`required`"
+        <ux-select class="col-12 col-sm-6 self-start"
+          name="customers"
+          :label="$tc('general.customer')"
+          v-model="rsForm.customers"
+          multiple use-chips square
+          option-value="id"  options-cover
+          :option-label="(cust) => cust === null ? '-None-' : `[${cust.code}] ${cust.name}`"
+          :options="CustomerOptions"
           :dark="LAYOUT.isDark"
-          :error="errors.has('time')"
-          :error-message="errors.first('time')" />
-
-        <q-input class="col-12 col-sm-6"
-          name="destination"
-          :label="$tc('transports.destination')"
-          v-model="rsForm.destination"
           v-validate="'required'"
+          :error="errors.has('customers')"
+        />
+
+        <ux-recurring class="col-12 col-sm-6 self-start"
+          v-model="rsForm.recurring"
           :dark="LAYOUT.isDark"
-          :error="errors.has('destination')"
-          :error-message="errors.first('destination')"/>
+        />
+
+        <code>REC => {{rsForm.recurring}}</code>
 
         <q-input class="col-12"
           v-model="rsForm.description"
@@ -86,6 +99,7 @@ export default {
   data () {
     return {
       SHEET: {
+        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
         vehicles: {data:[], api:'/api/v1/references/vehicles?mode=all&is_scheduled=1'},
         operators: {data:[], api:'/api/v1/common/employees?mode=all'}
       },
@@ -101,9 +115,10 @@ export default {
           number:null,
           vehicle_id: null,
           operator_id: null,
-          schedule: null,
-          destination: null,
+          date: this.$app.moment().format('YYYY-MM-DD'),
+          time: null,
           description:null,
+          customers: [],
         }
       }
     }
@@ -114,6 +129,9 @@ export default {
 
   },
   computed: {
+    CustomerOptions() {
+      return (this.SHEET.customers.data.map(item => ({...item, sublabel: item.address_raw})) || [])
+    },
     VehicleOptions() {
       return (this.SHEET.vehicles.data.map(item => ({label: item.number, value: item.id})) || [])
     },
@@ -153,7 +171,7 @@ export default {
         let {method, mode, apiUrl} = this.FORM.meta();
         this.$axios.set(method, apiUrl, this.rsForm)
         .then((response) => {
-          const label = response.data.name + ' - #' + response.data.id
+          const label = response.data.number + ' - #' + response.data.id
           this.FORM.response.success({message:label})
           this.FORM.toIndex()
         })
