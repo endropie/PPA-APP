@@ -84,38 +84,35 @@
           </table-header>
         </template>
 
-        <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
-          <q-btn v-if="isCanUpdate" dense flat color="grey" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`"/>
-          <q-btn v-if="isCanDelete" dense flat color="grey" icon="delete" @click.native="TABLE.delete(rs.row)" />
-        </q-td>
+        <q-td slot="body-cell" slot-scope="rs" :props="rs" :class="getRowClass(rs)">
+          <div v-if="rs.col.name === 'prefix'">
+            <q-btn v-if="isCanUpdate" dense flat color="grey" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`"/>
+            <q-btn v-if="isCanDelete" dense flat color="grey" icon="delete" @click.native="TABLE.delete(rs.row)" />
+          </div>
 
-        <q-td slot="body-cell-PDOREG" slot-scope="rs" :props="rs">
-          <span class="col">{{rs.row.totals['PDO.REG'] === 0 ? '-' : rs.row.totals['PDO.REG']}}</span>
-        </q-td>
+          <div v-else-if="rs.col.name === 'customer'">
+            <span v-if="rs.row.customer" v-text="rs.row.customer.code"/>
+            <span v-else v-text="'-'" />
+          </div>
 
-        <q-td slot="body-cell-PDORET" slot-scope="rs" :props="rs">
-          <span class="col">{{rs.row.totals['PDO.RET'] === 0 ? '-' : rs.row.totals['PDO.RET']}}</span>
-        </q-td>
+          <div v-else-if="rs.col.name === 'brand'">
+            <span v-if="rs.row.brand" v-text="rs.row.brand.name"/>
+            <span v-else v-text="'-'" />
+          </div>
 
-        <q-td slot="body-cell-customer" slot-scope="rs" :props="rs">
-          <span v-if="rs.row.customer" v-text="rs.row.customer.code"/>
-          <span v-else v-text="'-'" />
-        </q-td>
+          <div v-else-if="rs.col.name === 'specification'">
+            <span v-if="rs.row.specification" v-text="rs.row.specification.name"/>
+            <span v-else v-text="'-'" />
+          </div>
 
-        <q-td slot="body-cell-brand" slot-scope="rs" :props="rs">
-          <span v-if="rs.row.brand" v-text="rs.row.brand.name"/>
-          <span v-else v-text="'-'" />
-        </q-td>
-
-        <q-td slot="body-cell-specification" slot-scope="rs" :props="rs">
-          <span v-if="rs.row.specification" v-text="rs.row.specification.name"/>
-          <span v-else v-text="'-'" />
-        </q-td>
-
-        <q-td slot="body-cell-enable" slot-scope="rs" :props="rs" style="width:35px">
-          <q-avatar size="24px" class="shadow-1"
+          <div v-else-if="rs.col.name === 'enable'">
+            <q-avatar size="24px" class="shadow-1"
             :color="rs.row.enable ? 'green' : 'red'" text-color="white"
             :icon="rs.row.enable ? 'mdi-check-outline' : 'block'" />
+          </div>
+
+          <div v-else>{{rs.value}}</div>
+
         </q-td>
       </q-table>
     </q-pull-to-refresh>
@@ -158,7 +155,7 @@ export default {
 
           { name: 'customer', label: this.$tc('general.cust')+'.', field: 'customer_id', align: 'left', sortable: true},
           { name: 'part_number', label: this.$tc('label.part')+' #', field: 'part_number', align: 'left', sortable: true },
-          { name: 'part_name', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), field: 'part_name', align: 'left', sortable: true },
+          { name: 'part_name', label: this.$tc('items.part_name'), field: 'part_name', align: 'left', sortable: true },
           // { name: 'enable', label:this.$tc('label.active'), field: 'enable', align: 'center', sortable: true },
 
           // Item stocks
@@ -229,6 +226,10 @@ export default {
     }
   },
   methods: {
+    getRowClass(rs)  {
+      if (rs.row.__index % 2 === 0) return 'col-odd'
+      return ''
+    },
     totalStock(id, label) {
       if(!this.MAPINGKEY['itemstocks'][id]) return 0
       return Number(this.MAPINGKEY['itemstocks'][id][label])
@@ -236,3 +237,8 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus">
+.q-table td.col-odd
+  background-color #66666645
+</style>
