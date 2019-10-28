@@ -10,6 +10,7 @@ import UXSelect from '@/components/UXSelect'
 import UXBtnSelect from '@/components/UXBtnSelect'
 import UXNumeric from '@/components/UXNumeric'
 import UXDate from '@/components/UXDate'
+import UXRecurring from '@/components/UXRecurring'
 
 import UXBadgeStatus from '@/components/UXBadgeStatus'
 import UXChipStatus from '@/components/UXChipStatus'
@@ -31,6 +32,7 @@ export default async ({ app, store, router, Vue }) => {
   Vue.component('ux-btn-select', UXBtnSelect)
   Vue.component('ux-numeric', UXNumeric)
   Vue.component('ux-date', UXDate)
+  Vue.component('ux-recurring', UXRecurring)
 
   Vue.component('ux-badge-status', UXBadgeStatus)
   Vue.component('ux-chip-status', UXChipStatus)

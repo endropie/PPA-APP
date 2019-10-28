@@ -4,6 +4,7 @@ import general from './general'
 import auth from './auth'
 import label from './label'
 import form from './form'
+import recurring from './recurring'
 import messages from './messages'
 import customers from './customers'
 import factories from './factories'
@@ -17,6 +18,7 @@ export default {
   auth: auth,
   label: label,
   form: form,
+  recurring: recurring,
   messages: messages,
   customers: customers,
   warehouses: warehouses,

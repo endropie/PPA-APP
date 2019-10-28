@@ -2,6 +2,7 @@ export default {
   active: 'Active',
   actual: 'Aktual',
   address: 'Alamat {v}',
+  advance: 'Lanjutan',
   all: 'Semua',
   area: 'Area',
   available: 'Tersedia',
