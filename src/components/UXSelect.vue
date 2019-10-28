@@ -1,51 +1,50 @@
 <template>
   <q-select
     ref="QSelect"
-    class="ux-selet-filter"
+    class="ux-selet"
     v-model="value"
     v-bind="$attrs"
     v-on="$listeners"
     @filter="filterFunc"
     @input="inputFunction"
     :options="opt"
-    :use-input="useInput"
-    :fill-input="fillInput"
-    :emit-value="emitValue"
-    :map-options="mapOptions"
-    :hide-selected="hideSelected"
+    :use-input="PROP.useInput"
+    :fill-input="PROP.fillInput"
+    :emit-value="PROP.emitValue"
+    :map-options="PROP.mapOptions"
+    :hide-selected="PROP.hideSelected"
     :input-debounce="inputDebounce"
     autocomplete="off">
 
     <!--  -->
     <template v-slot:option="scope">
-      <q-item
-        v-bind="scope.itemProps"
-        v-on="scope.itemEvents"
-      >
-        <slot name="option-prepend" :option="scope.opt">
-          <q-item-section side v-if="scope.opt.icon">
-            <q-item-section avatar v-if="scope.opt.icon">
-              <q-icon :name="scope.opt.icon" />
+      <slot name="option" :scope="{...scope}">
+        <q-item v-bind="scope.itemProps" v-on="scope.itemEvents" >
+          <slot name="option-prepend" :option="{...scope}">
+            <q-item-section side v-if="scope.opt.icon">
+              <q-item-section avatar v-if="scope.opt.icon">
+                <q-icon :name="scope.opt.icon" />
+              </q-item-section>
             </q-item-section>
-          </q-item-section>
-        </slot>
-        <q-item-section>
-          <slot name="option-item" :option="scope.opt">
-          <!-- => {{scope}} -->
-            <q-item-label v-html="getOptionLabel(scope.opt)" />
-            <q-item-label caption>{{ getOptionSublabel(scope.opt) }}</q-item-label>
           </slot>
-        </q-item-section>
-        <slot name="option-append" :option="scope.opt">
-          <q-item-section side v-if="scope.opt.stamp || $attrs['option-stamp']">
-            <q-badge :label="scope.opt.stamp || $attrs['option-stamp']" />
+          <q-item-section>
+            <slot name="option-item" :option="{...scope}">
+              <q-item-label v-html="getOptionLabel(scope.opt)" />
+              <q-item-label caption>{{ getOptionSublabel(scope.opt) }}</q-item-label>
+            </slot>
           </q-item-section>
-          <q-item-section side v-if="scope.opt.disable">
-            <q-icon name="block" color="red"/>
-          </q-item-section>
-        </slot>
-      </q-item>
+          <slot name="option-append" :option="{...scope}">
+            <q-item-section side v-if="scope.opt.stamp || $attrs['option-stamp']">
+              <q-badge :label="scope.opt.stamp || $attrs['option-stamp']" />
+            </q-item-section>
+            <q-item-section side v-if="scope.opt.disable">
+              <q-icon name="block" color="red"/>
+            </q-item-section>
+          </slot>
+        </q-item>
+      </slot>
     </template>
+
     <template v-slot:no-option>
       <q-item>
         <q-item-section class="text-grey">
@@ -55,8 +54,8 @@
       </q-item>
     </template>
 
-    <template v-slot:selected-item="scope">
-      <slot name="selected-item" :scope="scope">
+    <template v-slot:selected-item="scope"  v-if="$attrs['use-chips'] === undefined">
+      <slot name="selected-item" :scope="{...scope}">
         {{getOptionLabel(scope.opt)}}
       </slot>
     </template>
@@ -78,18 +77,18 @@
 </template>
 <script>
 export default {
-  name: 'ux-select-filter',
+  name: 'ux-select',
   inheritAttrs: false,
   props: {
     source: {type: String, default:null},
     sourceKeys: {type: Array, default: () => []},
     filterSkip: {type: Number, default:0},
     filterSelf: {type: Boolean, default: true },
-    useInput: {type: Boolean, default: true },
-    fillInput: {type: Boolean, default: true },
-    hideSelected: {type: Boolean, default: true },
-    emitValue: {type: Boolean, default: true },
-    mapOptions: {type: Boolean, default: true },
+    useInput: {type: Boolean },
+    fillInput: {type: Boolean },
+    hideSelected: {type: Boolean },
+    emitValue: {type: Boolean },
+    mapOptions: {type: Boolean },
     inputDebounce: {type: Number, default: 600 }
   },
   data () {
@@ -109,6 +108,39 @@ export default {
   watch:{
     '$attrs.value': 'setValue',
     '$attrs.options': 'setOptions',
+  },
+  computed: {
+    PROP () {
+      let def = {
+        'emit-value' : true,
+        'map-options': true,
+        'use-input': true,
+        'fill-input': true,
+        'hide-selected': true,
+      }
+
+      if (this.$attrs['multiple'] !== undefined) {
+        def['emit-value'] = false
+        def['fill-input'] = false
+        def['hide-selected'] = false
+      }
+
+      return {
+        fillInput: this.$attrs['fill-input'] || def['fill-input'],
+        emitValue: this.$attrs['emit-value'] || def['emit-value'],
+        useInput: this.$attrs['use-input'] || def['use-input'],
+        mapOptions: this.$attrs['map-options'] || def['map-options'],
+        hideSelected: this.$attrs['hide-selected'] || def['hide-selected'],
+      }
+    },
+    QSelect() {
+      return this.$refs.QSelect || null
+    },
+    opt () {
+      if (this.source && !Boolean(this.options.length)) return this.defaultOptions
+      if (!this.filterSelf) return this.$attrs.options
+      return this.options
+    }
   },
   methods: {
     init() {
@@ -200,8 +232,12 @@ export default {
         let attrOptions = this.$attrs.options || []
         this.options = attrOptions.filter(v => {
 
-          if(!v.hasOwnProperty('sublabel')) v.sublabel = ''
-          return String(v.label).toLowerCase().includes(needle) || String(v.sublabel).toLowerCase().includes(needle)
+        let needles = String(needle).split(' ')
+          for (let i = 0; i < needles.length; i++) {
+            if (needles[i] && !String(v.label + v.sublabel).toLowerCase().includes(needles[i])) return false
+          }
+
+          return true
         })
       })
     },
@@ -220,16 +256,6 @@ export default {
 
         this.$emit('selected', this.value, innerValue)
       })
-    }
-  },
-  computed: {
-    QSelect() {
-      return this.$refs.QSelect || null
-    },
-    opt () {
-      if (this.source && !Boolean(this.options.length)) return this.defaultOptions
-      if (!this.filterSelf) return this.$attrs.options
-      return this.options
     }
   }
 }
