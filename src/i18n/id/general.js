@@ -49,6 +49,8 @@ export default {
   size: 'Ukuran',
   item_type: 'Tipe Part',
   item_category: 'Kategori Part',
+  fault: 'Fault',
+  type_fault: 'Tipe Fault',
   department: 'Depertemen',
   position: 'Jabatan',
   jobs: 'Pekerjaan',

@@ -349,7 +349,7 @@ const references = [
   {
     name: 'Type of items',
     icon: 'dehaze',
-    path: 'type_items',
+    path: 'type-items',
     lang: 'general.item_type',
     resources: [
       { page: 'index', path: '', meta: { permission: 'type-items-read' } },
@@ -360,12 +360,23 @@ const references = [
   {
     name: 'Category of items',
     icon: 'table_chart',
-    path: 'category_items',
+    path: 'category-items',
     lang: 'general.item_category',
     resources: [
       { page: 'index', path: '', meta: { permission: 'category-items-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'category-items-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'category-items-update' } }
+    ]
+  },
+  {
+    name: 'Faults',
+    icon: 'table_chart',
+    path: 'faults',
+    lang: 'general.fault',
+    resources: [
+      { page: 'index', path: '', meta: { permission: 'faults-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'faults-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'faults-update' } }
     ]
   }
 ]
