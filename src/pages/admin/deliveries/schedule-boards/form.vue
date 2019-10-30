@@ -12,6 +12,7 @@
           :label="$tc('general.vehicle')"
           v-model="rsForm.vehicle_id"
           v-validate="'required'"
+          map-options emit-value
           :options="VehicleOptions"
           :dark="LAYOUT.isDark"
           :error="errors.has('vehicle_id')"
@@ -23,6 +24,7 @@
           :label="$tc('general.operator')"
           v-model="rsForm.operator_id"
           v-validate="'required'"
+          map-options emit-value
           :options="OperatorOptions"
           :dark="LAYOUT.isDark"
           :error="errors.has('operator_id')"
@@ -53,8 +55,8 @@
           name="customers"
           :label="$tc('general.customer')"
           v-model="rsForm.customers"
-          multiple use-chips square
-          option-value="id"  options-cover
+          filter multiple use-chips square
+          option-value="id"
           :option-label="(cust) => cust === null ? '-None-' : `[${cust.code}] ${cust.name}`"
           :options="CustomerOptions"
           :dark="LAYOUT.isDark"
@@ -66,8 +68,6 @@
           v-model="rsForm.recurring"
           :dark="LAYOUT.isDark"
         />
-
-        <code>REC => {{rsForm.recurring}}</code>
 
         <q-input class="col-12"
           v-model="rsForm.description"
