@@ -48,8 +48,8 @@ export default {
     return {
       TABLE:{
         resource:{
-          api: '/api/v1/references/type_items',
-          uri: '/admin/references/type_items',
+          api: '/api/v1/references/type-items',
+          uri: '/admin/references/type-items',
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},

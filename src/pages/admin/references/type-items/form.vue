@@ -46,8 +46,8 @@ export default {
     return {
       FORM:{
         resource:{
-          uri: '/admin/references/type_items',
-          api: '/api/v1/references/type_items',
+          uri: '/admin/references/type-items',
+          api: '/api/v1/references/type-items',
         },
       },
       rsForm:{},

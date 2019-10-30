@@ -48,8 +48,8 @@ export default {
       TABLE:{
         show:false,
         resource:{
-          api: '/api/v1/references/category_items',
-          uri: '/admin/references/category_items',
+          api: '/api/v1/references/category-items',
+          uri: '/admin/references/category-items',
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},
