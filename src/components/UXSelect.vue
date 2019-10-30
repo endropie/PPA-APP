@@ -10,8 +10,6 @@
     :options="opt"
     :use-input="PROP.useInput"
     :fill-input="PROP.fillInput"
-    :emit-value="PROP.emitValue"
-    :map-options="PROP.mapOptions"
     :hide-selected="PROP.hideSelected"
     :input-debounce="inputDebounce"
     autocomplete="off">
@@ -48,7 +46,7 @@
     <template v-slot:no-option>
       <q-item>
         <q-item-section class="text-grey">
-          <span v-if="Boolean(isFilterSkip)" v-html="$tc('messages.input_min_character', 1, {v:filterSkip})"/>
+          <span v-if="Boolean(isFilterSkip)" v-html="$tc('messages.input_min_character', 1, {v:filterMin})"/>
           <span v-else v-html="$tc('messages.no_results')" />
         </q-item-section>
       </q-item>
@@ -82,28 +80,22 @@ export default {
   props: {
     source: {type: String, default:null},
     sourceKeys: {type: Array, default: () => []},
-    filterSkip: {type: Number, default:0},
-    filterSelf: {type: Boolean, default: true },
+    filter: {type: Boolean, default: false },
+    filterMin: {default:0},
     useInput: {type: Boolean },
     fillInput: {type: Boolean },
     hideSelected: {type: Boolean },
-    emitValue: {type: Boolean },
-    mapOptions: {type: Boolean },
     inputDebounce: {type: Number, default: 600 }
   },
   data () {
     return {
       value: this.$attrs.value,
       options: this.$attrs.options || [],
-      defaultOptions: [],
-      isFilterSkip: false,
-      isFiltering: false
+      isFilterSkip: false
     }
   },
   created() {
-    this.$nextTick(() => {
-      // this.init()
-    })
+
   },
   watch:{
     '$attrs.value': 'setValue',
@@ -112,52 +104,31 @@ export default {
   computed: {
     PROP () {
       let def = {
-        'emit-value' : true,
-        'map-options': true,
-        'use-input': true,
-        'fill-input': true,
-        'hide-selected': true,
+        'use-input': this.filter,
+        'fill-input': this.filter,
+        'hide-selected': this.filter,
       }
 
       if (this.$attrs['multiple'] !== undefined) {
-        def['emit-value'] = false
         def['fill-input'] = false
         def['hide-selected'] = false
       }
 
       return {
-        fillInput: this.$attrs['fill-input'] || def['fill-input'],
-        emitValue: this.$attrs['emit-value'] || def['emit-value'],
-        useInput: this.$attrs['use-input'] || def['use-input'],
-        mapOptions: this.$attrs['map-options'] || def['map-options'],
-        hideSelected: this.$attrs['hide-selected'] || def['hide-selected'],
+        useInput: def['use-input'],
+        fillInput: def['fill-input'],
+        hideSelected: def['hide-selected'],
       }
     },
     QSelect() {
       return this.$refs.QSelect || null
     },
     opt () {
-      if (this.source && !Boolean(this.options.length)) return this.defaultOptions
-      if (!this.filterSelf) return this.$attrs.options
+      if (!this.filter) return this.$attrs.options
       return this.options
     }
   },
   methods: {
-    init() {
-      if (this.source && this.value) {
-        const separator = String(this.source).indexOf('?') < 0 ? '?' : '&'
-        const search = `${this.$attrs['option-value'] || 'label'}=${this.value}`
-        const apiUrl = this.source + separator + search
-        console.info(`[PLAY] Source GET: ${apiUrl}`);
-        return this.$axios.get(apiUrl)
-          .then(response => {
-            this.defaultOptions = response.data
-          })
-          .catch(error => {
-            console.error(error)
-          })
-      }
-    },
     setValue(v) {
       this.value = v
     },
@@ -191,20 +162,24 @@ export default {
       }
       return option[this.$attrs['option-sublabel']]
     },
-    // use this default filter function
     filterFn (val, update, abort) {
-      if (!this.filterSelf) {
+      if (this.$listeners['filter'] && typeof this.$listeners['filter'] === 'function') {
         this.$emit('filter', val, update, abort)
         return
       }
 
-      // if (abort) return update()
-      if (this.filterSkip ) {
-        if (String(val).length < this.filterSkip) {
+      const min = Number(this.filterMin)
+      if (min) {
+        if (String(val).length < min) {
           this.isFilterSkip = true
           return update()
         }
         this.isFilterSkip = false
+      }
+
+      if (this.options.length && !String(val).length) {
+        update()
+        return
       }
 
       if (this.source) {
@@ -229,20 +204,20 @@ export default {
 
       update(() => {
         const needle = val.toLowerCase()
-        let attrOptions = this.$attrs.options || []
-        this.options = attrOptions.filter(v => {
+        this.options = this.$attrs.options.filter(v => {
 
-        let needles = String(needle).split(' ')
+          let needles = String(needle).split(' ')
           for (let i = 0; i < needles.length; i++) {
             if (needles[i] && !String(v.label + v.sublabel).toLowerCase().includes(needles[i])) return false
           }
-
           return true
         })
       })
     },
     filterFunc (v, u, a) {
-      this.filterSelf ? this.filterFn(v, u) : this.$emit('filter', v, u, a)
+      this.$listeners['filter'] && typeof this.$listeners['filter'] === 'function'
+        ? this.$emit('filter', v, u, a)
+        : this.filterFn(v, u)
     },
     inputFunction(v) {
       this.$nextTick(() => {
