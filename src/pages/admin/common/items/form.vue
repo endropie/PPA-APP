@@ -367,8 +367,8 @@ export default {
     return {
       SHEET: {
         colors: {data:[], api:'/api/v1/references/colors?mode=all'},
-        type_items: {data:[], api:'/api/v1/references/type_items?mode=all'},
-        category_items: {data:[], api:'/api/v1/references/category_items?mode=all'},
+        type_items: {data:[], api:'/api/v1/references/type-items?mode=all'},
+        category_items: {data:[], api:'/api/v1/references/category-items?mode=all'},
         sizes: {data:[], api:'/api/v1/references/sizes?mode=all'},
         units: {data:[], api:'/api/v1/references/units?mode=all'},
         brands: {data:[], api:'/api/v1/references/brands?mode=all'},
