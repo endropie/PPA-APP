@@ -240,5 +240,7 @@ export default {
 
 <style lang="stylus">
 .q-table td.col-odd
-  background-color #66666645
+  background-color #88888845
+.q-table.q-table--dark td.col-odd
+  background-color #66666660
 </style>
