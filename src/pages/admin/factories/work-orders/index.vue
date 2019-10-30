@@ -112,7 +112,30 @@
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
-          <ux-badge-status :row="rs.row" class="shadow-1"/>
+          <ux-badge-status v-if="rs.row.status!=='ON-PROCESS'" :row="rs.row" class="shadow-1"/>
+          <div v-else>
+            <q-chip  dense square
+              class="shadow-1 text-uppercase"
+              color="grey-3" text-color="light" >
+              {{$tc('factories.production')}}
+              <q-badge class="status-chip-badge"
+                :color="rs.row.status_production === true ? `blue-10` : 'blue'"
+                :label="rs.row.status_production === true ? `CLOSED` : `${rs.row.status_production}%`"
+              />
+            </q-chip>
+
+            <q-chip dense square
+              class="shadow-1 text-uppercase"
+              color="grey-2" text-color="grey-6">
+              {{$tc('factories.packing')}}
+              <q-badge class="status-chip-badge" color="blue-10"
+                label="CLOSED"
+                v-if="rs.row.status_packing === true"/>
+              <q-badge v-else class="status-chip-badge" color="blue"
+                :label="(rs.row.status_packing) ? `${rs.row.status_packing}%` : 'NONE'"
+              />
+            </q-chip>
+          </div>
         </q-td>
 
         <q-td slot="body-cell-shift_id" slot-scope="rs" :props="rs">
@@ -123,7 +146,6 @@
         </q-td>
 
         <q-td slot="body-cell-date" slot-scope="rs" :props="rs">
-          <!-- {{ rs.row.work_order_items }} -->
           <span v-if="rs.row.date"> {{ $app.moment(rs.row.date).format('DD/MM/YY') }}</span>
         </q-td>
 
@@ -179,7 +201,7 @@ export default {
           { name: 'prefix', label: '', align: 'left'},
 
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'status', align: 'right' },
+          { name: 'status', label: 'status', align: 'center' },
           { name: 'line_id', label: 'Line', field: (rs)=> rs.line.name , align: 'left', sortable: true },
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true },
           { name: 'shift_id', label: 'Shift', field: (rs)=> rs.shift.name , align: 'center', sortable: true },
@@ -212,3 +234,13 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus">
+.status-chip-badge
+  position: relative;
+  right: -6px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+</style>

@@ -231,7 +231,7 @@ export default {
         units: {api:'/api/v1/references/units?mode=all'},
         shifts: {api:'/api/v1/references/shifts?mode=all'},
         faults: {api:'/api/v1/references/faults?mode=all'},
-        type_faults: {api:'/api/v1/references/type_faults?mode=all'},
+        type_faults: {api:'/api/v1/references/type-faults?mode=all'},
         customers: {api:'/api/v1/incomes/customers?mode=all'},
         employees: {api:'/api/v1/common/employees?mode=all'},
         items: {autoload:false, api:'/api/v1/common/items?mode=all&enable=true'},

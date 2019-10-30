@@ -37,7 +37,6 @@ export default {
   plan: 'Plan',
   price: 'Harga',
   preference: 'Preference',
-  production: 'Produksi',
   qty: 'JML {v}',
   quantity: 'Jumlah {v}',
   rate: 'rating',
