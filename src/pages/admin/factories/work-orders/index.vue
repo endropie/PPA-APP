@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="page-index" >
     <q-pull-to-refresh @refresh="TABLE.refresh" inline>
-      <q-table ref="table" inline class="table-index th-uppercase" color="primary" :dark="LAYOUT.isDark"
+      <q-table ref="table" inline class="table-index table-striped th-uppercase" color="primary" :dark="LAYOUT.isDark"
         :data="TABLE.rowData"
         :columns="TABLE.columns"
         selection="none"
@@ -52,7 +52,7 @@
 
               <q-select class="col-4 col-sm-2 "
                 v-model="FILTERABLE.fill.status.value" clearable
-                :options="['OPEN', 'PROCESSED', 'CLOSED']"
+                :options="['OPEN', 'PRODUCTION', 'PACKING', 'CLOSED:PRODUCTION', 'CLOSED:PACKING', 'CLOSED']"
                 :label=" $tc('label.state')"
                 dense hide-bottom-space hide-dropdown-icon
                 standout="bg-blue-grey-5 text-white"
@@ -112,15 +112,16 @@
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
-          <ux-badge-status v-if="rs.row.status!=='ON-PROCESS'" :row="rs.row" class="shadow-1"/>
-          <div v-else>
+          <div v-if="rs.row.status =='OPEN' && (rs.row.status_production !== 0 || rs.row.status_packing !== 0)">
             <q-chip  dense square
               class="shadow-1 text-uppercase"
               color="grey-3" text-color="light" >
               {{$tc('factories.production')}}
-              <q-badge class="status-chip-badge"
-                :color="rs.row.status_production === true ? `blue-10` : 'blue'"
-                :label="rs.row.status_production === true ? `CLOSED` : `${rs.row.status_production}%`"
+              <q-badge class="status-chip-badge" color="blue-10"
+                label="CLOSED"
+                v-if="rs.row.status_production === true"/>
+              <q-badge v-else class="status-chip-badge" color="blue"
+                :label="(rs.row.status_production) ? `${rs.row.status_production}%` : 'NONE'"
               />
             </q-chip>
 
@@ -136,11 +137,12 @@
               />
             </q-chip>
           </div>
+          <ux-badge-status v-else :row="rs.row" class="shadow-1" />
         </q-td>
 
         <q-td slot="body-cell-shift_id" slot-scope="rs" :props="rs">
-          <q-badge class="shadow-1 q-pa-xs"
-            :label="`SHIFT ${rs.row.shift.name}`"
+          <q-badge class="shadow-1 q-pa-xs text-uppercase"
+            :label="rs.row.shift.name"
             dense color="light" text-color="white"
             v-if="rs.row.shift_id" />
         </q-td>

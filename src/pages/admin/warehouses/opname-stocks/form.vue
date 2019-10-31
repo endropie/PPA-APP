@@ -58,6 +58,7 @@
                     :name="`items.${rsItem.row.__index}.item_id`"
                     :data-vv-as="$tc('items.part_name')"
                     dense outlined hide-bottom-space color="blue-grey-5"
+                    popup-content-class="options-striped"
                     v-model="rsItem.row.item_id" clearable
                     v-validate="'required'"
                     filter filter-min="3"

@@ -81,21 +81,21 @@
           <template slot="body" slot-scope="rsItem">
             <q-tr :rsItem="rsItem">
               <q-td key="prefix" :rsItem="rsItem" style="width:50px">
-                <q-btn dense flat round icon="clear" size="md" color="negative" @click="removeItem(rsItem.row.__index)"/>
+                <q-btn dense flat icon="clear" color="negative" tabindex="100" @click="removeItem(rsItem.row.__index)"/>
               </q-td>
               <q-td key="item_id" width="35%" >
                 <ux-select-filter autofocus
                   :name="`work_order_items.${rsItem.row.__index}.item_id`"
-                  :dark="LAYOUT.isDark"
+                  :disable="!rsForm.line_id"
+                  outlined dense hide-bottom-space color="blue-grey-4"
                   v-model="rsItem.row.item_id"
                   v-validate="'required'"
-                  outlined dense hide-bottom-space color="blue-grey-4"
-                  :disable="!rsForm.line_id"
                   :options="ItemOptions" clearable
-                  @input="(val) => setItemReference(rsItem.row.__index, val)"
+                  popup-content-class="options-striped"
+                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                   :error="errors.has(`work_order_items.${rsItem.row.__index}.item_id`)"
                   :loading="SHEET.items.loading"
-                >
+                  @input="(val) => setItemReference(rsItem.row.__index, val)">
                   <q-tooltip v-if="!rsForm.line_id" :offset="[0, 10]">Select a Pre-Line , first! </q-tooltip>
                 </ux-select-filter>
 
@@ -159,9 +159,13 @@
             </q-tr>
           </template>
           <q-tr slot="bottom-row" slot-scope="rsItem" :rsItem="rsItem">
-            <q-td colspan="100%">
-              <q-btn round dense @click="addNewItem()"  icon="add" color="positive"/>
+            <q-td></q-td>
+            <q-td>
+              <q-btn dense outline icon-right="add_circle" color="primary" class="full-width"
+                :label="$tc('form.add')"
+                @click="addNewItem()" />
             </q-td>
+            <q-td colspan="100%"> </q-td>
           </q-tr>
         </q-table>
       </div>

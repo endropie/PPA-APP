@@ -1,13 +1,9 @@
 <template>
   <q-page padding class="page-index">
     <q-pull-to-refresh @refresh="TABLE.refresh">
-      <q-table
-        ref="table"
-        inline dense
-        class="table-index table-sticky-column th-uppercase"
-        :table-style="{'height:calc(100vh - 280px)': $q.screen.lt.sm}"
-        separator="horizontal"
-        color="primary"
+      <q-table ref="table"
+        class="table-index table-striped table-sticky-column th-uppercase"
+        :dense="$q.screen.lt.md"
         :dark="LAYOUT.isDark"
         :title="TABLE.getTitle()"
         :data="TABLE.rowData"
@@ -84,7 +80,7 @@
           </table-header>
         </template>
 
-        <q-td slot="body-cell" slot-scope="rs" :props="rs" :class="getRowClass(rs)">
+        <q-td slot="body-cell" slot-scope="rs" :props="rs">
           <div v-if="rs.col.name === 'prefix'">
             <q-btn v-if="isCanUpdate" dense flat color="grey" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`"/>
             <q-btn v-if="isCanDelete" dense flat color="grey" icon="delete" @click.native="TABLE.delete(rs.row)" />
@@ -237,10 +233,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus">
-.q-table td.col-odd
-  background-color #88888845
-.q-table.q-table--dark td.col-odd
-  background-color #66666660
-</style>

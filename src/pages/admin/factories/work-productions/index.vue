@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="page-index" >
     <q-pull-to-refresh @refresh="TABLE.refresh" inline>
-      <q-table ref="table" inline class="table-index th-uppercase" color="primary" :dark="LAYOUT.isDark"
+      <q-table ref="table" inline class="table-index table-striped th-uppercase" color="primary" :dark="LAYOUT.isDark"
         :data="TABLE.rowData"
         :columns="TABLE.columns"
         :pagination.sync="TABLE.pagination"
@@ -107,8 +107,8 @@
         </q-td>
 
         <q-td slot="body-cell-shift_id" slot-scope="rs" :props="rs">
-          <q-badge class="shadow-1 q-pa-xs"
-            :label="`SHIFT ${rs.row.shift.name}`"
+          <q-badge class="shadow-1 q-pa-xs text-uppercase"
+            :label="rs.row.shift.name"
             dense color="light" text-color="white"
             v-if="rs.row.shift_id" />
         </q-td>

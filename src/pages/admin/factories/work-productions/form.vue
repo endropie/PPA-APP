@@ -81,17 +81,17 @@
                     <ux-select-filter class="col-12 col-md-6" autofocus
                       :name="`work_production_items.${rsItem.row.__index}.item_id`"
                       :label="$tc('items.part_name')" stack-label
-                      :dark="LAYOUT.isDark"
-                      v-model="rsItem.row.item_id"
-                      v-validate="'required'"
                       outlined color="blue-grey-4"
                       hide-bottom-space hide-dropdown-icon
+                      v-model="rsItem.row.item_id"
+                      v-validate="'required'"
                       :disable="!rsForm.line_id"
                       :options="ItemOptions" clearable
-                      @input="(val) => setItemReference(rsItem.row.__index, val)"
+                      popup-content-class="options-striped"
+                      :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${rsItem.row.__index}.item_id`)"
-                      :loading="SHEET['items'].loading">
-                    </ux-select-filter>
+                      :loading="SHEET['items'].loading"
+                      @input="(val) => setItemReference(rsItem.row.__index, val)" />
 
                     <ux-select-filter class="col-12 col-md-6"
                       :name="`work_production_items.${rsItem.row.__index}.work_order_item_line_id`"

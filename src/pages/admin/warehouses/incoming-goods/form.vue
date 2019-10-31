@@ -104,13 +104,13 @@
             :error="errors.has('vehicle_id')"
             :error-message="errors.first('vehicle_id')" >
             <template slot="after">
-              <q-input class="no-padding text-uppercase"
+              <q-input class="no-padding"
                 input-class="text-weight-bold"
                 input-style="width:50px;text-align:center"
                 name="rit" type="number" min="0"
                 label="RIT"
                 v-model="rsForm.rit"
-                dense no-error-icon standout="dark"
+                dense no-error-icon
                 v-validate="'min_value:0'"
                 :error="errors.has('rit')" />
               <!-- Incoming Items lists -->
@@ -141,12 +141,12 @@
 
             <template v-slot:body-cell-prefix="{row}">
               <q-td  style="width:50px">
-                <q-btn dense  @click="removeItem(row.__index)" icon="delete" color="negative"/>
+                <q-btn dense flat="" @click="removeItem(row.__index)" icon="clear" tabindex="100" color="negative"/>
               </q-td>
             </template>
             <template v-slot:body-cell-item_id="{row}">
               <q-td width="45%">
-                <ux-select-filter
+                <ux-select-filter autofocus
                   :name="`items.${row.__index}.item_id`"
                   :data-vv-as="$tc('items.part_name')"
                   dense outlined hide-bottom-space color="blue-grey-5"
@@ -205,9 +205,13 @@
             </template>
 
           <q-tr slot="bottom-row" slot-scope="props" :props="props">
-            <q-td colspan="100%">
-              <strong><q-btn dense  @click="addNewItem()" icon="add" color="positive"/></strong>
+            <q-td></q-td>
+            <q-td>
+              <q-btn dense outline icon-right="add_circle" color="primary" class="full-width"
+                :label="$tc('form.add', 2)"
+                @click="addNewItem()" />
             </q-td>
+            <q-td colspan="100%"> </q-td>
           </q-tr>
         </q-table>
       </div>

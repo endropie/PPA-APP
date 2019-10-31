@@ -79,9 +79,10 @@
             :label="$tc('general.item')"
             :data-vv-as="$tc('general.item')"
             v-model="rsForm.packing_items.item_id" clearable
-            :dark="LAYOUT.isDark"
-            :options="ItemOptions"
             v-validate="'required'"
+            popup-content-class="options-striped"
+            :options="ItemOptions"
+            :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
             :error="errors.has('packing_items.item_id')"
             :error-message="errors.first('packing_items.item_id')"
             :loading="SHEET.items.loading"
