@@ -93,26 +93,12 @@ export default {
   data () {
     return {
       value: this.$attrs.value,
-      options: this.$attrs.options || [] // this.$attrs.options
+      options: this.$attrs.options || []
     }
   },
   created() {
-    // console.warn('MOUNTED', this.$refs)
-
     this.$nextTick(() => {
       // console.warn('select', this);
-
-      // this.$watch('$refs.QSelect.innerValue', function(newValue, oldValue) {
-
-      // })
-      // this.$watch('$refs.QSelect.focused', function(newValue, oldValue) {
-      //   // // console.warn('Watch Qselect ', this.$refs.QSelect)
-      //   // // console.warn('multiple',this.$refs.QSelect.multiple)
-
-      //   // if(!this.$refs.QSelect.multiple) {
-      //   //   this.$attrs.hideSelected = newValue
-      //   // }
-      // })
     })
   },
   watch:{
