@@ -154,6 +154,7 @@
                   v-validate="'required'"
                   map-options emit-value
                   :options="ItemOptions" clearable
+                  popup-content-class="options-striped"
                   :options-dark="LAYOUT.isDark"
                   :dark="LAYOUT.isDark"
                   :readonly="!Boolean(rsForm.customer_id)"

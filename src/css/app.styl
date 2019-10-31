@@ -42,12 +42,10 @@ import('./quasar.variables.styl')
 .no-highlight .q-table tbody tr:hover
   background-color inherit
 
+// hr inset
 .inset-md { margin-left: 25%; margin-right: 25%; width: 50%;}
-
 .inset-sm { margin-left: 30%; margin-right: 30%; width: 40%;}
-
 .inset-xs { margin-left: 35%; margin-right: 35%; width: 30%;}
-
 .no-field-after.q-field--standard
   .q-field__control:before
     border-bottom 0
@@ -77,6 +75,14 @@ import('./quasar.variables.styl')
   th
     text-align right
 
+// q-table body striped => class="table-striped"
+.table-striped
+  .q-table > tbody > tr:nth-of-type(odd)
+    background-color rgba(125, 125, 125, 0.05)
+.table-striped.q-table--dark
+  .q-table > tbody > tr:nth-of-type(odd)
+    background-color rgba(125, 125, 125, 0.5)
+// q-table Sticky column => class="table-sticky-column"
 .table-sticky-column
   max-width 100%
 
@@ -97,14 +103,15 @@ import('./quasar.variables.styl')
 .table-sticky-column.q-table--dark
   thead tr:first-child th:first-child
     background-color #2d2d2d
-
   td:first-child
     background-color #323232 !important
 
-// .table-sticky-column.cols-2
-//   thead tr:first-child th:nth-child(2),
-//   td:nth-child(2)
-//     background-color #f9f9f9
-//     position sticky
-//     left 90px
-//     z-index 2
+// q-select options striped => popup-content-class="options-striped"
+.q-dialog .scroll.options-striped,
+.q-menu.scroll.options-striped
+  .q-virtual-scroll__content > .q-item:nth-of-type(odd)
+    background-color rgba(125, 125, 125, 0.2)
+  .q-virtual-scroll__content > .q-item.q-item--dark:nth-of-type(odd)
+    background-color rgba(125, 125, 125, 0.3)
+
+// styl-end
