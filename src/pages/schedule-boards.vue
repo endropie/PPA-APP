@@ -3,7 +3,7 @@
     <q-page-container>
       <q-page padding class="page-index" >
         <q-pull-to-refresh @refresh="TABLE.refresh" inline>
-          <q-table ref="table" class="table-index th-uppercase" color="primary" :dark="ScreenMode"
+          <q-table ref="table" class="table-index table-striped th-uppercase" color="primary" :dark="ScreenMode"
             :data="TABLE.rowData"
             :columns="TABLE.columns"
             :filter="TABLE.filter"
@@ -104,7 +104,7 @@ export default {
       noBottom: false,
       TABLE: {
         resource: {
-          api: '/api/v1/views/schedule-boards',
+          api: '/api/v1/landing/schedule-boards',
           uri: '/admin/deliveries/schedule-boards',
         },
         columns: [
