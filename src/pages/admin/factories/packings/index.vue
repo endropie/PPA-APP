@@ -217,13 +217,13 @@ export default {
   },
   methods: {
     initItemOptions(val, update, abort) {
-      console.warn('TEST', val, update, abort)
       if(String(val).length > 2) {
         this.SHEET.load('items', 'search='+val)
       }
     },
     isEditable(row) {
       if (row.deleted_at) return false
+      if (row.is_relationship) return false
       return true
     },
   },
