@@ -64,7 +64,7 @@
       </q-field>
       <div class="col-12">
         <q-table ref="table-items" dense hide-bottom
-          class="no-shadow th-uppercase no-highlight" color="secondary"  style="display:grid"
+          class="no-shadow th-uppercase no-highlight transparent" color="secondary"  style="display:grid"
           :dark="LAYOUT.isDark"
           :data="rsForm.work_order_items"
           :rows-per-page-options ="[0]"

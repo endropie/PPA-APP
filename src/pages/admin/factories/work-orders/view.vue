@@ -13,7 +13,7 @@
             <div class="col-auto self-end">
               <span class="text-h6 text-center q-pt-lg q-pl-sm">WORK ORDER</span>
 
-              <q-markup-table class="super-dense no-shadow"
+              <q-markup-table class="no-shadow transparent"
                 :dark="LAYOUT.isDark">
                 <tr>
                   <th class="text-left">{{$tc('general.line')}}</th><td>{{ rsView.line.name }}</td>
@@ -24,7 +24,7 @@
               </q-markup-table>
             </div>
             <div class="col-auto">
-              <q-markup-table class="super-dense bordered no-shadow" separator="cell" :dark="LAYOUT.isDark">
+              <q-markup-table dense class="bordered no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
                 <tr>
                   <th>{{$tc('label.number')}}</th>
                   <td>
@@ -47,10 +47,10 @@
         <div class="col-12">
         </div>
         <div class="col-12">
-          <q-table class="no-highlight bordered no-shadow"
+          <q-table class="bordered no-shadow no-highlight transparent"
             color="secondary"
             separator="cell"
-            dense hide-bottom :dark="LAYOUT.isDark"
+            hide-bottom :dark="LAYOUT.isDark"
             :data="rsView.work_order_items"
             no-data-label = "No Production"
             :columns="[
@@ -90,7 +90,9 @@
               <q-td colspan="100%" style="padding:2px">
                 <div class="row q-col-gutter-sm">
                   <div class="col"  v-for="(itemLine, index) in rsItem.row.work_order_item_lines" :key="index">
-                    <q-expansion-item dense expand-separator :label="'Line: '+itemLine.line_id" class="bordered" header-class="bg-blue-grey-1">
+                    <q-expansion-item dense expand-separator :dark="LAYOUT.isDark"
+                      :label="'Line: '+itemLine.line_id"
+                      class="bordered" :header-class="LAYOUT.isDark ? `bg-blue-grey-10` : `bg-blue-grey-1`">
                       <div slot="header" class="q-item__section column q-item__section--main justify-center">
                         <span v-if="MAPINGKEY['lines']" >
                           {{MAPINGKEY['lines'][itemLine.line_id].name}}
@@ -122,7 +124,9 @@
                     </q-expansion-item>
                   </div>
                   <div class="col" v-if="Boolean(rsItem.row.item_id)">
-                    <q-expansion-item dense expand-separator :label="$tc('general.packing')" class="bordered" header-class="bg-blue-grey-1">
+                    <q-expansion-item dense expand-separator :dark="LAYOUT.isDark"
+                      :label="$tc('general.packing')"
+                      class="bordered" :header-class="LAYOUT.isDark ? `bg-blue-grey-10` : `bg-blue-grey-1`">
                       <div slot="header" class="q-item__section column q-item__section--main justify-center">
                         <span>
                           {{$tc('general.packing')}}

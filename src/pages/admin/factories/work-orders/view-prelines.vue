@@ -29,8 +29,7 @@
               <div class="col-auto self-end">
                 <span class="text-h6 text-center q-pt-lg q-pl-sm">WORK ORDER</span>
 
-                <q-markup-table class="super-dense no-shadow"
-                  :dark="LAYOUT.isDark">
+                <q-markup-table dense class="no-shadow transparent" :dark="LAYOUT.isDark">
                   <tr>
                     <th class="text-left">{{$tc('general.line')}}</th><td>{{ group.name }}</td>
                   </tr>
@@ -40,7 +39,7 @@
                 </q-markup-table>
               </div>
               <div class="col-auto">
-                <q-markup-table class="super-dense bordered no-shadow" separator="cell" :dark="LAYOUT.isDark">
+                <q-markup-table dense class="bordered no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
                   <tr>
                     <th>{{$tc('label.number')}}</th>
                     <td>
@@ -61,10 +60,10 @@
             </div>
           </div>
           <div class="col-12">
-            <q-table class="bordered no-highlight no-shadow"
+            <q-table class="bordered no-highlight no-shadow transparent"
               color="secondary"
               separator="vertical"
-              dense hide-bottom :dark="LAYOUT.isDark"
+              hide-bottom :dark="LAYOUT.isDark"
               :data="group.work_order_items"
               :rows-per-page-options ="[0]"
               :pagination="{ rowsPerPage: 0}"
