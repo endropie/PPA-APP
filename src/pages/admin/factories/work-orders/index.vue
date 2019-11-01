@@ -112,30 +112,35 @@
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
-          <div v-if="rs.row.status =='OPEN' && (rs.row.status_production !== 0 || rs.row.status_packing !== 0)">
-            <q-chip  dense square
-              class="shadow-1 text-uppercase"
-              color="grey-3" text-color="light" >
-              {{$tc('factories.production')}}
-              <q-badge class="status-chip-badge" color="blue-10"
-                label="CLOSED"
-                v-if="rs.row.status_production === true"/>
-              <q-badge v-else class="status-chip-badge" color="blue"
-                :label="(rs.row.status_production) ? `${rs.row.status_production}%` : 'NONE'"
-              />
-            </q-chip>
+          <div class="column inline q-pb-xs"
+            v-if="rs.row.status =='OPEN' && (rs.row.status_production !== 0 || rs.row.status_packing !== 0)">
+            <span>
+              <q-chip  dense square
+                class="status-chip shadow-1 text-uppercase"
+                color="blue-grey" text-color="white" >
+                {{$tc('factories.production')}}
+                <q-badge class="status-chip-badge" color="red"
+                  label="CLOSED"
+                  v-if="rs.row.status_production === true"/>
+                <q-badge v-else class="status-chip-badge" color="blue-grey-10"
+                  :label="(rs.row.status_production) ? `${rs.row.status_production}%` : '-'"
+                />
+              </q-chip>
+            </span>
+            <span>
+              <q-chip dense square
+                class="status-chip shadow-1 text-uppercase no-margin"
+                color="blue-grey" text-color="white">
+                {{$tc('factories.packing')}}
+                <q-badge class="status-chip-badge" color="red"
+                  label="CLOSED"
+                  v-if="rs.row.status_packing === true"/>
+                <q-badge v-else class="status-chip-badge" color="blue-grey-10"
+                  :label="(rs.row.status_packing) ? `${rs.row.status_packing}%` : '-'"
+                />
+              </q-chip>
 
-            <q-chip dense square
-              class="shadow-1 text-uppercase"
-              color="grey-2" text-color="grey-6">
-              {{$tc('factories.packing')}}
-              <q-badge class="status-chip-badge" color="blue-10"
-                label="CLOSED"
-                v-if="rs.row.status_packing === true"/>
-              <q-badge v-else class="status-chip-badge" color="blue"
-                :label="(rs.row.status_packing) ? `${rs.row.status_packing}%` : 'NONE'"
-              />
-            </q-chip>
+            </span>
           </div>
           <ux-badge-status v-else :row="rs.row" class="shadow-1" />
         </q-td>
@@ -238,11 +243,13 @@ export default {
 </script>
 
 <style lang="stylus">
+.status-chip, .status-chip-badge
+  height: 20px
+.status-chip
+  margin :2px
 .status-chip-badge
   position: relative;
   right: -6px;
-  padding-top: 5px;
-  padding-bottom: 5px;
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
 </style>
