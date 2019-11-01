@@ -52,7 +52,7 @@
 
               <q-select class="col-4 col-sm-2 "
                 v-model="FILTERABLE.fill.status.value" clearable
-                :options="['OPEN', 'PRODUCTION', 'PACKING', 'CLOSED:PRODUCTION', 'CLOSED:PACKING', 'CLOSED']"
+                :options="['OPEN', 'ON:PROCESS', 'CLOSED:PRODUCTION', 'CLOSED:PACKING', 'CLOSED']"
                 :label=" $tc('label.state')"
                 dense hide-bottom-space hide-dropdown-icon
                 standout="bg-blue-grey-5 text-white"

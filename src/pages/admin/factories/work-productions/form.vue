@@ -12,12 +12,12 @@
           <div class="row q-col-gutter-x-sm">
             <ux-select-filter class="col-12"
               name="line_id"
-              v-model="rsForm.line_id"
               :label="$tc('items.preline')"
-              :disable="IssetWorkProductionItems"
-              :dark="LAYOUT.isDark"
-              :options="LineOptions" clearable
+              v-model="rsForm.line_id"
               v-validate="'required'"
+              :disable="IssetWorkProductionItems"
+              :options="LineOptions" clearable
+              :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
               :error="errors.has('line_id')"
               :error-message="errors.first('line_id')"
               @input="(val) => val ? loadItemOptions() : false" />
@@ -39,10 +39,10 @@
                 name="shift_id"
                 :label="$tc('label.shift')" stack-label
                 v-model="rsForm.shift_id"
-                :dark="LAYOUT.isDark"
+                v-validate="'required'"
                 :options="ShiftOptions" filter
                 map-options emit-value
-                v-validate="'required'"
+                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                 :error="errors.has('shift_id')"
               />
             </ux-date>
@@ -66,7 +66,7 @@
 
             <template slot="item" slot-scope="rsItem">
               <div class="q-pa-xs col-12 col-sm-12">
-                <q-card>
+                <q-card class="main-box" :dark="LAYOUT.isDark">
                   <q-card-section class="row items-center no-wrap q-py-xs">
                       <div class="col">
                         <div class="text-subtitle2">{{$tc('general.item')}}
@@ -96,13 +96,13 @@
                     <ux-select-filter class="col-12 col-md-6"
                       :name="`work_production_items.${rsItem.row.__index}.work_order_item_line_id`"
                       :label="$tc('general.work_production')" stack-label
-                      :dark="LAYOUT.isDark"
                       v-model="rsItem.row.work_order_item_line_id"
                       v-validate="'required'"
                       outlined color="blue-grey-4"
                       no-error-icon hide-bottom-space hide-dropdown-icon
                       :disable="!rsForm.line_id"
                       :options="WorkOrderItemLineOptions.filter(x => x.item_id === rsItem.row.item.id)" clearable
+                      :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${rsItem.row.__index}.work_order_item_line_id`)"
                       :loading="SHEET['work_orders'].loading" />
 
@@ -125,12 +125,12 @@
                     <q-select class="col-12 col-sm-4 col-md-2"
                       :name="`work_production_items.${rsItem.row.__index}.unit_id`"
                       :label="$tc('label.unit')" stack-label
-                      :dark="LAYOUT.isDark"
                       v-model="rsItem.row.unit_id"
+                      v-validate="rsItem.row.item_id ? 'required' : ''"
                       outlined hide-bottom-space color="blue-grey-4"
                       :options="ItemUnitOptions[rsItem.row.__index]"
                       map-options  emit-value
-                      v-validate="rsItem.row.item_id ? 'required' : ''"
+                      :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${rsItem.row.__index}.unit_id`)"
                       :disable="!rsForm.line_id || !rsItem.row.item_id"
                       @input="(val) => setUnitReference(rsItem.row.__index, val)"
