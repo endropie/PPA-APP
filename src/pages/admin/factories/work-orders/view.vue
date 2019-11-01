@@ -16,7 +16,7 @@
               <q-markup-table class="no-shadow transparent"
                 :dark="LAYOUT.isDark">
                 <tr>
-                  <th class="text-left">{{$tc('general.line')}}</th><td>{{ rsView.line.name }}</td>
+                  <th class="text-left">{{$tc('general.line')}}</th><td>{{ rsView.line ? rsView.line.name : '-' }}</td>
                 </tr>
                 <tr>
                   <th class="text-left">Material of</th><td>{{ getStockistFrom(rsView.stockist_from) }}</td>
@@ -38,7 +38,7 @@
                 </tr>
                 <tr>
                   <th>{{$tc('label.shift')}}</th>
-                  <td>{{rsView.shift.name}}</td>
+                  <td>{{rsView.shift ? rsView.shift.name : '-'}}</td>
                 </tr>
               </q-markup-table>
             </div>
@@ -324,20 +324,17 @@ export default {
     },
 
     setClosing () {
-      console.warn('CLOSING')
       const submit = () => {
         this.VIEW.show = false
         this.VIEW.loading = true
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=closed&nodata=true`
         this.$axios.put(url)
           .then((response) => {
-            // console.warn('response->', response.data)
             const data = response.data
-            this.setView(data)
+            this.init()
           })
           .catch(error => {
-            // this.VIEW.onCatch(error.response, 'FORM REVISION')
-            this.$app.response.error(error.response, 'FORM REVISION')
+            this.$app.response.error(error.response, 'FORM CLOSED')
           })
           .finally(()=>{
             this.VIEW.show = true
