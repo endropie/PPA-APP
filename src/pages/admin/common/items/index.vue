@@ -155,7 +155,7 @@ export default {
           // { name: 'enable', label:this.$tc('label.active'), field: 'enable', align: 'center', sortable: true },
 
           // Item stocks
-          { name: 'ALL', label: 'ALL', sortable: true, style:'text-weight-medium',
+          { name: 'ALL', label: 'ALL', sortable: true, style:'text-weight-medium', format:(v) => Boolean(v) ? this.$app.number_format(v) : '-',
             field: (item)=> (
               Number(item.totals['FM'])
               + Number(item.totals['WO'])
@@ -165,18 +165,23 @@ export default {
               + Number(item.totals['RET'])
             )
           },
-          { name: 'FM', field: (item)=> item.totals['FM'] || '-', label: 'FM', sortable: true },
-          { name: 'WO', field: (item)=> item.totals['WO'] || '-', label: 'WO', sortable: true },
-          { name: 'WIP', field: (item)=> item.totals['WIP'] || '-', label: 'WIP', sortable: true },
-          { name: 'FG', field: (item)=> item.totals['FG'] || '-', label: 'FG', sortable: true },
-          { name: 'NG', field: (item)=> item.totals['NG'] || '-', label: 'NC', sortable: true },
-          { name: 'RET', field: (item)=> item.totals['RET'] || '-', label: 'NCR', sortable: true },
+          { name: 'FM', label: 'FM', sortable: true, field: (item)=> item.totals['FM'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-' },
+          { name: 'WO', label: 'WO', sortable: true, field: (item)=> item.totals['WO'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'WIP', label: 'WIP', sortable: true, field: (item)=> item.totals['WIP'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'FG', label: 'FG', sortable: true, field: (item)=> item.totals['FG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'NG', label: 'NC', sortable: true, field: (item)=> item.totals['NG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'RET', label: 'NCR', sortable: true, field: (item)=> item.totals['RET'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
 
-          { name: 'RDOREG', field: (item)=> item.totals['RDO.REG'] || '-', label: 'RDO [REG]', hidden: !process.env.DEV },
-          { name: 'RDORET', field: (item)=> item.totals['RDO.RET'] || '-', label: 'RDO [RET]', hidden: !process.env.DEV },
-          { name: 'PDOREG', field: (item)=> item.totals['PDO.REG'] || '-', label: 'PDO [REG]', align: 'center', clases:'bg-faded', hidden:  !process.env.DEV },
-          { name: 'PDORET', field: (item)=> item.totals['PDO.RET'] || '-', label: 'PDO [RET]', align: 'center', clases:'bg-faded', hidden:  !process.env.DEV },
-          { name: 'VDO', field: (item)=> item.totals['VDO'] || '-', label: 'VDO', sortable: true, hidden:  !process.env.DEV },
+          { name: 'RDOREG', label: 'RDO [REG]', hidden: !process.env.DEV,
+            field: (item) => item.totals['RDO.REG'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'RDORET', label: 'RDO [RET]', hidden: !process.env.DEV,
+            field: (item) => item.totals['RDO.RET'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'PDOREG', label: 'PDO [REG]', align: 'center', clases:'bg-faded', hidden:  !process.env.DEV,
+            field: (item) => item.totals['PDO.REG'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'PDORET', label: 'PDO [RET]', align: 'center', clases:'bg-faded', hidden:  !process.env.DEV,
+            field: (item) => item.totals['PDO.RET'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'VDO', label: 'VDO', sortable: true, hidden:  !process.env.DEV,
+            field: (item)=> item.totals['VDO'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
 
           { name: 'price', label: 'Price', field: 'price', sortable: true, hidden: !this.$app.can('items.price') },
           { name: 'price_dm', label: 'Price in DM', field: 'price', sortable: true, hidden: !this.$app.can('items.price') },
