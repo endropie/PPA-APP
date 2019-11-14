@@ -6,7 +6,7 @@
     input-class="no-option-date"
     >
       <template v-slot:append v-if="!$attrs.disable && !$attrs.readonly">
-        <q-btn flat dense icon="event" class="self-end q-mb-sm cursor-pointer">
+        <q-btn flat dense icon="event" class="self-end cursor-pointer">
           <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
             <q-date :mask="valueFormat"
               v-model="value"
