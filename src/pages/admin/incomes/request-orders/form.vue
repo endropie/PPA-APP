@@ -26,7 +26,7 @@
             :error="errors.has('number')" :error-message="errors.first('number')"/>
 
           <ux-date class="col-12" name="date"
-            stack-label :label="$t('label.date')"
+            stack-label :label="$tc('label.date')"
             v-model="rsForm.date"
             :dark="LAYOUT.isDark"
             v-validate="'required'"

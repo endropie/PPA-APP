@@ -8,7 +8,7 @@
       <template v-slot:label>
         <div class="row items-center no-wrap">
           <q-icon v-if="$q.screen.lt.sm" name="person" />
-          <span v-else>{{ USER.name || $t('general.administrator')}}</span>
+          <span v-else>{{ USER.name || $tc('general.administrator')}}</span>
         </div>
       </template>
       <div class="row no-wrap q-pa-md">
@@ -43,7 +43,7 @@
               <q-icon name="person_outline" size="78px" color="primary" class="bg-light"></q-icon>
           </q-avatar>
           <div class="text-subtitle2 text-capitalize q-mt-md q-mb-xs">
-            {{ USER.name || $t('general.administrator')}}
+            {{ USER.name || $tc('general.administrator')}}
           </div>
           <q-btn color="primary" label="Logout" push size="sm" v-close-popup @click="setLogout()" />
         </div>

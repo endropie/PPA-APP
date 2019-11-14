@@ -75,7 +75,7 @@
             {name:'plate', label: 'Label Plate'},
           ]"
           :data="rsForm.specification_details"
-          :label-new="$t('form.new', {v:$tc('items.specification')})"
+          :label-new="$tc('form.new', {v:$tc('items.specification')})"
           :new-data="{id: null, plate:null, thick:null }"
           :dark="LAYOUT.isDark"
           min-length="-1">

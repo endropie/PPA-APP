@@ -287,7 +287,7 @@
           </q-item>
           <q-item>
             <q-item-section>
-              <q-btn dense outline color="primary" :label="$t('form.add',2)" @click="addNewProduction()" />
+              <q-btn dense outline color="primary" :label="$tc('form.add',2)" @click="addNewProduction()" />
             </q-item-section>
           </q-item>
         </q-list>
@@ -332,7 +332,7 @@
           </q-item>
           <q-item  class="">
             <q-item-section>
-              <q-btn dense outline color="primary" :label="$t('form.add', 2)" @click="addNewUnit()" />
+              <q-btn dense outline color="primary" :label="$tc('form.add', 2)" @click="addNewUnit()" />
             </q-item-section>
           </q-item>
         </q-list>
