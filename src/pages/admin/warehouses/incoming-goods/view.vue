@@ -129,6 +129,13 @@
                 VIEW.void(()=> init() )
               }
             },
+            { label: 'PDO', color:'blue-10', icon: 'assignment',
+              hidden: !this.$app.can('pre-deliveries-create'),
+              detail: $tc('form.add_new',1, {v:'PDO'}),
+              actions: () => {
+                $router.push(`/admin/deliveries/pre-deliveries/create?incoming_good_id=${ROUTE.params.id}`)
+              }
+            },
           ]"/>
       </div>
     </page-print>

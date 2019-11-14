@@ -1,7 +1,7 @@
 export default {
-  add: 'Tambah',
-  add_new: 'Tambah Baru | Tambahan | Tambahkan',
-  add_clone: 'Tambah Clone',
+  add: 'Tambah |Tambahkan',
+  add_new: 'Buat Baru',
+  add_clone: 'Buat Clone',
   back: 'Kembali',
   cancel: 'Batal',
   clone: 'Salin | Salinan',

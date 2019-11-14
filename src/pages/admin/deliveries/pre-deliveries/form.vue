@@ -127,10 +127,12 @@
             </q-tr>
           </template>
 
-          <q-tr slot="bottom-row" slot-scope="rsItem" >
-            <q-td colspan="100%" :rsItem="rsItem">
-              <strong><q-btn dense icon="add" color="green" @click="addNewItem()"/></strong>
+          <q-tr slot="bottom-row" >
+            <td></td>
+            <q-td>
+              <q-btn dense outline color="primary" :label="$tc('form.add')" icon="add_circle_outline" class="full-width" @click="addNewItem()"/>
             </q-td>
+            <td colspan="100%"></td>
           </q-tr>
         </q-table>
       </div>
@@ -173,6 +175,9 @@ export default {
         resource: {
           api: '/api/v1/incomes/pre-deliveries',
           uri: '/admin/deliveries/pre-deliveries',
+        },
+        incoming_good: {
+          api: '/api/v1/warehouses/incoming-goods'
         }
       },
       rsForm: {},
@@ -346,7 +351,43 @@ export default {
   methods: {
     init() {
       this.FORM.load((data) => {
-        this.setForm(data || this.setDefault())
+        if (this.ROUTE.query.incoming_good_id){
+          this.FORM.show = false
+          this.FORM.loading = true
+
+          this.$axios.get(`${this.FORM.incoming_good.api}/${this.ROUTE.query.incoming_good_id}`)
+          .then(response => {
+              data.customer_id = response.data.customer_id
+              data.transaction = response.data.transaction
+              data.pre_delivery_items = []
+              response.data.incoming_good_items.map(detail => {
+                  data.pre_delivery_items.push({
+                  id: null,
+                  item_id: detail.item_id,
+                  item: detail.item,
+                  unit_id: detail.unit_id,
+                  unit: detail.unit,
+                  unit_rate: detail.unit_rate,
+                  quantity: detail.quantity
+                })
+              })
+
+              console.warn('RESULT', data)
+
+              this.setForm(data)
+              // setTimeout(() => this.setForm(data), 0)
+              setTimeout(() => this.FORM.show = true, 500)
+          })
+          .catch(error => {
+            this.FORM.response.error(error.response || error, this.$tc('messages.fail', 1, {v:this.$tc('form.clone')}).toUpperCase())
+            this.setForm(data || this.setDefault())
+            setTimeout(() => this.FORM.show = true, 500)
+          })
+          .finally(() => {
+            setTimeout(() => this.FORM.loading = false, 500)
+          })
+        }
+        else this.setForm(data || this.setDefault())
       })
     },
     strUnitConvertion(row, val = 0) {
