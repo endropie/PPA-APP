@@ -37,62 +37,79 @@
               }
             ]">
 
-            <div class="row q-col-gutter-xs" >
-              <ux-select-filter class="col-8 col-sm-4"
-                name="line_id"
-                v-model="FILTERABLE.fill.line_id.value" clearable
-                :label="$tc('items.preline')" stack-label
-                :placeholder="$tc('form.select', 1, {v:$tc('items.preline')})"
-                dense hide-bottom-space hide-dropdown-icon
-                standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                :options="LineOptions"
-                @input="FILTERABLE.submit" />
+            <div class="column" >
+              <div class="row q-col-gutter-xs q-pb-xs">
+                <ux-select-filter class="col" style="min-width:150px"
+                  name="line_id"
+                  v-model="FILTERABLE.fill.line_id.value" clearable
+                  :label="$tc('items.preline')" stack-label
+                  :placeholder="$tc('form.select', 1, {v:$tc('items.preline')})"
+                  dense hide-bottom-space hide-dropdown-icon
+                  standout="bg-blue-grey-5 text-white"
+                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
+                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                  :options="LineOptions"
+                  @input="FILTERABLE.submit" />
 
-              <q-select class="col-4 col-sm-2 "
-                v-model="FILTERABLE.fill.status.value" clearable
-                :options="['OPEN', 'ON:PROCESS', 'CLOSED:PRODUCTION', 'CLOSED:PACKING', 'CLOSED']"
-                :label=" $tc('label.state')"
-                dense hide-bottom-space hide-dropdown-icon
-                standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark"
-                @input="FILTERABLE.submit" />
 
-              <ux-date class="col-8 col-sm-4"
-                stack-label :label="$tc('label.date')"
-                v-model="FILTERABLE.fill.date.value" type="date"  clearable
-                dense hide-bottom-space
-                standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark"
-                @input="FILTERABLE.submit"/>
+                <ux-date class="col" style="min-width:150px"
+                  stack-label :label="$tc('label.date')"
+                  v-model="FILTERABLE.fill.date.value" type="date"  clearable
+                  dense hide-bottom-space
+                  standout="bg-blue-grey-5 text-white"
+                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
+                  :dark="LAYOUT.isDark"
+                  @input="FILTERABLE.submit"/>
 
-              <q-select class="col-4 col-sm-2"
-                map-options emit-value
-                v-model="FILTERABLE.fill.shift_id.value" clearable
-                :options="ShiftOptions"
-                :label="$tc('label.shift')"
-                dense hide-bottom-space hide-dropdown-icon
-                standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark"
-                @input="FILTERABLE.submit"/>
+                <q-select class="col" style="min-width:120px"
+                  label="Stockist"
+                  v-model="FILTERABLE.fill.stockist_from.value" clearable
+                  :options="stockist_options" map-options emit-value
+                  dense hide-bottom-space hide-dropdown-icon
+                  standout="bg-blue-grey-5 text-white"
+                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
+                  :dark="LAYOUT.isDark"
+                  @input="FILTERABLE.submit" />
 
-              <q-select class="col-12" autocomplete="off"
-                multiple use-chips use-input new-value-mode="add"
-                dense hide-dropdown-icon
-                v-model="FILTERABLE.search" emit-value
-                :placeholder="`${$tc('form.search',2)}...`"
-                standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark">
+                <q-select class="col" style="min-width:120px"
+                  v-model="FILTERABLE.fill.status.value" clearable
+                  :options="['OPEN', 'ON:PROCESS', 'HAS:PRODUCTED', 'HAS:PACKED', 'PRODUCTED', 'PACKED', 'CLOSED']"
+                  :label=" $tc('label.state')"
+                  dense hide-bottom-space hide-dropdown-icon
+                  standout="bg-blue-grey-5 text-white"
+                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
+                  :dark="LAYOUT.isDark"
+                  @input="FILTERABLE.submit" />
 
-                <template slot="append">
-                  <q-btn flat dense icon="search" color="blue-grey-10" @click="FILTERABLE.submit"/>
-                </template>
-              </q-select>
+                <q-select class="col" style="min-width:120px"
+                  map-options emit-value
+                  v-model="FILTERABLE.fill.shift_id.value" clearable
+                  :options="ShiftOptions"
+                  :label="$tc('label.shift')"
+                  dense hide-bottom-space hide-dropdown-icon
+                  standout="bg-blue-grey-5 text-white"
+                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
+                  :dark="LAYOUT.isDark"
+                  @input="FILTERABLE.submit"/>
+
+
+              </div>
+              <div class="row q-col-gutter-xs q-pb-xs">
+                <q-select class="col-12" autocomplete="off"
+                  multiple use-chips use-input new-value-mode="add"
+                  dense hide-dropdown-icon
+                  v-model="FILTERABLE.search" emit-value
+                  :placeholder="`${$tc('form.search',2)}...`"
+                  standout="bg-blue-grey-5 text-white"
+                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
+                  :dark="LAYOUT.isDark">
+
+                  <template slot="append">
+                    <q-btn flat dense icon="search" color="blue-grey-10" @click="FILTERABLE.submit"/>
+                  </template>
+                </q-select>
+              </div>
+
             </div>
           </table-header>
         </template>
@@ -113,18 +130,17 @@
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
           <div class="column inline q-pb-xs"
-            v-if="rs.row.status =='OPEN' && (rs.row.status_production !== 0 || rs.row.status_packing !== 0)">
+            v-if="['OPEN', 'PRODUCTED', 'PACKED'].find(x => x === rs.row.status) && (rs.row.total_production > 0 || rs.row.total_packing > 0)">
             <span>
               <q-chip  dense square
                 class="status-chip shadow-1 text-uppercase"
                 color="blue-grey" text-color="white" >
                 {{$tc('factories.production')}}
-                <q-badge class="status-chip-badge" color="red"
-                  label="CLOSED"
-                  v-if="rs.row.status_production === true"/>
-                <q-badge v-else class="status-chip-badge" color="blue-grey-10"
-                  :label="(rs.row.status_production) ? `${rs.row.status_production}%` : '-'"
-                />
+                <q-badge class="status-chip-badge"
+                  :color="!Boolean(rs.row.has_producted) ? 'blue-grey-10' : 'red'">
+                  <span>{{$app.number_abbreviate(rs.row.total_production)}} </span>
+                  <span v-if="!Boolean(rs.row.has_producted)">&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_amount)}}</span>
+                </q-badge>
               </q-chip>
             </span>
             <span>
@@ -132,12 +148,11 @@
                 class="status-chip shadow-1 text-uppercase no-margin"
                 color="blue-grey" text-color="white">
                 {{$tc('factories.packing')}}
-                <q-badge class="status-chip-badge" color="red"
-                  label="CLOSED"
-                  v-if="rs.row.status_packing === true"/>
-                <q-badge v-else class="status-chip-badge" color="blue-grey-10"
-                  :label="(rs.row.status_packing) ? `${rs.row.status_packing}%` : '-'"
-                />
+                <q-badge class="status-chip-badge"
+                  :color="!Boolean(rs.row.has_packed) !== 'PACKED' ? 'blue-grey-10' : 'red'">
+                  <span>{{$app.number_abbreviate(rs.row.total_packing)}} </span>
+                  <span v-if="!Boolean(rs.row.has_packed) !== 'PACKED'">&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_production)}}</span>
+                </q-badge>
               </q-chip>
 
             </span>
@@ -145,11 +160,10 @@
           <ux-badge-status v-else :row="rs.row" class="shadow-1" />
         </q-td>
 
-        <q-td slot="body-cell-shift_id" slot-scope="rs" :props="rs">
-          <q-badge class="shadow-1 q-pa-xs text-uppercase"
-            :label="rs.row.shift.name"
-            dense color="light" text-color="white"
-            v-if="rs.row.shift_id" />
+        <q-td slot="body-cell-stockist" slot-scope="rs" :props="rs" style="width:35px">
+          <span v-if="rs.row.stockist_from">
+            {{Object.assign({}, stockist_options.find(x => x.value === rs.row.stockist_from)).label || '-'}}
+          </span>
         </q-td>
 
         <q-td slot="body-cell-date" slot-scope="rs" :props="rs">
@@ -170,6 +184,11 @@ export default {
   mixins: [MixIndex],
   data () {
     return {
+      stockist_options: [
+        {value:'FM', label:'FM [FRESH]'},
+        {value:'NG', label:'NG [NOTGOOD]'},
+        {value:'RET', label:'RET [REPAIR]'}
+      ],
       SHEET: {
         lines: {data:[], api:'/api/v1/references/lines?mode=all'},
         shifts: {data:[], api:'/api/v1/references/shifts?mode=all'}
@@ -182,6 +201,11 @@ export default {
             transform: (value) => { return null }
           },
           status: {
+            value: null,
+            type: 'string',
+            transform: (value) => { return null }
+          },
+          stockist_from: {
             value: null,
             type: 'string',
             transform: (value) => { return null }
@@ -212,6 +236,7 @@ export default {
           { name: 'line_id', label: 'Line', field: (rs)=> rs.line.name , align: 'left', sortable: true },
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true },
           { name: 'shift_id', label: 'Shift', field: (rs)=> rs.shift.name , align: 'center', sortable: true },
+          { name: 'stockist', label: 'Stockist', align: 'left'},
         ]
       },
     }

@@ -59,7 +59,7 @@
               { name: 'part_number', label: this.$tc('label.no', 1, {v:this.$tc('label.part')}), align: 'left', field: (v)=> v.item.part_name},
               { name: 'target', label: $tc('label.quantity'), align: 'right', field: (v)=> v.target},
               { name: 'unit_id', label: $tc('label.unit'), align: 'center', field: (v)=> v.unit.code},
-              { name: 'ngratio', label: 'NG', align: 'right', format:(v)=> v ? `${Number(v)}%` : '-', field: (v)=> v.ngratio},
+              { name: 'ngratio', label: '%NG', align: 'right', format:(v)=> v ? `${Number(v)}%` : '-', field: (v)=> v.ngratio},
               { name: 'total', label: 'Total', align: 'right', format:(v)=> `${Math.round(v)}`, field: (v)=> Number(v.quantity)},
             ]">
           <template slot="body" slot-scope="rsItem" :scope="rsItem">
@@ -97,8 +97,8 @@
                         <span v-if="MAPINGKEY['lines']" >
                           {{MAPINGKEY['lines'][itemLine.line_id].name}}
                           <q-badge v-if="itemLine.work_production_items"
-                            :label="`${persenLine(itemLine, rsItem.row)} %`"
-                            :color="validLine(itemLine, rsItem.row) ? 'primary' : 'red-10'"/>
+                            :label="`${totalLine(itemLine, rsItem.row)} / ${totalAmount(rsItem.row)}`"
+                            :color="rsView.has_producted ? 'red-10' : 'primary'"/>
                         </span>
                         <span v-else>
                           {{itemLine.line_id}}
@@ -109,7 +109,7 @@
                           <q-item-section>
                             <span v-if="itemProduction.work_production">
                               {{itemProduction.work_production.number}}
-                              <q-badge color="blue-grey" :label="`#${itemProduction.id}`" />
+                              <!-- <q-badge color="blue-grey" :label="`#${itemProduction.id}`" /> -->
                             </span>
                           </q-item-section>
                           <q-item-section side>
@@ -130,8 +130,8 @@
                       <div slot="header" class="q-item__section column q-item__section--main justify-center">
                         <span>
                           {{$tc('general.packing')}}
-                          <q-badge :label="`${persenPacking(rsItem.row, )} %`"
-                            :color="0 > Math.round(persenPacking(rsItem.row)) || Math.round(persenPacking(rsItem.row)) > 100 ? 'red-10' : 'primary'"/>
+                          <q-badge :label="`${totalPacking(rsItem.row)} / ${totalProduction(rsItem.row)}`"
+                            :color="rsView.has_packed ? 'red-10' : 'primary'"/>
                         </span>
                       </div>
                       <q-list dense separator>
@@ -176,6 +176,18 @@
                 detail: $tc('messages.process_create'),
                 hidden: !$app.can('work-orders-create'),
                 actions: () => $router.push(`${VIEW.resource.uri}/create`)
+              },
+              {
+                label: 'PRODUCTED', color:'green', icon: 'done_all',
+                detail: $tc('messages.process_producted'),
+                hidden: !IS_PRODUCTED || !$app.can('work-orders-close'),
+                actions: () => setProducted()
+              },
+              {
+                label: 'PACKED', color:'green', icon: 'done_all',
+                detail: $tc('messages.process_packed'),
+                hidden: !IS_PACKED || !$app.can('work-orders-close'),
+                actions: () => setPacked()
               },
               {
                 label: 'CLOSE', color:'green', icon: 'done_all',
@@ -244,6 +256,16 @@ export default {
     this.init()
   },
   computed: {
+    IS_PRODUCTED() {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status != 'OPEN') return false
+      return true
+    },
+    IS_PACKED() {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status != 'PRODUCTED') return false
+      return true
+    },
     IS_CLOSE() {
       if (this.rsView.deleted_at) return false
       if (['CLOSED'].find(x => x === this.rsView.status)) return false
@@ -306,21 +328,81 @@ export default {
       this.rsView =  data
     },
 
-    persenLine (itemLine, detail) {
+    totalLine (itemLine, detail) {
       const total = itemLine.work_production_items.reduce((total, item) => total += item.unit_amount, 0)
-      return Math.round(total / (detail.quantity || 0 * detail.unit_rate || 1) * 100)
+      return this.$app.number_abbreviate(Math.round(total))
     },
-    validLine (itemLine, detail) {
-      const total = itemLine.work_production_items.reduce((total, item) => total += item.unit_amount, 0)
-      const amount = (detail.quantity || 0 * detail.unit_rate || 1)
-      return 0 <= Math.round(total) && Math.round(total) <= Math.round(amount)
+    totalProduction(detail) {
+      return Math.round(detail.amount_process)
     },
-    persenPacking (detail) {
+    totalPacking (detail) {
       const total = detail.packing_items.reduce((total, item) => total += item.unit_total, 0)
-      return Math.round(total / (detail.quantity || 0 * detail.unit_rate || 1) * 100)
+      return this.$app.number_abbreviate(Math.round(total))
     },
-    validPacking (detail) {
-      return 0 > (this.persenPacking(detail)) || (this.persenPacking(detail)) > 100
+    totalAmount (detail) {
+      return Math.round(detail.unit_amount)
+    },
+
+    setProducted () {
+      const submit = () => {
+        this.VIEW.show = false
+        this.VIEW.loading = true
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=producted&nodata=true`
+        this.$axios.put(url)
+          .then((response) => {
+            const data = response.data
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'FORM PRODUCTED')
+          })
+          .finally(()=>{
+            this.VIEW.show = true
+            setTimeout(() => {
+              this.VIEW.loading = false
+            }, 1000);
+          })
+      }
+
+      this.$q.dialog({
+          title: this.$tc('form.confirm', 1, {v:'PRODUCTED'}),
+          message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_producted')}),
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          submit()
+        })
+    },
+
+    setPacked () {
+      const submit = () => {
+        this.VIEW.show = false
+        this.VIEW.loading = true
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=packed&nodata=true`
+        this.$axios.put(url)
+          .then((response) => {
+            const data = response.data
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'FORM PACKED')
+          })
+          .finally(()=>{
+            this.VIEW.show = true
+            setTimeout(() => {
+              this.VIEW.loading = false
+            }, 1000);
+          })
+      }
+
+      this.$q.dialog({
+          title: this.$tc('form.confirm', 1, {v:'PACKED'}),
+          message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_packed')}),
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          submit()
+        })
     },
 
     setClosing () {

@@ -35,11 +35,13 @@ export default {
   process_create: 'Form Penambahan data.',
   process_update: 'Form Perubahan data.',
   process_delete: 'Proses Penghapusan data.',
-  process_close: 'Tandai Proses telah selesai.',
+  process_close: 'Tandai Proses Dukumen telah selesai.',
   process_validation: 'Proses Validasi data.',
   process_confirm: 'Proses Konfirmasi data.',
   process_revise: 'Proses perubahan Revisi data.',
   process_void: 'Proses Pembatalan data.',
+  process_producted: 'Tandai Proses produksi telah selesai.',
+  process_packed: 'Tandai Proses Packing telah selesai.',
 
   yes_to: 'Ya, {v}!'
 }
