@@ -101,18 +101,19 @@
 
           <q-input class="col-12 col-sm-6"
             name="packing_items.quantity"
-            :label="$tc('label.quantity')"
+            :label="$tc('label.quantity')" stack-label
             :data-vv-as="$tc('label.quantity')"
             v-model="rsForm.packing_items.quantity" type="number" :min="0"
             :dark="LAYOUT.isDark"
-            v-validate="`required|gt_value:0|max_value:${MaxUnit}`"
+            v-validate="`required|${MinValidate}|max_value:${MaxUnit}`"
             :suffix="rsForm.packing_items.item_id ? `/ ${$app.number_format(MaxUnit)}` : ''"
             :error="errors.has(`packing_items.quantity`)"
             :error-message="errors.first(`packing_items.quantity`)" >
 
             <q-select slot="after" class="no-padding" style="min-width:80px"
               name="packing_items.unit_id"
-              :label="$tc('label.unit')" :data-vv-as="$tc('label.unit')"
+              :label="$tc('label.unit')" stack-label
+              :data-vv-as="$tc('label.unit')"
               :dark="LAYOUT.isDark"
               no-error-icon
               v-model="rsForm.packing_items.unit_id"
@@ -161,7 +162,7 @@
                 <q-input autofocus
                   :name="`packing_items.packing_item_faults.${props.row.__index}.quantity`"
                   type="number" min="0" align="center"
-                  outlined dense hide-bottom-space color="blue-grey"
+                  outlined dense hide-bottom-space no-error-icon color="blue-grey"
                   :dark="LAYOUT.isDark"
                   v-model="props.row.quantity"
                   v-validate="props.row.fault_id ? 'required|gt_value:0' : ''"
@@ -173,7 +174,7 @@
                 <ux-select-filter
                   :name="`packing_items.packing_item_faults.${props.row.__index}.fault_id`"
                   outlined style="min-width:150px"
-                  dense hide-bottom-space color="blue-grey"
+                  dense hide-bottom-space no-error-icon color="blue-grey"
                   :dark="LAYOUT.isDark"
                   v-model="props.row.fault_id"
                   :options="FaultOptions" clearable
@@ -284,6 +285,12 @@ export default {
     this.init()
   },
   computed: {
+    MinValidate() {
+      if (this.rsForm.packing_items.packing_item_faults.some(x => Boolean(x.fault_id))) {
+        return 'min:0'
+      }
+      return 'gt_value:0'
+    },
     IssetItemID() {
       if(!this.rsForm.hasOwnProperty('packing_items')) return false;
 
