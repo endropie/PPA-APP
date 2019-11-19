@@ -19,6 +19,7 @@ export default {
   due_date: 'Batas Tanggal',
   email: 'Email',
   field: 'Kolom',
+  grandtotal: 'Grand Total',
   general: 'Umum',
   item: 'Item',
   keyword: 'Kata Kunci',

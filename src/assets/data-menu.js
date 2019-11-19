@@ -211,12 +211,20 @@ const factories = [
     lang: 'general.work_order',
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'work-orders-read' } },
+      { page: 'items', path: 'items', icon: 'list', meta: { permission: 'work-orders-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'work-orders-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'work-orders-update' } },
       { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'work-orders-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'work-orders-read' } },
       { page: 'view-prelines', path: ':id/prelines', meta: { mode: 'view', permission: 'work-orders-read' } }
     ]
+  },
+  {
+    name: 'Work Order Items',
+    icon: 'work',
+    path: 'work-orders/items',
+    page: 'items',
+    lang: 'general.work_order_items',
   },
   {
     name: 'Work Production',
