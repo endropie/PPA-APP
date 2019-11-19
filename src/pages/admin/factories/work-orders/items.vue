@@ -42,16 +42,6 @@
                   :dark="LAYOUT.isDark"
                   @input="FILTERABLE.submit" />
 
-                <q-select class="col" style="min-width:120px"
-                  v-model="FILTERABLE.fill.status.value" clearable
-                  :options="['OPEN', 'ON:PROCESS', 'HAS:PRODUCTED', 'HAS:PACKED', 'PRODUCTED', 'PACKED', 'CLOSED']"
-                  :label=" $tc('label.state')"
-                  dense hide-bottom-space hide-dropdown-icon
-                  standout="bg-blue-grey-5 text-white"
-                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                  :dark="LAYOUT.isDark"
-                  @input="FILTERABLE.submit" />
-
                 <ux-date class="col" style="min-width:150px"
                   stack-label :label="$tc('label.date')"
                   v-model="FILTERABLE.fill.date.value" type="date"  clearable
@@ -116,7 +106,8 @@
                   :placeholder="`${$tc('form.search',2)}...`"
                   standout="bg-blue-grey-5 text-white"
                   :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                  :dark="LAYOUT.isDark">
+                  :dark="LAYOUT.isDark"
+                  @input="FILTERABLE.submit">
 
                   <template slot="append">
                     <q-btn flat dense icon="search" color="blue-grey-10" @click="FILTERABLE.submit"/>
