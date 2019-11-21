@@ -39,7 +39,7 @@
             :data="rsView.pre_delivery_items"
             no-data-label = "No Production"
             :columns="[
-              { name: 'code', label: 'code', align: 'left', field: (v)=> v.item.code, hidden: true},
+              { name: 'code', label: 'code', align: 'left', field: (v)=> v.item.customer_code, hidden: true},
               { name: 'part_name', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left', field: (v)=> v.item.part_name},
               { name: 'part_number', label: this.$tc('label.number', 1, {v:this.$tc('label.part')}), align: 'left', field: (v)=> v.item.part_number},
               { name: 'quantity', label: $tc('label.quantity'), align: 'right', field: (v)=> v.quantity},

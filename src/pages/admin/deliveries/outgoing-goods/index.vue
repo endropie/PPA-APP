@@ -228,10 +228,6 @@ export default {
     },
   },
   methods: {
-    toggleExpanded(rs) {
-      this.TABLE.rowData[rs.row.__index].expanded = !rs.row.expanded
-      console.log('click', rs, this.TABLE.rowData[rs.row.__index].expanded)
-    },
     showDO(id) {
       let mode = {
         path: '/admin/deliveries/delivery-orders/view',

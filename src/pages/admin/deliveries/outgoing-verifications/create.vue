@@ -41,66 +41,61 @@
 
     </q-card-section>
     <q-card-section>
-      <q-table class="bordered no-shadow no-highlight th-uppercase"
-        dense hide-bottom color="primary"
-        :data="rsForm.outgoing_good_verifications"
-        :rows-per-page-options ="[0]"
-        :columns="[
-          { name: 'item_id', label: $tc('items.part_name'), align: 'left'},
-          { name: 'part_number', label: $tc('items.part_number'), align: 'left'},
-          { name: 'unit_id', label: $tc('label.unit'), align: 'center'},
-          { name: 'quantity', label: $tc('label.quantity'), align: 'center'},
-          { name: 'AVA', label: this.$tc('label.available'), field:'AVA', align: 'right'},
-        ]"
-        :pagination="{ rowsPerPage: 0}"
-        :loading="SHEET['pre_deliveries'].loading"
-        :loading-label="$tc('messages.to_waiting')">
-
-        <q-tr slot="body" slot-scope="rsItem" :scope="rsItem" >
+      <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
+        dense separator="horizontal"
+        :dark="LAYOUT.isDark">
+        <q-tr>
+          <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
+          <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
+          <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
+          <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+          <q-th key="AVA">{{$tc('label.available')}}</q-th>
+        </q-tr>
+        <q-tr v-for="(row, index) in rsForm.outgoing_good_verifications" :key="index">
           <q-td key="item_id" width="35%" >
             <q-input readonly
-              :value="rsItem.row.item ? rsItem.row.item.part_name : null"
+              :value="row.item ? row.item.part_name : null"
               outlined dense hide-bottom-space color="blue-grey-5"
               :dark="LAYOUT.isDark" />
           </q-td>
           <q-td key="part_number" width="35%" >
             <q-input readonly
-              :value="rsItem.row.item ? rsItem.row.item.part_number : null"
+              :value="row.item ? row.item.part_number : null"
               outlined dense hide-bottom-space color="blue-grey-5"
               :dark="LAYOUT.isDark" />
           </q-td>
           <q-td key="unit_id" width="20%" >
             <q-select
-              v-model="rsItem.row.unit_id"
-              :options="ItemUnitOptions[rsItem.row.__index]"
+              v-model="row.unit_id"
+              :options="ItemUnitOptions[index]"
               map-options emit-value
               outlined dense hide-bottom-space color="blue-grey-5"
               :dark="LAYOUT.isDark"
-              @input="(val) => setUnitReference(rsItem.row.__index, val)" />
+              @input="(val) => setUnitReference(index, val)" />
           </q-td>
           <q-td key="quantity" width="25%">
-            <q-input :name="`outgoing_good_verifications.${rsItem.row.__index}.quantity`"
+            <q-input :name="`outgoing_good_verifications.${index}.quantity`"
               style="min-width:120px"
-              v-model="rsItem.row.quantity" type="number" :min="0"
+              v-model="row.quantity" type="number" :min="0"
               outlined dense hide-bottom-space no-error-icon align="center"
               :dark="LAYOUT.isDark" color="blue-grey-5"
-              :suffix="rsItem.row.item_id ? `/ ${$app.number_format(rsItem.row.maximum / rsItem.row.unit_rate)}` : ''"
-              v-validate="`gt_value:0|max_value: ${maximality(rsItem.row.maximum, STOCKS[rsItem.row.__index]) / rsItem.row.unit_rate}`"
-              :error="errors.has(`outgoing_good_verifications.${rsItem.row.__index}.quantity`)"
+              :suffix="row.item_id ? `/ ${$app.number_format(row.maximum / row.unit_rate)}` : ''"
+              v-validate="`gt_value:0|max_value: ${maximality(row.maximum, STOCKS[index]) / row.unit_rate}`"
+              :error="errors.has(`outgoing_good_verifications.${index}.quantity`)"
             />
           </q-td>
            <q-td key="AVA" width="25%" align="right">
             <q-chip square class="text-weight-medium">
-              {{$app.number_format(STOCKS[rsItem.row.__index] / rsItem.row.unit_rate)}}
+              {{$app.number_format(STOCKS[index] / row.unit_rate)}}
             </q-chip>
            </q-td>
         </q-tr>
-        <q-tr slot="bottom-row" slot-scope="prop" :scope="prop">
+        <q-tr>
           <q-td colspan="100%" class="text-center" v-if="AllDetail && AllDetail.length == 0">
             <div v-show="!Boolean(rsForm.outgoing_good_verifications.length)" class="q-pa-sm">{{$tc('messages.no_details')}}</div>
           </q-td>
         </q-tr>
-      </q-table>
+      </q-markup-table>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
     <q-card-actions align="right" class="items-end self-end">

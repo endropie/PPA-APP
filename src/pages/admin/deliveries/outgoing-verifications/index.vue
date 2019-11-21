@@ -79,23 +79,6 @@
         </template>
 
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
-          <q-btn v-show="false" v-if="isCanUpdate && isEditRow(rs.row)" dense flat color="light" icon="edit">
-            <q-popup-edit v-if="!rs.row.outgoing_good_id" buttons
-              title="Form"
-              v-model="rs.row"
-              @save="(val, initialValue) => saveRow(val, initialValue)"
-              @cancel="(val, initialValue) => cancelRow(val, initialValue)">
-
-              <q-input class="col-12 col-sm-6" type="number"
-                :name="`quantity.${rs.row.__index}`"
-                label="Quantity" autofocus
-                v-model="rs.row.quantity" min="0"
-                v-validate="`required|min_value:0`"
-                :error="errors.has(`quantity.${rs.row.__index}`)"
-              />
-
-            </q-popup-edit>
-          </q-btn>
           <q-btn v-if="isCanUpdate && isEditRow(rs.row)" dense flat color="light" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`"/>
           <q-btn v-if="isCanDelete && isEditRow(rs.row)" dense flat color="light" icon="delete" @click.native="TABLE.delete(rs.row)"/>
         </q-td>

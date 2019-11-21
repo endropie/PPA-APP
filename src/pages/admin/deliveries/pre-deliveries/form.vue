@@ -59,82 +59,76 @@
         :error-message="errors.first('rit')"/>
 
       <div class="col-12">
-        <q-table ref="table" dense hide-bottom
-          :data="rsForm.pre_delivery_items"
-          :dark="LAYOUT.isDark"
-          class="main-box bordered no-shadow th-uppercase"
-          :columns="[
-            { name: 'prefix', label: '',  align: 'left'},
-            { name: 'item_id', label: $tc('items.part_name'), align: 'left'},
-            { name: 'part_number', label: $tc('items.part_number'), align: 'left'},
-            { name: 'unit_id', label: $tc('label.unit'), align: 'center'},
-            { name: 'quantity', label: $tc('label.quantity'), align: 'center'},
-          ]"
-          :rows-per-page-options ="[0]"
-          :pagination="{rowsPerPage: 0}"
-          >
-          <template slot="body" slot-scope="rsItem">
-            <q-tr :rsItem="rsItem">
+        <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
+          dense separator="horizontal"
+          :dark="LAYOUT.isDark">
+          <q-tr>
+            <q-th key="prefix"></q-th>
+            <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
+            <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
+            <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
+            <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+          </q-tr>
+          <q-tr v-for="(row, index) in rsForm.pre_delivery_items" :key="index">
               <q-td key="prefix">
-                <q-btn dense flat round icon="close" color="red" @click="removeItem(rsItem.row.__index)"/>
+                <q-btn dense flat round icon="close" color="red" @click="removeItem(index)"/>
               </q-td>
               <q-td key="item_id" width="35%" style="min-width:150px">
                 <ux-select-filter autofocus
-                  :name="`pre_delivery_items.${rsItem.row.__index}.item_id`"
-                  v-model="rsItem.row.item_id"
+                  :name="`pre_delivery_items.${index}.item_id`"
+                  v-model="row.item_id"
                   outlined dense hide-bottom-space no-error-icon hide-dropdown-icon color="blue-grey-5"
                   :readonly="!IssetCustomerID"
                   :options="ItemOptions"
                   :loading="SHEET.items.loading"
                   :data-vv-as="$tc('general.item')"
-                  v-validate="`required|excluded:${rsForm.pre_delivery_items.map((x,index) => (index) < rsItem.row.__index ? x.item_id : -1)}`"
+                  v-validate="`required|excluded:${rsForm.pre_delivery_items.map((x,index) => (index) < index ? x.item_id : -1)}`"
                   :dark="LAYOUT.isDark"
-                  :error="errors.has(`pre_delivery_items.${rsItem.row.__index}.item_id`)"
-                  :error-message="errors.first(`pre_delivery_items.${rsItem.row.__index}.item_id`)"
-                  @input="(val)=>{ setItemReference(rsItem.row.__index, val) }" />
+                  :error="errors.has(`pre_delivery_items.${index}.item_id`)"
+                  :error-message="errors.first(`pre_delivery_items.${index}.item_id`)"
+                  @input="(val)=>{ setItemReference(index, val) }" />
                 <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
               </q-td>
               <q-td key="part_number" width="35%" style="min-width:150px">
                 <q-input readonly
-                  :value="rsItem.row.item ? rsItem.row.item.part_number : null"
+                  :value="row.item ? row.item.part_number : null"
                   outlined dense hide-bottom-space color="blue-grey-5"
                   :dark="LAYOUT.isDark" />
               </q-td>
               <q-td key="unit_id" width="15%">
                 <q-select style="min-width:80px"
-                  :name="`pre_delivery_items.${rsItem.row.__index}.unit_id`"
-                  v-model="rsItem.row.unit_id"
+                  :name="`pre_delivery_items.${index}.unit_id`"
+                  v-model="row.unit_id"
                   outlined dense hide-bottom-space
-                  :options="ItemUnitOptions[rsItem.row.__index]"
+                  :options="ItemUnitOptions[index]"
                   map-options emit-value
                   :dark="LAYOUT.isDark" color="blue-grey-5"
-                  :error="errors.has(`pre_delivery_items.${rsItem.row.__index}.unit_id`)"
-                  :error-message="errors.first(`pre_delivery_items.${rsItem.row.__index}.unit_id`)"
-                  @input="(val)=> { setUnitReference(rsItem.row.__index, val) }"
+                  :error="errors.has(`pre_delivery_items.${index}.unit_id`)"
+                  :error-message="errors.first(`pre_delivery_items.${index}.unit_id`)"
+                  @input="(val)=> { setUnitReference(index, val) }"
                 />
               </q-td>
               <q-td key="quantity" width="30%">
                 <q-input style="min-width:100px"
-                  :name="`pre_delivery_items.${rsItem.row.__index}.quantity`"
-                  v-model="rsItem.row.quantity" type="number" min="0"
+                  :name="`pre_delivery_items.${index}.quantity`"
+                  v-model="row.quantity" type="number" min="0"
                   outlined dense hide-bottom-space no-error-icon color="blue-grey-5"
                   :dark="LAYOUT.isDark"
-                  :suffix="' / ' + strUnitConvertion(rsItem.row, MaxMount[rsItem.row.__index])"
-                  v-validate="`required|gt_value:0|max_value:${numUnitConvertion(rsItem.row, MaxMount[rsItem.row.__index])}`"
-                  :error="errors.has(`pre_delivery_items.${rsItem.row.__index}.quantity`)"
-                  @input="(val)=> {rsItem.row.unit_qty = (val) * (rsItem.row.unit_rate)}"/>
+                  :suffix="' / ' + strUnitConvertion(row, MaxMount[index])"
+                  v-validate="`required|gt_value:0|max_value:${numUnitConvertion(row, MaxMount[index])}`"
+                  :error="errors.has(`pre_delivery_items.${index}.quantity`)"
+                  @input="(val)=> {row.unit_qty = (val) * (row.unit_rate)}"/>
               </q-td>
             </q-tr>
-          </template>
 
-          <q-tr slot="bottom-row" >
+          <q-tr>
             <td></td>
             <q-td>
               <q-btn dense outline color="primary" :label="$tc('form.add')" icon="add_circle_outline" class="full-width" @click="addNewItem()"/>
             </q-td>
             <td colspan="100%"></td>
           </q-tr>
-        </q-table>
+        </q-markup-table>
       </div>
       <!-- COLUMN::4th Description -->
       <q-input class="col-12"
@@ -252,7 +246,7 @@ export default {
 
       return (data.map(item => ({
         label: `${item.part_name}`,
-        sublabel: `${item.code} ${item.part_number}`,
+        sublabel: `[${item.customer_code}] ${item.part_number}`,
         value: item.id,
         data: item
       })) || [])

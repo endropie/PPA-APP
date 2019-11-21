@@ -126,24 +126,21 @@
     <q-card-section class="row q-col-gutter-sm">
 
       <div class="col-12">
-        <q-table ref="table" class="main-box bordered no-shadow no-highlight th-uppercase"
-          :data="rsForm.incoming_good_items" dense
-          :rows-per-page-options ="[0]" hide-bottom
-          :pagination="{ sortBy: null, descending: false, page: null, rowsPerPage: 0 }"
-          :columns="[
-            { name: 'prefix', field: 'prefix', label: '',  align: 'left'},
-            { name: 'item_id', field: 'item_id', label: $tc('items.part_name'), align: 'left'},
-            { name: 'part_number', field: 'item_id', label: $tc('items.part_number'), align: 'left'},
-            { name: 'unit_id', field: 'unit_id', label: $tc('label.unit'), align: 'center'},
-            { name: 'quantity', field: 'quantity', label: $tc('label.quantity'), align: 'center'},
-            { name: 'note', field: 'note', label: $tc('label.note'), align: 'left'},
-          ]"
+        <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
+          dense separator="horizontal"
           :dark="LAYOUT.isDark">
-
-            <template v-slot:body="{row}">
             <q-tr>
+              <q-th key="prefix"></q-th>
+              <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
+              <q-th key="part_name">{{$tc('items.part_number')}}</q-th>
+              <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
+              <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+              <q-th key="note">{{$tc('label.note')}}</q-th>
+            </q-tr>
+
+            <q-tr v-for="(row, index) in rsForm.incoming_good_items" :key="index">
               <q-td key="prefix" style="width:50px">
-                <!-- <q-btn dense flat icon="clear" color="red" @click="excludeItem(row, row.__index)" /> -->
+                <!-- <q-btn dense flat icon="clear" color="red" @click="excludeItem(row, index)" /> -->
                 <q-btn dense flat color="primary"
                   @click="row.valid = row.valid ? 0 : row.quantity" >
                   <q-tooltip  content-class="bg-primary">set valid</q-tooltip>
@@ -174,12 +171,12 @@
 
               <q-td key="quantity" width="15%">
                 <q-input style="min-width:100px"
-                  :name="`items.${row.__index}.quantity`" type="number"
+                  :name="`items.${index}.quantity`" type="number"
                   v-model="row.quantity" readonly
                   v-validate="row.item_id ? 'required' : ''"
                   dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
                   :dark="LAYOUT.isDark"
-                  :error="errors.has(`items.${row.__index}.quantity`)"/>
+                  :error="errors.has(`items.${index}.quantity`)"/>
               </q-td>
 
               <q-td key="note" width="35%">
@@ -189,7 +186,6 @@
                   :dark="LAYOUT.isDark" />
               </q-td>
             </q-tr>
-            </template>
 
           <q-tr slot="bottom-row"
             v-for="(row, index) in (rsForm.exclude_items)" :key="index">
@@ -224,7 +220,7 @@
                   :dark="LAYOUT.isDark" />
               </q-td>
           </q-tr>
-        </q-table>
+        </q-markup-table>
       </div>
       <!-- COLUMN::4th Description -->
       <q-input class="col-12"

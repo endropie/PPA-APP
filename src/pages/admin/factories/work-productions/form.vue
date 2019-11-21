@@ -49,101 +49,85 @@
           </div>
         </div>
         <div class="col-12">
-          <q-table dense hide-bottom grid
-            separator="vertical"
-            :dark="LAYOUT.isDark"
-            :data="rsForm.work_production_items"
-            :rows-per-page-options ="[0]"
-            :columns="[
-              { name: 'prefix', label: '',  align: 'left'},
-              { name: 'item_id', label: $tc('items.part_name'), align: 'left'},
-              { name: 'part_number', label: $tc('items.part_number'), align: 'left'},
-              { name: 'work_order_item_line_id', label: 'WO [#]', align: 'left'},
-              { name: 'unit_id', label: $tc('label.unit'), align: 'center'},
-              { name: 'quantity', label: $tc('label.quantity'), align: 'center'},
-            ]"
-            :pagination=" {sortBy: null, descending: false, page: null, rowsPerPage: 0}">
-
-            <template slot="item" slot-scope="rsItem">
-              <div class="q-pa-xs col-12 col-sm-12">
+          <div class="main-box">
+            <template v-for="(row, index) in rsForm.work_production_items" >
+              <div class="q-pa-xs col-12 col-sm-12" :key="index">
                 <q-card class="main-box" :dark="LAYOUT.isDark">
                   <q-card-section class="row items-center no-wrap q-py-xs">
                       <div class="col">
                         <div class="text-subtitle2">{{$tc('general.item')}}
-                          <q-badge :label="rsItem.row.__index+1" color="blue-grey" v-if="rsItem.row.__index>0" />
+                          <q-badge :label="index+1" color="blue-grey" v-if="index>0" />
                         </div>
                       </div>
                       <div class="col-auto">
-                        <q-btn dense flat round color="negative" icon="clear" tabindex="100" @click="removeItem(rsItem.row.__index)"/>
+                        <q-btn dense flat round color="negative" icon="clear" tabindex="100" @click="removeItem(index)"/>
                       </div>
                   </q-card-section>
                   <q-card-section class="row q-col-gutter-sm">
                     <ux-select-filter class="col-12 col-md-6" autofocus
-                      :name="`work_production_items.${rsItem.row.__index}.item_id`"
+                      :name="`work_production_items.${index}.item_id`"
                       :label="$tc('items.part_name')" stack-label
                       outlined color="blue-grey-4"
                       hide-bottom-space hide-dropdown-icon
-                      v-model="rsItem.row.item_id"
+                      v-model="row.item_id"
                       v-validate="'required'"
                       :disable="!rsForm.line_id"
                       :options="ItemOptions" clearable
                       popup-content-class="options-striped"
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                      :error="errors.has(`work_production_items.${rsItem.row.__index}.item_id`)"
+                      :error="errors.has(`work_production_items.${index}.item_id`)"
                       :loading="SHEET['items'].loading"
-                      @input="(val) => setItemReference(rsItem.row.__index, val)" />
+                      @input="(val) => setItemReference(index, val)" />
 
                     <ux-select-filter class="col-12 col-md-6"
-                      :name="`work_production_items.${rsItem.row.__index}.work_order_item_line_id`"
+                      :name="`work_production_items.${index}.work_order_item_line_id`"
                       :label="$tc('general.work_production')" stack-label
-                      v-model="rsItem.row.work_order_item_line_id"
+                      v-model="row.work_order_item_line_id"
                       v-validate="'required'"
                       outlined color="blue-grey-4"
                       no-error-icon hide-bottom-space hide-dropdown-icon
                       :disable="!rsForm.line_id"
-                      :options="WorkOrderItemLineOptions.filter(x => x.item_id === rsItem.row.item.id)" clearable
+                      :options="WorkOrderItemLineOptions.filter(x => x.item_id === row.item.id)" clearable
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                      :error="errors.has(`work_production_items.${rsItem.row.__index}.work_order_item_line_id`)"
+                      :error="errors.has(`work_production_items.${index}.work_order_item_line_id`)"
                       :loading="SHEET['work_orders'].loading" />
 
                     <q-input readonly tabindex="100" class="col-12 col-md-6"
                       :label="$tc('items.part_number')" stack-label
-                      :value="rsItem.row.item ? rsItem.row.item.part_number : null"
+                      :value="row.item ? row.item.part_number : null"
                       outlined hide-bottom-space color="blue-grey-5"
                       :dark="LAYOUT.isDark" />
 
                     <q-input type="number" class="col-12 col-sm-8 col-md-4" style="min-width:120px"
-                      :name="`work_production_items.${rsItem.row.__index}.quantity`"
+                      :name="`work_production_items.${index}.quantity`"
                       :label="$tc('label.quantity')" stack-label
                       :dark="LAYOUT.isDark" color="blue-grey-6"
-                      v-model="rsItem.row.quantity" min="0"
+                      v-model="row.quantity" min="0"
                       outlined hide-bottom-space no-error-icon align="right"
-                      v-validate="`required|gt_value:0|max_value:${MaxStock[rsItem.row.__index] / (rsItem.row.unit_rate||1)}`"
-                      :error="errors.has(`work_production_items.${rsItem.row.__index}.quantity`)"
-                      :suffix="' / '+ $app.number_format(MaxStock[rsItem.row.__index] / (rsItem.row.unit_rate||1))" />
+                      v-validate="`required|gt_value:0|max_value:${MaxStock[index] / (row.unit_rate||1)}`"
+                      :error="errors.has(`work_production_items.${index}.quantity`)"
+                      :suffix="' / '+ $app.number_format(MaxStock[index] / (row.unit_rate||1))" />
 
                     <q-select class="col-12 col-sm-4 col-md-2"
-                      :name="`work_production_items.${rsItem.row.__index}.unit_id`"
+                      :name="`work_production_items.${index}.unit_id`"
                       :label="$tc('label.unit')" stack-label
-                      v-model="rsItem.row.unit_id"
-                      v-validate="rsItem.row.item_id ? 'required' : ''"
+                      v-model="row.unit_id"
+                      v-validate="row.item_id ? 'required' : ''"
                       outlined hide-bottom-space color="blue-grey-4"
-                      :options="ItemUnitOptions[rsItem.row.__index]"
+                      :options="ItemUnitOptions[index]"
                       map-options  emit-value
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                      :error="errors.has(`work_production_items.${rsItem.row.__index}.unit_id`)"
-                      :disable="!rsForm.line_id || !rsItem.row.item_id"
-                      @input="(val) => setUnitReference(rsItem.row.__index, val)"
+                      :error="errors.has(`work_production_items.${index}.unit_id`)"
+                      :disable="!rsForm.line_id || !row.item_id"
+                      @input="(val) => setUnitReference(index, val)"
                     />
                   </q-card-section>
                 </q-card>
               </div>
             </template>
-          </q-table>
+          </div>
 
-          <q-btn outline dense color="positive" class="q-mt-md full-width"
-            :label="$tc('form.add_new', 1)" icon-right="add"
-            @click="addNewItem()" />
+          <q-btn outline dense color="blue-grey" :label="$tc('form.add')" icon="add_circle_outline" class="q-mt-md full-width" @click="addNewItem()" />
         </div>
         <!-- COLUMN::4th Description -->
         <div class="col-12 column q-gutter-md q-pt-md">

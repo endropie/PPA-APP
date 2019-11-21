@@ -227,10 +227,6 @@ export default {
     }
   },
   methods: {
-    getRowClass(rs)  {
-      if (rs.row.__index % 2 === 0) return 'col-odd'
-      return ''
-    },
     totalStock(id, label) {
       if(!this.MAPINGKEY['itemstocks'][id]) return 0
       return Number(this.MAPINGKEY['itemstocks'][id][label])

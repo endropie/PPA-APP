@@ -162,12 +162,6 @@ export default {
         totals['VDO'] -= this.FORM.data.unit_amount
       }
 
-      console.warn('STOCK', PdoItem, {
-        ...totals,
-        PRE: PreItem,
-        MAX: maxi(totals.AVA, PreItem)
-      })
-
       return {
           ...totals,
           PRE: PreItem,

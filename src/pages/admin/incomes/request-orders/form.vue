@@ -70,98 +70,94 @@
     <!-- COLUMN::2th Incoming Items lists -->
     <q-card-section class="row q-col-gutter-sm q-col-gutter-x-md">
       <div class="col-12 q-my-md">
-        <q-table
-          :data="rsForm.request_order_items" dense
-          class="table-form full-width d-grid no-shadow" :dark="LAYOUT.isDark"
-          hide-bottom
-          :rows-per-page-options ="[0]"
-          :columns="[
-            { name: 'prefix', label: '',  align: 'left'},
-            { name: 'item_id', label: $tc('items.part_name'), align: 'left'},
-            { name: 'part_number', label: $tc('items.part_number'), align: 'left'},
-            { name: 'quantity', label: 'Qty', align: 'center'},
-            { name: 'unit_id', label: $tc('label.unit'), align: 'center'},
-            { name: 'price', label: 'Price', align: 'center'},
-            { name: 'total', label: 'Total', align: 'center'},
-          ]"
-          :pagination="{sortBy: null, descending: false, page: null,rowsPerPage: 0}"
-        >
-          <template slot="body" slot-scope="rsItem">
-            <q-tr :rsItem="rsItem">
-              <q-td key="prefix" :rsItem="rsItem" style="width:50px">
-                <q-btn dense  icon="delete" color="blue-grey-5" @click="removeItem(rsItem.row.__index)"/>
-              </q-td>
-              <q-td key="item_id" :rsItem="rsItem" width="30%" style="min-width:150px">
-                <ux-select-filter :name="`request_orders_items.${rsItem.row.__index}.item_id`"
-                  v-model="rsItem.row.item_id"
-                  v-validate="'required'"
-                  outlined dense hide-bottom-space color="blue-grey-5"
-                  :options="ItemOptions"
-                  :readonly="!IssetCustomerID"
-                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                  :error="errors.has(`request_orders_items.${rsItem.row.__index}.item_id`)"
-                  :loading="SHEET['items'].loading"
-                  @input="(val)=>{ setItemReference(rsItem.row.__index, val) }"
-                />
-                <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
-              </q-td>
-              <q-td key="part_number" width="30%" style="min-width:150px">
-                <q-input readonly
-                  :value="rsItem.row.item ? rsItem.row.item.part_number : null"
-                  outlined dense hide-bottom-space color="blue-grey-5"
-                  :dark="LAYOUT.isDark" />
-              </q-td>
-              <q-td key="quantity" :rsItem="rsItem" width="10%">
-                <q-input :name="`request_orders_items.${rsItem.row.__index}.quantity`"
-                  v-model="rsItem.row.quantity" type="number"
-                  outlined dense hide-bottom-space
-                  color="blue-grey-5" style="width:80px"
-                  v-validate="rsItem.row.item_id ? 'required' : ''"
-                  :dark="LAYOUT.isDark"
-                  :error="errors.has(`request_orders_items.${rsItem.row.__index}.quantity`)"
-                />
-              </q-td>
-              <q-td key="unit_id" :rsItem="rsItem" width="10%">
-                <q-select :name="`request_orders_items.${rsItem.row.__index}.unit_id`"
-                  v-model="rsItem.row.unit_id"
-                  :options="ItemUnitOptions[rsItem.row.__index]"
-                  map-options emit-value
-                  outlined dense hide-bottom-space
-                  color="blue-grey-5" style="width:80px"
-                  v-validate="rsItem.row.item_id ? 'required' : ''"
-                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                  :error="errors.has(`request_orders_items.${rsItem.row.__index}.unit_id`)"
-                  @input="(val)=> { setUnitReference(rsItem.row.__index, val) }" />
-                <q-input v-model="rsItem.row.unit_rate" class="hidden" />
-              </q-td>
-              <q-td key="price" :rsItem="rsItem" width="20%" style="min-width:120px">
-                <ux-numeric type="number" :name="`request_orders_items.${rsItem.row.__index}.price`"
-                  v-model="rsItem.row.price"
-                  outlined dense hide-bottom-space
-                  color="blue-grey-5" style="width:120px"
-                  v-validate="rsItem.row.item_id ? 'required' : ''"
-                  :dark="LAYOUT.isDark"
-                  :error="errors.has(`request_orders_items.${rsItem.row.__index}.price`)" />
-              </q-td>
-              <q-td key="total" :rsItem="rsItem" width="20%" style="min-width:150px">
-                <ux-numeric :name="`total-${rsItem.row.__index}`"
-                  :value="Number(rsItem.row.quantity) * Number(rsItem.row.price)"
-                  readonly dense borderless hide-bottom-space
-                  color="blue-grey-5" style="width:120px"
-                  v-validate="rsItem.row.item_id ? '' : ''"
-                  :dark="LAYOUT.isDark"
-                  :error="errors.has(`total-${rsItem.row.__index}`)"
-                />
-              </q-td>
-            </q-tr>
-          </template>
-
-          <q-tr slot="bottom-row" slot-scope="rsItem" :rsItem="rsItem">
-            <q-td colspan="100%">
-              <strong><q-btn dense  @click="addNewItem()" icon="add" color="positive"/></strong>
-            </q-td>
+        <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
+          dense separator="horizontal"
+          :dark="LAYOUT.isDark">
+          <q-tr>
+            <q-th key="prefix"></q-th>
+            <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
+            <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
+            <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
+            <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+            <q-th key="price">{{$tc('label.price')}}</q-th>
+            <q-th key="total">{{$tc('label.total')}}</q-th>
           </q-tr>
-        </q-table>
+          <q-tr v-for="(row, index) in rsForm.request_order_items" :key="index">
+            <q-td key="prefix" style="width:50px">
+              <q-btn dense flat icon="clear" color="negative" @click="removeItem(index)"/>
+            </q-td>
+            <q-td key="item_id" width="30%" style="min-width:150px">
+              <ux-select-filter :name="`request_orders_items.${index}.item_id`"
+                v-model="row.item_id"
+                v-validate="'required'"
+                outlined dense hide-bottom-space color="blue-grey-5"
+                :options="ItemOptions"
+                :readonly="!IssetCustomerID"
+                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                :error="errors.has(`request_orders_items.${index}.item_id`)"
+                :loading="SHEET['items'].loading"
+                @input="(val)=>{ setItemReference(index, val) }"
+              />
+              <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
+            </q-td>
+            <q-td key="part_number" width="30%" style="min-width:150px">
+              <q-input readonly
+                :value="row.item ? row.item.part_number : null"
+                outlined dense hide-bottom-space color="blue-grey-5"
+                :dark="LAYOUT.isDark" />
+            </q-td>
+            <q-td key="quantity" width="10%">
+              <q-input :name="`request_orders_items.${index}.quantity`"
+                v-model="row.quantity" type="number"
+                outlined dense hide-bottom-space
+                color="blue-grey-5" style="width:80px"
+                v-validate="row.item_id ? 'required' : ''"
+                :dark="LAYOUT.isDark"
+                :error="errors.has(`request_orders_items.${index}.quantity`)"
+              />
+            </q-td>
+            <q-td key="unit_id" width="10%">
+              <q-select :name="`request_orders_items.${index}.unit_id`"
+                v-model="row.unit_id"
+                :options="ItemUnitOptions[index]"
+                map-options emit-value
+                outlined dense hide-bottom-space
+                color="blue-grey-5" style="width:80px"
+                v-validate="row.item_id ? 'required' : ''"
+                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                :error="errors.has(`request_orders_items.${index}.unit_id`)"
+                @input="(val)=> { setUnitReference(index, val) }" />
+              <q-input v-model="row.unit_rate" class="hidden" />
+            </q-td>
+            <q-td key="price" width="20%" style="min-width:120px">
+              <ux-numeric type="number" :name="`request_orders_items.${index}.price`"
+                v-model="row.price"
+                outlined dense hide-bottom-space
+                color="blue-grey-5" style="width:120px"
+                v-validate="row.item_id ? 'required' : ''"
+                :dark="LAYOUT.isDark"
+                :error="errors.has(`request_orders_items.${index}.price`)" />
+            </q-td>
+            <q-td key="total" width="20%" style="min-width:150px">
+              <ux-numeric :name="`total-${index}`"
+                :value="Number(row.quantity) * Number(row.price)"
+                readonly dense borderless hide-bottom-space
+                color="blue-grey-5" style="width:120px"
+                v-validate="row.item_id ? '' : ''"
+                :dark="LAYOUT.isDark"
+                :error="errors.has(`total-${index}`)"
+              />
+            </q-td>
+            </q-tr>
+
+          <q-tr>
+            <q-td></q-td>
+            <q-td>
+              <q-btn dense outline :label="$tc('form.add')" icon="add_circle_outline" color="blue-grey" class="full-width" @click="addNewItem()"/>
+            </q-td>
+            <q-td colspan="100%"></q-td>
+          </q-tr>
+        </q-markup-table>
       </div>
       <!-- COLUMN::4th Description -->
       <div class="col-12">
@@ -286,10 +282,7 @@ export default {
     },
     ItemOptions() {
       let items = this.SHEET.items.data.filter((item) => item.customer_id === this.rsForm.customer_id)
-      const sublabel = (val) => {
-        return val != null ? `No.${val}` : null
-      }
-      return (items.map(item => ({label: `[${item.code}] ${item.part_name}`, sublabel: sublabel(item.part_number), value: item.id})) || [])
+      return (items.map(item => ({label: item.part_name, sublabel: `[${item.customer_code}] No.${item.part_number}`, value: item.id})) || [])
     },
     ItemUnitOptions() {
       let vars = []

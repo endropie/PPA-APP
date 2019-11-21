@@ -1,5 +1,6 @@
 
 export default {
+  fault: 'Fault',
   stock_init: 'Awal',
   stock_final: 'Akhir',
   packing_duration: 'Durasi Packing (s)',

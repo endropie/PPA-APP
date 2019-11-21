@@ -110,89 +110,85 @@
         </div>
         <!-- COLUMN::3th Part items lists -->
         <div class="col-12 q-my-md">
-          <q-table dense hide-bottom separator="vertical"
-            class="bordered no-shadow"
-            :data="rsForm.delivery_order_items"
-            :rows-per-page-options ="[0]"
-            :pagination="{ sortBy: null, descending: false, page: null, rowsPerPage: 0 }"
-            :columns="[
-              { name: 'prefix', align: 'left'},
-              { name: 'item_id', label: $tc('items.part_name'), align: 'left'},
-              { name: 'part_name', label: $tc('items.part_number'), align: 'left'},
-              { name: 'quantity', label: $tc('label.quantity'), align: 'center'},
-              { name: 'unit_id', label: $tc('label.unit'), align: 'center'},
-            ]">
-            <template slot="body" slot-scope="rsItem">
-              <q-tr :rsItem="rsItem">
-                <q-td key="prefix" style="width:50px">
-                  <q-btn dense flat round icon="clear" color="red" @click="removeItem(rsItem.row.__index)"/>
-                </q-td>
-                <q-td key="request_order_item_id" width="30%" >
-                  <ux-select-filter v-if="WITH_RO" style="min-width:150px"
-                    :name="`delivery_order_items.${rsItem.row.__index}.item_id`"
-                    v-model="rsItem.row.request_order_item_id"
-                    outlined dense color="blue-grey-5"
-                    hide-bottom-space no-error-icon
-                    :options="RequestOrderItemOptions" clearable
-                    v-validate="`required`"
-                    :error="errors.has(`delivery_order_items.${rsItem.row.__index}.item_id`)"
-                    @input="(val)=>{ setRequestOrderItem(rsItem.row.__index, val) }" />
+          <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
+            dense separator="horizontal"
+            :dark="LAYOUT.isDark">
+            <q-tr>
+              <q-th key="prefix"></q-th>
+              <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
+              <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
+              <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
+              <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+            </q-tr>
+            <q-tr v-for="(row, index) in rsForm.delivery_order_items" :key="index">
+              <q-td key="prefix" style="width:50px">
+                <q-btn dense flat round icon="clear" color="red" @click="removeItem(index)"/>
+              </q-td>
+              <q-td key="request_order_item_id" width="30%" >
+                <ux-select-filter v-if="WITH_RO" style="min-width:150px"
+                  :name="`delivery_order_items.${index}.item_id`"
+                  v-model="row.request_order_item_id"
+                  outlined dense color="blue-grey-5"
+                  hide-bottom-space no-error-icon
+                  :options="RequestOrderItemOptions" clearable
+                  v-validate="`required`"
+                  :error="errors.has(`delivery_order_items.${index}.item_id`)"
+                  @input="(val)=>{ setRequestOrderItem(index, val) }" />
 
-                  <ux-select-filter v-else style="min-width:150px"
-                    :name="`delivery_order_items.${rsItem.row.__index}.item_id`"
-                    v-model="rsItem.row.item_id"
-                    outlined dense color="blue-grey-5"
-                    hide-bottom-space no-error-icon
-                    :options="ItemOptions"
-                    v-validate="`required`"
-                    :error="errors.has(`delivery_order_items.${rsItem.row.__index}.item_id`)"
-                    @input="(val)=>{ setItemReference(rsItem.row.__index, val) }"
-                    :loading="SHEET['items'].loading"/>
-                </q-td>
-                <q-td key="item_id" width="30%" >
+                <ux-select-filter v-else style="min-width:150px"
+                  :name="`delivery_order_items.${index}.item_id`"
+                  v-model="row.item_id"
+                  outlined dense color="blue-grey-5"
+                  hide-bottom-space no-error-icon
+                  :options="ItemOptions"
+                  v-validate="`required`"
+                  :error="errors.has(`delivery_order_items.${index}.item_id`)"
+                  @input="(val)=>{ setItemReference(index, val) }"
+                  :loading="SHEET['items'].loading"/>
+              </q-td>
+              <q-td key="item_id" width="30%" >
 
-                  <q-input readonly
-                    :value="rsItem.row.item ? rsItem.row.item.part_number : null"
-                    outlined dense hide-bottom-space color="blue-grey-5"
-                    :dark="LAYOUT.isDark" />
-                </q-td>
-                <q-td key="quantity" width="25%">
-                  <q-input type="number" v-if="WITH_RO" style="min-width:120px"
-                    :name="`delivery_order_items.${rsItem.row.__index}.quantity`"
-                    v-model="rsItem.row.quantity"
-                    outlined dense color="blue-grey-5"
-                    hide-bottom-space no-error-icon
-                    v-validate="`required|max_value:${numUnitConvertion(rsItem.row, MaxMount[rsItem.row.__index])}`"
-                    :error="errors.has(`delivery_order_items.${rsItem.row.__index}.quantity`)">
-                    <span slot="append" class="text-body2">
-                    / <q-badge :label="numUnitConvertion(rsItem.row, MaxMount[rsItem.row.__index])" />
-                    </span>
-                  </q-input>
+                <q-input readonly
+                  :value="row.item ? row.item.part_number : null"
+                  outlined dense hide-bottom-space color="blue-grey-5"
+                  :dark="LAYOUT.isDark" />
+              </q-td>
+              <q-td key="quantity" width="25%">
+                <q-input type="number" v-if="WITH_RO" style="min-width:120px"
+                  :name="`delivery_order_items.${index}.quantity`"
+                  v-model="row.quantity"
+                  outlined dense color="blue-grey-5"
+                  hide-bottom-space no-error-icon
+                  v-validate="`required|max_value:${numUnitConvertion(row, MaxMount[index])}`"
+                  :error="errors.has(`delivery_order_items.${index}.quantity`)">
+                  <span slot="append" class="text-body2">
+                  / <q-badge :label="numUnitConvertion(row, MaxMount[index])" />
+                  </span>
+                </q-input>
 
-                  <q-input type="number" v-else style="min-width:120px"
-                    :name="`delivery_order_items.${rsItem.row.__index}.quantity`"
-                    v-model="rsItem.row.quantity"
-                    outlined dense color="blue-grey-5"
-                    hide-bottom-space no-error-icon
-                    v-validate="`required|gt_value:0`"
-                    :error="errors.has(`delivery_order_items.${rsItem.row.__index}.quantity`)" />
-                </q-td>
-                <q-td key="unit_id" width="20%" >
-                  <q-select style="min-width:100px"
-                    :name="`delivery_order_items.${rsItem.row.__index}.unit_id`"
-                    v-model="rsItem.row.unit_id"
-                    outlined dense color="blue-grey-5"
-                    hide-bottom-space no-error-icon
-                    :options="ItemUnitOptions[rsItem.row.__index]"
-                    map-options emit-value
-                    v-validate="rsItem.row.item_id ? 'required' : ''"
-                    :error="errors.has(`delivery_order_items.${rsItem.row.__index}.unit_id`)"
-                    @input="(val)=>{ setUnitReference(rsItem.row.__index, val) }"
-                  />
-                </q-td>
-              </q-tr>
-            </template>
-            <q-tr slot="bottom-row">
+                <q-input type="number" v-else style="min-width:120px"
+                  :name="`delivery_order_items.${index}.quantity`"
+                  v-model="row.quantity"
+                  outlined dense color="blue-grey-5"
+                  hide-bottom-space no-error-icon
+                  v-validate="`required|gt_value:0`"
+                  :error="errors.has(`delivery_order_items.${index}.quantity`)" />
+              </q-td>
+              <q-td key="unit_id" width="20%" >
+                <q-select style="min-width:100px"
+                  :name="`delivery_order_items.${index}.unit_id`"
+                  v-model="row.unit_id"
+                  outlined dense color="blue-grey-5"
+                  hide-bottom-space no-error-icon
+                  :options="ItemUnitOptions[index]"
+                  map-options emit-value
+                  v-validate="row.item_id ? 'required' : ''"
+                  :error="errors.has(`delivery_order_items.${index}.unit_id`)"
+                  @input="(val)=>{ setUnitReference(index, val) }"
+                />
+              </q-td>
+            </q-tr>
+            <q-tr>
               <q-td colspan="100%">
                 <q-btn-dropdown split dense icon="add" color="green"
                   :label="$tc('form.add')"
@@ -213,7 +209,7 @@
                 </q-btn-dropdown>
               </q-td>
             </q-tr>
-          </q-table>
+          </q-markup-table>
         </div>
         <!-- COLUMN::4th Description -->
         <div class="col-12">

@@ -115,103 +115,86 @@
       </div>
       <!-- COLUMN::3th Part items lists -->
       <div class="col-12 q-my-md" >
-        <q-table ref="table"
-          :data="rsForm.outgoing_good_items"
-          dense hide-bottom
-          class="main-box bordered no-shadow no-highlight th-uppercase"
-          :rows-per-page-options ="[0]"
-          :columns="[
-            { name: 'prefix', label: '', field:'id', align: 'left'},
-            { name: 'code', label: $tc('label.code'), align: 'left', field:(v)=> v.item.code, style:'padding:10px 7px'},
-            { name: 'item_id', label: $tc('label.part'), align: 'left', field:(v)=> v.item.part_name},
-            { name: 'unit_id', label: $tc('label.unit'), align: 'center', field: 'unit_id'},
-            { name: 'quantity', label: $tc('label.quantity'), align: 'center', field: 'quantity'},
-          ]"
-          :pagination="{ rowsPerPage: 0}"
-          :dark="LAYOUT.isDark"
-          :loading="SHEET['items'].loading">
-
-          <q-tr slot="body" slot-scope="rsItem" :scope="rsItem">
-
+        <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
+          dense separator="horizontal"
+          :dark="LAYOUT.isDark">
+          <q-tr>
+            <q-th key="prefix"></q-th>
+            <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
+            <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
+            <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
+            <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+          </q-tr>
+          <q-tr v-for="(row, index) in rsForm.outgoing_good_items" :key="index">
             <q-td key="prefix" width="50px" class="q-gutter-x-xs">
-              <q-btn dense round flat color="red" icon="clear" @click="exclude(rsItem.row.__index, rsItem.row)"/>
+              <q-btn dense round flat color="red" icon="clear" @click="exclude(index, row)"/>
             </q-td>
-
-            <q-td key="code">
-              <span v-if="Boolean(rsItem.row.item)" class="">
-                {{rsItem.row.item.code}}
-              </span>
-            </q-td>
-
             <q-td key="part_name">
-              <span v-if="Boolean(rsItem.row.item)" class="">
-                {{rsItem.row.item.part_name}}
+              <span v-if="Boolean(row.item)" class="">
+                {{row.item.part_name}}
               </span>
             </q-td>
-
+            <q-td key="part_number">
+              <span v-if="Boolean(row.item)" class="">
+                {{row.item.part_number}}
+              </span>
+            </q-td>
             <q-td key="unit_id" width="15%" >
-              <q-select :name="`outgoing_good_items.${rsItem.row.__index}.unit_id`"
+              <q-select :name="`outgoing_good_items.${index}.unit_id`"
                 style="min-width:60px"
-                v-model="rsItem.row.unit_id"
+                v-model="row.unit_id"
                 outlined dense hide-bottom-space
                 :dark="LAYOUT.isDark" color="blue-grey-5"
-                :options="ItemUnitOptions[rsItem.row.__index]"
+                :options="ItemUnitOptions[index]"
                 map-options emit-value
-                v-validate="rsItem.row.item_id ? 'required' : ''"
-                :error="errors.has(`outgoing_good_items.${rsItem.row.__index}.unit_id`)"
-                @input="(val)=>{ setUnitReference(rsItem.row.__index, val) }"/>
+                v-validate="row.item_id ? 'required' : ''"
+                :error="errors.has(`outgoing_good_items.${index}.unit_id`)"
+                @input="(val)=>{ setUnitReference(index, val) }"/>
             </q-td>
-
             <q-td key="quantity" width="25%" >
-              <q-input :name="`outgoing_good_items.${rsItem.row.__index}.quantity`"
+              <q-input :name="`outgoing_good_items.${index}.quantity`"
                 style="min-width:120px"
-                v-model="rsItem.row.quantity" type="number" :min="0"
+                v-model="row.quantity" type="number" :min="0"
                 outlined dense hide-bottom-space no-error-icon align="center"
                 :dark="LAYOUT.isDark" color="blue-grey-5"
-                v-validate="`required|gt_value:0|max_value: ${rsItem.row.MAX / rsItem.row.unit_rate}`"
-                :error="errors.has(`outgoing_good_items.${rsItem.row.__index}.quantity`)">
+                v-validate="`required|gt_value:0|max_value: ${row.MAX / row.unit_rate}`"
+                :error="errors.has(`outgoing_good_items.${index}.quantity`)">
 
                 <span slot="append" class="text-subtitle2">
-                  {{`/ ${$app.number_format(rsItem.row.MAX / rsItem.row.unit_rate)}`}}
+                  {{`/ ${$app.number_format(row.MAX / row.unit_rate)}`}}
                 </span>
 
                 <q-btn slot="after"
                   dense flat color="primary"
                   icon="done_all"
-                  v-if="!rsItem.row.quantity"
-                  @click="rsItem.row.quantity = rsItem.row.MAX" >
+                  v-if="!row.quantity"
+                  @click="row.quantity = row.MAX" >
                   <q-tooltip>{{$tc('label.all')}}</q-tooltip>
                 </q-btn>
               </q-input>
             </q-td>
           </q-tr>
-          <q-tr slot="bottom-row" v-for="(exItem, index) in rsForm.exclude_items" :key="index"
+          <q-tr v-for="(exItem, index) in rsForm.exclude_items" :key="index"
             style="background-color: rgba(125, 125, 125, 0.2)">
             <q-td key="prefix" class="q-gutter-x-xs">
               <q-btn dense glossy color="green-5" icon="add" @click="include(index, exItem)"/>
             </q-td>
-
-            <q-td key="code">
-              <span v-if="Boolean(exItem.item)" class="text-strike">
-                {{exItem.item.code}}
-              </span>
-            </q-td>
-
             <q-td key="part_name">
               <span v-if="Boolean(exItem.item)" class="text-strike">
                 {{exItem.item.part_name}}
               </span>
             </q-td>
-
-            <q-td key="unit_id" width="20%" >
-
+            <q-td key="part_number">
+              <span v-if="Boolean(exItem.item)" class="text-strike">
+                {{exItem.item.part_number}}
+              </span>
             </q-td>
-
+            <q-td key="unit_id" width="20%" >
+            </q-td>
             <q-td key="quantity" width="20%" >
-
             </q-td>
           </q-tr>
-          <q-tr slot="bottom-row" v-show="rsForm.outgoing_good_items.length <= 0">
+          <q-tr v-show="rsForm.outgoing_good_items.length <= 0">
             <q-td colspan="100%">
               <q-banner  inline-actions class="main-box"
                 :class="{
@@ -232,7 +215,7 @@
               </q-banner>
             </q-td>
           </q-tr>
-        </q-table>
+        </q-markup-table>
       </div>
       <!-- COLUMN::4th Description -->
       <div class="col-12">
@@ -462,13 +445,10 @@ export default {
 
     },
     exclude(index, row) {
-      console.warn('exclude', index, row)
-      delete row.__index
       this.rsForm.exclude_items.push({...row, quantity: null})
       this.rsForm.outgoing_good_items.splice(index, 1)
     },
     include(index, row) {
-      console.warn('include', index, row)
       this.rsForm.outgoing_good_items.push(row)
       this.rsForm.exclude_items.splice(index, 1)
     },

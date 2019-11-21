@@ -141,57 +141,53 @@
             :disable="rsForm.packing_items.packing_item_faults.some(x => Boolean(x.fault_id))" />
 
 
-          <q-table class="bordered th-uppercase no-shadow no-highlight"
-            dense hide-bottom
-            v-show="rsForm.packing_items.type_fault_id"
-            :data="rsForm.packing_items.packing_item_faults"
+          <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
+            dense separator="horizontal"
             :dark="LAYOUT.isDark"
-            :rows-per-page-options ="[0]"
-            :columns="[
-              { name: 'prefix', label: '',  align: 'left', style:'width:50px'},
-              { name: 'quantity', label: $tc('label.quantity'), align: 'center', style:'width:120px'},
-              { name: 'fault_id', label: 'Fault of Part', align: 'left'},
-            ]"
-            :pagination="{sortBy: null, descending: false, page: null, rowsPerPage: 0}"
-            >
-            <q-tr slot="body" slot-scope="props" :props="props">
-              <q-td key="prefix" :props="props" >
-                <q-btn dense flat  icon="clear" color="red" @click="removeItemFault(props.row.__index)"/>
+            v-show="rsForm.packing_items.type_fault_id">
+            <q-tr>
+              <q-th key="prefix" width="50px"></q-th>
+              <q-th key="quantity" width="35%">{{$tc('label.quantity')}}</q-th>
+              <q-th key="fault_id">{{$tc('items.fault')}}</q-th>
+            </q-tr>
+            <q-tr v-for="(row, index) in rsForm.packing_items.packing_item_faults" :key="index">
+              <q-td key="prefix">
+                <q-btn dense flat  icon="clear" color="red" @click="removeItemFault(index)"/>
               </q-td>
-              <q-td key="quantity" :props="props" >
-                <q-input autofocus
-                  :name="`packing_items.packing_item_faults.${props.row.__index}.quantity`"
+              <q-td key="quantity">
+                <q-input autofocus input-class="text-center"
+                  :name="`packing_items.packing_item_faults.${index}.quantity`"
                   type="number" min="0" align="center"
                   outlined dense hide-bottom-space color="blue-grey"
                   :dark="LAYOUT.isDark"
-                  v-model="props.row.quantity"
-                  v-validate="props.row.fault_id ? 'required|gt_value:0' : ''"
+                  v-model="row.quantity"
+                  v-validate="row.fault_id ? 'required|gt_value:0' : ''"
                   :data-vv-as="$tc('label.quantity')"
-                  :error="errors.has(`packing_items.packing_item_faults.${props.row.__index}.quantity`)"
+                  :error="errors.has(`packing_items.packing_item_faults.${index}.quantity`)"
                   />
               </q-td>
-              <q-td key="fault_id" :props="props" >
+              <q-td key="fault_id">
                 <ux-select-filter
-                  :name="`packing_items.packing_item_faults.${props.row.__index}.fault_id`"
+                  :name="`packing_items.packing_item_faults.${index}.fault_id`"
                   outlined style="min-width:150px"
                   dense hide-bottom-space color="blue-grey"
                   :dark="LAYOUT.isDark"
-                  v-model="props.row.fault_id"
+                  v-model="row.fault_id"
                   :options="FaultOptions" clearable
-                  :disable="!props.row.quantity"
-                  v-validate="props.row.quantity ? 'required' : ''"
+                  :disable="!row.quantity"
+                  v-validate="row.quantity ? 'required' : ''"
                   data-vv-as="fault"
-                  :error="errors.has(`packing_items.packing_item_faults.${props.row.__index}.fault_id`)"
+                  :error="errors.has(`packing_items.packing_item_faults.${index}.fault_id`)"
                 />
               </q-td>
             </q-tr>
-
-            <q-tr slot="bottom-row" slot-scope="props" :props="props">
+            <q-tr>
+              <q-td></q-td>
               <q-td colspan="100%">
-                <strong><q-btn dense  @click="addNewItemFault()" icon="add" color="positive"/></strong>
+                <q-btn dense outline :label="$tc('form.add')" icon="add_circle_outline" class="full-width" color="blue-grey" @click="addNewItemFault()" />
               </q-td>
             </q-tr>
-          </q-table>
+           </q-markup-table>
 
         </div>
       </div>
