@@ -59,7 +59,7 @@
                   filter filter-min="3"
                   source="api/v1/common/items?mode=all&--limit=50"
                   :source-keys="['part_name', 'part_number']"
-                  option-value="id"
+                  option-value="id" emit-value map-options
                   :option-label="(item) => item.part_name || row.item.part_name"
                   :option-sublabel="(item) => `[${item.customer_code}] ${item.part_number}`"
                   :option-disable="(item) => !item.enable"
