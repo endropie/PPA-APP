@@ -2,7 +2,6 @@
   <q-page padding class="page-admin">
     <div class="row content-stretch">
       <incoming-good class="col-12 col-md-auto q-pa-xs" style="min-width:50%" />
-      <incoming-good class="col-12 col-md-auto q-pa-xs" style="min-width:50%" />
     </div>
   </q-page>
 </template>

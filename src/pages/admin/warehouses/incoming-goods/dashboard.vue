@@ -6,7 +6,7 @@
         class="float-right relative-position" style="top:-5px"
         :icon="show ? 'arrow_drop_up' : 'arrow_drop_down'"
         @click="show = !show"/>
-      <div class="text-subtitle2 no-wrap">Validasi Incoming Good</div>
+      <div class="text-subtitle2 text-uppercase no-wrap">Validasi Incoming Good</div>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
     <q-card-section v-show="show" class="q-pa-sm">
