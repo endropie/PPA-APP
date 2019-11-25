@@ -50,30 +50,6 @@
                 :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                 :options="CustomerOptions"
                 @input="FILTERABLE.submit" />
-
-              <!-- <ux-select-filter class="col-12 col-sm-6"
-                v-model="FILTERABLE.fill.item_id.value" clearable
-                :label="$tc('general.item')"
-                dense hide-bottom-space hide-dropdown-icon
-                standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                :options="ItemOptions"
-                @input="FILTERABLE.submit" /> -->
-
-              <!-- <q-select class="col-12 col-sm-6" autocomplete="off"
-                multiple use-chips use-input new-value-mode="add"
-                dense hide-dropdown-icon
-                v-model="FILTERABLE.search" emit-value
-                :placeholder="`${$tc('form.search',2)}...`"
-                standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark">
-
-                <template slot="append">
-                  <q-btn flat dense icon="search" dark-percentage color="fadded" @click="FILTERABLE.submit"/>
-                </template>
-              </q-select> -->
             </div>
           </table-header>
         </template>

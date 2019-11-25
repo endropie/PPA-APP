@@ -76,7 +76,8 @@
                 :placeholder="`${$tc('form.search',2)}...`"
                 standout="bg-blue-grey-5 text-white"
                 :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark">
+                :dark="LAYOUT.isDark"
+                @input="FILTERABLE.submit">
 
                 <template slot="before">
                 </template>

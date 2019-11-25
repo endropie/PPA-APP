@@ -95,8 +95,6 @@
                       :options="ItemOptions"
                       @input="FILTERABLE.submit"
                       :loading="SHEET['items'].loading"/>
-
-
                   </div>
                 </div>
                 <q-select class="col-12 col-md-6" autocomplete="off"
