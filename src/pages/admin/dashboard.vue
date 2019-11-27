@@ -1,19 +1,25 @@
 <template>
   <q-page padding class="page-admin">
     <div class="row content-stretch">
-      <incoming-good class="col-12 col-md-auto q-pa-xs" style="min-width:50%" />
+      <item-histories class="col-12 q-pa-xs" />
+      <incoming-validation class="col-12 col-md-auto q-pa-xs" style="min-width:50%" />
+      <work-order-validation class="col-12 col-md-auto q-pa-xs" style="min-width:50%" />
     </div>
   </q-page>
 </template>
 
 <script>
 import MixPage from '@/mixins/mix-page.vue'
-import IncomingGood from '@/pages/admin/warehouses/incoming-goods/dashboard'
+import ItemHistories from '@/pages/admin/common/items/dashboard-histories'
+import IncomingValidation from '@/pages/admin/warehouses/incoming-goods/dashboard-validation'
+import WorkOrderValidation from '@/pages/admin/factories/work-orders/dashboard-validation'
 
 export default {
   mixins:[MixPage],
   components: {
-    IncomingGood
+    ItemHistories,
+    IncomingValidation,
+    WorkOrderValidation
   },
   data () {
     return {
