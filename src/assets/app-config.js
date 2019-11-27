@@ -50,7 +50,7 @@ const config = {
   },
   items: {
     stockists: [
-      { value: 'FM', label: 'FRESH MATERIAL' },
+      { value: 'FM', label: 'FRESH' },
       { value: 'WO', label: 'WORK ORDER' },
       { value: 'WIP', label: 'WORK PROCESS' },
       { value: 'FG', label: 'FINISH GOOD' },

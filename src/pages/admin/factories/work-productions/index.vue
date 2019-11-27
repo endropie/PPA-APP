@@ -209,11 +209,11 @@ export default {
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},
-
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', align: 'right' },
           { name: 'line_id', label: this.$tc('general.line'), field: (rs)=> rs.line.name , align: 'left', sortable: true },
           { name: 'date', label: this.$tc('label.date'), field: (rs)=> rs.date, format: (v) => this.$app.moment(v).format('DD/MM/YY'), align: 'center', sortable: true },
+          { name: 'stockist', label: this.$tc('items.stockist'), field: (rs)=> (rs.stockist) , align: 'center', sortable: true },
           { name: 'shift_id', label: this.$tc('label.shift'), field: (rs)=> rs.shift.name , align: 'center', sortable: true },
         ]
       },

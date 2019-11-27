@@ -20,7 +20,17 @@
               :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
               :error="errors.has('line_id')"
               :error-message="errors.first('line_id')"
-              @input="(val) => val ? loadItemOptions() : false" />
+              @input="(val) => val ? loadItemOptions() : false" >
+              <q-select slot="after" class="no-padding" style="width:100px"
+                name="stockist" :label="$tc('items.stockist').toUpperCase()" hide-dropdown-icon
+                v-model="rsForm.stockist" emit-value map-options
+                v-validate="'required'"
+                :disable="IssetWorkProductionItems"
+                :options="StockistOptions"
+                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                :error="errors.has('stockist')"
+                @input="(val) => val ? loadItemOptions() : false"/>
+            </ux-select-filter>
 
           </div>
         </div>
@@ -71,7 +81,7 @@
                       hide-bottom-space hide-dropdown-icon
                       v-model="row.item_id"
                       v-validate="'required'"
-                      :disable="!rsForm.line_id"
+                      :disable="!rsForm.line_id || !rsForm.stockist"
                       :options="ItemOptions" clearable
                       popup-content-class="options-striped"
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
@@ -86,7 +96,7 @@
                       v-validate="'required'"
                       outlined color="blue-grey-4"
                       no-error-icon hide-bottom-space hide-dropdown-icon
-                      :disable="!rsForm.line_id"
+                      :disable="!rsForm.line_id || !rsForm.stockist"
                       :options="WorkOrderItemLineOptions.filter(x => x.item_id === row.item.id)" clearable
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${index}.work_order_item_line_id`)"
@@ -197,6 +207,7 @@ export default {
           multiple: null,
           number: null,
           line_id: null,
+          stockist: null,
           date: this.$app.moment().format('YYYY-MM-DD'),
           shift_id: null,
           description: null,
@@ -262,6 +273,9 @@ export default {
           rowdata: detail
         })
       })
+    },
+    StockistOptions() {
+      return this.CONFIG.items['stockists'].filter(stockist => ['FM','NG','RET'].indexOf(stockist.value) > -1 )
     },
     LineOptions() {
       let data = this.SHEET.lines.data || []
@@ -423,13 +437,14 @@ export default {
       }
     },
     loadItemOptions(data = this.rsForm) {
-      let params = [`has_amount_line=${data.line_id}`]
-      if (this.FORM.data.work_production_items) {
-        let orKeys = this.FORM.data.work_production_items.map(x => x.work_order_item_line_id)
-        params.push(`or_work_order_item_line_ids=${orKeys.join(',')}`)
+      if (data.line_id && data.stockist) {
+        let params = [`has_amount_line=${data.line_id}`, `stockist_from=${data.stockist}`]
+        if (this.FORM.data.work_production_items) {
+          let orKeys = this.FORM.data.work_production_items.map(x => x.work_order_item_line_id)
+          params.push(`or_work_order_item_line_ids=${orKeys.join(',')}`)
+        }
+        this.SHEET.load('work_orders', params.join('&'))
       }
-      this.SHEET.load('work_orders', params.join('&'))
-
     },
     setItemReference(index, val) {
       this.rsForm.work_production_items[index].work_order_item_line_id = null
