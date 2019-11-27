@@ -68,7 +68,7 @@
               { name: 'unit_id', label: $tc('label.unit'), align: 'center', field: (v)=> v.unit.code},
               { name: 'quantity', label: $tc('label.quantity'), align: 'right',
                 field: (v)=> v.quantity, format: (v) => $app.number_format(v)},
-              { name: 'note', label: $tc('label.note'), align: 'left', field: 'note', style: `width:35%;${rsView.status !== 'REJECTED' ? 'display:none':''}`},
+              { name: 'note', label: $tc('label.note'), align: 'left', field: 'note', style: `min-width:25%;`},
             ]"
           >
           </q-table>
