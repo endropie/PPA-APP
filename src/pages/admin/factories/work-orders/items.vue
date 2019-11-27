@@ -65,13 +65,12 @@
 
               </div>
               <div class="row q-col-gutter-xs q-pb-xs">
-                <div class="col-12 col-md-6">
-                  <div class="row q-col-gutter-x-xs">
-
+                <div class="col-12 col-sm-6">
+                  <div class="row q-col-gutter-xs">
                     <ux-select class="col-12 col-sm-4"
                       v-model="FILTERABLE.fill.customer_id.value" clearable
                       :label="$tc('general.customer')" stack-label
-                      :placeholder="$tc('form.select_a', null, {v:$tc('general.customer')})"
+                      :placeholder="$tc('form.select', 1, {v:$tc('general.customer')})"
                       dense hide-bottom-space hide-dropdown-icon
                       standout="bg-blue-grey-5 text-white"
                       :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
@@ -87,7 +86,7 @@
                     <ux-select-filter class="col-12 col-sm-8"
                       v-model="FILTERABLE.fill.item_id.value" clearable
                       :label="$tc('general.item')" stack-label
-                      :placeholder="$tc('form.select_a', null, {v:$tc('general.item')})"
+                      :placeholder="$tc('form.select', 1, {v:$tc('general.item')})"
                       dense hide-bottom-space hide-dropdown-icon
                       standout="bg-blue-grey-5 text-white"
                       :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
@@ -238,12 +237,6 @@ export default {
   },
   created () {
     this.INDEX.load()
-
-    // this.$nextTick(() => {
-    //   if (this.FILTERABLE.fill.customer_id.value) {
-    //     this.SHEET.load('items', `customer_id=${this.FILTERABLE.fill.customer_id.value}`)
-    //   }
-    // })
   },
   computed: {
     ShiftOptions() {
@@ -258,8 +251,8 @@ export default {
     ItemOptions() {
       return (this.SHEET.items.data.map(item => ({
         // item: item,
-        label: item.part_name,
-        sublabel:`[${item.code}] ${item.part_number}`,
+        label: `${item.part_name} - ${item.part_number}`,
+        sublabel:`[${item.customer_code}] ${item.part_number}`,
         value: item.id
       })) || [])
     },

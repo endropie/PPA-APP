@@ -35,7 +35,7 @@
               }
             ]">
 
-            <div class="row q-col-gutter-xs" >
+            <div class="row q-col-gutter-xs q-pb-xs" >
               <ux-select-filter class="col-8 col-sm-4"
                 name="line_id"
                 v-model="FILTERABLE.fill.line_id.value" clearable
@@ -77,8 +77,41 @@
                 :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
                 :dark="LAYOUT.isDark"
                 @input="FILTERABLE.submit"/>
+            </div>
 
-              <q-select class="col-12" autocomplete="off"
+            <div class="row q-col-gutter-xs q-pb-xs">
+              <div class="col-12 col-sm-6">
+                <div class="row q-col-gutter-xs">
+                  <ux-select class="col-12 col-sm-4"
+                    v-model="FILTERABLE.fill.customer_id.value" clearable
+                    :label="$tc('general.customer')" stack-label
+                    :placeholder="$tc('form.select', 1, {v:$tc('general.customer')})"
+                    dense hide-bottom-space hide-dropdown-icon
+                    standout="bg-blue-grey-5 text-white"
+                    :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
+                    :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                    :options="CustomerOptions"
+                    filter emit-value map-options
+                    @input="[
+                      FILTERABLE.fill.item_id.value=null,
+                      SHEET.load('items', `customer_id=${FILTERABLE.fill.customer_id.value}`),
+                      FILTERABLE.submit()
+                    ]"/>
+
+                  <ux-select-filter class="col-12 col-sm-8"
+                    v-model="FILTERABLE.fill.item_id.value" clearable
+                    :label="$tc('general.item')" stack-label
+                    :placeholder="$tc('form.select', 1, {v:$tc('general.item')})"
+                    dense hide-bottom-space hide-dropdown-icon
+                    standout="bg-blue-grey-5 text-white"
+                    :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
+                    :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                    :options="ItemOptions"
+                    @input="FILTERABLE.submit"
+                    :loading="SHEET['items'].loading"/>
+                </div>
+              </div>
+              <q-select class="col-12 col-sm-6" autocomplete="off"
                 multiple use-chips use-input new-value-mode="add"
                 dense hide-dropdown-icon
                 v-model="FILTERABLE.search" emit-value
@@ -130,7 +163,9 @@ export default {
     return {
       SHEET: {
         lines: {data:[], api:'/api/v1/references/lines?mode=all'},
-        shifts: {data:[], api:'/api/v1/references/shifts?mode=all'}
+        shifts: {data:[], api:'/api/v1/references/shifts?mode=all'},
+        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
+        items: {data:[], api:'/api/v1/common/items?mode=all', autoload: false},
       },
       FILTERABLE: {
         fill: {
@@ -150,6 +185,16 @@ export default {
             transform: (value) => { return null }
           },
           shift_id: {
+            value: null,
+            type: 'integer',
+            transform: (value) => { return null }
+          },
+          customer_id: {
+            value: null,
+            type: 'integer',
+            transform: (value) => { return null }
+          },
+          item_id: {
             value: null,
             type: 'integer',
             transform: (value) => { return null }
@@ -183,6 +228,17 @@ export default {
     },
     LineOptions() {
       return (this.SHEET.lines.data.map(item => ({label: item.name, value: item.id})) || [])
+    },
+    CustomerOptions() {
+      return (this.SHEET.customers.data.map(item => ({label: item.code, value: item.id})) || [])
+    },
+    ItemOptions() {
+      return (this.SHEET.items.data.map(item => ({
+        // item: item,
+        label: `${item.part_name} - ${item.part_number}`,
+        sublabel:`[${item.customer_code}] ${item.part_number}`,
+        value: item.id
+      })) || [])
     },
   },
   methods: {
