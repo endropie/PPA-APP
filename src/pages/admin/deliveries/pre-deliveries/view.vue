@@ -2,18 +2,30 @@
   <q-page padding class="row justify-center"  style="min-width:210mm;">
     <page-print v-if="VIEW.show" :class="{'header-minimaze':$q.screen.lt.sm}" style="max-width:210mm;">
       <div slot="header-title">PPA - Pre Delivery </div>
-      <template slot="header-tags">
+      <template slot="header-tags hide-print">
         <q-chip square outline color="blue-grey" text-color="white"
           label="RETURN" v-if="rsView.transaction === 'RETURN'" />
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </template>
 
       <div class="row justify-between q-col-gutter-y-sm" >
-        <div class="profile">
-
+        <div class="profile self-bottom">
+          <q-markup-table dense bordered class="super-dense no-shadow th-left" separator="cell">
+            <tr>
+              <th class="text-weight-light">No</th>
+              <td>
+                {{ rsView.number }}
+                <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
+              </td>
+            </tr>
+            <tr>
+              <th class="text-weight-light">{{$tc('label.transaction')}}</th>
+              <td class="text-weight-medium">{{ rsView.transaction }}</td>
+            </tr>
+          </q-markup-table>
         </div>
         <div class="info">
-          <q-markup-table class="bordered super-dense th-text-left no-shadow" separator="cell" dense>
+          <q-markup-table dense bordered class="super-dense no-shadow " separator="cell">
             <tr>
               <th class="text-weight-light">No</th>
               <td>
@@ -32,8 +44,8 @@
           </q-markup-table>
         </div>
         <div class="col-12">
-          <q-table ref="table"
-            class="bordered no-shadow no-radius no-highlight"
+          <q-table bordered ref="table"
+            class="no-shadow no-highlight"
             color="secondary"
             separator="vertical" dense hide-bottom
             :data="rsView.pre_delivery_items"
@@ -54,8 +66,30 @@
           </q-table>
         </div>
         <div class="col-12">
-            <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
-            <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
+            <div class="q-mb-sm text-italic">{{$tc('label.description')}}:</div>
+            <div class="q-mb-md text-weight-light" style="">{{ rsView.description }}</div>
+        </div>
+        <div class="col-7 text-subtitle">
+          <div class="row text-center">
+            <div class="col-4 bottom-signature column">
+              <div class="sign-name">Diterima Oleh</div>
+              <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+            </div>
+            <div class="col-4">
+              <div class="sign-name">Outgoing Oleh</div>
+              <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+            </div>
+            <div class="col-4 bottom-signature">
+              <div class="sign-name">Security</div>
+              <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-5  text-subtitle">
+          <div class="text-center bottom-signature">
+            <div class="sign-name">Hormat Kami</div>
+              <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+          </div>
         </div>
         <div class="col-12 q-gutter-xs print-hide " style="padding-top:50px">
           <q-btn :label="$tc('form.back')" icon="cancel"  color="dark" :to="`${VIEW.resource.uri}?return`" />
@@ -150,3 +184,11 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+.bottom-signature
+  min-height 90px
+.sign-tag
+  margin-top 40px
+  vertical-align bottom
+</style>
