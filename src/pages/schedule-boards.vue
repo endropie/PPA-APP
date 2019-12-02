@@ -64,7 +64,11 @@
             </q-td>
 
             <q-td slot="body-cell-destination" slot-scope="rs" :props="rs">
-              <span v-if="rs.row.scheduled"> {{ rs.row.scheduled.destination }}</span>
+              <span v-if="rs.row.scheduled">
+                <span v-for="(customer, index) in rs.row.scheduled.customers" :key="index">
+                  {{customer.name}} <span v-if="rs.row.scheduled.customers.length > index+1">,</span>
+                </span>
+              </span>
               <span v-else>-</span>
             </q-td>
 
