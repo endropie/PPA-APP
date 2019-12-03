@@ -30,27 +30,51 @@
           </q-markup-table>
         </div>
         <div class="col-12">
-          <q-table ref="table" class="bordered no-shadow no-highlight" color="secondary" separator="vertical" dense hide-bottom
-            :data="rsView.delivery_order_items"
-            no-data-label = "No Production"
-            :columns="[
-              { name: 'part_name', label: this.$tc('items.part_name'), align: 'left', field: (v)=> v.item.part_name},
-              { name: 'part_number', label: this.$tc('items.part_number'), align: 'left', field: (v)=> v.item.part_number},
-              { name: 'quantity', label: $tc('label.quantity'), align: 'right', field: (v)=> v.quantity},
-              { name: 'unit_id', label: $tc('label.unit'), align: 'center', field: (v)=> v.unit.code},
-              { name: 'request_order_id', label: '#', align: 'left', field: (v)=> v.item.request_order_id},
-            ]"
-          >
-          <q-td slot="body-cell-request_order_id" slot-scope="rsItem" :scope="rsItem">
-            <span v-if="rsItem.row.request_order_item_id" >#{{rsItem.row.request_order_item_id}}</span>
-            <q-icon v-else name="clear" color="red" />
-          </q-td>
 
-          </q-table>
+          <q-markup-table dense bordered class="no-shadow" separator="cell">
+            <thead>
+            <q-tr>
+              <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th>{{ $tc('label.unit') }}</q-th>
+              <q-th>{{ $tc('label.quantity') }}</q-th>
+            </q-tr>
+            </thead>
+            <tbody>
+            <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index">
+              <q-td>{{row.item.part_name}}</q-td>
+              <q-td>{{row.item.part_number}}</q-td>
+              <q-td>{{row.unit.name}}</q-td>
+              <q-td>{{$app.number_format(row.quantity)}}</q-td>
+            </q-tr>
+            </tbody>
+          </q-markup-table>
         </div>
         <div class="col-12">
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
             <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
+        </div>
+        <div class="col-12">
+          <q-markup-table class="signature no-shadow">
+            <tr class="text-center">
+              <td width="21%">
+                <div class="sign-name">Diterima Oleh</div>
+                <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+              </td>
+              <td width="21%">
+                <div class="sign-name">Outgoing Oleh</div>
+                <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+              </td>
+              <td width="21%">
+                <div class="sign-name">Security</div>
+                <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+              </td>
+              <td width="35%">
+                <div class="sign-name">Hormat Kami</div>
+                <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+              </td>
+            </tr>
+          </q-markup-table>
         </div>
       </div>
 

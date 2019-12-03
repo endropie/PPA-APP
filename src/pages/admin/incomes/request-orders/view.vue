@@ -39,7 +39,6 @@
           </div>
         </div>
         <div class="col-12">
-
           <q-markup-table dense bordered class="no-shadow" separator="cell">
             <thead>
             <q-tr>

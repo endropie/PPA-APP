@@ -44,52 +44,30 @@
           </q-markup-table>
         </div>
         <div class="col-12">
-          <q-table bordered ref="table"
-            class="no-shadow no-highlight"
-            color="secondary"
-            separator="vertical" dense hide-bottom
-            :data="rsView.pre_delivery_items"
-            no-data-label = "No Production"
-            :columns="[
-              { name: 'code', label: 'code', align: 'left', field: (v)=> v.item.customer_code, hidden: true},
-              { name: 'part_name', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left', field: (v)=> v.item.part_name},
-              { name: 'part_number', label: this.$tc('label.number', 1, {v:this.$tc('label.part')}), align: 'left', field: (v)=> v.item.part_number},
-              { name: 'quantity', label: $tc('label.quantity'), align: 'right', field: (v)=> v.quantity},
-              { name: 'unit_id', label: $tc('label.unit'), align: 'center', field: (v)=> v.unit.code},
-              { name: 'amount_verification', label: 'Verify', align: 'right',
-                field: (v)=> Number(v.amount_verification),
-                format: (v) => Boolean(v) ? $app.number_format(v) : '',
-              }
-            ]"
-          >
-
-          </q-table>
+          <q-markup-table dense bordered class="no-shadow" separator="cell">
+            <thead>
+            <q-tr>
+              <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th>{{ $tc('label.unit') }}</q-th>
+              <q-th>{{ $tc('label.quantity') }}</q-th>
+              <q-th>Verify</q-th>
+            </q-tr>
+            </thead>
+            <tbody>
+            <q-tr v-for="(row, index) in rsView.pre_delivery_items" :key="index">
+              <q-td>{{row.item.part_name}}</q-td>
+              <q-td>{{row.item.part_number}}</q-td>
+              <q-td>{{row.unit.name}}</q-td>
+              <q-td>{{$app.number_format(row.quantity)}}</q-td>
+              <q-td>{{$app.number_format(row.amount_verification)}}</q-td>
+            </q-tr>
+            </tbody>
+          </q-markup-table>
         </div>
         <div class="col-12">
             <div class="q-mb-sm text-italic">{{$tc('label.description')}}:</div>
             <div class="q-mb-md text-weight-light" style="">{{ rsView.description }}</div>
-        </div>
-        <div class="col-7 text-subtitle">
-          <div class="row text-center">
-            <div class="col-4 bottom-signature column">
-              <div class="sign-name">Diterima Oleh</div>
-              <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
-            </div>
-            <div class="col-4">
-              <div class="sign-name">Outgoing Oleh</div>
-              <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
-            </div>
-            <div class="col-4 bottom-signature">
-              <div class="sign-name">Security</div>
-              <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-5  text-subtitle">
-          <div class="text-center bottom-signature">
-            <div class="sign-name">Hormat Kami</div>
-              <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
-          </div>
         </div>
         <div class="col-12 q-gutter-xs print-hide " style="padding-top:50px">
           <q-btn :label="$tc('form.back')" icon="cancel"  color="dark" :to="`${VIEW.resource.uri}?return`" />
@@ -186,8 +164,6 @@ export default {
 </script>
 
 <style lang="stylus">
-.bottom-signature
-  min-height 90px
 .sign-tag
   margin-top 40px
   vertical-align bottom
