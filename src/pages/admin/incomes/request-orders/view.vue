@@ -39,23 +39,27 @@
           </div>
         </div>
         <div class="col-12">
-          <q-table ref="table" class="d-grid bordered no-shadow" color="secondary" separator="vertical" dense hide-bottom
-            :data="rsView.request_order_items"
-            no-data-label = "No Production"
-            :columns="[
-              { name: 'code', label: 'code', align: 'left', field: (v)=> v.item.code},
-              { name: 'part_name', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left', field: (v)=> v.item.part_name},
-              { name: 'part_number', label: this.$tc('label.number', 1, {v:this.$tc('label.part')}), align: 'left', field: (v)=> v.item.part_number},
-              { name: 'unit_id', label: $tc('label.unit'), align: 'center', field: (v)=> v.unit.code},
-              { name: 'quantity', label: $tc('label.quantity'), align: 'right', field: (v)=> v.quantity},
-              { name: 'delivery', label: $tc('general.delivery'), align: 'right', field: (v)=> v.total_delivery_order_item},
-            ]"
-          >
-          <q-td slot="body-cell-delivery" slot-scope="rs" :props="rs">
-            {{rs.row.total_delivery_order_item}}
-          </q-td>
 
-          </q-table>
+          <q-markup-table dense bordered class="no-shadow" separator="cell">
+            <thead>
+            <q-tr>
+              <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th>{{ $tc('label.unit') }}</q-th>
+              <q-th>{{ $tc('label.quantity') }}</q-th>
+              <q-th>{{ $tc('general.delivery') }}</q-th>
+            </q-tr>
+            </thead>
+            <tbody>
+            <q-tr v-for="(row, index) in rsView.request_order_items" :key="index">
+              <q-td>{{row.item.part_name}}</q-td>
+              <q-td>{{row.item.part_number}}</q-td>
+              <q-td>{{row.unit.name}}</q-td>
+              <q-td>{{$app.number_format(row.quantity)}}</q-td>
+              <q-td>{{$app.number_format(row.total_delivery_order_item)}}</q-td>
+            </q-tr>
+            </tbody>
+          </q-markup-table>
         </div>
         <div class="col-12 text-weight-light text-italic" v-if="rsView.begin_date || rsView.until_date">
             From date {{ rsView.begin_date ? $app.moment(rsView.begin_date).format('DD/MM/YYYY') : '' }}
