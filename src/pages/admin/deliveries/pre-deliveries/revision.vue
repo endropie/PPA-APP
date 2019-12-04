@@ -61,7 +61,7 @@
         :error-message="errors.first('rit')"/>
 
       <div class="col-12">
-        
+
         <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
           dense separator="horizontal"
           :dark="LAYOUT.isDark">
@@ -121,6 +121,12 @@
                 :error="errors.has(`pre_delivery_items.${index}.quantity`)"
                 @input="(val)=> {row.unit_qty = (val) * (row.unit_rate)}"/>
             </q-td>
+            <q-td key="wrap" width="25%">
+              <q-input style="min-width:100px"
+                :name="`pre_delivery_items.${index}.wrap`"
+                outlined dense hide-bottom-space  color="blue-grey-5"
+                v-model="row.wrap" />
+            </q-td>
           </q-tr>
 
           <!-- <q-tr v-for="(row, index) in row.outgoing_verifications" :key="index+'.'+index"
@@ -167,7 +173,7 @@
             <q-td>
               <q-btn dense outline :label="$tc('form.add')" icon="add_circle_outline" color="blue-grey" class="full-width" @click="addNewItem()"/>
             </q-td>
-            <q-td colspan="100%"></q-td>              
+            <q-td colspan="100%"></q-td>
           </q-tr>
         </q-markup-table>
       </div>
@@ -237,6 +243,7 @@ export default {
                 unit_rate: 1,
                 unit_qty: null,
                 quantity: null,
+                wrap: null
               }]
             }
           ]

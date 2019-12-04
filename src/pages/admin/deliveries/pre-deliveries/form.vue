@@ -66,14 +66,15 @@
             <q-th key="prefix"></q-th>
             <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
             <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
-            <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
             <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+            <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
+            <q-th key="wrap">{{$tc('label.wrap')}}</q-th>
           </q-tr>
           <q-tr v-for="(row, index) in rsForm.pre_delivery_items" :key="index">
               <q-td key="prefix">
                 <q-btn dense flat round icon="close" color="red" @click="removeItem(index)"/>
               </q-td>
-              <q-td key="item_id" width="35%" style="min-width:150px">
+              <q-td key="item_id" width="25%" style="min-width:150px">
                 <ux-select-filter autofocus
                   :name="`pre_delivery_items.${index}.item_id`"
                   v-model="row.item_id"
@@ -89,13 +90,13 @@
                   @input="(val)=>{ setItemReference(index, val) }" />
                 <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
               </q-td>
-              <q-td key="part_number" width="35%" style="min-width:150px">
+              <q-td key="part_number" width="25%" style="min-width:150px">
                 <q-input readonly
                   :value="row.item ? row.item.part_number : null"
                   outlined dense hide-bottom-space color="blue-grey-5"
                   :dark="LAYOUT.isDark" />
               </q-td>
-              <q-td key="unit_id" width="15%">
+              <q-td key="unit_id" width="10%">
                 <q-select style="min-width:80px"
                   :name="`pre_delivery_items.${index}.unit_id`"
                   v-model="row.unit_id"
@@ -108,7 +109,7 @@
                   @input="(val)=> { setUnitReference(index, val) }"
                 />
               </q-td>
-              <q-td key="quantity" width="30%">
+              <q-td key="quantity" width="15%">
                 <q-input style="min-width:100px"
                   :name="`pre_delivery_items.${index}.quantity`"
                   v-model="row.quantity" type="number" min="0"
@@ -118,6 +119,12 @@
                   v-validate="`required|gt_value:0|max_value:${numUnitConvertion(row, MaxMount[index])}`"
                   :error="errors.has(`pre_delivery_items.${index}.quantity`)"
                   @input="(val)=> {row.unit_qty = (val) * (row.unit_rate)}"/>
+              </q-td>
+              <q-td key="wrap" width="25%">
+                <q-input style="min-width:100px"
+                  :name="`pre_delivery_items.${index}.wrap`"
+                  outlined dense hide-bottom-space  color="blue-grey-5"
+                  v-model="row.wrap" />
               </q-td>
             </q-tr>
 
@@ -196,7 +203,7 @@ export default {
               unit_rate: 1,
               unit_qty: null,
               quantity: null,
-
+              wrap: null,
               request_order_item_id: null
             }
           ]
@@ -349,24 +356,23 @@ export default {
           this.FORM.show = false
           this.FORM.loading = true
 
+          const newEntri = this.setDefault().pre_delivery_items[0]
           this.$axios.get(`${this.FORM.incoming_good.api}/${this.ROUTE.query.incoming_good_id}`)
           .then(response => {
               data.customer_id = response.data.customer_id
               data.transaction = response.data.transaction
               data.pre_delivery_items = []
+
               response.data.incoming_good_items.map(detail => {
-                  data.pre_delivery_items.push({
-                  id: null,
+                  data.pre_delivery_items.push(Object.assign({}, newEntri, {
                   item_id: detail.item_id,
                   item: detail.item,
                   unit_id: detail.unit_id,
                   unit: detail.unit,
                   unit_rate: detail.unit_rate,
                   quantity: detail.quantity
-                })
+                }))
               })
-
-              console.warn('RESULT', data)
 
               this.setForm(data)
               // setTimeout(() => this.setForm(data), 0)
@@ -467,7 +473,7 @@ export default {
       }
     },
     addNewItem(){
-      let newEntri = this.setDefault().pre_delivery_items[0] // {id:null, item_id: null, quantity: null};
+      let newEntri = this.setDefault().pre_delivery_items[0]
 
       this.rsForm.pre_delivery_items.push(newEntri)
     },

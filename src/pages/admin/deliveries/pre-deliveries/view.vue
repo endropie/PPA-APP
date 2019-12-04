@@ -10,41 +10,36 @@
 
       <div class="row justify-between q-col-gutter-y-sm" >
         <div class="profile self-bottom">
-          <q-markup-table dense bordered class="super-dense no-shadow th-left" separator="cell">
+          <q-markup-table dense class="super-dense no-shadow text-weight-medium">
             <tr>
-              <th class="text-weight-light">No</th>
+              <td>{{$tc('general.customer')}}</td>
               <td>
-                {{ rsView.number }}
-                <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
+                <span v-if="rsView.customer"> {{rsView.customer.name}} </span>
+                <span v-else v-text="`-`" />
               </td>
             </tr>
             <tr>
-              <th class="text-weight-light">{{$tc('label.transaction')}}</th>
-              <td class="text-weight-medium">{{ rsView.transaction }}</td>
+              <td>{{$tc('label.transaction')}}</td>
+              <td>{{ rsView.transaction }}</td>
             </tr>
           </q-markup-table>
         </div>
         <div class="info">
           <q-markup-table dense bordered class="super-dense no-shadow " separator="cell">
-            <tr>
-              <th class="text-weight-light">No</th>
-              <td>
-                {{ rsView.number }}
-                <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
-              </td>
-            </tr>
-            <tr>
-              <th class="text-weight-light">{{$tc('label.date')}}</th>
-              <td>{{$app.date_format(rsView.date)}}</td>
-            </tr>
-            <tr>
-              <th class="text-weight-light">{{$tc('label.transaction')}}</th>
-              <td class="text-weight-medium">{{ rsView.transaction }}</td>
-            </tr>
+            <tbody>
+              <tr>
+                <td class="text-weight-medium">{{$tc('label.number')}}</td>
+                <td>{{ rsView.full_number || rsView.number }}</td>
+              </tr>
+              <tr>
+                <td class="text-weight-medium">{{$tc('label.date')}}</td>
+                <td>{{$app.date_format(rsView.date)}}</td>
+              </tr>
+            </tbody>
           </q-markup-table>
         </div>
         <div class="col-12">
-          <q-markup-table dense bordered class="no-shadow" separator="cell">
+          <q-markup-table dense bordered class="no-shadow th-uppercase" separator="cell">
             <thead>
             <q-tr>
               <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
@@ -52,6 +47,7 @@
               <q-th>{{ $tc('label.unit') }}</q-th>
               <q-th>{{ $tc('label.quantity') }}</q-th>
               <q-th>Verify</q-th>
+              <q-th>{{ $tc('label.wrap') }}</q-th>
             </q-tr>
             </thead>
             <tbody>
@@ -61,6 +57,7 @@
               <q-td>{{row.unit.name}}</q-td>
               <q-td>{{$app.number_format(row.quantity)}}</q-td>
               <q-td>{{$app.number_format(row.amount_verification)}}</q-td>
+              <q-td>{{row.wrap || '-'}}</q-td>
             </q-tr>
             </tbody>
           </q-markup-table>
