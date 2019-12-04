@@ -162,9 +162,3 @@ export default {
   }
 }
 </script>
-
-<style lang="stylus">
-.sign-tag
-  margin-top 40px
-  vertical-align bottom
-</style>

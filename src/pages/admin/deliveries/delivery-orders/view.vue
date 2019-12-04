@@ -11,8 +11,8 @@
           <div class="text-weight-light ">Phone: {{rsView.customer_phone}}</div>
         </div>
         <div class="info" style="max-width:50%">
-          <q-markup-table separator="cell" dense:dark="LAYOUT.isDark"
-            class="bordered super-dense no-shadow no-margin th-text-left">
+          <q-markup-table bordered separator="cell" :dark="LAYOUT.isDark"
+            class="super-dense no-shadow no-margin th-uppercase th-text-left">
             <tr>
               <th>No. SJ-OUT</th>
               <td>
@@ -25,13 +25,13 @@
               <td>{{$app.date_format(rsView.date)}}</td>
             </tr>
             <tr>
-              <th>SALE ORDER</th><td>{{ rsView.request_order ? rsView.request_order.number : '-' }}</td>
+              <th>No. SO</th><td>{{ rsView.request_order ? rsView.request_order.number : '-' }}</td>
             </tr>
           </q-markup-table>
         </div>
         <div class="col-12">
 
-          <q-markup-table dense bordered class="no-shadow" separator="cell">
+          <q-markup-table dense bordered class="no-shadow no-highlight th-uppercase" separator="cell">
             <thead>
             <q-tr>
               <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
@@ -44,8 +44,8 @@
             <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index">
               <q-td>{{row.item.part_name}}</q-td>
               <q-td>{{row.item.part_number}}</q-td>
-              <q-td>{{row.unit.name}}</q-td>
-              <q-td>{{$app.number_format(row.quantity)}}</q-td>
+              <q-td class="text-center">{{row.unit.name}}</q-td>
+              <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
             </q-tr>
             </tbody>
           </q-markup-table>
@@ -55,7 +55,7 @@
             <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
         </div>
         <div class="col-12">
-          <q-markup-table class="signature no-shadow">
+          <q-markup-table class="no-shadow text-weight-light">
             <tr class="text-center">
               <td width="21%">
                 <div class="sign-name">Diterima Oleh</div>
@@ -123,7 +123,6 @@
 </template>
 
 <script>
-
 import MixView from '@/mixins/mix-view.vue'
 import PagePrint from '@/components/page-print'
 import PagePrintBreak from '@/components/page-print-break'
@@ -222,3 +221,9 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+.sign-tag
+  margin-top 40px
+  vertical-align bottom
+</style>
