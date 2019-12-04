@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="row justify-center" >
     <page-print v-if="VIEW.show" class="q-pa-md q-pr-lg shadow-2">
-      <div slot="header-tags">
+      <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark'/>
       </div>
       <div class="row justify-around q-gutter-y-sm" >

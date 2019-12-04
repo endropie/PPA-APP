@@ -16,7 +16,7 @@
       </div>
       <template v-for="(group , index) in rsView.MAPLINES">
       <page-print class=" shadow-2 q-mb-md" :key="index" v-show="printer.indexOf(group.id) > -1">
-        <div slot="header-tags">
+        <div slot="header-tags" class="print-hide">
           <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
         </div>
         <span slot="header-title" style="font-size:26px">Priuk Perkasa Abadi, PT</span>

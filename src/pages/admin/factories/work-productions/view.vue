@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="row justify-center" :dark="LAYOUT.isDark">
     <page-print v-if="VIEW.show" class="q-ma-md shadow-2">
-      <div slot="header-tags">
+      <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
       <span slot="header-title" style="font-size:26px">Priuk Perkasa Abadi, PT</span>
