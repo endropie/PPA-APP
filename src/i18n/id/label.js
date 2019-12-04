@@ -54,5 +54,6 @@ export default {
   type: 'Tipe',
   unit: 'Satuan {v}',
   until: 'Hingga',
+  wrap: 'Kemasan',
   weight: 'Berat'
 }

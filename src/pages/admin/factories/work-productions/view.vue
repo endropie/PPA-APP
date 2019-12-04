@@ -69,7 +69,7 @@
         <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
         <q-space />
         <q-btn :label="$tc('form.list')" icon-right="list" color="dark" :to="`${VIEW.resource.uri}?return`"/>
-        <q-btn :label="$tc('form.clone')" icon-right="add_circle" color="positive" outline align="right" @click.native="$router.push(`${VIEW.resource.uri}/create?clone=${ROUTE.params.id}`)" ></q-btn>
+        <!-- <q-btn :label="$tc('form.clone')" icon-right="add_circle" color="positive" outline align="right" @click.native="$router.push(`${VIEW.resource.uri}/create?clone=${ROUTE.params.id}`)" ></q-btn> -->
         <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" no-caps
           :options="[
             { label: $tc('form.add_new'), color:'primary', icon: 'add',
@@ -77,6 +77,13 @@
               hidden: !$app.can('work-orders-create'),
               actions: () => {
                 $router.push(`${VIEW.resource.uri}/create`)
+              }
+            },
+            { label: $tc('form.clone'), color:'positive', icon: 'post_add',
+              detail: $tc('messages.process_clone'),
+              hidden: !$app.can('work-orders-create'),
+              actions: () => {
+                $router.push(`${VIEW.resource.uri}/create?clone=${ROUTE.params.id}`)
               }
             },
             { label: 'DELETE', color:'red', icon: 'delete',

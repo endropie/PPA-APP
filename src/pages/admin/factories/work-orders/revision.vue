@@ -116,6 +116,18 @@
                   @input="(val) => setUnitReference(index, val)"
                 />
               </q-td>
+              <q-td key="target"  width="15%">
+                <q-input style="min-width:70px"
+                  :name="`work_order_items.${index}.target`"
+                  type="number" :min="0" align="center"
+                  v-model="row.target"
+                  :dark="LAYOUT.isDark" color="blue-grey-4"
+                  outlined dense hide-bottom-space no-error-icon
+                  v-validate="`required|gt_value:0|max_value:${MaxStock[index]}`"
+                  :error="errors.has(`work_order_items.${index}.target`)"
+                  @input="() => { row.quantity = setTotalQuantity(row)}"
+                />
+              </q-td>
               <q-td key="ngratio"  width="15%">
                 <q-input  style="min-width:80px"
                   v-model="row.ngratio" type="number" min="0"
@@ -128,18 +140,6 @@
                   :disable="!rsForm.line_id || !rsForm.work_order_items[index].item_id"
                   @input="() => { row.quantity = setTotalQuantity(row) }"
                   />
-              </q-td>
-              <q-td key="target"  width="15%">
-                <q-input style="min-width:70px"
-                  :name="`work_order_items.${index}.target`"
-                  type="number" :min="0" align="center"
-                  v-model="row.target"
-                  :dark="LAYOUT.isDark" color="blue-grey-4"
-                  outlined dense hide-bottom-space no-error-icon
-                  v-validate="`required|gt_value:0|max_value:${MaxStock[index]}`"
-                  :error="errors.has(`work_order_items.${index}.target`)"
-                  @input="() => { row.quantity = setTotalQuantity(row)}"
-                />
               </q-td>
               <q-td key="quantity"  width="15%">
                 <q-input style="min-width:120px"

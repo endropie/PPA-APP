@@ -36,12 +36,14 @@ export default {
   process_update: 'Form Perubahan data.',
   process_delete: 'Proses Penghapusan data.',
   process_close: 'Tandai Proses Dukumen telah selesai.',
+  process_clone: 'Proses Salin data.',
   process_validation: 'Proses Validasi data.',
   process_confirm: 'Proses Konfirmasi data.',
   process_revise: 'Proses perubahan Revisi data.',
   process_void: 'Proses Pembatalan data.',
   process_producted: 'Tandai Proses produksi telah selesai.',
   process_packed: 'Tandai Proses Packing telah selesai.',
+  process_reopen: 'Proses Pengembalian status "OPEN".',
 
   yes_to: 'Ya, {v}!'
 }

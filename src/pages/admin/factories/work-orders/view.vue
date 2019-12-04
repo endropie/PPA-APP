@@ -47,7 +47,7 @@
         <div class="col-12">
         </div>
         <div class="col-12">
-          <q-table class="bordered no-shadow no-highlight transparent"
+          <q-table dense class="bordered no-shadow no-highlight transparent"
             color="secondary"
             separator="cell"
             hide-bottom :dark="LAYOUT.isDark"
@@ -178,6 +178,12 @@
                 actions: () => $router.push(`${VIEW.resource.uri}/create`)
               },
               {
+                label: 'RE-OPEN', color:'green', icon: 'refresh',
+                detail: $tc('messages.process_revise'),
+                hidden: !IS_REOPEN || !$app.can('work-orders-revision'),
+                actions: () => setReopen()
+              },
+              {
                 label: 'PRODUCTED', color:'green', icon: 'done_all',
                 detail: $tc('messages.process_producted'),
                 hidden: !IS_PRODUCTED || !$app.can('work-orders-close'),
@@ -256,6 +262,11 @@ export default {
     this.init()
   },
   computed: {
+    IS_REOPEN() {
+      if (this.rsView.deleted_at) return false
+      if (!['PRODUCTED', 'PACKED'].find(x => x === this.rsView.status)) return false
+      return true
+    },
     IS_PRODUCTED() {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status != 'OPEN') return false
@@ -341,6 +352,39 @@ export default {
     },
     totalAmount (detail) {
       return Math.round(detail.unit_amount)
+    },
+
+
+
+    setReopen () {
+      const submit = () => {
+        this.VIEW.show = false
+        this.VIEW.loading = true
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=reopen&nodata=true`
+        this.$axios.put(url)
+          .then((response) => {
+            const data = response.data
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'FORM REOPEN')
+          })
+          .finally(()=>{
+            this.VIEW.show = true
+            setTimeout(() => {
+              this.VIEW.loading = false
+            }, 1000);
+          })
+      }
+
+      this.$q.dialog({
+          title: this.$tc('form.confirm', 1, {v:'RE-OPEN'}),
+          message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_reopen')}),
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          submit()
+        })
     },
 
     setProducted () {
