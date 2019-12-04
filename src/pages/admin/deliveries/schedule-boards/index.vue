@@ -88,16 +88,9 @@
           </table-header>
         </template>
 
-        <!-- slot name syntax: body-cell-<column_name> -->
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
-          <!-- <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" /> -->
-          <!-- <q-btn v-if="isCanUpdate && isEditable(rs.row)" dense flat color="light" icon="edit"   :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" :class="{'hidden': rs.row.is_relationship === true}" /> -->
-          <!-- <q-btn v-if="isCanDelete && isEditable(rs.row)" dense flat color="light" icon="delete" @click.native="TABLE.delete(rs.row)" :class="{'hidden': rs.row.is_relationship === true}" /> -->
-          <q-btn-dropdown auto-close outline dense color="light" dropdown-icon="more_horiz" menu-self="top right" class="no-label-dropdown">
-            <q-list dense>
-              <!-- <q-item clickable @click="setChangeState(rs.row, 'SCHEDULED')" v-if="!hasChangeState(rs.row)">
-                <q-item-section>{{$tc('form.tag', 1, {v:$tc('transports.schedule')})}}</q-item-section>
-              </q-item> -->
+          <q-btn-dropdown auto-close dense flat color="light" dropdown-icon="more_horiz" menu-self="top right" class="no-label-dropdown">
+            <q-list dense style="width:180px">
               <q-item clickable @click="setChangeState(rs.row, 'DEPARTED')" v-if="hasChangeState(rs.row) && rs.row.status !== 'DEPARTED'">
                 <q-item-section>{{$tc('form.tag', 1, {v:'DEPARTED'})}}</q-item-section>
               </q-item>
@@ -134,8 +127,14 @@
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
           <ux-badge-status :row="rs.row" class="shadow-0"
-            :labelOptions="{'OPEN' : 'SCHEDULED'}"
-            :colorOptions="{'DEPARTED' : 'green-14', 'ARRIVED': 'green-10'}" />
+            :dark="LAYOUT.isDark"
+            :colorOptions="{'DEPARTED' : 'green-7', 'ARRIVED': 'blue-grey-9'}"
+            v-if="rs.row.status !== 'OPEN'"/>
+          <q-chip dense square class="shadow-0 text-weight-medium"
+            :dark="LAYOUT.isDark"
+            :label="getOntimeLabel(rs.row)"
+            :color="getOntimeColor(rs.row)"
+            v-if="!Boolean(rs.row.deleted_at)"/>
         </q-td>
 
         <q-td slot="body-cell-vehicle_id" slot-scope="rs" :props="rs">
@@ -147,6 +146,15 @@
           <span v-if="rs.row.operator">
             <!-- <div class="extend-line">{{$tc('label.no')}} {{ rs.row.operator.code }}</div> -->
             {{ rs.row.operator.name }}
+          </span>
+          <span v-else>-</span>
+        </q-td>
+
+        <q-td slot="body-cell-customers" slot-scope="rs" :props="rs">
+          <span v-if="rs.row.customers && rs.row.customers.length > 0" class="row flex">
+            <q-chip dense square v-for="(customer, i) in rs.row.customers" :key="i">
+              {{customer.name || 'no-name'}}
+            </q-chip>
           </span>
           <span v-else>-</span>
         </q-td>
@@ -194,11 +202,11 @@ export default {
         columns: [
           { name: 'prefix', label: '', align: 'left'},
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'vehicle_id', label: this.$tc('general.vehicle'), field: 'vehicle_id', align: 'left', sortable: true },
           { name: 'schedule', label: this.$tc('transports.schedule'), align: 'center', sortable: true},
+          { name: 'vehicle_id', label: this.$tc('general.vehicle'), field: 'vehicle_id', align: 'left', sortable: true },
           { name: 'operator_id', label: this.$tc('general.operator'), field: 'operator_id', align: 'left', sortable: true },
-          { name: 'status', label: this.$tc('label.state'), field: 'status', align: 'center'},
-          { name: 'destination', label: this.$tc('transports.destination'), field: 'destination', align: 'left', style:'width:30%' },
+          { name: 'status', label: '', field: 'status', align: 'center'},
+          { name: 'customers', label: this.$tc('transports.destination'), align: 'left', style:'width:45%' },
         ]
       },
     }
@@ -269,6 +277,26 @@ export default {
       }).onOk(() => {
         submit()
       })
+    },
+    duration(datetime, after = null) {
+      console.warn('DURATION', datetime, after)
+      after = this.$app.moment(after || undefined)
+      datetime = this.$app.moment(datetime)
+
+      //Difference in number of Minutes
+      return this.$app.moment.duration(after.diff(datetime)).asMinutes();
+    },
+    getOntimeLabel(row) {
+      const duration = this.duration(`${row.date} ${row.time}`, row.departed_at)
+      if (duration > 0) return 'DELAYED'
+      else if (row.departed_at) return 'ON-TIME'
+      else return 'SCHEDULED'
+    },
+    getOntimeColor(row) {
+      const duration = this.duration(`${row.date} ${row.time}`, row.departed_at)
+      if (duration > 0) return 'negative'
+      else if (row.departed_at) return 'green-8'
+      else return 'primary'
     }
   },
 }

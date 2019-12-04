@@ -63,24 +63,28 @@
               <span v-else>-</span>
             </q-td>
 
-            <q-td slot="body-cell-destination" slot-scope="rs" :props="rs">
-              <span v-if="rs.row.scheduled">
-                <span v-for="(customer, index) in rs.row.scheduled.customers" :key="index">
-                  {{customer.name}} <span v-if="rs.row.scheduled.customers.length > index+1">,</span>
-                </span>
+            <q-td slot="body-cell-customers" slot-scope="rs" :props="rs">
+              <span v-if="rs.row.scheduled.customers && rs.row.scheduled.customers.length > 0" class="row flex">
+                <q-chip dense square v-for="(customer, i) in rs.row.scheduled.customers" :key="i">
+                  {{customer.name || 'no-name'}}
+                </q-chip>
               </span>
               <span v-else>-</span>
             </q-td>
 
             <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
-              <div v-if="rs.row.scheduled">
-                <ux-badge-status v-if="duration(`${rs.row.scheduled.date} ${rs.row.scheduled.time}`) < 0"
-                  label="DELAY" color="red"/>
-                <ux-badge-status v-else
-                  :row="rs.row.scheduled"
-                  :labelOptions="{'OPEN' : 'SCHEDULED'}"
-                  :colorOptions="{'DEPARTED' : 'green-14', 'ARRIVED': 'green-10'}" />
-              </div>
+              <span v-if="rs.row.scheduled">
+                <ux-badge-status :row="rs.row.scheduled" class="shadow-0"
+                  :dark="ScreenMode"
+
+                  :colorOptions="{'DEPARTED' : 'green-7', 'ARRIVED': 'blue-grey-9'}"
+                  v-if="rs.row.scheduled.status !== 'OPEN'"/>
+                <q-chip dense square class="shadow-0"
+                  :dark="ScreenMode"
+                  :label="getOntimeLabel(rs.row.scheduled)"
+                  :color="getOntimeColor(rs.row.scheduled)"
+                  v-if="!Boolean(rs.row.scheduled.deleted_at)"/>
+              </span>
               <span v-else>-</span>
             </q-td>
 
@@ -114,7 +118,7 @@ export default {
         columns: [
           { name: 'schedule', label: this.$tc('transports.schedule'), align: 'center', sortable: true},
           { name: 'vehicle_id', label: this.$tc('general.vehicle'), field: 'number', align: 'center', sortable: true },
-          { name: 'destination', label: this.$tc('transports.destination'), field: 'destination', align: 'left', style:'width:40%' },
+          { name: 'customers', label: this.$tc('general.customer'), field: 'customers', align: 'left', style:'width:40%' },
           { name: 'status', label: this.$tc('label.state'), field: 'status', align: 'center'},
         ]
       },
@@ -138,14 +142,24 @@ export default {
       this.INDEX.load()
       this.reload = setInterval(() => this.INDEX.load(), 1000 * 30);
     },
-    duration(datetime) {
-      const now = this.$app.moment()
+    duration(datetime, after = null) {
+      after = this.$app.moment(after || undefined)
       datetime = this.$app.moment(datetime)
-
       //Difference in number of Minutes
-      return this.$app.moment.duration(datetime.diff(now)).asMinutes();
+      return this.$app.moment.duration(after.diff(datetime)).asMinutes();
+    },
+    getOntimeLabel(row) {
+      const duration = this.duration(`${row.date} ${row.time}`, row.departed_at)
+      if (duration > 0) return 'DELAY'
+      else if (row.departed_at) return 'ON-TIME'
+      else return 'SCHEDULED'
+    },
+    getOntimeColor(row) {
+      const duration = this.duration(`${row.date} ${row.time}`, row.departed_at)
+      if (duration > 0) return 'negative'
+      else if (row.departed_at) return 'green-8'
+      else return 'primary'
     }
-    // #
   },
   destroyed() {
     clearInterval(this.reload)
