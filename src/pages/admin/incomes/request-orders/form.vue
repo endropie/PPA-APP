@@ -3,45 +3,22 @@
   <q-card inline class="main-box" :dark="LAYOUT.isDark" v-if="FORM.show">
     <q-card-section>
       <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" hide-menu>
-          <q-chip slot="optional" v-if="rsForm.order_mode"
-            icon="assignment"  class="text-weight-medium"
-            :label="rsForm.order_mode" color="primary" outline/>
+        <q-chip slot="optional" v-if="rsForm.transaction"
+          icon="label"  class="text-weight-medium"
+          :label="rsForm.transaction" color="primary" outline/>
 
-          <q-chip slot="optional" v-if="rsForm.status === 'VOID'"
-            icon="bookmark"  class="text-weight-medium"
-            label="void" color="negative" outline/>
+        <q-chip slot="optional" v-if="rsForm.order_mode"
+          icon="assignment"  class="text-weight-medium"
+          :label="rsForm.order_mode" color="primary" outline/>
+
+        <q-chip slot="optional" v-if="rsForm.status === 'VOID'"
+          icon="bookmark"  class="text-weight-medium"
+          label="void" color="negative" outline/>
 
       </form-header>
     </q-card-section>
     <!-- COLUMN::1st customer Identitity -->
     <q-card-section class="row q-col-gutter-sm">
-      <div class="col-12 col-sm-6" >
-        <div class="row q-col-gutter-x-sm">
-          <q-input class="col-12" name="number"
-            label="No Transaction"
-            placeholder="[Auto Generate]"
-            v-model="rsForm.number"
-            :dark="LAYOUT.isDark"
-            v-validate="ROUTE.meta.mode == 'edit' ? 'required':''"
-            :error="errors.has('number')" :error-message="errors.first('number')"/>
-
-          <ux-date class="col-12" name="date"
-            stack-label :label="$tc('label.date')"
-            v-model="rsForm.date"
-            :dark="LAYOUT.isDark"
-            v-validate="'required'"
-            :error="errors.has('date')"
-            :error-message="errors.first('date')" />
-
-          <!-- <q-input class="col-12" name="date" type="date"
-            stack-label label="Date"
-            v-model="rsForm.date"
-            :dark="LAYOUT.isDark"
-            v-validate="'required'"
-            :error="errors.has('date')"
-            :error-message="errors.first('date')"/> -->
-        </div>
-      </div>
       <div class="col-12 col-sm-6" >
         <div class="row q-col-gutter-x-sm">
           <ux-select-filter name="customer" class="col-12"
@@ -56,6 +33,17 @@
             :loading="SHEET['customers'].loading">
             <q-tooltip v-if="IssetItemDetails" :offset="[0, 10]">To change: Please delete Part items first!</q-tooltip>
           </ux-select-filter>
+          <ux-date class="col-12" name="date"
+            stack-label :label="$tc('label.date')"
+            v-model="rsForm.date"
+            :dark="LAYOUT.isDark"
+            v-validate="'required'"
+            :error="errors.has('date')"
+            :error-message="errors.first('date')" />
+        </div>
+      </div>
+      <div class="col-12 col-sm-6" >
+        <div class="row q-col-gutter-x-sm">
           <q-input name="reference_number" class="col-12"
               stack-label label="PO / Qoutation / Memo"
               v-model="rsForm.reference_number"
