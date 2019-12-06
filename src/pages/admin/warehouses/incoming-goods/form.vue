@@ -103,18 +103,15 @@
             :dark="LAYOUT.isDark"
             :error="errors.has('vehicle_id')"
             :error-message="errors.first('vehicle_id')" >
-            <template slot="after">
-              <q-input class="no-padding"
-                input-class="text-weight-bold"
-                input-style="width:50px;text-align:center"
-                name="rit" type="number" min="0"
-                label="RIT"
-                v-model="rsForm.rit"
-                dense no-error-icon
-                v-validate="'min_value:0'"
-                :error="errors.has('rit')" />
-              <!-- Incoming Items lists -->
-            </template>
+
+            <q-select slot="after" class="no-padding" style="min-width:80px"
+              name="rit" label="RIT"
+              v-model="rsForm.rit" clearable
+              no-error-icon hide-dropdown-icon
+              :options="RitOptions" options-dense
+              :options-dark="LAYOUT.isDark" :dark="LAYOUT.isDark"
+              v-validate="'min_value:0'"
+              :error="errors.has('rit')" />
           </ux-select-filter>
 
         </div>
@@ -298,6 +295,11 @@ export default {
     },
     IssetCustomerID() {
       return (this.rsForm.customer_id ? true : false)
+    },
+    RitOptions() {
+      let rits = []
+      for (let i = 0; i < 10; i++) rits.push(i+1)
+      return rits
     },
     CustomerOptions() {
       // let label = [item.code, item.name].join('-')

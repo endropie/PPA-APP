@@ -49,14 +49,15 @@
         :error="errors.has('date')"
         :error-message="errors.first('date')"/>
 
-      <q-input class="col-6 col-sm-3"
-        name="rit" type="number" min="0"
-        stack-label label="RIT"
-        v-model="rsForm.rit"
-        v-validate="''"
-        :dark="LAYOUT.isDark"
+      <q-select class="col-6 col-sm-3"
+        name="rit" label="RIT"
+        v-model="rsForm.rit" clearable
+        no-error-icon hide-dropdown-icon
+        :options="RitOptions" options-dense
+        :options-dark="LAYOUT.isDark" :dark="LAYOUT.isDark"
+        v-validate="'min_value:0'"
         :error="errors.has('rit')"
-        :error-message="errors.first('rit')"/>
+        :error-message="errors.first('rit')" />
 
       <div class="col-12">
         <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
@@ -124,7 +125,8 @@
                 <q-input style="min-width:100px"
                   :name="`pre_delivery_items.${index}.wrap`"
                   outlined dense hide-bottom-space  color="blue-grey-5"
-                  v-model="row.wrap" />
+                  v-model="row.wrap"
+                  :dark="LAYOUT.isDark" />
               </q-td>
             </q-tr>
 
@@ -234,6 +236,11 @@ export default {
     },
     IssetCustomerID() {
       return (this.rsForm.customer_id ? true : false)
+    },
+    RitOptions() {
+      let rits = []
+      for (let i = 0; i < 10; i++) rits.push(i+1)
+      return rits
     },
     CustomerOptions() {
       return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])

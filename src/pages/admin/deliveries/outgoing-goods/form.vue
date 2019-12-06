@@ -56,37 +56,24 @@
             :error="errors.has('due_date')"
             :error-message="errors.first('due_date')"/>
 
-          <ux-select-filter name="operator_id" class="col-12" hide-bottom-space
-            stack-label label="Operator"
-            v-model="rsForm.operator_id"
-            :options="EmployeeOptions"
-            :dark="LAYOUT.isDark"
-            v-validate="'required'"
-            :error="errors.has(`operator_id`)"
-            :error-message="errors.first(`operator_id`)"/>
-
-          <ux-select-filter class="col-12" hide-bottom-space
+          <ux-select-filter class="col-9"
             name="vehicle_id"
             :label="$tc('transports.seri')" stack-label
             v-model="rsForm.transport_number"
-            autocomplete="off"
+            hide-bottom-space autocomplete="off"
             :options="VehicleOptions"
             :dark="LAYOUT.isDark"
             :error="errors.has('vehicle_id')"
-            :error-message="errors.first('vehicle_id')" >
-            <template slot="after">
-              <q-input class="text-uppercase no-padding no-field-after"
-                input-class="rounded-borders no-padding bg-faded text-white"
-                input-style="width:50px;text-align:center"
-                name="transport_rate" type="number" min="0"
-                :placeholder="$tc('transports.trip')"
-                v-model="rsForm.transport_rate"
-                dense no-error-icon rounded
-                v-validate="'gt_value:0'"
-                :error="errors.has('transport_rate')" />
-              <!-- Incoming Items lists -->
-            </template>
-          </ux-select-filter>
+            :error-message="errors.first('vehicle_id')" />
+
+          <q-select class="col-3"
+            name="rit" label="RIT"
+            v-model="rsForm.rit" clearable
+            hide-bottom-space no-error-icon hide-dropdown-icon
+            :options="RitOptions" options-dense
+            :options-dark="LAYOUT.isDark" :dark="LAYOUT.isDark"
+            v-validate="'min_value:0'"
+            :error="errors.has('rit')" />
 
 
         </div>
@@ -120,8 +107,8 @@
           :dark="LAYOUT.isDark">
           <q-tr>
             <q-th key="prefix"></q-th>
-            <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
-            <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
+            <q-th key="item_id" class="text-left">{{$tc('items.part_name')}}</q-th>
+            <q-th key="part_number" class="text-left">{{$tc('items.part_number')}}</q-th>
             <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
             <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
           </q-tr>
@@ -274,9 +261,8 @@ export default {
           customer_phone: null,
           customer_address: null,
 
-          operator_id: null,
-          transport_number: null,
-          transport_rate: null,
+          vehicle_id: null,
+          rit: null,
 
           due_date: this.$app.moment().format('YYYY-MM-DD'),
           due_time: this.$app.moment().format('HH:mm'),
@@ -301,6 +287,11 @@ export default {
         if (Object.keys(this.rsForm.has_relationship).length > 0) return false
       }
       return true
+    },
+    RitOptions() {
+      let rits = []
+      for (let i = 0; i < 10; i++) rits.push(i+1)
+      return rits
     },
     CustomerOptions() {
       // let label = [item.code, item.name].join('-')
