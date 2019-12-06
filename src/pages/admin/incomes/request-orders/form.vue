@@ -44,14 +44,41 @@
       </div>
       <div class="col-12 col-sm-6" >
         <div class="row q-col-gutter-x-sm">
-          <q-input name="reference_number" class="col-12"
-              stack-label label="PO / Qoutation / Memo"
-              v-model="rsForm.reference_number"
-              :dark="LAYOUT.isDark"
-              v-validate="rsForm.order_mode === 'PO' ? 'required' :''"
-              :error="errors.has('reference_number')"
-              :error-message="errors.first('reference_number')"/>
+          <q-field  class="col-12" borderless hint=""
+            :class="{'hidden': Boolean(rsForm.id) && !rsForm.is_estimate}">
+            <q-toggle slot="before" name="is_estimate"
+              :label="$tc('label.estimate')" left-label
+              v-model="rsForm.is_estimate"
+              :true-value="1" :false-value="0"
+              :disable="Boolean(rsForm.id)"/>
+            <q-input name="estimate_number" class="no-padding fit"
+                stack-label :label="$tc('label.no', 1, {v: 'PO '+$tc('label.estimate', 2)})"
+                v-model="rsForm.estimate_number"
+                :dark="LAYOUT.isDark"
+                v-validate="rsForm.is_estimate ? 'required' :''"
+                :error="errors.has('estimate_number')"
+                :error-message="errors.first('estimate_number')"
+                :disable="Boolean(rsForm.id)"
+                v-if="rsForm.is_estimate"/>
 
+          </q-field>
+          <div class="col-12 q-px-lg">
+            <q-btn outline class="full-width"
+              :label="$tc('messages.release_customer_order')"
+              color="primary"
+              @click="isFinished = true"
+              v-if="rsForm.id && rsForm.is_estimate && !Boolean(isFinished)"/>
+          </div>
+          <q-input name="reference_number" class="col-12"
+            stack-label label="PO / Qoutation / Memo"
+            v-model="rsForm.reference_number"
+            :dark="LAYOUT.isDark"
+            v-validate="rsForm.order_mode === 'PO' ? 'required' :''"
+            :error="errors.has('reference_number')"
+            :error-message="errors.first('reference_number')"
+            v-if="!rsForm.is_estimate || isFinished">
+            <q-btn slot="after" flat round icon="clear" v-if="isFinished" @click="setCancelFinished" />
+          </q-input>
         </div>
       </div>
     </q-card-section>
@@ -72,7 +99,7 @@
           </q-tr>
           <q-tr v-for="(row, index) in rsForm.request_order_items" :key="index">
             <q-td key="prefix" style="width:50px">
-              <q-btn dense flat icon="clear" color="negative" @click="removeItem(index)"/>
+              <q-btn dense flat icon="clear" color="negative" @click="removeItem(index)" v-if="!Boolean(row.id)"/>
             </q-td>
             <q-td key="item_id" width="30%" style="min-width:150px">
               <ux-select-filter :name="`request_orders_items.${index}.item_id`"
@@ -96,10 +123,10 @@
             </q-td>
             <q-td key="quantity" width="10%">
               <q-input :name="`request_orders_items.${index}.quantity`"
-                v-model="row.quantity" type="number"
+                v-model="row.quantity" type="number" min="0"
                 outlined dense hide-bottom-space
                 color="blue-grey-5" style="width:80px"
-                v-validate="row.item_id ? 'required' : ''"
+                v-validate="row.item_id ? `required|gt_value:0|min_value:${getMinQuantity(index)}` : ''"
                 :dark="LAYOUT.isDark"
                 :error="errors.has(`request_orders_items.${index}.quantity`)"
               />
@@ -149,9 +176,9 @@
       </div>
       <!-- COLUMN::4th Description -->
       <div class="col-12">
-        <q-input name="description" type="textarea" rows="3"
+        <q-input filled type="textarea" rows="3"
+          name="description"
           stack-label :label="$tc('label.description')"
-          filled
           v-model="rsForm.description"
           :dark="LAYOUT.isDark">
 
@@ -181,6 +208,7 @@ export default {
   mixins: [MixForm],
   data () {
     return {
+      isFinished: false,
       SHEET: {
         customers: {api:'/api/v1/incomes/customers?mode=all'},
         brands: {api:'/api/v1/references/brands?mode=all'},
@@ -207,6 +235,8 @@ export default {
           transaction: 'REGULER',
           order_mode: null,
           description: null,
+          is_estimate: 0,
+          estimate_number: null,
 
           request_order_items:[
             {
@@ -231,8 +261,8 @@ export default {
     IS_EDITABLE() {
       if (this.rsForm.order_mode === 'NONE') return false
       if (this.rsForm.deleted_at) return false
-      if (this.rsForm.hasOwnProperty('has_relationship') && Object.keys(this.rsForm.has_relationship).length > 0) {
-        return false
+      if (Object.keys(this.rsForm.has_relationship|| {}).length > 0) {
+        if (!Boolean(this.rsForm.is_estimate)) return false
       }
 
       return true
@@ -320,12 +350,16 @@ export default {
       this.rsData = JSON.parse(JSON.stringify(data))
       this.rsForm = JSON.parse(JSON.stringify(data))
 
-      if(data.hasOwnProperty('has_relationship') && Object.keys(data['has_relationship']).length > 0) {
+      if(data.id && Object.keys(data['has_relationship']).length > 0 && !Boolean(data['is_estimate'])) {
         this.FORM.response.relationship({
           title: 'Sale Orders has relations!',
           messages: data['has_relationship'],
           then: () => this.$router.push(`${this.FORM.resource.uri}/${data.id}`)
         })
+      }
+
+      if (data.customer_id) {
+        this.SHEET.load('items', `customer_id=${data.customer_id}`)
       }
     },
     setCustomerReference(val) {
@@ -403,6 +437,13 @@ export default {
         this.FORM.show = true;
       }
     },
+    getMinQuantity(index) {
+      if (this.FORM.data.request_order_items) {
+        const details = this.FORM.data.request_order_items
+        if (details[index]) return details[index].quantity || 0
+      }
+      return 0
+    },
     addNewItem(autofocus = true){
       let newEntri = this.setDefault().request_order_items[0] // {id:null, item_id: null, quantity: null};
 
@@ -411,6 +452,12 @@ export default {
     removeItem(index) {
         this.rsForm.request_order_items.splice(index, 1)
         if(this.rsForm.request_order_items.length < 1) this.addNewItem()
+    },
+    setCancelFinished() {
+      this.rsForm.reference_number = null
+      this.$nextTick(()=> {
+        this.isFinished = false
+      })
     },
     onSave() {
       this.$validator.validate().then(result => {
@@ -424,6 +471,15 @@ export default {
         }
         this.FORM.loading = true
         let {method, mode, apiUrl} = this.FORM.meta();
+
+        if (this.rsForm.is_estimate) {
+          apiUrl = this.isFinished
+            ? `${apiUrl}?mode=estimate_finished`
+            : `${apiUrl}?mode=estimate_updated`
+        }
+
+        console.warn('URL',apiUrl)
+
         this.$axios.set(method, apiUrl, this.rsForm)
         .then((response) => {
           let message = response.data.number + ' - #' + response.data.id

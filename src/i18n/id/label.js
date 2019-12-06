@@ -18,6 +18,7 @@ export default {
   detail: 'Detail {v}',
   due_date: 'Batas Tanggal',
   email: 'Email',
+  estimate: 'Estimasi | Estimasi (Bayangan)',
   field: 'Kolom',
   grandtotal: 'Grand Total',
   general: 'Umum',

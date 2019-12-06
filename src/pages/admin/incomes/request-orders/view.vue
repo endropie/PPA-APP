@@ -39,7 +39,7 @@
           </div>
         </div>
         <div class="col-12">
-          <q-markup-table dense bordered class="no-shadow" separator="cell">
+          <q-markup-table dense bordered class="no-shadow no-highlight" separator="cell">
             <thead>
             <q-tr>
               <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
@@ -141,9 +141,11 @@ export default {
     IS_EDITABLE() {
       if (this.rsView.revise_id) return false
       if (this.rsView.order_mode === 'NONE') return false
-      if (this.rsView.status !== 'OPEN') return false
       if (this.rsView.deleted_at) return false
-      if (this.rsView.hasOwnProperty('has_relationship') && Object.keys(this.rsView.has_relationship).length > 0) return false
+      if (this.rsView.status !== 'OPEN') return false
+      if (Object.keys(this.rsView.has_relationship || {}).length > 0) {
+        if (!Boolean(this.rsView.is_estimate)) return false
+      }
 
       return true
     },

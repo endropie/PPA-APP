@@ -188,7 +188,9 @@ export default {
     isEditable(row) {
       if (row.order_mode === 'NONE') return false
       if (row.status !== 'OPEN') return false
-      if (row.hasOwnProperty('is_relationship') && row.is_relationship) return false
+      if (row.hasOwnProperty('is_relationship') && row.is_relationship) {
+        if (!Boolean(row.is_estimate)) return false
+      }
       return true
     }
   }
