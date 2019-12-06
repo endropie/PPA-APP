@@ -15,7 +15,7 @@
               :label="$tc('items.preline')"
               v-model="rsForm.line_id"
               v-validate="'required'"
-              :disable="IssetWorkProductionItems"
+              :disable="IssetDetails"
               :options="LineOptions" clearable
               :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
               :error="errors.has('line_id')"
@@ -33,17 +33,21 @@
               :date-options="(date) => FORM.ifCreate(date >= $app.moment().format('YYYY/MM/DD'), true)"
               :dark="LAYOUT.isDark"
               :error="errors.has('date')"
-              :error-message="errors.first('date')">
+              :error-message="errors.first('date')"
+              :disable="IssetDetails"
+              debounce="1000"
+              @input="(val) => val ? loadItemOptions() : false" >
 
               <q-select slot="after" class="no-padding" style="min-width:80px"
                 name="shift_id"
                 :label="$tc('label.shift')" stack-label
                 v-model="rsForm.shift_id"
                 v-validate="'required'"
-                :options="ShiftOptions" filter
-                map-options emit-value
+                :disable="IssetDetails"
+                :options="ShiftOptions" map-options emit-value
                 :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                 :error="errors.has('shift_id')"
+                @input="(val) => val ? loadItemOptions() : false"
               />
             </ux-date>
           </div>
@@ -72,7 +76,7 @@
                       hide-bottom-space hide-dropdown-icon
                       v-model="row.item_id"
                       v-validate="'required'"
-                      :disable="!rsForm.line_id || Boolean(row.stockist)"
+                      :disable="!DetailRequired || Boolean(row.stockist)"
                       :options="ItemOptions" clearable
                       popup-content-class="options-striped"
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
@@ -87,7 +91,7 @@
                       v-validate="'required'"
                       outlined color="blue-grey-4"
                       no-error-icon hide-bottom-space hide-dropdown-icon
-                      :disable="!rsForm.line_id"
+                      :disable="!DetailRequired"
                       :options="WorkOrderItemLineOptions.filter(x => x.item_id === row.item.id && x.stockist === row.stockist)" clearable
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${index}.work_order_item_line_id`)"
@@ -130,7 +134,7 @@
                       map-options  emit-value
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${index}.unit_id`)"
-                      :disable="!rsForm.line_id || !row.item_id"
+                      :disable="!DetailRequired || !row.item_id"
                       @input="(val) => setUnitReference(index, val)"
                     />
                   </q-card-section>
@@ -235,7 +239,10 @@ export default {
     this.init()
   },
   computed: {
-    IssetWorkProductionItems() {
+    DetailRequired() {
+      return Boolean(this.rsForm.line_id && this.rsForm.date && this.rsForm.shift_id)
+    },
+    IssetDetails() {
       if (this.rsForm.work_production_items) {
         return this.rsForm.work_production_items.some((item) => item.item_id)
       }
@@ -436,8 +443,8 @@ export default {
       }
     },
     loadItemOptions(data = this.rsForm) {
-      if (data.line_id) {
-        let params = [`has_amount_line=${data.line_id}`]
+      if (data.line_id && data.shift_id && data.date) {
+        let params = [`has_amount_line=${data.line_id}`, `date=${data.date}`, `shift_id=${data.shift_id}`]
         if (this.FORM.data.work_production_items) {
           let orKeys = this.FORM.data.work_production_items.map(x => x.work_order_item_line_id)
           params.push(`or_work_order_item_line_ids=${orKeys.join(',')}`)
