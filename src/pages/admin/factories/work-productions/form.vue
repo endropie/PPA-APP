@@ -20,17 +20,7 @@
               :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
               :error="errors.has('line_id')"
               :error-message="errors.first('line_id')"
-              @input="(val) => val ? loadItemOptions() : false" >
-              <q-select slot="after" class="no-padding" style="width:100px"
-                name="stockist" :label="$tc('items.stockist').toUpperCase()" hide-dropdown-icon
-                v-model="rsForm.stockist" emit-value map-options
-                v-validate="'required'"
-                :disable="IssetWorkProductionItems"
-                :options="StockistOptions"
-                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                :error="errors.has('stockist')"
-                @input="(val) => val ? loadItemOptions() : false"/>
-            </ux-select-filter>
+              @input="(val) => val ? loadItemOptions() : false" />
 
           </div>
         </div>
@@ -74,14 +64,15 @@
                       </div>
                   </q-card-section>
                   <q-card-section class="row q-col-gutter-sm">
-                    <ux-select-filter class="col-12 col-md-6" autofocus
+
+                    <ux-select-filter dense class="col-12 col-md-6" autofocus
                       :name="`work_production_items.${index}.item_id`"
                       :label="$tc('items.part_name')" stack-label
                       outlined color="blue-grey-4"
                       hide-bottom-space hide-dropdown-icon
                       v-model="row.item_id"
                       v-validate="'required'"
-                      :disable="!rsForm.line_id || !rsForm.stockist"
+                      :disable="!rsForm.line_id || Boolean(row.stockist)"
                       :options="ItemOptions" clearable
                       popup-content-class="options-striped"
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
@@ -89,26 +80,36 @@
                       :loading="SHEET['items'].loading"
                       @input="(val) => setItemReference(index, val)" />
 
-                    <ux-select-filter class="col-12 col-md-6"
+                    <ux-select-filter dense class="col-12 col-md-6"
                       :name="`work_production_items.${index}.work_order_item_line_id`"
                       :label="$tc('general.work_production')" stack-label
                       v-model="row.work_order_item_line_id"
                       v-validate="'required'"
                       outlined color="blue-grey-4"
                       no-error-icon hide-bottom-space hide-dropdown-icon
-                      :disable="!rsForm.line_id || !rsForm.stockist"
-                      :options="WorkOrderItemLineOptions.filter(x => x.item_id === row.item.id)" clearable
+                      :disable="!rsForm.line_id"
+                      :options="WorkOrderItemLineOptions.filter(x => x.item_id === row.item.id && x.stockist === row.stockist)" clearable
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${index}.work_order_item_line_id`)"
-                      :loading="SHEET['work_orders'].loading" />
+                      :loading="SHEET['work_orders'].loading">
+                        <q-select slot="before" class="no-padding" style="width:100px"
+                          :name="`work_production_items.${index}.stockist`"
+                          :label="$tc('items.stockist').toUpperCase()" hide-dropdown-icon
+                          v-model="row.stockist" emit-value map-options
+                          v-validate="'required'"
+                          :options="StockistOptions"
+                          :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                          :error="errors.has(`work_production_items.${index}.stockist`)"
+                          @input="row.work_order_item_line_id = null"/>
+                    </ux-select-filter>
 
-                    <q-input readonly tabindex="100" class="col-12 col-md-6"
+                    <q-input dense readonly tabindex="100" class="col-12 col-md-6"
                       :label="$tc('items.part_number')" stack-label
                       :value="row.item ? row.item.part_number : null"
                       outlined hide-bottom-space color="blue-grey-5"
                       :dark="LAYOUT.isDark" />
 
-                    <q-input type="number" class="col-12 col-sm-8 col-md-4" style="min-width:120px"
+                    <q-input dense type="number" class="col-12 col-sm-8 col-md-4" style="min-width:120px"
                       :name="`work_production_items.${index}.quantity`"
                       :label="$tc('label.quantity')" stack-label
                       :dark="LAYOUT.isDark" color="blue-grey-6"
@@ -118,7 +119,7 @@
                       :error="errors.has(`work_production_items.${index}.quantity`)"
                       :suffix="' / '+ $app.number_format(MaxStock[index] / (row.unit_rate||1))" />
 
-                    <q-select class="col-12 col-sm-4 col-md-2"
+                    <q-select dense class="col-12 col-sm-4 col-md-2"
                       :name="`work_production_items.${index}.unit_id`"
                       :label="$tc('label.unit')" stack-label
                       v-model="row.unit_id"
@@ -207,13 +208,13 @@ export default {
           multiple: null,
           number: null,
           line_id: null,
-          stockist: null,
           date: this.$app.moment().format('YYYY-MM-DD'),
           shift_id: null,
           description: null,
           work_production_items: [
             {
               id:null,
+              stockist: null,
               item_id: null,
               quantity: null,
               target:null,
@@ -254,7 +255,8 @@ export default {
           if (this.rsForm.line_id !== detail.line_id) return false
           if (!oldKeys.find(x => x === detail.id) && detail.unit_amount <= detail.amount_line) return false
 
-          detail.work_order_number = rs.number
+          detail.work_order_number = rs.full_number || rs.number
+          detail.stockist = rs.stockist_from
           Data.push(detail)
           if (!Item.find(x => x === (detail.work_order_item.item_id || null))) Item.push(detail.work_order_item.item_id)
 
@@ -270,6 +272,7 @@ export default {
           value: detail.id,
           stamp: this.$app.number_format(total),
           item_id: (detail.work_order_item.item_id || null),
+          stockist: (detail.stockist || null),
           rowdata: detail
         })
       })
@@ -289,10 +292,6 @@ export default {
     },
     ItemOptions() {
       if (this.SHEET.items.data.length <= 0) return []
-
-      // const stockist = 'WO'
-      // let OrKeys = this.FORM.data.work_production_items.map(x => x.item_id, [])
-
       let ITEM = this.SHEET.items.data.filter((item) => {
         // if (!item.item_prelines || !item.item_prelines.length) return false
         // if (item.item_prelines[0].line_id !== this.rsForm.line_id) return false
@@ -335,7 +334,6 @@ export default {
 
       let failed = this.rsForm.work_production_items.some((x,i,a) => {
         return (x.quantity * this.rsForm.multiple) > this.MaxStock[i]
-        // console.warn('WARN', x.quantity, this.MaxStock[i], a)
       })
       return failed ? `is_not:${this.rsForm.multiple}` : ``
     },
@@ -437,8 +435,8 @@ export default {
       }
     },
     loadItemOptions(data = this.rsForm) {
-      if (data.line_id && data.stockist) {
-        let params = [`has_amount_line=${data.line_id}`, `stockist_from=${data.stockist}`]
+      if (data.line_id) {
+        let params = [`has_amount_line=${data.line_id}`]
         if (this.FORM.data.work_production_items) {
           let orKeys = this.FORM.data.work_production_items.map(x => x.work_order_item_line_id)
           params.push(`or_work_order_item_line_ids=${orKeys.join(',')}`)
