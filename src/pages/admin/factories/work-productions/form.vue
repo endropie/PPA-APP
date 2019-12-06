@@ -95,6 +95,7 @@
                         <q-select slot="before" class="no-padding" style="width:100px"
                           :name="`work_production_items.${index}.stockist`"
                           :label="$tc('items.stockist').toUpperCase()" hide-dropdown-icon
+                          outlined clearable no-error-icon
                           v-model="row.stockist" emit-value map-options
                           v-validate="'required'"
                           :options="StockistOptions"
