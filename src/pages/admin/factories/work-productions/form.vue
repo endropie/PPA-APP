@@ -92,10 +92,10 @@
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${index}.work_order_item_line_id`)"
                       :loading="SHEET['work_orders'].loading">
-                        <q-select slot="before" class="no-padding" style="width:100px"
+                        <q-select slot="before" class="no-padding" style="min-width:120px"
                           :name="`work_production_items.${index}.stockist`"
                           :label="$tc('items.stockist').toUpperCase()" hide-dropdown-icon
-                          outlined clearable no-error-icon
+                          use-chips outlined no-error-icon
                           v-model="row.stockist" emit-value map-options
                           v-validate="'required'"
                           :options="StockistOptions"
