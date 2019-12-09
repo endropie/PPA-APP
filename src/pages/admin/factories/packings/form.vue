@@ -21,30 +21,21 @@
           :options="CONFIG.options['worktime']"
         />
       </q-field>
-      <ux-select-filter class="col-12"
-        name="customer_id"
-        v-model="rsForm.customer_id"
-        :label="$tc('general.customer')"
-        :disable="IssetItemID"
-        :dark="LAYOUT.isDark"
-        v-validate="'required'"
-        :options="CustomerOptions" filter clearable
-        @input="setCustomerReference"
-        :error="errors.has('customer_id')"
-        :error-message="errors.first('customer_id')"
-        :loading="SHEET.customers.loading" />
-
-
-
       <!-- COLUMN::1st Packing Identitity --><div class="col-12" >
         <div class="row q-col-gutter-xs">
-          <ux-select-filter class="col-12 col-sm-6" name="operator_id"
-            v-model="rsForm.operator_id" label="Operator"
+
+          <ux-select-filter class="col-12 col-sm-6"
+            name="customer_id"
+            v-model="rsForm.customer_id"
+            :label="$tc('general.customer')"
+            :disable="IssetItemID"
             :dark="LAYOUT.isDark"
-            :options="EmployeeOptions" clearable
             v-validate="'required'"
-            :error="errors.has('operator_id')"
-            :error-message="errors.first('operator_id')"/>
+            :options="CustomerOptions" filter clearable
+            @input="setCustomerReference"
+            :error="errors.has('customer_id')"
+            :error-message="errors.first('customer_id')"
+            :loading="SHEET.customers.loading" />
 
           <ux-date class="col-12 col-sm-6" name="date"
             :label="$tc('label.date')"
@@ -231,7 +222,6 @@ export default {
         faults: {api:'/api/v1/references/faults?mode=all'},
         type_faults: {api:'/api/v1/references/type-faults?mode=all'},
         customers: {api:'/api/v1/incomes/customers?mode=all'},
-        employees: {api:'/api/v1/common/employees?mode=all'},
         items: {autoload:false, api:'/api/v1/common/items?mode=all&enable=true'},
         work_orders: {autoload:false, api:'/api/v1/factories/work-orders?mode=all&has_amount_packing=true'},
       },
@@ -254,7 +244,6 @@ export default {
           shift_id: null,
           worktime: 'REGULER',
           description: null,
-          operator_id: null,
 
           packing_items : {
             item_id: null,
@@ -315,9 +304,6 @@ export default {
           stamp: total
         })
       })
-    },
-    EmployeeOptions() {
-      return (this.SHEET.employees.data.map(item => ({label: `[${item.code}] ${item.name}`, value: item.id})) || [])
     },
     TypeFaultOptions() {
       return (this.SHEET.type_faults.data.map(item => ({label: item.name, value: item.id})) || [])
