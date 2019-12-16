@@ -7,21 +7,8 @@
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark"/>
     <q-card-section class="row q-col-gutter-x-md">
-      <!-- COLUMN::Base process work time -->
-      <q-field dense borderless class="col-12"
-        :dark="LAYOUT.isDark"
-        prefix="Work Time Process"
-        :error="errors.has('worktime')"
-        :error-message="errors.first('worktime')">
-        <q-option-group slot="control"
-          name="worktime" type="radio" inline
-          v-model="rsForm.worktime"
-          v-validate="'required'"
-          :dark="LAYOUT.isDark"
-          :options="CONFIG.options['worktime']"
-        />
-      </q-field>
-      <!-- COLUMN::1st Packing Identitity --><div class="col-12" >
+      <!-- COLUMN::1st Packing Identitity -->
+      <div class="col-12" >
         <div class="row q-col-gutter-xs">
 
           <ux-select-filter class="col-12 col-sm-6"
@@ -187,6 +174,34 @@
     </q-card-section>
      <q-card-section class="row q-col-gutter-x-md">
       <!-- COLUMN::4th Description -->
+      <q-field dense borderless class="col-12 col-sm-grow"
+        :dark="LAYOUT.isDark"
+        prefix="Work Time Process"
+        :error="errors.has('worktime')"
+        :error-message="errors.first('worktime')">
+        <q-option-group slot="control"
+          name="worktime" type="radio" inline
+          v-model="rsForm.worktime"
+          v-validate="'required'"
+          :dark="LAYOUT.isDark"
+          :options="CONFIG.options['worktime']"
+        />
+      </q-field>
+      <ux-select class="col-12 col-sm-auto" style="min-width:250px"
+        name="operator_id"
+        label="Operator"
+        v-model="rsForm.operator"
+        dense filled
+        filter clearable
+        :source-keys="['name']"
+        source="/api/v1/common/employees?mode=all&limit=15&sort=name"
+        option-label="name" option-value="id"
+        @selected="(ol) => rsForm.operator_id = (ol ? ol.id : null)"
+        :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+        v-validate="'required'" data-vv-as="Operator"
+        :error="errors.has('operator_id')" da-vv-as="Operator"
+        :error-message="errors.first('operator_id')"/>
+
       <div class="col-12 column">
         <q-input name="description" type="textarea" rows="3"
           stack-label :label="$tc('label.description')"
@@ -244,6 +259,7 @@ export default {
           shift_id: null,
           worktime: 'REGULER',
           description: null,
+          operator_id: null,
 
           packing_items : {
             item_id: null,
@@ -419,6 +435,9 @@ export default {
     '$route' : 'init',
   },
   methods: {
+    testChange(data) {
+      console.warn('CHANGE', data)
+    },
     init() {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())

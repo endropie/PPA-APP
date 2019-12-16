@@ -7,7 +7,7 @@
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark"/>
     <q-card-section class="row q-col-gutter-x-md">
-      <q-field dense borderless class="col-12"
+      <q-field dense borderless class="col-12 col-sm-grow"
         :dark="LAYOUT.isDark"
         prefix="Work Time Process"
         :error="errors.has('worktime')"
@@ -20,6 +20,22 @@
           :options="CONFIG.options['worktime']"
         />
       </q-field>
+
+      <ux-select class="col-12 col-sm-auto" style="min-width:250px"
+        name="operator_id"
+        label="Operator"
+        v-model="rsForm.operator"
+        dense filled
+        filter clearable
+        :source-keys="['name']"
+        source="/api/v1/common/employees?mode=all&limit=15&sort=name"
+        option-label="name" option-value="id"
+        @selected="(ol) => rsForm.operator_id = (ol ? ol.id : null)"
+        :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+        v-validate="'required'" data-vv-as="Operator"
+        :error="errors.has('operator_id')" da-vv-as="Operator"
+        :error-message="errors.first('operator_id')"/>
+
       <!-- COLUMN::1st Packing Identitity --><div class="col-12" >
         <div class="row q-col-gutter-xs">
 
@@ -209,6 +225,7 @@ export default {
         faults: {api:'/api/v1/references/faults?mode=all'},
         type_faults: {api:'/api/v1/references/type-faults?mode=all'},
         customers: {api:'/api/v1/incomes/customers?mode=all'},
+        employees: {api:'/api/v1/common/employees?mode=all', autoload: false},
         items: {autoload:false, api:'/api/v1/common/items?mode=all&enable=true'},
         work_orders: {autoload:false, api:'/api/v1/factories/work-orders?mode=all&has_amount_packing=true'},
       },
@@ -231,6 +248,7 @@ export default {
           shift_id: null,
           worktime: 'REGULER',
           description: null,
+          operator_id: null,
 
           packing_items : {
             item_id: null,
@@ -297,6 +315,9 @@ export default {
           stamp: total
         })
       })
+    },
+    EmployeeOptions() {
+      return (this.SHEET.employees.data.map(item => ({label: `[${item.code}] ${item.name}`, value: item.id})) || [])
     },
     TypeFaultOptions() {
       return (this.SHEET.type_faults.data.map(item => ({label: item.name, value: item.id})) || [])
