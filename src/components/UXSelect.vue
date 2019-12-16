@@ -189,7 +189,7 @@ export default {
           ? `search=${val}&search-keys=${fields.join(',')}`
           : `search=${val}`
         const apiUrl = this.source + separator + search
-        console.info(`[PLAY] Source GET: ${apiUrl}`, fields);
+        console.info(`[PLAY] Source GET: ${apiUrl}`);
         return this.$axios.get(apiUrl)
           .then(response => {
             this.options = response.data

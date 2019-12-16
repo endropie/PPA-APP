@@ -7,74 +7,73 @@
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark"/>
     <q-card-section class="row q-col-gutter-x-md">
-      <q-field dense borderless class="col-12 col-sm-grow"
-        :dark="LAYOUT.isDark"
-        prefix="Work Time Process"
-        :error="errors.has('worktime')"
-        :error-message="errors.first('worktime')">
-        <q-option-group slot="control"
-          name="worktime" type="radio" inline
-          v-model="rsForm.worktime"
-          v-validate="'required'"
+      <!-- COLUMN::1st Packing Identitity -->
+      <div class="col-12 row">
+        <q-field dense borderless class="col-12 col-sm-grow"
           :dark="LAYOUT.isDark"
-          :options="CONFIG.options['worktime']"
-        />
-      </q-field>
-
-      <ux-select class="col-12 col-sm-auto" style="min-width:250px"
-        name="operator_id"
-        label="Operator"
-        v-model="rsForm.operator"
-        dense filled
-        filter clearable
-        :source-keys="['name']"
-        source="/api/v1/common/employees?mode=all&limit=15&sort=name"
-        option-label="name" option-value="id"
-        @selected="(ol) => rsForm.operator_id = (ol ? ol.id : null)"
-        :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-        v-validate="'required'" data-vv-as="Operator"
-        :error="errors.has('operator_id')" da-vv-as="Operator"
-        :error-message="errors.first('operator_id')"/>
-
-      <!-- COLUMN::1st Packing Identitity --><div class="col-12" >
-        <div class="row q-col-gutter-xs">
-
-          <ux-select-filter class="col-12 col-sm-6"
-            name="customer_id"
-            v-model="rsForm.customer_id"
-            :label="$tc('general.customer')"
-            :disable="IssetItemID"
-            :dark="LAYOUT.isDark"
+          prefix="Work Time Process"
+          :error="errors.has('worktime')"
+          :error-message="errors.first('worktime')">
+          <q-option-group slot="control"
+            name="worktime" type="radio" inline
+            v-model="rsForm.worktime"
             v-validate="'required'"
-            :options="CustomerOptions" clearable
-            @input="setCustomerReference"
-            :error="errors.has('customer_id')"
-            :error-message="errors.first('customer_id')"
-            :loading="SHEET.customers.loading" />
-
-          <ux-date class="col-12 col-sm-6" name="date"
-            :label="$tc('label.date')"
-            no-error-icon
-            v-model="rsForm.date" type="date"
             :dark="LAYOUT.isDark"
-            v-validate="'required'"
-            :error="errors.has('date')"
-            :error-message="errors.first('date')">
+            :options="CONFIG.options['worktime']"
+          />
+        </q-field>
 
-            <q-select slot="after" class="no-padding" style="min-width:100px"
-              name="shift_id"
-              hide-dropdown-icon no-error-icon
-              :label="$tc('label.shift')" stack-label
-              v-model="rsForm.shift_id"
-              v-validate="'required'"
-              :options="ShiftOptions" filter
-              map-options emit-value
-              :error="errors.has('shift_id')"
-            />
-
-           </ux-date>
-        </div>
+        <ux-select class="col-12 col-sm-auto" style="min-width:250px"
+          name="operator_id"
+          label="Operator"
+          v-model="rsForm.operator"
+          dense filled
+          filter clearable
+          :source-keys="['name']"
+          source="/api/v1/common/employees?mode=all&limit=15&sort=name"
+          option-label="name" option-value="id"
+          @selected="(ol) => rsForm.operator_id = (ol ? ol.id : null)"
+          :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+          v-validate="'required'" data-vv-as="Operator"
+          :error="errors.has('operator_id')" da-vv-as="Operator"
+          :error-message="errors.first('operator_id')"/>
       </div>
+
+      <ux-select-filter class="col-12 col-sm-6"
+        name="customer_id"
+        v-model="rsForm.customer_id"
+        :label="$tc('general.customer')"
+        :disable="IssetItemID"
+        :dark="LAYOUT.isDark"
+        v-validate="'required'"
+        :options="CustomerOptions" clearable
+        @input="setCustomerReference"
+        :error="errors.has('customer_id')"
+        :error-message="errors.first('customer_id')"
+        :loading="SHEET.customers.loading" />
+
+      <ux-date class="col-12 col-sm-6" name="date"
+        :label="$tc('label.date')"
+        no-error-icon
+        v-model="rsForm.date" type="date"
+        :dark="LAYOUT.isDark"
+        v-validate="'required'"
+        :error="errors.has('date')"
+        :error-message="errors.first('date')">
+
+        <q-select slot="after" class="no-padding" style="min-width:100px"
+          name="shift_id"
+          hide-dropdown-icon no-error-icon
+          :label="$tc('label.shift')" stack-label
+          v-model="rsForm.shift_id"
+          v-validate="'required'"
+          :options="ShiftOptions" filter
+          map-options emit-value
+          :error="errors.has('shift_id')"
+        />
+
+        </ux-date>
+
     </q-card-section>
     <q-card-section>
       <div class="q-pa-md bordered">
