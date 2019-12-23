@@ -201,7 +201,6 @@ export default {
       return `(${detail.unit_amount} ${detail.item.unit.code})`
     },
     getArrayPage(c) {
-      console.warn('getArrayPage', c)
       if (c.delivery_mode === 'SEPARATE') return ['Material', 'Jasa']
       else return ['']
     },
@@ -218,12 +217,10 @@ export default {
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=confirmation&nodata=true`
         this.$axios.put(url)
           .then((response) => {
-            // console.warn('response->', response.data)
             const data = response.data
             this.setView(data)
           })
           .catch(error => {
-            // this.VIEW.onCatch(error.response, 'FORM REVISION')
             this.$app.response.error(error.response, 'FORM REVISION')
           })
           .finally(()=>{
