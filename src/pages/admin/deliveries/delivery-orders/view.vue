@@ -1,6 +1,46 @@
 <template>
-  <q-page padding class="row justify-center" style="min-width:100mm">
-    <page-print v-if="VIEW.show" class="q-pa-md q-pr-lg shadow-2 scroll" style="max-width:210mm">
+  <q-page padding class="column content-center q-gutter-sm"  v-if="VIEW.show">
+    <q-card  v-if="VIEW.show" class="print-hide modal-hide" style="max-width:210mm">
+      <q-card-actions class="q-px-lg q-gutter-xs" >
+          <q-btn :label="$tc('form.list')" icon="list"  color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
+          <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
+          <q-space />
+          <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" no-caps class="float-right"
+            :options="[
+              { label: 'Delete', color:'red', icon: 'delete',
+                detail: $tc('messages.process_delete'),
+                hidden: !IS_EDITABLE || !$app.can('sj-delivery-orders-delete'),
+                actions: () => {
+                  VIEW.delete()
+                }
+              },
+              { label: $tc('form.confirm').toUpperCase(), color:'green', icon: 'block',
+                detail: $tc('messages.process_confirm'),
+                hidden: !IS_VOID || !$app.can('sj-delivery-orders-confirm'),
+                actions: () => {
+                  setConfirmation()
+                }
+              },
+              { label: $tc('form.revision').toUpperCase(), color:'red', icon: 'block',
+                detail: $tc('messages.process_revise'),
+                hidden: !IS_VOID || !$app.can('sj-delivery-orders-revision'),
+                actions: () => {
+                  setRevision()
+                }
+              },
+              { label: 'VOID', color:'red', icon: 'block',
+                detail: $tc('messages.process_void'),
+                hidden: !IS_VOID || !$app.can('sj-delivery-orders-void'),
+                actions: () => {
+                  VIEW.void(()=> init() )
+                }
+              }
+            ]"
+          />
+      </q-card-actions>
+    </q-card>
+    <page-print class="shadow-2 scroll" style="max-width:210mm"
+      v-for="(mode, pi) in getArrayPage(rsView.customer)" :key="pi">
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
@@ -30,25 +70,52 @@
           </q-markup-table>
         </div>
         <div class="col-12">
-
           <q-markup-table dense bordered class="no-shadow no-highlight th-uppercase" separator="cell">
             <thead>
-            <q-tr>
+            <q-tr vfor="(line, i) in [1,2,3,4,5,6]" key="i">
               <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th>{{ $tc('label.unit') }}</q-th>
               <q-th>{{ $tc('label.quantity') }}</q-th>
             </q-tr>
             </thead>
-            <tbody>
+            <template v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
+            <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
+              <q-tr >
+                <q-td>
+                  <span class="text-weight-medium">Material:&nbsp;</span>
+                  {{row.item.part_name}}
+                </q-td>
+                <q-td>{{row.item.part_number}}</q-td>
+                <q-td class="text-center">{{row.unit.name}}</q-td>
+                <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
+              </q-tr>
+              <q-tr >
+                <q-td>
+                  <span class="text-weight-medium">Jasa:&nbsp;</span>
+                  {{row.item.part_name}}
+                </q-td>
+                <q-td>{{row.item.part_number}}</q-td>
+                <q-td class="text-center">{{row.unit.name}}</q-td>
+                <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
+              </q-tr>
+            </tbody>
+            </template>
+            <tbody v-else>
             <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index">
-              <q-td>{{row.item.part_name}}</q-td>
+              <q-td>
+                <span v-if="Boolean(mode)" class="text-weight-medium">{{mode}}:&nbsp;</span>
+                {{row.item.part_name}}
+              </q-td>
               <q-td>{{row.item.part_number}}</q-td>
               <q-td class="text-center">{{row.unit.name}}</q-td>
               <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
             </q-tr>
             </tbody>
           </q-markup-table>
+          <q-chip dense square class="float-right print-hide">
+            <small class="text-weight-light">{{`MODE: ${rsView.customer.delivery_mode}`}}</small>
+          </q-chip>
         </div>
         <div class="col-12">
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
@@ -77,45 +144,7 @@
           </q-markup-table>
         </div>
       </div>
-
-      <div class="q-gutter-xs print-hide modal-hide" style="padding-top:50px">
-        <q-btn :label="$tc('form.back')" icon="cancel"  color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
-        <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
-
-        <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" no-caps class="float-right"
-          :options="[
-            { label: 'Delete', color:'red', icon: 'delete',
-              detail: $tc('messages.process_delete'),
-              hidden: !IS_EDITABLE || !$app.can('sj-delivery-orders-delete'),
-              actions: () => {
-                VIEW.delete()
-              }
-            },
-            { label: $tc('form.confirm').toUpperCase(), color:'green', icon: 'block',
-              detail: $tc('messages.process_confirm'),
-              hidden: !IS_VOID || !$app.can('sj-delivery-orders-confirm'),
-              actions: () => {
-                setConfirmation()
-              }
-            },
-            { label: $tc('form.revision').toUpperCase(), color:'red', icon: 'block',
-              detail: $tc('messages.process_revise'),
-              hidden: !IS_VOID || !$app.can('sj-delivery-orders-revision'),
-              actions: () => {
-                setRevision()
-              }
-            },
-            { label: 'VOID', color:'red', icon: 'block',
-              detail: $tc('messages.process_void'),
-              hidden: !IS_VOID || !$app.can('sj-delivery-orders-void'),
-              actions: () => {
-                VIEW.void(()=> init() )
-              }
-            }
-          ]"/>
-      </div>
     </page-print>
-
     <q-inner-loading :showing="VIEW.loading">
         <q-spinner-dots size="50px" color="primary" />
     </q-inner-loading>
@@ -170,6 +199,11 @@ export default {
     getBaseUnit(detail) {
       if(detail.unit_rate == 1) return ''
       return `(${detail.unit_amount} ${detail.item.unit.code})`
+    },
+    getArrayPage(c) {
+      console.warn('getArrayPage', c)
+      if (c.delivery_mode === 'SEPARATE') return ['Material', 'Jasa']
+      else return ['']
     },
     setView(data) {
       this.rsView =  data
