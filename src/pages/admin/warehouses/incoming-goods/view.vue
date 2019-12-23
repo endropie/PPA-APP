@@ -50,7 +50,13 @@
                 </tr>
                 <tr v-if="rsView.request_order">
                   <th>{{$tc('general.request_order')}}</th>
-                  <td>{{rsView.request_order.number}}</td>
+                  <td>
+                    <span v-if="!$app.can('request-orders-read')">{{rsView.request_order.number}}</span>
+                    <q-btn v-else dense flat
+                      :label="rsView.request_order.number"
+                      class="q-py-none" style="line-height:normal"
+                      :to="`/admin/incomes/request-orders/${rsView.request_order.id}`"/>
+                  </td>
                 </tr>
               </q-markup-table>
             </div>
