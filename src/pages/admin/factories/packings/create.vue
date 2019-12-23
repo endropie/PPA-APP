@@ -463,7 +463,6 @@ export default {
         this.SHEET.load('items', 'customer_id='+val)
         const params = [`customer_id=${val}`]
         if(this.FORM.data.packing_items && this.FORM.data.packing_items.work_order_item_id) {
-          console.warn('DATAOLD', this.FORM.data.packing_items)
           params.push(`or_detail_ids=${this.FORM.data.packing_items.work_order_item_id}`)
         }
         params.push(`or_detail_ids=10`)

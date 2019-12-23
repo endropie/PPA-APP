@@ -467,7 +467,7 @@ export default {
       else {
         this.SHEET.load('items', 'customer_id='+val)
         const params = [`customer_id=${val}`]
-        if(this.FORM.data.packing_items) {
+        if(this.FORM.data.packing_items && this.FORM.data.packing_items.work_order_item_id) {
           params.push(`or_detail_ids=${this.FORM.data.packing_items.work_order_item_id}`)
         }
         this.SHEET.load('work_order_items', params.join('&') )
@@ -519,7 +519,6 @@ export default {
 
       this.$validator.validate().then(result => {
         if (!result) {
-          console.warn(this.errors)
           return this.$q.notify({
             color:'negative', icon:'error', position:'top-right', timeout: 3000,
             message: this.$tc('messages.to_complete_form')
