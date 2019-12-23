@@ -305,7 +305,7 @@ export default {
           label: item.work_order.full_number || item.work_order.number,
           value: item.id,
           rowdata: item,
-          stamp: total
+          stamp: this.$app.number_format(total)
         })
       })
     },
@@ -361,7 +361,7 @@ export default {
         label: item.part_name,
         sublabel: `[${item.code}] ${item.part_number}`,
         value: item.id,
-        stamp: total(item.id),
+        stamp: this.$app.number_format(total(item.id)),
         disable: !item.enable,
         rowdata:item
       })) || [])
