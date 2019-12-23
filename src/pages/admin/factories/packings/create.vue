@@ -289,17 +289,17 @@ export default {
       if (!this.rsForm.customer_id) return []
       if (!this.SHEET.work_order_items.data.length) return []
 
-      let data = this.SHEET.work_order_items.data.filter(detail => {
-        if (detail.amount_process <= detail.amount_packing) return false
+      const hasold = (id) => (this.FORM.data.packing_items && this.FORM.data.packing_items.work_order_item_id === id)
+          ? Number(this.FORM.data.packing_items.unit_total) : 0
+
+      let data = this.SHEET.work_order_items.data.filter(item => {
+        if ((item.amount_process) <= (item.amount_packing - hasold(item.id))) return false
         return true
       })
 
-      console.warn('this.SHEET.work_order_items', this.SHEET.work_order_items.data)
-
       return data.map(item => {
-        let hasold = (this.FORM.data.packing_items && this.FORM.data.packing_items.work_order_item_id === item.id)
-          ? Number(this.FORM.data.packing_items.unit_total) : 0
-        let total = (Number(item.amount_process) - Number(item.amount_packing)) - hasold
+        item.amount_packing -= hasold(item.id)
+        let total = (Number(item.amount_process) - Number(item.amount_packing))
         if (item.id === this.rsForm.packing_items.item_id) total = total / UnitRate
         return ({
           label: item.work_order.full_number || item.work_order.number,
@@ -334,8 +334,6 @@ export default {
     },
     ItemOptions() {
       if (!this.WorkOrderItemOptions.length) return []
-
-      console.warn('ItemOptions => WorkOrderItemOptions', this.WorkOrderItemOptions)
 
       const hasItems = this.WorkOrderItemOptions.map(x => ({
         id: x.rowdata.item_id,

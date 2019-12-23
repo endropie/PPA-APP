@@ -106,7 +106,7 @@
             :options="WorkOrderItemOptions.filter(opt => opt.rowdata.item_id === rsForm.packing_items.item_id)"
             :error="errors.has('packing_items.work_order_item_id')"
             :error-message="errors.first('packing_items.work_order_item_id')"
-            :loading="SHEET['work_orders'].loading"/>
+            :loading="SHEET['work_order_items'].loading"/>
 
           <q-input class="col-12 col-sm-4"
             name="packing_items.quantity"
@@ -240,7 +240,8 @@ export default {
         type_faults: {api:'/api/v1/references/type-faults?mode=all'},
         customers: {api:'/api/v1/incomes/customers?mode=all'},
         items: {autoload:false, api:'/api/v1/common/items?mode=all&enable=true'},
-        work_orders: {autoload:false, api:'/api/v1/factories/work-orders?mode=all&has_amount_packing=true'},
+        // work_orders: {autoload:false, api:'/api/v1/factories/work-orders?mode=all&has_amount_packing=true'},
+        work_order_items: {autoload:false, api:'/api/v1/factories/work-orders?mode=items&has_amount_packing=true'},
       },
       FORM:{
         resource:{
@@ -295,28 +296,22 @@ export default {
     },
     WorkOrderItemOptions() {
       if (!this.rsForm.customer_id) return []
-      if (!this.SHEET.work_orders.data.length) return []
+      if (!this.SHEET.work_order_items.data.length) return []
 
-      let data = []
-      this.SHEET.work_orders.data.map(rs => {
-        rs.work_order_items.map(detail => {
-          detail.work_order_number = rs.number
-          if (this.FORM.data.packing_items) {
-            if (this.FORM.data.packing_items.work_order_item_id === detail.id) {
-              detail.amount_packing -= Number(this.FORM.data.packing_items.unit_total)
-            }
-          }
+      const hasold = (id) => (this.FORM.data.packing_items && this.FORM.data.packing_items.work_order_item_id === id)
+          ? Number(this.FORM.data.packing_items.unit_total) : 0
 
-          if (detail.amount_process > detail.amount_packing) data.push(detail)
-
-        })
+      let data = this.SHEET.work_order_items.data.filter(item => {
+        if ((item.amount_process) <= (item.amount_packing - hasold(item.id))) return false
+        return true
       })
 
       return data.map(item => {
+        item.amount_packing -= hasold(item.id)
         let total = (Number(item.amount_process) - Number(item.amount_packing))
         if (item.id === this.rsForm.packing_items.item_id) total = total / UnitRate
         return ({
-          label: item.work_order_number,
+          label: item.work_order.full_number || item.work_order.number,
           value: item.id,
           rowdata: item,
           stamp: total
@@ -437,9 +432,6 @@ export default {
     '$route' : 'init',
   },
   methods: {
-    testChange(data) {
-      console.warn('CHANGE', data)
-    },
     init() {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
@@ -455,7 +447,7 @@ export default {
           `customer_id=${data.customer_id}`,
           `or_detail_ids=${data.packing_items.work_order_item_id}`,
         ]
-        this.SHEET.load('work_orders', params.join('&') )
+        this.SHEET.load('work_order_items', params.join('&') )
       }
 
       if(data.hasOwnProperty('has_relationship') && data['has_relationship'].length > 0) {
@@ -478,7 +470,7 @@ export default {
         if(this.FORM.data.packing_items) {
           params.push(`or_detail_ids=${this.FORM.data.packing_items.work_order_item_id}`)
         }
-        this.SHEET.load('work_orders', params.join('&') )
+        this.SHEET.load('work_order_items', params.join('&') )
       }
     },
     setItemReference(val) {
@@ -497,7 +489,6 @@ export default {
         this.rsForm.packing_items.unit = this.MAPINGKEY['units'][baseUnitID]
 
         this.rsForm.packing_items.work_order_item_id = null
-        // this.SHEET.load('work_orders', 'item_id='+val)
       }
     },
     setUnitReference(val) {
