@@ -81,7 +81,7 @@
                       popup-content-class="options-striped"
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${index}.item_id`)"
-                      :loading="SHEET['items'].loading"
+                      :loading="SHEET['items'].loading || SHEET['work_order_item_lines'].loading"
                       @input="(val) => setItemReference(index, val)" />
 
                     <ux-select-filter dense class="col-12 col-md-6"
@@ -95,7 +95,7 @@
                       :options="WorkOrderItemLineOptions.filter(x => x.item_id === row.item.id && x.stockist === row.stockist)" clearable
                       :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${index}.work_order_item_line_id`)"
-                      :loading="SHEET['work_orders'].loading">
+                      :loading="SHEET['work_order_item_lines'].loading">
                         <q-select slot="before" class="no-padding" style="min-width:120px"
                           :name="`work_production_items.${index}.stockist`"
                           :label="$tc('items.stockist').toUpperCase()" hide-dropdown-icon
@@ -198,7 +198,7 @@ export default {
         lines: {api:'/api/v1/references/lines?mode=all'},
         shifts: {api:'/api/v1/references/shifts?mode=all'},
         items: {autoload:false, api:'/api/v1/common/items?mode=all'},
-        work_orders: {autoload:false, api:'/api/v1/factories/work-orders?mode=all'},
+        work_order_item_lines: {autoload:false, api:'/api/v1/factories/work-orders?mode=lines&has_amount_line=true'},
       },
       FORM: {
         resource:{
@@ -250,38 +250,41 @@ export default {
     },
     WorkOrderItemLineOptions() {
       if (!this.rsForm.line_id) return []
-      if (!this.SHEET['work_orders'].data.length) return []
+      if (!this.SHEET['work_order_item_lines'].data.length) return []
 
-      const oldKeys = this.FORM.data.work_production_items
-        ? this.FORM.data.work_production_items.map(detail => detail.work_order_item_line_id)
-        : []
+      const hasold = (id) => (this.FORM.data.work_production_items)
+          ? this.FORM.data.work_production_items.find(x => x.work_order_item_line_id === id) : null
 
-      let Data = []
       let Item = []
-      this.SHEET['work_orders'].data.map(rs => {
-        rs.work_order_item_lines.map(detail => {
-          if (this.rsForm.line_id !== detail.line_id) return false
-          if (!oldKeys.find(x => x === detail.id) && detail.unit_amount <= detail.amount_line) return false
+      let data = this.SHEET['work_order_item_lines'].data.filter(itemline => {
+        if (this.rsForm.line_id !== itemline.line_id) return false
 
-          detail.work_order_number = rs.full_number || rs.number
-          detail.stockist = rs.stockist_from
-          Data.push(detail)
-          if (!Item.find(x => x === (detail.work_order_item.item_id || null))) Item.push(detail.work_order_item.item_id)
+        if (hasold(itemline.id)) {
+          const old = hasold(itemline.id)
+          if (Number(itemline.unit_amount) <= (Number(itemline.amount_line) - Number(old.unit_amount))) return false
+        }
 
-        })
+        if (!Item.find(x => x === (itemline.work_order_item.item_id || null))) Item.push(itemline.work_order_item.item_id)
+        return true
       })
 
       if(Item.length) this.SHEET.load('items', `or_ids=${Item.join(',')}`)
 
-      return Data.map(detail => {
-        let total = (Number(detail.unit_amount) - Number(detail.amount_line))
+      return data.map(itemline => {
+        const work_order = itemline.work_order_item.work_order || {}
+
+        let total = Number(itemline.unit_amount) - Number(itemline.amount_line)
+        const old = hasold(itemline.id)
+        if (old) total += Number(old.unit_amount)
+
+        if (itemline.work_order_item.unit_rate) total = total / itemline.work_order_item.unit_rate
         return ({
-          label: detail.work_order_number,
-          value: detail.id,
+          label: work_order.full_number || work_order.number,
+          value: itemline.id,
           stamp: this.$app.number_format(total),
-          item_id: (detail.work_order_item.item_id || null),
-          stockist: (detail.stockist || null),
-          rowdata: detail
+          item_id: (itemline.work_order_item.item_id || null),
+          stockist: (work_order.stockist_from),
+          rowdata: itemline
         })
       })
     },
@@ -444,12 +447,12 @@ export default {
     },
     loadItemOptions(data = this.rsForm) {
       if (data.line_id && data.shift_id && data.date) {
-        let params = [`has_amount_line=${data.line_id}`, `date=${data.date}`, `shift_id=${data.shift_id}`]
+        let params = [`date=${data.date}`, `shift_id=${data.shift_id}`]
         if (this.FORM.data.work_production_items) {
           let orKeys = this.FORM.data.work_production_items.map(x => x.work_order_item_line_id)
-          params.push(`or_work_order_item_line_ids=${orKeys.join(',')}`)
+          params.push(`or_detail_line_ids=${orKeys.join(',')}`)
         }
-        this.SHEET.load('work_orders', params.join('&'))
+        this.SHEET.load('work_order_item_lines', params.join('&'))
       }
     },
     setItemReference(index, val) {
