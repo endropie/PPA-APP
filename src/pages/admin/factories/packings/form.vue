@@ -52,7 +52,7 @@
             @input="setCustomerReference"
             :error="errors.has('customer_id')"
             :error-message="errors.first('customer_id')"
-            :loading="SHEET.customers.loading" />
+            :loading="SHEET['customers'].loading" />
 
           <ux-date class="col-12 col-sm-6" name="date"
             :label="$tc('label.date')"
@@ -93,7 +93,7 @@
             :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
             :error="errors.has('packing_items.item_id')"
             :error-message="errors.first('packing_items.item_id')"
-            :loading="SHEET.items.loading"
+            :loading="SHEET['items'].loading || SHEET['work_order_items'].loading"
             @input="setItemReference" />
 
           <ux-select-filter class="col-12 col-sm-4"

@@ -49,7 +49,7 @@
         @input="setCustomerReference"
         :error="errors.has('customer_id')"
         :error-message="errors.first('customer_id')"
-        :loading="SHEET.customers.loading" />
+        :loading="SHEET['customers'].loading" />
 
       <ux-date class="col-12 col-sm-6" name="date"
         :label="$tc('label.date')"
@@ -89,7 +89,7 @@
             :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
             :error="errors.has('packing_items.item_id')"
             :error-message="errors.first('packing_items.item_id')"
-            :loading="SHEET.items.loading"
+            :loading="SHEET['items'].loading || SHEET['work_order_items'].loading"
             @input="setItemReference" />
 
           <q-input class="col-12 col-sm-6"
@@ -465,7 +465,6 @@ export default {
         if(this.FORM.data.packing_items && this.FORM.data.packing_items.work_order_item_id) {
           params.push(`or_detail_ids=${this.FORM.data.packing_items.work_order_item_id}`)
         }
-        params.push(`or_detail_ids=10`)
         this.SHEET.load('work_order_items', params.join('&') )
       }
     },
