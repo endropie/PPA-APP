@@ -65,7 +65,7 @@
 
               </div>
               <div class="row q-col-gutter-xs q-pb-xs">
-                <div class="col-12 col-sm-6">
+                <div class="col-12 col-md-6">
                   <div class="row q-col-gutter-xs">
                     <ux-select class="col-12 col-sm-4"
                       v-model="FILTERABLE.fill.customer_id.value" clearable
