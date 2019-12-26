@@ -1,7 +1,7 @@
 <template>
   <q-btn-dropdown v-show="!EMPTY"
     split
-    :label="FIRST.label || $attrs.label"
+    :label="(FIRST && FIRST.label) || $attrs.label"
     @click="firstCall()"
     v-bind="$attrs"
     v-on="$listeners"
@@ -21,7 +21,7 @@
           <q-avatar :icon="item.icon" :color="item.color || 'primary'" text-color="white" size="38px"/>
         </q-item-section>
         <q-item-section>
-          <q-item-label>{{item.label}}</q-item-label>
+          <q-item-label>{{item.label || 'test'}}</q-item-label>
           <q-item-label caption v-if="item.detail">{{item.detail}}</q-item-label>
         </q-item-section>
         <q-item-section side v-if="item.stamp">
