@@ -84,11 +84,21 @@
               :error="errors.has(`outgoing_good_verifications.${index}.quantity`)"
             />
           </q-td>
-           <q-td key="AVA" width="25%" align="right">
+          <q-td key="AVA" width="25%" align="right">
             <q-chip square class="text-weight-medium">
               {{$app.number_format(STOCKS[index] / row.unit_rate)}}
             </q-chip>
-           </q-td>
+          </q-td>
+          <q-td key="encasement" width="25%">
+            <q-input :name="`outgoing_good_verifications.${index}.encasement`"
+              style="min-width:120px"
+              v-model="row.encasement"
+              outlined dense hide-bottom-space no-error-icon align="center"
+              :dark="LAYOUT.isDark" color="blue-grey-5"
+              v-validate="``"
+              :error="errors.has(`outgoing_good_verifications.${index}.encasement`)"
+            />
+          </q-td>
         </q-tr>
         <q-tr>
           <q-td colspan="100%" class="text-center" v-if="AllDetail && AllDetail.length == 0">

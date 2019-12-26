@@ -121,6 +121,7 @@ export default {
           { name: 'part_number', label: this.$tc('items.part_number'), field:(v)=> v.item.part_number, align: 'left', sortable: true },
           { name: 'quantity', label: this.$tc('label.quantity'), field: 'quantity', align: 'center', sortable: true },
           { name: 'unit_id', label: this.$tc('label.unit'), field: (v) => v.unit.code, align: 'left', sortable: true},
+          { name: 'encasement', label: this.$tc('label.encasement'), field: 'encasement', align: 'left', sortable: true },
           { name: 'pre_delivery_number', label: 'No. PDO', field: 'pre_delivery_number', align: 'left', sortable: true },
         ]
       },

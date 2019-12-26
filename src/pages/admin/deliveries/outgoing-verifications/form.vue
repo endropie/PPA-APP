@@ -68,6 +68,19 @@
             </q-chip>
           </td>
         </tr>
+        <tr>
+          <th>{{$tc('label.encasement')}}</th>
+          <td>
+            <q-input
+              :name="`encasement`"
+              v-model="rsForm.encasement"
+              outlined dense hide-bottom-space no-error-icon align="center"
+              :dark="LAYOUT.isDark" color="blue-grey-5"
+              v-validate="``"
+              :error="errors.has(`encasement`)"
+              :error-message="errors.first(`encasement`)" />
+          </td>
+        </tr>
       </q-markup-table>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
