@@ -109,7 +109,7 @@ export default {
           .then((response) => {
             if (response.data.success) {
               this.$app.notify.success({
-                message: this.$tc('messages.success', 1, 'VOID').toUpperCase(),
+                message: this.$tc('messages.success', 1, {v: 'VOID'}).toUpperCase(),
                 detail: this.$tc('messages.form_has_void', 1, {v: `[code: #${this.ROUTE.params.id}]`}),
               })
 
