@@ -50,6 +50,7 @@
           <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
           <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
           <q-th key="AVA">{{$tc('label.available')}}</q-th>
+          <q-th key="encasement">{{$tc('label.encasement')}}</q-th>
         </q-tr>
         <q-tr v-for="(row, index) in rsForm.outgoing_good_verifications" :key="index">
           <q-td key="item_id" width="35%" >
