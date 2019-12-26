@@ -34,7 +34,7 @@
                 <q-input name="phone" class="col-12 col-sm-6"
                   label="Phone"
                   v-model="rsForm.phone"
-                  v-validate="'required'"
+                  v-validate="''"
                   :dark="LAYOUT.isDark"
                   :error="errors.has('phone')"
                   :error-message="errors.first('phone')"/>
