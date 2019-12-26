@@ -69,7 +69,7 @@
             <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
             <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
             <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
-            <q-th key="wrap">{{$tc('label.wrap')}}</q-th>
+            <q-th key="encasement">{{$tc('label.encasement')}}</q-th>
           </q-tr>
           <q-tr v-for="(row, index) in rsForm.pre_delivery_items" :key="index">
               <q-td key="prefix">
@@ -121,11 +121,11 @@
                   :error="errors.has(`pre_delivery_items.${index}.quantity`)"
                   @input="(val)=> {row.unit_qty = (val) * (row.unit_rate)}"/>
               </q-td>
-              <q-td key="wrap" width="25%">
+              <q-td key="encasement" width="25%">
                 <q-input style="min-width:100px"
-                  :name="`pre_delivery_items.${index}.wrap`"
+                  :name="`pre_delivery_items.${index}.encasement`"
                   outlined dense hide-bottom-space  color="blue-grey-5"
-                  v-model="row.wrap"
+                  v-model="row.encasement"
                   :dark="LAYOUT.isDark" />
               </q-td>
             </q-tr>
@@ -205,11 +205,10 @@ export default {
               unit_rate: 1,
               unit_qty: null,
               quantity: null,
-              wrap: null,
+              encasement: null,
               request_order_item_id: null
             }
           ]
-
         }
       }
     }

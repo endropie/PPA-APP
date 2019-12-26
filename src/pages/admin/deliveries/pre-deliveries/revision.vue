@@ -121,53 +121,13 @@
                 :error="errors.has(`pre_delivery_items.${index}.quantity`)"
                 @input="(val)=> {row.unit_qty = (val) * (row.unit_rate)}"/>
             </q-td>
-            <q-td key="wrap" width="25%">
+            <q-td key="encasement" width="25%">
               <q-input style="min-width:100px"
-                :name="`pre_delivery_items.${index}.wrap`"
+                :name="`pre_delivery_items.${index}.encasement`"
                 outlined dense hide-bottom-space  color="blue-grey-5"
-                v-model="row.wrap" />
+                v-model="row.encasement" />
             </q-td>
           </q-tr>
-
-          <!-- <q-tr v-for="(row, index) in row.outgoing_verifications" :key="index+'.'+index"
-            >
-            <q-td key="prefix"></q-td>
-            <q-td colspan="2">
-              <q-btn outline dense round icon="clear" size="xs" color="red-4"
-                class="float-right q-my-xs"
-                @click="removeVerify(index, index)" />
-            </q-td>
-            <q-td>
-              <ux-date autofocus style="min-width:100px" class="slime-height"
-                :name="`pre_delivery_items.${index}.outgoing_verifications.${index}.date`"
-                outlined dense hide-bottom-space no-error-icon color="blue-grey-5"
-                v-model="row.date" type="date"
-                v-validate="`required|date_format:yyyy-MM-dd`"
-                :dark="LAYOUT.isDark"
-                :error="errors.has(`pre_delivery_items.${index}.outgoing_verifications.${index}.date`)"/>
-            </q-td>
-            <q-td>
-              <q-input autofocus style="min-width:120px" class="slime-height"
-                :name="`pre_delivery_items.${index}.outgoing_verifications.${index}.quantity`"
-                v-model="row.quantity" type="number" min="0"
-                outlined dense hide-bottom-space no-error-icon color="blue-grey-5"
-                :dark="LAYOUT.isDark"
-                :suffix="' / ' + $app.number_format(MaxTotal[index][index])"
-                v-validate="`required|gt_value:0|max_value:${$app.number_format(MaxTotal[index][index])}`"
-                :error="errors.has(`pre_delivery_items.${index}.outgoing_verifications.${index}.quantity`)"
-                />
-            </q-td>
-          </q-tr> -->
-          <!-- <q-tr>
-            <q-td key="prefix"></q-td>
-            <q-td colspan="3"></q-td>
-            <q-td class="text-right">
-              <q-btn dense icon-right="add" :label="$tc('form.add')" size="xs" color="green"
-                align="center"
-                @click="addNewVerify(index)" />
-            </q-td>
-          </q-tr> -->
-
           <q-tr>
             <q-td></q-td>
             <q-td>
@@ -243,7 +203,7 @@ export default {
                 unit_rate: 1,
                 unit_qty: null,
                 quantity: null,
-                wrap: null
+                encasement: null
               }]
             }
           ]

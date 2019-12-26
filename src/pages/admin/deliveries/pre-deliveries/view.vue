@@ -47,7 +47,7 @@
               <q-th>{{ $tc('label.unit') }}</q-th>
               <q-th>{{ $tc('label.quantity') }}</q-th>
               <q-th>Verify</q-th>
-              <q-th>{{ $tc('label.wrap') }}</q-th>
+              <q-th>{{ $tc('label.encasement') }}</q-th>
             </q-tr>
             </thead>
             <tbody>
@@ -57,7 +57,7 @@
               <q-td>{{row.unit.name}}</q-td>
               <q-td>{{$app.number_format(row.quantity)}}</q-td>
               <q-td>{{$app.number_format(row.amount_verification)}}</q-td>
-              <q-td>{{row.wrap || '-'}}</q-td>
+              <q-td>{{row.encasement || '-'}}</q-td>
             </q-tr>
             </tbody>
           </q-markup-table>
