@@ -1,5 +1,5 @@
 <template>
-  <q-chip class="text-weight-medium" style="padding: 4px 6px"
+  <q-chip class="text-weight-medium"
     v-bind="$attrs"
     v-on="$listeners"
     text-color="white" :label="Label" :color="Color" />
