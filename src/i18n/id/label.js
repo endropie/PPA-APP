@@ -17,6 +17,7 @@ export default {
   description: 'Keterangan',
   detail: 'Detail {v}',
   due_date: 'Batas Tanggal',
+  encasement: 'Kemasan',
   email: 'Email',
   estimate: 'Estimasi | Estimasi (Bayangan)',
   field: 'Kolom',
@@ -55,6 +56,5 @@ export default {
   type: 'Tipe',
   unit: 'Satuan {v}',
   until: 'Hingga',
-  wrap: 'Kemasan',
   weight: 'Berat'
 }
