@@ -227,9 +227,7 @@ export default {
               item: {}, unit: {},
               work_order_item_lines: [{
                   line_id: null,
-                  shift_id: null,
-                  begin_date: this.$app.moment().format('YYYY-MM-DD'),
-                  until_date: this.$app.moment().format('YYYY-MM-DD'),
+                  ismain: 0,
               }]
             }
           ]
