@@ -86,6 +86,9 @@
                   dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
                   :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                   :options="StockistOptions"
+                  option-label="code"
+                  option-value="value"
+                  emit-value map-options
                   v-validate="'required'"
                   :error="errors.has(`items.${index}.stockist`)"
                   :error-message="errors.first(`items.${index}.stockist`)"
@@ -168,7 +171,6 @@ export default {
   mixins: [MixForm],
   data () {
     return {
-      StockistOptions: ['FM', 'WO', 'WIP', 'FG'],
       SHEET:{
         units: {api:'/api/v1/references/units?mode=all'},
       },
@@ -212,6 +214,10 @@ export default {
     IS_EDITABLE() {
       if (Object.keys(this.FORM.data.has_relationship || {}).length > 0) return false
       return this.$app.can('opname-stocks-update')
+    },
+    StockistOptions() {
+      // console.warn(this.$store.state['admin'].CONFIG.items.stockists)
+      return this.$store.state['admin'].CONFIG.items.stockists
     },
     UnitOptions() {
       return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])

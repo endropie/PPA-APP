@@ -50,12 +50,12 @@ const config = {
   },
   items: {
     stockists: [
-      { value: 'FM', label: 'FRESH' },
-      { value: 'WO', label: 'WORK ORDER' },
-      { value: 'WIP', label: 'WORK PROCESS' },
-      { value: 'FG', label: 'FINISH GOOD' },
-      { value: 'NG', label: 'NOT GOOD', color: 'warning' },
-      { value: 'RET', label: 'REPAIR', color: 'orange-8' }
+      { value: 'FM', code:'FM', label: 'FRESH' },
+      { value: 'WO', code: 'WO', label: 'WORK ORDER' },
+      { value: 'WIP', code:'WIP', label: 'WORK PROCESS' },
+      { value: 'FG', code:'FG', label: 'FINISH GOOD' },
+      { value: 'NG', code:'NC', label: 'NOT GOOD', color: 'warning' },
+      { value: 'RET', code:'NCR', label: 'REPAIR', color: 'orange-8' }
     ]
   },
   incomes: {
