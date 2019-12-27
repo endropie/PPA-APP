@@ -126,14 +126,15 @@
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
-          <ux-badge-status :row="rs.row" class="shadow-0"
+          <ux-chip-status dense square :row="rs.row"
             :dark="LAYOUT.isDark"
             :colorOptions="{'DEPARTED' : 'green-7', 'ARRIVED': 'blue-grey-9'}"
             v-if="rs.row.status !== 'OPEN'"/>
-          <q-chip dense square class="shadow-0 text-weight-medium"
+          <q-chip dense square class="text-weight-medium"
             :dark="LAYOUT.isDark"
             :label="getOntimeLabel(rs.row)"
             :color="getOntimeColor(rs.row)"
+            text-color="white"
             v-if="!Boolean(rs.row.deleted_at)"/>
         </q-td>
 
@@ -279,7 +280,6 @@ export default {
       })
     },
     duration(datetime, after = null) {
-      console.warn('DURATION', datetime, after)
       after = this.$app.moment(after || undefined)
       datetime = this.$app.moment(datetime)
 

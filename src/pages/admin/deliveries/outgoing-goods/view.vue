@@ -13,6 +13,7 @@
               <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
               <address class="text-weight-light">{{rsView.customer_address}}</address>
               <div class="text-weight-light ">Phone: {{rsView.customer_phone}}</div>
+              <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
             </div>
             <div class="col-auto info">
               <q-markup-table class="bordered super-dense no-highlight no-shadow" separator="cell">

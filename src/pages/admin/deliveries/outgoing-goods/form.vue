@@ -75,6 +75,11 @@
             v-validate="'min_value:0'"
             :error="errors.has('rit')" />
 
+          <q-input name="customer_note" class="col-12"
+            stack-label :label="$tc('label.no',1, {v:'DN'})"
+            v-model="rsForm.customer_note"
+            :dark="LAYOUT.isDark"
+            v-validate="''" />
 
         </div>
       </div>
@@ -94,7 +99,7 @@
             :dark="LAYOUT.isDark" />
 
           <q-input name="customer_address" class="col-12"
-            type="textarea" rows="3"
+            type="textarea" rows="4"
             stack-label label="Address"
             v-model="rsForm.customer_address"
             :dark="LAYOUT.isDark" />
@@ -260,6 +265,7 @@ export default {
           customer_name: null,
           customer_phone: null,
           customer_address: null,
+          customer_note: null,
 
           vehicle_id: null,
           rit: null,

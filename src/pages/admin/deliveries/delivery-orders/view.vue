@@ -48,7 +48,8 @@
         <div class="profile" style="max-width:50%">
           <div class="text-weight-regular uppercase">To: {{rsView.customer_name}}</div>
           <address class="text-weight-light">{{rsView.customer_address}}</address>
-          <div class="text-weight-light ">Phone: {{rsView.customer_phone}}</div>
+          <div class="text-weight-light" v-if="rsView.customer_phone">Phone: {{rsView.customer_phone}}</div>
+          <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
         </div>
         <div class="info" style="max-width:50%">
           <q-markup-table bordered separator="cell" :dark="LAYOUT.isDark"
@@ -72,11 +73,12 @@
         <div class="col-12">
           <q-markup-table dense bordered class="no-shadow no-highlight th-uppercase" separator="cell">
             <thead>
-            <q-tr vfor="(line, i) in [1,2,3,4,5,6]" key="i">
+            <q-tr v-for="(line, i) in [1,2,3,4,5,6]" :key="i">
               <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th>{{ $tc('label.unit') }}</q-th>
               <q-th>{{ $tc('label.quantity') }}</q-th>
+              <q-th>{{ $tc('label.encasement') }}</q-th>
             </q-tr>
             </thead>
             <template v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
@@ -98,6 +100,7 @@
                 <q-td>{{row.item.part_number}}</q-td>
                 <q-td class="text-center">{{row.unit.name}}</q-td>
                 <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
+                <q-td>{{row.encasement}}</q-td>
               </q-tr>
             </tbody>
             </template>
@@ -110,6 +113,7 @@
               <q-td>{{row.item.part_number}}</q-td>
               <q-td class="text-center">{{row.unit.name}}</q-td>
               <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
+              <q-td>{{row.encasement}}</q-td>
             </q-tr>
             </tbody>
           </q-markup-table>

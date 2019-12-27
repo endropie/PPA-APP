@@ -1,6 +1,6 @@
 <template>
   <div class="page-print shadow-2" >
-    <table style="width100%; max-width: calc(100vw - 20px);">
+    <table style="page-break-after: always;width100%; max-width: calc(100vw - 20px);">
     <thead>
       <tr >
         <td class="page-print-header">
