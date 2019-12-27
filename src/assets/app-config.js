@@ -55,7 +55,13 @@ const config = {
       { value: 'WIP', code:'WIP', label: 'WORK PROCESS' },
       { value: 'FG', code:'FG', label: 'FINISH GOOD' },
       { value: 'NG', code:'NC', label: 'NOT GOOD', color: 'warning' },
-      { value: 'RET', code:'NCR', label: 'REPAIR', color: 'orange-8' }
+      { value: 'RET', code:'NCR', label: 'REPAIR', color: 'orange-8' },
+
+      { value: 'RDO.REG', code:'RDO REGULER', label: 'REQUEST'},
+      { value: 'RDO.RET', code:'RDO REPAIR', label: 'REQUEST REPAIR'},
+      { value: 'PDO.REG', code:'PDO REGULER', label: 'DELIVERY'},
+      { value: 'PDO.RET', code:'PDO REPAIR', label: 'DELIVERY REPAIR'},
+      { value: 'VDO', code:'VERIFICATION', label: 'VERIFICATION'},
     ]
   },
   incomes: {

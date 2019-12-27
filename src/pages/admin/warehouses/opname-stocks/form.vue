@@ -10,22 +10,80 @@
     <q-separator :dark="LAYOUT.isDark"></q-separator>
     <!-- COLUMN::1st Transaction details -->
     <q-card-section class="row q-col-gutter-x-md">
-      <ux-date autofocus name="date" type="date" class="col-12 col-sm-6"
-        :label="$tc('label.date')" stack-label
-        v-model="rsForm.date"
-        v-validate="`required`"
-        :dark="LAYOUT.isDark"
-        :error="errors.has('date')"
-        :error-message="errors.first('date')"/>
+      <div class="col-12 col-sm-6 column">
+        <ux-date autofocus name="date" type="date"
+          :label="$tc('label.date')" stack-label
+          v-model="rsForm.date"
+          v-validate="`required`"
+          :dark="LAYOUT.isDark"
+          :error="errors.has('date')"
+          :error-message="errors.first('date')"/>
 
-      <q-input class="col-12 col-sm-6"
-        name="reference"
-        stack-label :label="$tc('label.reference')"
-        v-model="rsForm.reference"
-        v-validate="'required'"
-        :dark="LAYOUT.isDark"
-        :error="errors.has('reference')"
-        :error-message="errors.first('reference')"/>
+        <ux-select
+          name="item_id"
+          :data-vv-as="$tc('items.part_name')"
+          popup-content-class="options-striped"
+          v-model="rsForm.item_id" clearable
+          v-validate="'required'"
+          filter
+          source="api/v1/common/items?mode=all&--limit=50"
+          :source-keys="['part_name', 'part_number']"
+          option-value="id" emit-value map-options
+          :option-label="(item) => item.part_name || rsForm.item.part_name"
+          :option-sublabel="(item) => `[${item.customer_code}] ${item.part_number}`"
+          :option-disable="(item) => !item.enable"
+          :options-dark="LAYOUT.isDark"
+          :dark="LAYOUT.isDark"
+          @selected="(val, opt)=>{ setItemReference(val, opt) }"
+          :error="errors.has(`item_id`)"
+          :error-message="errors.first(`item_id`)" />
+
+        <q-input readonly
+          :value="rsForm.item ? rsForm.item.part_number : null"
+          outlined dense hide-bottom-space color="blue-grey-5"
+          :dark="LAYOUT.isDark" />
+      </div>
+
+      <div class="col-12 col-sm-6 column">
+        <q-select
+          :name="`stockist`"
+          label="STOCKIST" stack-label
+          :data-vv-as="$tc('items.stockist')"
+          v-model="rsForm.stockist"
+          :disable="!Boolean(rsForm.item_id)"
+          :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+          :options="StockistOptions"
+          option-label="code"
+          option-value="value"
+          emit-value map-options
+          v-validate="'required'"
+          :error="errors.has(`stockist`)"
+          :error-message="errors.first(`stockist`)"
+          @input="(val) => setStockistReference(val) " />
+
+        <q-input type="number" style="min-width:120px"
+          :name="`init_amount`"
+          :data-vv-as="$tc('items.stock_init')"
+          v-model="rsForm.init_amount" readonly dense outlined
+          v-validate="'required'"
+          :dark="LAYOUT.isDark"
+          :error="errors.has(`init_amount`)"
+          :error-message="errors.first(`init_amount`)">
+          <span slot="prepend" class="text-caption" v-text="$tc('items.stock_init')"></span>
+        </q-input>
+
+        <q-input type="number" style="min-width:120px"
+          :name="`total_amount`"
+          :data-vv-as="$tc('items.stock_final')"
+          :value="FinalAmount" dense outlined readonly
+          v-validate="'required'"
+          :dark="LAYOUT.isDark"
+          :error="errors.has(`total_amount`)"
+          :error-message="errors.first(`total_amount`)">
+          <span slot="prepend" class="text-caption" v-text="$tc('items.stock_final')"></span>
+        </q-input>
+      </div>
+
     </q-card-section>
     <!-- COLUMN::2nd Request orders -->
     <q-separator inset spaced :dark="LAYOUT.isDark"></q-separator>
@@ -37,98 +95,48 @@
           :dark="LAYOUT.isDark">
             <q-tr>
               <q-th key="prefix"></q-th>
-              <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
-              <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
-              <q-th key="stockist">{{$tc('items.stockist')}}</q-th>
-              <q-th key="stock_init">{{$tc('items.stock_init')}}</q-th>
-              <q-th key="stock_final">{{$tc('items.stock_final')}}</q-th>
+              <q-th key="reference">{{$tc('label.reference')}}</q-th>
+              <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
               <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
             </q-tr>
             <q-tr v-for="(row, index) in rsForm.opname_stock_items" :key="index" style="vertical-align:top">
               <q-td  style="width:50px">
                 <q-btn dense flat round icon="clear" color="negative" tabindex="100" @click="removeItem(index)"/>
               </q-td>
-              <q-td width="35%">
-                <ux-select autofocus
-                  :name="`items.${index}.item_id`"
-                  :data-vv-as="$tc('items.part_name')"
-                  dense outlined hide-bottom-space color="blue-grey-5"
-                  popup-content-class="options-striped"
-                  v-model="row.item_id" clearable
-                  v-validate="'required'"
-                  filter filter-min="3"
-                  source="api/v1/common/items?mode=all&--limit=50"
-                  :source-keys="['part_name', 'part_number']"
-                  option-value="id" emit-value map-options
-                  :option-label="(item) => item.part_name || row.item.part_name"
-                  :option-sublabel="(item) => `[${item.customer_code}] ${item.part_number}`"
-                  :option-disable="(item) => !item.enable"
-                  :options-dark="LAYOUT.isDark"
-                  :dark="LAYOUT.isDark"
-                  @selected="(val, opt)=>{ setItemReference(index, val, opt) }"
-                  :error="errors.has(`items.${index}.item_id`)"
-                  :error-message="errors.first(`items.${index}.item_id`)"
-                />
-
-              </q-td>
-              <q-td key="part_number" width="35%" style="min-width:150px">
-                <q-input readonly
-                  :value="row.item ? row.item.part_number : null"
-                  outlined dense hide-bottom-space color="blue-grey-5"
-                  :dark="LAYOUT.isDark" />
-              </q-td>
-              <q-td width="20%">
-                <q-select style="min-width:50px"
-                  :name="`items.${index}.stockist`"
-                  :data-vv-as="$tc('items.stockist')"
-                  v-model="row.stockist"
-                  :disable="!Boolean(row.item_id)"
-                  dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
-                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                  :options="StockistOptions"
-                  option-label="code"
-                  option-value="value"
-                  emit-value map-options
-                  v-validate="'required'"
-                  :error="errors.has(`items.${index}.stockist`)"
-                  :error-message="errors.first(`items.${index}.stockist`)"
-                  @input="(val) => setStockistReference(index, val) " />
-
-                <q-input class="hidden" v-model="row.unit_rate" />
-              </q-td>
               <q-td width="25%">
+                <q-input autofocus style="min-width:120px"
+                  :name="`opname_stock_items.${index}.reference`"
+                  :data-vv-as="$tc('label.reference')"
+                  v-model="row.reference"
+                  v-validate="'required|integer'"
+                  dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has(`opname_stock_items.${index}.reference`)"
+                  :error-message="errors.first(`opname_stock_items.${index}.reference`)"/>
+              </q-td>
+              <q-td width="45%">
                 <q-input type="number" style="min-width:120px"
-                  :name="`items.${index}.init_amount`"
-                  :data-vv-as="$tc('items.stock_init')"
-                  v-model="row.init_amount" disable
+                  :name="`opname_stock_items.${index}.quantity`"
+                  :data-vv-as="$tc('label.quantity')"
+                  v-model="row.quantity"
                   v-validate="'required'"
                   dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
                   :dark="LAYOUT.isDark"
-                  :error="errors.has(`items.${index}.init_amount`)"
-                  :error-message="errors.first(`items.${index}.init_amount`)"/>
+                  @input="row.unit_id = (rsForm.item) ? rsForm.item.unit_id : null"
+                  :error="errors.has(`opname_stock_items.${index}.quantity`)"
+                  :error-message="errors.first(`opname_stock_items.${index}.quantity`)"/>
               </q-td>
-              <q-td width="25%">
-                <q-input type="number" style="min-width:120px"
-                  :name="`items.${index}.final_amount`"
-                  :data-vv-as="$tc('items.stock_final')"
-                  v-model="row.final_amount"
-                  v-validate="'required'"
-                  dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
-                  :dark="LAYOUT.isDark"
-                  :error="errors.has(`items.${index}.final_amount`)"
-                  :error-message="errors.first(`items.${index}.final_amount`)"/>
-              </q-td>
-              <q-td width="20%">
+              <q-td width="30%">
                 <q-select map-options emit-value style="min-width:100px"
-                  :name="`items.${index}.unit_id`"
+                  :name="`opname_stock_items.${index}.unit_id`"
                   :data-vv-as="$tc('label.unit')"
                   v-model="row.unit_id" disable
                   dense outlined hide-bottom-space color="blue-grey-5"
                   :dark="LAYOUT.isDark"
-                  :options="ItemUnitOptions[index]"
+                  :options="ItemUnitOptions"
                   :options-dark="LAYOUT.isDark"
                   v-validate="row.item_id ? 'required' : ''"
-                  :error="errors.has(`items.${index}.unit_id`)"
+                  :error="errors.has(`opname_stock_items.${index}.unit_id`)"
                   @input="(val)=> { setUnitReference(index, val) }"/>
                 <q-input class="hidden" v-model="row.unit_rate" />
               </q-td>
@@ -185,19 +193,18 @@ export default {
         return {
           number: null,
           date: this.$app.moment().format('YYYY-MM-DD'),
-          reference: null,
+
+          item_id: null, item: null,
+          stockist: null,
+          init_amount: 0,
           description: null,
 
           opname_stock_items:[
             {
               id:null,
-              item_id: null, item: {},
               quantity: null,
-
               unit_id: null,
               unit_rate: 1,
-              init_amount: null,
-              final_amount: null,
             }
           ]
 
@@ -215,23 +222,30 @@ export default {
       if (Object.keys(this.FORM.data.has_relationship || {}).length > 0) return false
       return this.$app.can('opname-stocks-update')
     },
+    FinalAmount() {
+      const total = this.rsForm.opname_stock_items.reduce((sum, item) => {
+        return sum + (item.quantity * item.unit_rate)
+      }, 0);
+      return Number(total)
+    },
     StockistOptions() {
-      // console.warn(this.$store.state['admin'].CONFIG.items.stockists)
+      let excluded = ['WO', 'RDO.REG', 'RDO.RET', 'PDO.REG', 'PDO.RET', 'VDO']
+
+      if (this.ROUTE.query && this.ROUTE.query.DEV) excluded = []
       return this.$store.state['admin'].CONFIG.items.stockists
+        .filter(x => !excluded.some(e => e === x.value))
     },
     UnitOptions() {
       return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
     },
     ItemUnitOptions() {
-      if (!this.rsForm.opname_stock_items) return []
       if (!this.UnitOptions) return []
+      if (!this.rsForm.item) return []
 
-      return this.rsForm.opname_stock_items.map(detail => {
-        if (!detail.item.item_units) return []
-        return this.UnitOptions.filter(unit => {
-          if (unit.value === detail.item.unit_id) return unit
-          return detail.item.item_units.find(x => x.unit_id === unit.value)
-        })
+      const item = this.rsForm.item
+      return this.UnitOptions.filter(unit => {
+        if (unit.value === item.unit_id) return true
+        return item.item_units.find(x => x.unit_id === unit.value)
       })
     }
   },
@@ -256,47 +270,36 @@ export default {
         })
       }
     },
-    setItemReference(index, val, opt) {
-      this.rsForm.opname_stock_items[index].stockist = null
-      this.rsForm.opname_stock_items[index].init_amount = null
-      this.rsForm.opname_stock_items[index].final_amount = null
+    setItemReference(val, opt) {
+      this.rsForm.init_amount = 0
+      this.rsForm.item = (val) ? opt : null
 
-      if(!val) {
-        this.rsForm.opname_stock_items[index].unit_id = null
-        this.rsForm.opname_stock_items[index].unit_rate = 1
-        this.rsForm.opname_stock_items[index].unit = {}
-        this.rsForm.opname_stock_items[index].item = {}
+      if (this.rsForm.item && this.rsForm.stockist) {
+        this.setStockistReference(this.rsForm.stockist)
       }
-      else {
-        this.rsForm.opname_stock_items[index].item = opt
-        this.rsForm.opname_stock_items[index].unit_id = opt.unit_id
-        this.rsForm.opname_stock_items[index].unit_rate = 1
-        this.rsForm.opname_stock_items[index].unit = opt.unit
-      }
-
+    },
+    setStockistReference(val) {
+      const totals = this.rsForm.item.totals || {}
+      this.rsForm.init_amount = Number(totals[val] || 0)
     },
     setUnitReference(index, val) {
 
       if(!val) return;
-      else if (this.rsForm.opname_stock_items[index].item.unit_id === val) {
+      else if (this.rsForm.item.unit_id === val) {
         this.rsForm.opname_stock_items[index].unit_rate = 1
       }
       else {
-        if(this.rsForm.opname_stock_items[index].item.item_units) {
-          this.rsForm.opname_stock_items[index].item.item_units.map((unitItem)=> {
+        if(this.rsForm.item.item_units) {
+          this.rsForm.item.item_units.map((unitItem)=> {
             if (unitItem.unit_id == val) this.rsForm.opname_stock_items[index].unit_rate = unitItem.rate
           })
         }
       }
     },
-    setStockistReference(index, val) {
-      const totals = this.rsForm.opname_stock_items[index].item.totals || {}
-      this.rsForm.opname_stock_items[index].init_amount = Number(totals[val] || 0)
-    },
-
     addNewItem(autofocus){
       autofocus = autofocus || false
       let newEntri = this.setDefault().opname_stock_items[0] // {id:null, item_id: null, quantity: null};
+      if (this.rsForm.item) newEntri.unit_id = this.rsForm.item.unit_id
 
       this.rsForm.opname_stock_items.push(newEntri)
     },

@@ -1,8 +1,8 @@
 
 export default {
   fault: 'Fault',
-  stock_init: 'Awal',
-  stock_final: 'Akhir',
+  stock_init: 'Stok Awal',
+  stock_final: 'Stok Akhir',
   packing_duration: 'Durasi Packing (s)',
   part_number: 'No. Part',
   part_name: 'Nama Part',

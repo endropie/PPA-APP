@@ -12,9 +12,13 @@
       <div class="row q-col-gutter-md" >
         <div class="col-12">
           <div class="row justify-between q-gutter-sm" >
-            <div class="items-end q-pt-lg">
-              <div class="text-h6">
+            <div class="items-end q-pt-md">
+              <div class="text-h6 text-uppercase">
                 {{$tc('general.opname_stocks')}}
+              </div>
+              <div class="column">
+                <span class="text-weight-medium">{{rsView.item.part_name}}</span>
+                <span class="text-caption">[{{rsView.item.customer_code}}] {{rsView.item.part_number}}</span>
               </div>
             </div>
             <div>
@@ -22,51 +26,48 @@
                 <tr>
                   <th>{{$tc('label.number')}}</th>
                   <td>
-                    {{rsView.number}}
-                    <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
+                    {{rsView.full_number || rsView.number}}
                   </td>
                 </tr>
                 <tr>
                   <th>{{$tc('label.date')}}</th>
                   <td>{{ $app.date_format(rsView.date) }}</td>
                 </tr>
-                <tr>
-                  <th>{{$tc('label.reference')}}</th>
-                  <td>{{ rsView.reference || '-'}}</td>
-                </tr>
               </q-markup-table>
             </div>
           </div>
         </div>
-        <div class="col-12">
-          <q-table ref="table" class="no-highlight bordered no-shadow" color="secondary" separator="vertical" dense hide-bottom :dark="LAYOUT.isDark"
-            :data="rsView.opname_stock_items"
-            no-data-label = "No Detail"
-            :rows-per-page-options ="[0]"
-            :pagination="{page: null, rowsPerPage: 0 }"
-            :columns="[
-              { name: 'code', label:  this.$tc('general.cust'), align: 'left', field: (v)=> v.item.customer_code},
-              { name: 'part_name', label: this.$tc('items.part_name'), align: 'left', field: (v)=> v.item.part_name},
-              { name: 'part_number', label: this.$tc('items.part_number'), align: 'left', field: (v)=> v.item.part_number},
-              { name: 'quantity', label: $tc('label.quantity'), align: 'center'},
-              { name: 'init_amount', label: $tc('items.stock_init'), align: 'right',
-                field: (v)=> v.init_amount, format: (v) => $app.number_format(v)},
-              { name: 'final_amount', label: $tc('items.stock_final'), align: 'right',
-                field: (v)=> v.final_amount, format: (v) => $app.number_format(v)}
-            ]"
-          >
-          <template v-slot:body-cell-quantity="rsItem">
-            <q-td class="text-right">
-              <q-badge class="float-left"
-                :color="rsItem.row.quantity > 0 ? 'positive' : 'negative'">
-                <q-icon  name="mdi-chevron-double-up" v-if="rsItem.row.quantity > 0" />
-                <q-icon  name="mdi-chevron-double-down" v-if="rsItem.row.quantity < 0" />
-              </q-badge>
-              <span v-if="rsItem.row.quantity" v-html="$app.number_format(Math.abs(rsItem.row.quantity))"/>
-              <span class="q-pl-xs" v-if="rsItem.row.unit" v-html="rsItem.row.unit.code" />
-            </q-td>
-          </template>
-          </q-table>
+        <div class="col-12 column">
+          <q-markup-table dense bordered
+            class="no-shadow" separator="cell" :dark="LAYOUT.isDark">
+            <thead>
+              <tr>
+                <th>{{$tc('label.reference')}}</th>
+                <th>{{$tc('label.unit')}}</th>
+                <th>{{$tc('label.quantity')}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(row, i) in rsView.opname_stock_items" :key="i">
+                <td>{{row.reference}}</td>
+                <td class="text-center">{{row.unit.code}}</td>
+                <td class="text-right">{{$app.number_format(row.quantity)}}</td>
+              </tr>
+
+              <tr class="text-weight-medium">
+                <td colspan="2" class="text-italic text-right">{{$tc('label.summary')}}</td>
+                <td class="text-right">{{$app.number_format(rsView.opname_stock_items.reduce((t,x) => t+Number(x.quantity), 0))}}</td>
+              </tr>
+              <tr class="text-weight-medium">
+                <td colspan="2" class="text-italic text-right">{{$tc('items.stock_init')}}</td>
+                <td class="text-right">{{$app.number_format(rsView.init_amount)}}</td>
+              </tr>
+              <tr class="text-weight-medium">
+                <td colspan="2" class="text-italic text-right">{{$tc('items.stock_final')}}</td>
+                <td class="text-right">{{$app.number_format(rsView.final_amount)}}</td>
+              </tr>
+            </tbody>
+          </q-markup-table>
         </div>
         <div class="col-12">
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>

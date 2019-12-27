@@ -145,9 +145,10 @@ export default {
           { name: 'prefix', label: '', align: 'left'},
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', label: '', field: 'status', align: 'left'},
-          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true},
-          { name: 'reference', label: this.$tc('label.reference'), field: 'reference', align: 'left', sortable: true },
-          { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center', sortable: true },
+          { name: 'date', label: this.$tc('label.date'), field: 'date', format:(v) => String(this.$app.moment(v).format('DD MMM YYYY')).toUpperCase(), align: 'center', sortable: true},
+          { name: 'part_name', label: this.$tc('items.part_name'), field:(v) => v.item.part_name, align: 'left'},
+          { name: 'stockist', label: 'Stockist', field:'stockist', format:(v) => v, align: 'center'},
+          { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', format:(v) => this.$app.moment(v).format('DD/MM/YYYY HH:mm'), align: 'center', sortable: true },
         ],
       },
     }
