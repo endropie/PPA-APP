@@ -73,7 +73,7 @@
         <div class="col-12">
           <q-markup-table dense bordered class="no-shadow no-highlight th-uppercase" separator="cell">
             <thead>
-            <q-tr v-for="(line, i) in [1,2,3,4,5,6]" :key="i">
+            <q-tr>
               <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th>{{ $tc('label.unit') }}</q-th>
