@@ -102,14 +102,14 @@
               <q-btn dense flat icon="clear" color="negative" @click="removeItem(index)" v-if="!Boolean(row.id)"/>
             </q-td>
             <q-td key="item_id" width="30%" style="min-width:150px">
-              <ux-select-filter :name="`request_orders_items.${index}.item_id`"
+              <ux-select-filter :name="`request_order_items.${index}.item_id`"
                 v-model="row.item_id"
                 v-validate="'required'"
                 outlined dense hide-bottom-space color="blue-grey-5"
                 :options="ItemOptions"
                 :readonly="!IssetCustomerID"
                 :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                :error="errors.has(`request_orders_items.${index}.item_id`)"
+                :error="errors.has(`request_order_items.${index}.item_id`)"
                 :loading="SHEET['items'].loading"
                 @input="(val)=>{ setItemReference(index, val) }"
               />
@@ -122,17 +122,17 @@
                 :dark="LAYOUT.isDark" />
             </q-td>
             <q-td key="quantity" width="10%">
-              <q-input :name="`request_orders_items.${index}.quantity`"
+              <q-input :name="`request_order_items.${index}.quantity`"
                 v-model="row.quantity" type="number" min="0"
                 outlined dense hide-bottom-space
                 color="blue-grey-5" style="width:80px"
                 v-validate="row.item_id ? `required|gt_value:0|min_value:${getMinQuantity(index)}` : ''"
                 :dark="LAYOUT.isDark"
-                :error="errors.has(`request_orders_items.${index}.quantity`)"
+                :error="errors.has(`request_order_items.${index}.quantity`)"
               />
             </q-td>
             <q-td key="unit_id" width="10%">
-              <q-select :name="`request_orders_items.${index}.unit_id`"
+              <q-select :name="`request_order_items.${index}.unit_id`"
                 v-model="row.unit_id"
                 :options="ItemUnitOptions[index]"
                 map-options emit-value
@@ -140,18 +140,18 @@
                 color="blue-grey-5" style="width:80px"
                 v-validate="row.item_id ? 'required' : ''"
                 :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                :error="errors.has(`request_orders_items.${index}.unit_id`)"
+                :error="errors.has(`request_order_items.${index}.unit_id`)"
                 @input="(val)=> { setUnitReference(index, val) }" />
               <q-input v-model="row.unit_rate" class="hidden" />
             </q-td>
             <q-td key="price" width="20%" style="min-width:120px">
-              <ux-numeric type="number" :name="`request_orders_items.${index}.price`"
+              <ux-numeric type="number" :name="`request_order_items.${index}.price`"
                 v-model="row.price"
                 outlined dense hide-bottom-space
                 color="blue-grey-5" style="width:120px"
                 v-validate="row.item_id ? 'required' : ''"
                 :dark="LAYOUT.isDark"
-                :error="errors.has(`request_orders_items.${index}.price`)" />
+                :error="errors.has(`request_order_items.${index}.price`)" />
             </q-td>
             <q-td key="total" width="20%" style="min-width:150px">
               <ux-numeric :name="`total-${index}`"
