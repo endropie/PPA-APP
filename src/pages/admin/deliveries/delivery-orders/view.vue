@@ -207,7 +207,7 @@ export default {
       return `(${detail.unit_amount} ${detail.item.unit.code})`
     },
     getArrayPage(c) {
-      if (c.delivery_mode === 'SEPARATE') return ['Material', 'Jasa', 'TEST']
+      if (c.delivery_mode === 'SEPARATE') return ['Material', 'Jasa']
       else return ['']
     },
     setView(data) {
