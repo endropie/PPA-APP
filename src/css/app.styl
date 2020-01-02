@@ -3,6 +3,13 @@ import('./quasar.variables.styl')
 
 
 // app global css
+.contentable, .contentable-xs, .contentable-sm, .contentable-md, .contentable-lg { margin: 0 auto }
+.contentable { max-width: 1200px }
+.contentable-xs { max-width: 480px }
+.contentable-sm { max-width: 960px }
+.contentable-md { max-width: 1200px }
+.contentable-lg { max-width: 100% }
+
 .main-box
   background unset
 
@@ -23,22 +30,22 @@ import('./quasar.variables.styl')
   .q-field__native, .q-field__prefix, .q-field__suffix
     line-height inherit
 
-.bordered:not(.q-table__container),
-.bordered.q-table__container .q-table
-  border solid 1px rgba(125, 125, 125, 0.3)
-  border-collapse collapse
+// .bordered:not(.q-table__container),
+// .bordered.q-table__container .q-table
+//   border solid 1px rgba(125, 125, 125, 0.3)
+//   border-collapse collapse
 
-.bordered.q-table__container
-  .q-table
-    width: calc(100% - 4px)
-  .q-table td:first-child, th:first-child
-    border-left solid 1px rgba(125, 125, 125, 0.3)
-  .q-table td:last-child, .q-table th:last-child
-    border-right solid 1px rgba(125, 125, 125, 0.3)
+// .bordered.q-table__container
+//   .q-table
+//     width: calc(100% - 4px)
+//   .q-table td:first-child, th:first-child
+//     border-left solid 1px rgba(125, 125, 125, 0.3)
+//   .q-table td:last-child, .q-table th:last-child
+//     border-right solid 1px rgba(125, 125, 125, 0.3)
 
-.bordered.q-table--cell-separator
-  // border-top: none
-  // border-bottom: none
+// .bordered.q-table--cell-separator
+//   border-top: none
+//   border-bottom: none
 
 .no-highlight .q-table tbody td:before
   background-color inherit
@@ -61,6 +68,30 @@ import('./quasar.variables.styl')
   font-size 90%
   line-height 100%
   font-weight 500
+
+.table-print.q-table--bordered
+  border-width 0
+
+  .q-table, .q-table td, .q-table th
+    border-collapse collapse
+
+  .q-table:first-child th,
+  .q-table:first-child td
+    border-top-width 1px
+
+  .q-table:last-child th,
+  .q-table:last-child td
+    border-bottom-width 1px
+
+  .q-table tr th:first-child, .q-table tr td:first-child
+    border-left-style solid
+    border-left-width 1px
+    border-left-color inherit
+
+  .q-table tr th:last-child, .q-table tr td:last-child
+    border-right-style solid
+    border-right-width 1px
+    border-right-color inherit
 
 .th-uppercase .q-table
   th
@@ -110,9 +141,9 @@ import('./quasar.variables.styl')
 // q-select options striped => popup-content-class="options-striped"
 .q-dialog .scroll.options-striped,
 .q-menu.scroll.options-striped
-  .q-virtual-scroll__content > .q-item:nth-of-type(odd)
+  .q-virtual-scroll__content > .q-item:nth-of-type(even)
     background-color rgba(125, 125, 125, 0.2)
-  .q-virtual-scroll__content > .q-item.q-item--dark:nth-of-type(odd)
+  .q-virtual-scroll__content > .q-item.q-item--dark:nth-of-type(even)
     background-color rgba(125, 125, 125, 0.3)
 
 // styl-end

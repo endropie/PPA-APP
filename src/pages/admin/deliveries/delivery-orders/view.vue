@@ -1,100 +1,114 @@
 <template>
-  <q-page padding class="column content-center q-gutter-sm"  v-if="VIEW.show">
-    <q-card  v-if="VIEW.show" class="print-hide modal-hide" style="max-width:210mm">
-      <q-card-actions class="q-px-lg q-gutter-xs" >
-          <q-btn :label="$tc('form.list')" icon="list"  color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
-          <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
-          <q-space />
-          <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" no-caps class="float-right"
-            :options="[
-              { label: 'Delete', color:'red', icon: 'delete',
-                detail: $tc('messages.process_delete'),
-                hidden: !IS_EDITABLE || !$app.can('sj-delivery-orders-delete'),
-                actions: () => {
-                  VIEW.delete()
+  <q-page padding class="contentable-sm flex content-center"  v-if="VIEW.show">
+    <div class="column q-gutter-sm">
+      <q-card  v-if="VIEW.show" class="print-hide modal-hide">
+        <q-card-actions class="q-px-lg q-gutter-xs" >
+            <q-btn :label="$tc('form.list')" icon="list"  color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
+            <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
+            <q-space />
+            <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" no-caps class="float-right"
+              :options="[
+                { label: 'Delete', color:'red', icon: 'delete',
+                  detail: $tc('messages.process_delete'),
+                  hidden: !IS_EDITABLE || !$app.can('sj-delivery-orders-delete'),
+                  actions: () => {
+                    VIEW.delete()
+                  }
+                },
+                { label: $tc('form.confirm').toUpperCase(), color:'green', icon: 'block',
+                  detail: $tc('messages.process_confirm'),
+                  hidden: !IS_VOID || !$app.can('sj-delivery-orders-confirm'),
+                  actions: () => {
+                    setConfirmation()
+                  }
+                },
+                { label: $tc('form.revision').toUpperCase(), color:'red', icon: 'block',
+                  detail: $tc('messages.process_revise'),
+                  hidden: !IS_VOID || !$app.can('sj-delivery-orders-revision'),
+                  actions: () => {
+                    setRevision()
+                  }
+                },
+                { label: 'VOID', color:'red', icon: 'block',
+                  detail: $tc('messages.process_void'),
+                  hidden: !IS_VOID || !$app.can('sj-delivery-orders-void'),
+                  actions: () => {
+                    VIEW.void(()=> init() )
+                  }
                 }
-              },
-              { label: $tc('form.confirm').toUpperCase(), color:'green', icon: 'block',
-                detail: $tc('messages.process_confirm'),
-                hidden: !IS_VOID || !$app.can('sj-delivery-orders-confirm'),
-                actions: () => {
-                  setConfirmation()
-                }
-              },
-              { label: $tc('form.revision').toUpperCase(), color:'red', icon: 'block',
-                detail: $tc('messages.process_revise'),
-                hidden: !IS_VOID || !$app.can('sj-delivery-orders-revision'),
-                actions: () => {
-                  setRevision()
-                }
-              },
-              { label: 'VOID', color:'red', icon: 'block',
-                detail: $tc('messages.process_void'),
-                hidden: !IS_VOID || !$app.can('sj-delivery-orders-void'),
-                actions: () => {
-                  VIEW.void(()=> init() )
-                }
-              }
-            ]"
-          />
-      </q-card-actions>
-    </q-card>
-    <page-print class="shadow-2 scroll" style="max-width:210mm"
-      v-for="(mode, pi) in getArrayPage(rsView.customer)" :key="pi">
-      <div slot="header-tags" class="print-hide">
-        <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
-      </div>
-      <div class="row justify-between q-gutter-y-md" >
-        <div class="profile" style="max-width:50%">
-          <div class="text-weight-regular uppercase">To: {{rsView.customer_name}}</div>
-          <address class="text-weight-light">{{rsView.customer_address}}</address>
-          <div class="text-weight-light" v-if="rsView.customer_phone">Phone: {{rsView.customer_phone}}</div>
-          <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
+              ]"
+            />
+        </q-card-actions>
+      </q-card>
+      <page-print class="shadow-2 q-pa-sm"
+        v-for="(mode, pi) in getArrayPage(rsView.customer)" :key="pi">
+        <div slot="header-tags" class="print-hide">
+          <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
         </div>
-        <div class="info" style="max-width:50%">
-          <q-markup-table bordered separator="cell" :dark="LAYOUT.isDark"
-            class="super-dense no-shadow no-margin th-uppercase th-text-left">
-            <tr>
-              <th>No. SJ-OUT</th>
-              <td>
-                {{ rsView.number }}
-                <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
-              </td>
-            </tr>
-            <tr>
-              <th>{{$tc('label.date')}}</th>
-              <td>{{$app.date_format(rsView.date)}}</td>
-            </tr>
-            <tr>
-              <th>No. SO</th><td>{{ rsView.request_order ? rsView.request_order.number : '-' }}</td>
-            </tr>
-          </q-markup-table>
-        </div>
-        <div class="col-12">
-          <q-markup-table dense bordered class="no-shadow no-highlight th-uppercase" separator="cell">
-            <thead>
-            <q-tr>
-              <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th>{{ $tc('label.unit') }}</q-th>
-              <q-th>{{ $tc('label.quantity') }}</q-th>
-              <q-th>{{ $tc('label.encasement') }}</q-th>
-            </q-tr>
-            </thead>
-            <template v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
-            <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
-              <q-tr >
-                <q-td>
-                  <span class="text-weight-medium">Material:&nbsp;</span>
-                  {{row.item.part_name}}
-                </q-td>
-                <q-td>{{row.item.part_number}}</q-td>
-                <q-td class="text-center">{{row.unit.name}}</q-td>
-                <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
+        <div class="row justify-between q-col-gutter-sm" >
+          <div class="profile col-stretch">
+            <div class="text-weight-regular uppercase">To: {{rsView.customer_name}}</div>
+            <address class="text-weight-light">{{rsView.customer_address}}</address>
+            <div class="text-weight-light" v-if="rsView.customer_phone">Phone: {{rsView.customer_phone}}</div>
+            <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
+          </div>
+          <div class="info col-auto">
+            <q-markup-table bordered separator="cell" :dark="LAYOUT.isDark"
+              class="super-dense no-shadow no-margin th-uppercase">
+              <tr>
+                <td>No. SJ-OUT</td>
+                <td>
+                  {{ rsView.number }}
+                  <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
+                </td>
+              </tr>
+              <tr>
+                <td>{{$tc('label.date')}}</td>
+                <td>{{$app.date_format(rsView.date)}}</td>
+              </tr>
+              <tr>
+                <td>No. SO</td><td>{{ rsView.request_order ? rsView.request_order.number : '-' }}</td>
+              </tr>
+            </q-markup-table>
+          </div>
+          <div class="col-12">
+            <q-markup-table dense bordered class="table-print no-shadow no-highlight th-uppercase" separator="cell">
+              <thead>
+              <q-tr>
+                <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+                <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
+                <q-th>{{ $tc('label.unit') }}</q-th>
+                <q-th>{{ $tc('label.quantity') }}</q-th>
+                <q-th>{{ $tc('label.encasement') }}</q-th>
               </q-tr>
-              <q-tr >
+              </thead>
+              <template v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
+              <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
+                <q-tr >
+                  <q-td>
+                    <span class="text-weight-medium">Material:&nbsp;</span>
+                    {{row.item.part_name}}
+                  </q-td>
+                  <q-td>{{row.item.part_number}}</q-td>
+                  <q-td class="text-center">{{row.unit.name}}</q-td>
+                  <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
+                </q-tr>
+                <q-tr >
+                  <q-td>
+                    <span class="text-weight-medium">Jasa:&nbsp;</span>
+                    {{row.item.part_name}}
+                  </q-td>
+                  <q-td>{{row.item.part_number}}</q-td>
+                  <q-td class="text-center">{{row.unit.name}}</q-td>
+                  <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
+                  <q-td>{{row.encasement}}</q-td>
+                </q-tr>
+              </tbody>
+              </template>
+              <tbody v-else>
+              <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index">
                 <q-td>
-                  <span class="text-weight-medium">Jasa:&nbsp;</span>
+                  <span v-if="Boolean(mode)" class="text-weight-medium">{{mode}}:&nbsp;</span>
                   {{row.item.part_name}}
                 </q-td>
                 <q-td>{{row.item.part_number}}</q-td>
@@ -102,53 +116,41 @@
                 <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
                 <q-td>{{row.encasement}}</q-td>
               </q-tr>
-            </tbody>
-            </template>
-            <tbody v-else>
-            <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index">
-              <q-td>
-                <span v-if="Boolean(mode)" class="text-weight-medium">{{mode}}:&nbsp;</span>
-                {{row.item.part_name}}
-              </q-td>
-              <q-td>{{row.item.part_number}}</q-td>
-              <q-td class="text-center">{{row.unit.name}}</q-td>
-              <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
-              <q-td>{{row.encasement}}</q-td>
-            </q-tr>
-            </tbody>
-          </q-markup-table>
-          <q-chip dense square class="float-right print-hide">
-            <small class="text-weight-light">{{`MODE: ${rsView.customer.delivery_mode}`}}</small>
-          </q-chip>
+              </tbody>
+            </q-markup-table>
+            <q-chip dense square class="float-right print-hide">
+              <small class="text-weight-light">{{`MODE: ${rsView.customer.delivery_mode}`}}</small>
+            </q-chip>
+          </div>
+          <div class="col-12">
+              <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
+              <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
+          </div>
+          <div class="col-12">
+            <q-markup-table class="no-shadow text-weight-light" style="">
+              <tr class="text-center">
+                <td width="21%">
+                  <div class="sign-name">Diterima Oleh</div>
+                  <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+                </td>
+                <td width="21%">
+                  <div class="sign-name">Outgoing Oleh</div>
+                  <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+                </td>
+                <td width="21%">
+                  <div class="sign-name">Security</div>
+                  <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+                </td>
+                <td width="35%">
+                  <div class="sign-name">Hormat Kami</div>
+                  <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+                </td>
+              </tr>
+            </q-markup-table>
+          </div>
         </div>
-        <div class="col-12">
-            <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
-            <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
-        </div>
-        <div class="col-12">
-          <q-markup-table class="no-shadow text-weight-light">
-            <tr class="text-center">
-              <td width="21%">
-                <div class="sign-name">Diterima Oleh</div>
-                <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
-              </td>
-              <td width="21%">
-                <div class="sign-name">Outgoing Oleh</div>
-                <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
-              </td>
-              <td width="21%">
-                <div class="sign-name">Security</div>
-                <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
-              </td>
-              <td width="35%">
-                <div class="sign-name">Hormat Kami</div>
-                <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
-              </td>
-            </tr>
-          </q-markup-table>
-        </div>
-      </div>
-    </page-print>
+      </page-print>
+    </div>
     <q-inner-loading :showing="VIEW.loading">
         <q-spinner-dots size="50px" color="primary" />
     </q-inner-loading>
@@ -205,7 +207,7 @@ export default {
       return `(${detail.unit_amount} ${detail.item.unit.code})`
     },
     getArrayPage(c) {
-      if (c.delivery_mode === 'SEPARATE') return ['Material', 'Jasa']
+      if (c.delivery_mode === 'SEPARATE') return ['Material', 'Jasa', 'TEST']
       else return ['']
     },
     setView(data) {
@@ -258,6 +260,18 @@ export default {
 </script>
 
 <style lang="stylus">
+.info, .info th
+  text-transform uppercase
+  font-size 11px
+  font-weight 500
+
+.table-print
+  .q-table tr, .q-table td
+    line-height normal
+    height unset !important
+  .q-table td
+    padding-top 2px
+    padding-bottom 2px
 .sign-tag
   margin-top 40px
   vertical-align bottom
