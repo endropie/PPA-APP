@@ -1,59 +1,61 @@
 <template>
   <div class="page-print shadow-2" >
-    <table>
-    <thead>
-      <tr>
-        <td :class="{'header-line': true}">
-          <div class="page-print-header header">
-            <slot name="header">
-              <div class="row no-wrap" >
-                <div class="head-icon self-center">
-                  <slot name="'header-icon'">
-                    <q-avatar color="transparent" text-color="primary" rounded class="q-mr-sm">
-                      <img src="/statics/icons/ppa-icon.png" width="100%" />
-                    </q-avatar>
-                    <!-- <div>
-                      <q-icon  name="widgets" color="primary" class=""/>
-                    </div> -->
-                  </slot>
-                </div>
-                <div class=" head-brand col-grow text-no-wrap ">
-                  <div  class="title text-weight-bolder uppercase ellipsis text-truncate" style="opacity:0.8">
-                    <slot name="header-title">
-                      <span>Priuk Perkasa Abadi, PT</span>
-                    </slot>
+    <div class="page-print-layout">
+      <table>
+        <thead>
+          <tr>
+            <td :class="{'header-line': true}">
+              <div class="page-print-header header">
+                <slot name="header">
+                  <div class="row no-wrap" >
+                    <div class="head-icon self-center">
+                      <slot name="'header-icon'">
+                        <q-avatar color="transparent" text-color="primary" rounded class="q-mr-sm">
+                          <img src="/statics/icons/ppa-icon.png" width="100%" />
+                        </q-avatar>
+                        <!-- <div>
+                          <q-icon  name="widgets" color="primary" class=""/>
+                        </div> -->
+                      </slot>
+                    </div>
+                    <div class=" head-brand col-grow text-no-wrap ">
+                      <div  class="title text-weight-bolder uppercase ellipsis text-truncate" style="opacity:0.8">
+                        <slot name="header-title">
+                          <span>Priuk Perkasa Abadi, PT</span>
+                        </slot>
+                      </div>
+                      <div class="subtitle text-weight-light ellipsis text-truncate">
+                        <slot name="header-subtitle">
+                          <span>Jalan Jati Raya Blok J3 No.7, Cikarang Selatan, Bekasi, Jawa Barat 17530</span>
+                        </slot>
+                      </div>
+                    </div>
+                    <q-space />
+                    <div class="col-auto no-print">
+                      <slot name="header-tags"></slot>
+                    </div>
                   </div>
-                  <div class="subtitle text-weight-light ellipsis text-truncate">
-                    <slot name="header-subtitle">
-                      <span>Jalan Jati Raya Blok J3 No.7, Cikarang Selatan, Bekasi, Jawa Barat 17530</span>
-                    </slot>
-                  </div>
-                </div>
-                <q-space />
-                <div class="col-auto no-print">
-                  <slot name="header-tags"></slot>
-                </div>
+                </slot>
               </div>
-            </slot>
-          </div>
-        </td>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="page-print-body">
-          <slot></slot>
-        </td>
-      </tr>
-    </tbody>
-    <tfoot>
-      <tr>
-        <td class="page-print-footer">
-          <slot name="footer"></slot>
-        </td>
-      </tr>
-    </tfoot>
-  </table>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="page-print-body">
+              <slot></slot>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="page-print-footer">
+              <slot name="footer"></slot>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -105,6 +107,9 @@ export default {
 @media print
   body
     margin 0
+  .q-layout, .q-page
+    height unset !important
+    min-height unset !important
   .q-table__container
     background-color transparent
   .q-page-container
@@ -117,17 +122,25 @@ export default {
     box-shadow none
     -webkit-box-shadow none
 
+    .page-print-layout
+      padding 10px
+
     .page-print-body
       font-size 12px
 
     .page-print-header div.header
-      display table-caption
+      display table-header-group
 
     .page-print-footer
       display table-row-group
 
-.page-print:after
-  content ' '
+.page-print.multi-page::before
+  content ''
+  top: 0
+  display block
+  page-break-after always
+
+.page-print.multi-page
   display block
   page-break-before always
 
