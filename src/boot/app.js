@@ -40,7 +40,8 @@ export default async ({ app, store, router, Vue }) => {
             type: 'negative'
           })
         } else {
-          if (process.env.DEV) console.error('[PLAY] response errors!', ErrRes)
+          const bugdev = router.history.current.query.DEV
+          if (process.env.DEV || bugdev) console.error('[PLAY] response errors!', ErrRes)
 
           let mode = {
             icon: 'error',
