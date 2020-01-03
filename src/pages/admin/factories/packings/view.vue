@@ -1,11 +1,11 @@
 <template>
-  <q-page padding class="row justify-center" :dark="LAYOUT.isDark" style="min-width:210mm;">
-    <page-print v-if="VIEW.show" class="q-pa-md shadow-2" style="max-width:210mm">
+  <q-page padding class="contentable" :dark="LAYOUT.isDark" >
+    <page-print v-if="VIEW.show" class="q-pa-md shadow-2" >
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark'/>
       </div>
-      <span slot="header-title" style="font-size:26px">Priuk Perkasa Abadi, PT</span>
-      <span slot="header-subtitle" style="font-size:16px">Planing & Production Control Division</span>
+      <span slot="header-title">Priuk Perkasa Abadi, PT</span>
+      <span slot="header-subtitle">Planing & Production Control Division</span>
 
       <div class="row q-col-gutter-sm" >
         <div class="col-12">
@@ -14,7 +14,7 @@
                 <span class="text-h6">PACKING GOODS</span>
             </div>
             <div class="col q-pb-md">
-              <q-markup-table class="bordered no-shadow text-center" separator="cell" dense :dark="LAYOUT.isDark">
+              <q-markup-table  class="no-shadow text-center super-dense" separator="cell" dense :dark="LAYOUT.isDark" bordered>
                 <tr><th>{{$tc('label.number')}}</th><th>{{$tc('label.date')}}</th></tr>
                 <tr>
                   <td>{{rsView.number}}</td>
@@ -25,7 +25,7 @@
           </div>
         </div>
         <div class="col-12">
-          <q-markup-table class="super-dense no-shadow th-text-right" dense :dark="LAYOUT.isDark">
+          <q-markup-table class="super-dense no-shadow th-text-right" dense :dark="LAYOUT.isDark" bordered>
             <tr>
               <th class="text-weight-light">Worktime</th>
               <td width="35%">{{ getWorktime(rsView.worktime) }}</td>
@@ -43,7 +43,9 @@
           </q-markup-table>
         </div>
         <div class="col-12">
-          <q-table ref="table" class="bordered no-highlight no-shadow" color="secondary" separator="vertical" dense hide-bottom :dark="LAYOUT.isDark"
+          <q-table ref="table" class="no-highlight no-shadow"
+           dense hide-bottom bordered
+            color="secondary" separator="vertical" :dark="LAYOUT.isDark"
             :data="[rsView.packing_items]"
             no-data-label = "No Production"
             :columns="[
@@ -76,13 +78,12 @@
           </template>
           </q-table>
         </div>
-
         <div class="col-12">
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
             <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
         </div>
       </div>
-      <div class="row q-gutter-sm">
+      <div class="row q-gutter-sm print-hide">
         <q-btn :label="$tc('form.edit')" icon="edit" color="green" outline :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`" v-if="IS_EDITABLE" />
         <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" />
         <q-space />
