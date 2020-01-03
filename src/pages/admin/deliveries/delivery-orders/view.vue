@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="contentable-sm flex content-center"  v-if="VIEW.show">
+  <q-page padding class="contentable-sm content-center"  v-if="VIEW.show">
     <div class="column q-gutter-sm">
       <q-card  v-if="VIEW.show" class="print-hide modal-hide">
         <q-card-actions class="q-px-lg q-gutter-xs" >
@@ -40,7 +40,7 @@
             />
         </q-card-actions>
       </q-card>
-      <page-print class="shadow-2 q-pa-sm"
+      <page-print class="shadow-2 q-pa-sm" :class="{'multi-page':getArrayPage(rsView.customer).length > 1}"
         v-for="(mode, pi) in getArrayPage(rsView.customer)" :key="pi">
         <div slot="header-tags" class="print-hide">
           <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
@@ -105,7 +105,7 @@
                 </q-tr>
               </tbody>
               </template>
-              <tbody v-else>
+              <tbody v-else v-for="(rr, ii) in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29]" :key="ii">
               <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index">
                 <q-td>
                   <span v-if="Boolean(mode)" class="text-weight-medium">{{mode}}:&nbsp;</span>
@@ -122,11 +122,11 @@
               <small class="text-weight-light">{{`MODE: ${rsView.customer.delivery_mode}`}}</small>
             </q-chip>
           </div>
-          <div class="col-12">
+          <div class="col-12" v-show="Boolean(rsView.description)">
               <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
               <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
           </div>
-          <div class="col-12">
+          <div class="col-12 page-break-inside">
             <q-markup-table class="no-shadow text-weight-light" style="">
               <tr class="text-center">
                 <td width="21%">
@@ -160,11 +160,10 @@
 <script>
 import MixView from '@/mixins/mix-view.vue'
 import PagePrint from '@/components/page-print'
-import PagePrintBreak from '@/components/page-print-break'
 
 export default {
   mixins: [MixView],
-  components: { PagePrint, PagePrintBreak },
+  components: { PagePrint },
   data () {
     return {
       VIEW: {
