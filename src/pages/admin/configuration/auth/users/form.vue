@@ -142,7 +142,6 @@ export default {
   methods: {
     init() {
       this.FORM.load((data) => {
-        console.warn('DATA', data, this)
         this.setForm(data || this.setDefault())
       })
     },

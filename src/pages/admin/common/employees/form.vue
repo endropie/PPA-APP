@@ -44,7 +44,7 @@
         :error="errors.has('phone')"
         :error-message="errors.first('phone')" />
 
-      <q-input class="col-12 col-sm-6"
+      <q-input autocomplete="off" class="col-12 col-sm-6"
         name="email" type="email"
         :label="$tc('label.email')"
         v-model="rsForm.email"
@@ -75,6 +75,46 @@
         :error="errors.has('department_id')"
         :error-message="errors.first('department_id')"
       />
+      <code>
+        {{rsForm}}
+      </code>
+    </q-card-section>
+    <q-card-section>
+      <q-list dense bordered>
+        <q-item>
+          <q-item-section avatar>
+            <q-avatar icon="person" />
+          </q-item-section>
+          <q-item-section v-if="rsForm.user">
+            <span>{{rsForm.user.name}}</span>
+            <span class="text-caption">{{rsForm.user.email}}</span>
+          </q-item-section>
+          <q-item-section>
+            <div class="row content-stretch no-wrap q-gutter-xs" v-if="rsForm.setup_user">
+              <q-input class="col" type="password"
+                ref="password"
+                name="setup_user.password"
+                label="Password"
+                v-model="rsForm.setup_user.password"
+                v-validate="'required'"
+                :error="errors.has('setup_user.password')"/>
+              <q-input class="col" type="password"
+                name="setup_user.password_confirmation"
+                label="Re-password"
+                v-model="rsForm.setup_user.password_confirmation"
+                v-validate="'required|confirmed:password'"
+                :error="errors.has('setup_user.password_confirmation')"/>
+              <span class="self-center">
+                <q-btn dense flat icon="clear" @click="cancelSetup()"/>
+              </span>
+            </div>
+          </q-item-section>
+          <q-item-section side v-if="!rsForm.setup_user">
+            <q-btn v-if="rsForm.user" label="reset password" @click="rsForm.setup_user = {password:null, password_confirmation:null, is_reset:true}"/>
+            <q-btn v-else label="create user" @click="rsForm.setup_user = {password:null, password_confirmation:null}"/>
+          </q-item-section>
+        </q-item>
+      </q-list>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
     <q-card-actions class="group">
@@ -109,7 +149,8 @@ export default {
         return {
           name:null,
           phone:null,
-          employee_jobs: []
+          employee_jobs: [],
+          setup_user: null,
         }
       }
     }
@@ -133,15 +174,21 @@ export default {
   methods: {
     init() {
       this.FORM.load((data) => {
-        this.setForm(data || this.setDefault())
+        this.setForm(Object.assign(this.setDefault(), data))
       })
     },
     setForm(data) {
       this.rsForm = JSON.parse(JSON.stringify(data))
     },
 
+    cancelSetup () {
+      this.$validator.reset()
+      this.rsForm.setup_user = {}
+      setTimeout(() => {
+        this.rsForm.setup_user = null
+      }, 0)
+    },
     onSave() {
-
       this.$validator.validate().then(result => {
         if (!result) {
           this.$q.notify({
@@ -149,7 +196,7 @@ export default {
             message:this.$tc('messages.to_complete_form')
           });
 
-          return;
+          return console.warn('RE',result, this.errors);
         }
         this.FORM.loading = true
         let {method, mode, apiUrl} = this.FORM.meta();
@@ -167,7 +214,6 @@ export default {
         .finally(()=>{
           this.FORM.loading = false
         });
-
       });
     },
   },
