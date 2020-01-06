@@ -105,7 +105,7 @@
                 </q-tr>
               </tbody>
               </template>
-              <tbody v-else v-for="(rr, ii) in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29]" :key="ii">
+              <tbody v-else>
               <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index">
                 <q-td>
                   <span v-if="Boolean(mode)" class="text-weight-medium">{{mode}}:&nbsp;</span>

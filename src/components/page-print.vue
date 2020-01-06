@@ -1,7 +1,7 @@
 <template>
   <div class="page-print shadow-2" >
     <div class="page-print-layout">
-      <table>
+      <table style="width:100%">
         <thead>
           <tr>
             <td :class="{'header-line': true}">
@@ -68,6 +68,8 @@ export default {
 <style lang="stylus">
 .page-print
   display block
+  .page-print-layout
+    padding 10px
   .header-line
     border-bottom-width 1px
     border-bottom-style solid
@@ -121,9 +123,6 @@ export default {
     margin 0 !important
     box-shadow none
     -webkit-box-shadow none
-
-    .page-print-layout
-      padding 10px
 
     .page-print-body
       font-size 12px
