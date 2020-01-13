@@ -29,7 +29,7 @@
               <div class="col-auto self-end">
                 <span class="text-h6 text-center q-pt-lg q-pl-sm">WORK ORDER</span>
 
-                <q-markup-table dense class="no-shadow transparent" :dark="LAYOUT.isDark">
+                <q-markup-table bordered dense class="no-shadow transparent" :dark="LAYOUT.isDark">
                   <tr>
                     <th class="text-left">{{$tc('general.line')}}</th><td>{{ group.name }}</td>
                   </tr>
@@ -39,7 +39,7 @@
                 </q-markup-table>
               </div>
               <div class="col-auto">
-                <q-markup-table dense class="bordered no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
+                <q-markup-table bordered dense class="no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
                   <tr>
                     <th>{{$tc('label.number')}}</th>
                     <td>
@@ -60,24 +60,44 @@
             </div>
           </div>
           <div class="col-12">
-            <q-table class="bordered no-highlight no-shadow transparent"
-              color="secondary"
-              separator="vertical"
-              hide-bottom :dark="LAYOUT.isDark"
-              :data="group.work_order_items"
-              :rows-per-page-options ="[0]"
-              :pagination="{ rowsPerPage: 0}"
-              no-data-label = "No Production"
-              :columns="[
-                { name: 'cust', label: $tc('general.cust'), align: 'left', field: (v, i)=> v.item.customer_code},
-                { name: 'part_name', label: $tc('label.name', 1, {v: $tc('label.part')}), align: 'left', field: (v)=> v.item.part_name},
-                { name: 'part_number', label: $tc('label.no', 1, {v: $tc('label.part')}), align: 'left', field: (v)=> v.item.part_number},
-                { name: 'target', label: $tc('label.quantity'), align: 'right', field: (v)=> v.target},
-                { name: 'unit_id', label: $tc('label.unit'), align: 'center', field: (v)=> v.unit.code},
-                { name: 'ngratio', label: 'NG Ratio', align: 'right', format:(v)=> v ? `${Number(v)}%` : '-', field: (v)=> v.ngratio},
-                { name: 'total', label: 'Total', align: 'right', format:(v)=> `${Math.round(v)}`, field: (v)=> Number(v.quantity)},
-              ]"
-            />
+            <q-markup-table bordered dense class="no-shadow" separator="cell" >
+              <thead>
+                <tr>
+                  <th>{{$tc('general.cust')}}</th>
+                  <th class="text-left">{{$tc('label.no', 1, {v:$tc('label.part')})}}</th>
+                  <th class="text-left">{{$tc('label.name', 1, {v:$tc('label.part')})}}</th>
+                  <th class="text-right">{{$tc('label.quantity')}}</th>
+                  <th>{{$tc('label.unit')}}</th>
+                  <th>%NG</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody v-for="(row, index) in group.work_order_items" :key="index">
+                <q-tr>
+                  <q-td key="code">
+                    {{row.item.customer_code}}
+                  </q-td>
+                  <q-td key="part_name" width="30%">
+                    {{row.item.part_name}}
+                  </q-td>
+                  <q-td key="part_number" width="30%">
+                    {{row.item.part_number}}
+                  </q-td>
+                  <q-td key="target" class="text-right">
+                    {{row.target}}
+                  </q-td>
+                  <q-td key="unit_id" class="text-left">
+                    {{row.unit.code}}
+                  </q-td>
+                  <q-td key="ngratio" class="text-right">
+                    {{row.ngratio}}
+                  </q-td>
+                  <q-td key="quantity" class="text-right">
+                    {{row.quantity}}
+                  </q-td>
+                </q-tr>
+              </tbody>
+             </q-markup-table>
           </div>
           <div class="col-12">
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>

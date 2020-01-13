@@ -28,42 +28,44 @@
               </q-markup-table>
             </div>
             <div>
-              <q-markup-table class="super-dense bordered no-shadow" separator="cell" :dark="LAYOUT.isDark">
-                <tr>
-                  <th>{{$tc('label.number')}}</th>
-                  <td>
-                    {{rsView.number}}
-                    <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
-                  </td>
-                </tr>
-                <tr>
-                  <th>{{$tc('label.date')}}</th>
-                  <td>{{ $app.date_format(rsView.date) }}</td>
-                </tr>
-                <tr>
-                  <th>{{$tc('warehouses.registration')}}</th>
-                  <td>{{rsView.registration}}</td>
-                </tr>
-                <tr>
-                  <th>{{'No. Indexed'}}</th>
-                  <td>{{rsView.indexed_number}}</td>
-                </tr>
-                <tr v-if="rsView.request_order">
-                  <th>{{$tc('general.request_order')}}</th>
-                  <td>
-                    <span v-if="!$app.can('request-orders-read')">{{rsView.request_order.number}}</span>
-                    <q-btn v-else dense flat
-                      :label="rsView.request_order.number"
-                      class="q-py-none" style="line-height:normal"
-                      :to="`/admin/incomes/request-orders/${rsView.request_order.id}`"/>
-                  </td>
-                </tr>
+              <q-markup-table bordered dense class="super-dense no-shadow" separator="cell" :dark="LAYOUT.isDark">
+                <tbody>
+                  <tr>
+                    <td>{{$tc('label.number')}}</td>
+                    <td>
+                      {{rsView.number}}
+                      <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>{{$tc('label.date')}}</td>
+                    <td>{{ $app.date_format(rsView.date) }}</td>
+                  </tr>
+                  <tr>
+                    <td>{{$tc('warehouses.registration')}}</td>
+                    <td>{{rsView.registration}}</td>
+                  </tr>
+                  <tr>
+                    <td>{{'No. Indexed'}}</td>
+                    <td>{{rsView.indexed_number}}</td>
+                  </tr>
+                  <tr v-if="rsView.request_order">
+                    <td>{{$tc('general.request_order')}}</td>
+                    <td>
+                      <span v-if="!$app.can('request-orders-read')">{{rsView.request_order.number}}</span>
+                      <q-btn v-else dense flat
+                        :label="rsView.request_order.number"
+                        class="q-py-none" style="line-height:normal"
+                        :to="`/admin/incomes/request-orders/${rsView.request_order.id}`"/>
+                    </td>
+                  </tr>
+                </tbody>
               </q-markup-table>
             </div>
           </div>
         </div>
         <div class="col-12">
-          <q-table ref="table" class="no-highlight bordered no-shadow" color="secondary" separator="vertical" dense hide-bottom :dark="LAYOUT.isDark"
+          <q-table ref="table" bordered class="no-highlight no-shadow" color="secondary" separator="vertical" dense hide-bottom :dark="LAYOUT.isDark"
             :data="rsView.incoming_good_items"
             no-data-label = "No Detail"
             :rows-per-page-options ="[0]"

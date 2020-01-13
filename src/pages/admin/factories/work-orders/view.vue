@@ -4,8 +4,8 @@
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
-      <span slot="header-title" style="font-size:26px">Priuk Perkasa Abadi, PT</span>
-      <span slot="header-subtitle" style="font-size:16px">Planing & Production Control Division</span>
+      <span slot="header-title">Priuk Perkasa Abadi, PT</span>
+      <span slot="header-subtitle" style="font-size:12px">Planing & Production Control Division</span>
 
       <div class="row q-col-gutter-xs" >
         <div class="col-12">
@@ -13,18 +13,19 @@
             <div class="col-auto self-end">
               <span class="text-h6 text-center q-pt-lg q-pl-sm">WORK ORDER</span>
 
-              <q-markup-table class="no-shadow transparent"
-                :dark="LAYOUT.isDark">
-                <tr>
-                  <th class="text-left">{{$tc('general.line')}}</th><td>{{ rsView.line ? rsView.line.name : '-' }}</td>
-                </tr>
-                <tr>
-                  <th class="text-left">Material of</th><td>{{ getStockistFrom(rsView.stockist_from) }}</td>
-                </tr>
+              <q-markup-table dense bordered class="no-shadow transparent" :dark="LAYOUT.isDark">
+                <tbody>
+                  <tr>
+                    <td class="text-left">{{$tc('general.line')}}</td><td>{{ rsView.line ? rsView.line.name : '-' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-left">Material of</td><td>{{ getStockistFrom(rsView.stockist_from) }}</td>
+                  </tr>
+                </tbody>
               </q-markup-table>
             </div>
             <div class="col-auto">
-              <q-markup-table dense class="bordered no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
+              <q-markup-table  dense bordered class="super-dense no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
                 <tr>
                   <th>{{$tc('label.number')}}</th>
                   <td>
@@ -47,7 +48,7 @@
         <div class="col-12">
         </div>
         <div class="col-12">
-          <q-markup-table dense class="bordered no-shadow" separator="cell" >
+          <q-markup-table bordered dense class="no-shadow" separator="cell" >
             <thead>
               <tr>
                 <th>{{this.$tc('general.cust')}}</th>
