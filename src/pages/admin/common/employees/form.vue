@@ -75,9 +75,6 @@
         :error="errors.has('department_id')"
         :error-message="errors.first('department_id')"
       />
-      <code>
-        {{rsForm}}
-      </code>
     </q-card-section>
     <q-card-section>
       <q-list dense bordered>
