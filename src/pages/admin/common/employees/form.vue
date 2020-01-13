@@ -87,21 +87,31 @@
             <span class="text-caption">{{rsForm.user.email}}</span>
           </q-item-section>
           <q-item-section>
-            <div class="row content-stretch no-wrap q-gutter-xs" v-if="rsForm.setup_user">
-              <q-input class="col" type="password"
-                ref="password"
-                name="setup_user.password"
-                label="Password"
-                v-model="rsForm.setup_user.password"
-                v-validate="'required'"
-                :error="errors.has('setup_user.password')"/>
-              <q-input class="col" type="password"
-                name="setup_user.password_confirmation"
-                label="Re-password"
-                v-model="rsForm.setup_user.password_confirmation"
-                v-validate="'required|confirmed:password'"
-                :error="errors.has('setup_user.password_confirmation')"/>
-              <span class="self-center">
+            <div v-if="rsForm.setup_user"  class="row no-wrap">
+              <div class="row col q-col-gutter-xs" >
+                <q-input class="col-12 col-md-4" disable autocomplete="off" v-if="!rsForm.user"
+                  name="email" type="email"
+                  :label="$tc('label.email')"
+                  v-model="rsForm.email"
+                  :dark="LAYOUT.isDark"
+                  v-validate="'required|email'"
+                  :error="errors.has('email')"
+                  :error-message="errors.first('email')" />
+                <q-input class="col-12 col-md-4" :class="{'col-md-6': rsForm.user}" type="password"
+                  ref="password"
+                  name="setup_user.password"
+                  label="Password"
+                  v-model="rsForm.setup_user.password"
+                  v-validate="'required'"
+                  :error="errors.has('setup_user.password')"/>
+                <q-input class="col-12 col-md-4" :class="{'col-md-6': rsForm.user}" type="password"
+                  name="setup_user.password_confirmation"
+                  label="Re-password"
+                  v-model="rsForm.setup_user.password_confirmation"
+                  v-validate="'required|confirmed:password'"
+                  :error="errors.has('setup_user.password_confirmation')"/>
+              </div>
+              <span class="self-center col-auto" style="">
                 <q-btn dense flat icon="clear" @click="cancelSetup()"/>
               </span>
             </div>
