@@ -61,9 +61,9 @@
                 :value="row.item ? row.item.part_name : null"
                 outlined dense hide-bottom-space color="blue-grey-5"
                 :dark="LAYOUT.isDark" /> -->
-              <div v-if="row.item" class="column">
-                <span class="text-subtitle">{{row.item.part_name}}</span>
-                <span class="text-small">{{row.item.part_number}}</span>
+              <div v-if="row.item" class="column text-body2">
+                <span class="text-subtitle2">{{row.item.part_name}}</span>
+                <span class="text-small" v-if="row.item.part_number">No. {{row.item.part_number}}</span>
               </div>
             </q-td>
             <q-td key="unit_id" width="10%" >
