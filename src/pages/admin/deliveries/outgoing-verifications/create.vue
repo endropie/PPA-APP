@@ -44,68 +44,70 @@
       <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
         dense separator="horizontal"
         :dark="LAYOUT.isDark">
-        <q-tr>
-          <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
-          <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
-          <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
-          <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
-          <q-th key="AVA">{{$tc('label.available')}}</q-th>
-          <q-th key="encasement">{{$tc('label.encasement')}}</q-th>
-        </q-tr>
-        <q-tr v-for="(row, index) in rsForm.outgoing_good_verifications" :key="index">
-          <q-td key="item_id" width="35%" >
-            <q-input readonly
-              :value="row.item ? row.item.part_name : null"
-              outlined dense hide-bottom-space color="blue-grey-5"
-              :dark="LAYOUT.isDark" />
-          </q-td>
-          <q-td key="part_number" width="35%" >
-            <q-input readonly
-              :value="row.item ? row.item.part_number : null"
-              outlined dense hide-bottom-space color="blue-grey-5"
-              :dark="LAYOUT.isDark" />
-          </q-td>
-          <q-td key="unit_id" width="20%" >
-            <q-select
-              v-model="row.unit_id"
-              :options="ItemUnitOptions[index]"
-              map-options emit-value
-              outlined dense hide-bottom-space color="blue-grey-5"
-              :dark="LAYOUT.isDark"
-              @input="(val) => setUnitReference(index, val)" />
-          </q-td>
-          <q-td key="quantity" width="25%">
-            <q-input :name="`outgoing_good_verifications.${index}.quantity`"
-              style="min-width:120px"
-              v-model="row.quantity" type="number" :min="0"
-              outlined dense hide-bottom-space no-error-icon align="center"
-              :dark="LAYOUT.isDark" color="blue-grey-5"
-              :suffix="row.item_id ? `/ ${$app.number_format(row.maximum / row.unit_rate)}` : ''"
-              v-validate="`gt_value:0|max_value: ${maximality(row.maximum, STOCKS[index]) / row.unit_rate}`"
-              :error="errors.has(`outgoing_good_verifications.${index}.quantity`)"
-            />
-          </q-td>
-          <q-td key="AVA" width="25%" align="right">
-            <q-chip square class="text-weight-medium">
-              {{$app.number_format(STOCKS[index] / row.unit_rate)}}
-            </q-chip>
-          </q-td>
-          <q-td key="encasement" width="25%">
-            <q-input :name="`outgoing_good_verifications.${index}.encasement`"
-              style="min-width:120px"
-              v-model="row.encasement"
-              outlined dense hide-bottom-space no-error-icon align="center"
-              :dark="LAYOUT.isDark" color="blue-grey-5"
-              v-validate="``"
-              :error="errors.has(`outgoing_good_verifications.${index}.encasement`)"
-            />
-          </q-td>
-        </q-tr>
-        <q-tr>
-          <q-td colspan="100%" class="text-center" v-if="AllDetail && AllDetail.length == 0">
-            <div v-show="!Boolean(rsForm.outgoing_good_verifications.length)" class="q-pa-sm">{{$tc('messages.no_details')}}</div>
-          </q-td>
-        </q-tr>
+        <thead>
+          <q-tr>
+            <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
+            <!-- <q-th key="part_number">{{$tc('items.part_number')}}</q-th> -->
+            <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
+            <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+            <q-th key="AVA">{{$tc('label.available')}}</q-th>
+            <q-th key="encasement">{{$tc('label.encasement')}}</q-th>
+          </q-tr>
+        </thead>
+        <tbody>
+          <q-tr v-for="(row, index) in rsForm.outgoing_good_verifications" :key="index">
+            <q-td key="item_id" width="35%" >
+              <!-- <q-input readonly
+                :value="row.item ? row.item.part_name : null"
+                outlined dense hide-bottom-space color="blue-grey-5"
+                :dark="LAYOUT.isDark" /> -->
+              <div v-if="row.item" class="column">
+                <span class="text-subtitle">{{row.item.part_name}}</span>
+                <span class="text-small">{{row.item.part_number}}</span>
+              </div>
+            </q-td>
+            <q-td key="unit_id" width="10%" >
+              <q-select
+                v-model="row.unit_id"
+                :options="ItemUnitOptions[index]"
+                map-options emit-value
+                outlined dense hide-bottom-space color="blue-grey-5"
+                :dark="LAYOUT.isDark"
+                @input="(val) => setUnitReference(index, val)" />
+            </q-td>
+            <q-td key="quantity" width="15%">
+              <q-input :name="`outgoing_good_verifications.${index}.quantity`"
+                style="min-width:120px"
+                v-model="row.quantity" type="number" :min="0"
+                outlined dense hide-bottom-space no-error-icon align="center"
+                :dark="LAYOUT.isDark" color="blue-grey-5"
+                :suffix="row.item_id ? `/ ${$app.number_format(row.maximum / row.unit_rate)}` : ''"
+                v-validate="`gt_value:0|max_value: ${maximality(row.maximum, STOCKS[index]) / row.unit_rate}`"
+                :error="errors.has(`outgoing_good_verifications.${index}.quantity`)"
+              />
+            </q-td>
+            <q-td key="AVA" width="15%" align="right">
+              <q-chip square class="text-weight-medium">
+                {{$app.number_format(STOCKS[index] / row.unit_rate)}}
+              </q-chip>
+            </q-td>
+            <q-td key="encasement" width="35%">
+              <q-input :name="`outgoing_good_verifications.${index}.encasement`"
+                style="min-width:120px"
+                v-model="row.encasement"
+                outlined dense hide-bottom-space no-error-icon align="center"
+                :dark="LAYOUT.isDark" color="blue-grey-5"
+                v-validate="``"
+                :error="errors.has(`outgoing_good_verifications.${index}.encasement`)"
+              />
+            </q-td>
+          </q-tr>
+          <q-tr  v-if="AllDetail && AllDetail.length == 0">
+            <q-td colspan="100%" class="text-center">
+              <div v-show="!Boolean(rsForm.outgoing_good_verifications.length)" class="q-pa-sm">{{$tc('messages.no_details')}}</div>
+            </q-td>
+          </q-tr>
+        </tbody>
       </q-markup-table>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
