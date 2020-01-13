@@ -102,12 +102,14 @@
                   name="setup_user.password"
                   label="Password"
                   v-model="rsForm.setup_user.password"
+                  :dark="LAYOUT.isDark"
                   v-validate="'required'"
                   :error="errors.has('setup_user.password')"/>
                 <q-input class="col-12 col-md-4" :class="{'col-md-6': rsForm.user}" type="password"
                   name="setup_user.password_confirmation"
                   label="Re-password"
                   v-model="rsForm.setup_user.password_confirmation"
+                  :dark="LAYOUT.isDark"
                   v-validate="'required|confirmed:password'"
                   :error="errors.has('setup_user.password_confirmation')"/>
               </div>
@@ -117,8 +119,8 @@
             </div>
           </q-item-section>
           <q-item-section side v-if="!rsForm.setup_user">
-            <q-btn v-if="rsForm.user" label="reset password" @click="rsForm.setup_user = {password:null, password_confirmation:null, is_reset:true}"/>
-            <q-btn v-else label="create user" @click="rsForm.setup_user = {password:null, password_confirmation:null}"/>
+            <q-btn v-if="rsForm.user" color="blue-grey" label="reset password" @click="rsForm.setup_user = {password:null, password_confirmation:null, is_reset:true}"/>
+            <q-btn v-else color="blue-grey" label="create user" @click="rsForm.setup_user = {password:null, password_confirmation:null}"/>
           </q-item-section>
         </q-item>
       </q-list>
