@@ -2,72 +2,42 @@
   <q-page padding class="contentable-sm column justify-start" :dark="LAYOUT.isDark">
     <page-print v-if="VIEW.show">
       <span slot="header-title">Priuk Perkasa Abadi, PT</span>
-      <span slot="header-subtitle">Warehouses - Stock Opname</span>
+      <span slot="header-subtitle">Warehouses - Periode Opname</span>
       <div slot="header-tags" class="print-hide">
-        <ux-chip-status :row="{...rsView, status: rsView.opname.status}" tag outline small square icon='bookmark' />
+        <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
       <div class="row q-col-gutter-md" >
         <div class="col-12">
           <div class="row justify-between q-gutter-sm" >
             <div class="col items-end q-pt-md">
               <div class="text-h6 text-uppercase">
-                {{$tc('general.opname_part')}}
+                {{$tc('general.opname_stock')}}
               </div>
-              <q-list style="max-width:300px">
-                <q-item>
-                  <q-item-section>
-                    <span>{{rsView.item.part_name}}</span>
-                    <small>[{{rsView.item.customer_code}}] {{rsView.item.part_number}}</small>
-                  </q-item-section>
-                  <q-item-section side>{{rsView.stockist}}</q-item-section>
-                </q-item>
-              </q-list>
             </div>
             <div class="col-auto">
               <q-markup-table dense bordered class="no-shadow">
                 <tbody>
                   <tr>
                     <td>{{$tc('label.number')}}</td>
-                    <td>{{rsView.opname_number}}</td>
+                    <td>{{rsView.number}}</td>
                   </tr>
                 </tbody>
               </q-markup-table>
             </div>
           </div>
         </div>
-        <div class="col-12 column">
-          <q-markup-table dense bordered class="no-shadow" separator="cell" :dark="LAYOUT.isDark">
-            <thead>
-              <tr>
-                <th>{{$tc('label.no',1,{v: 'Voucher'})}}</th>
-                <th>{{$tc('label.unit')}}</th>
-                <th>{{$tc('label.quantity')}}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, i) in rsView.opname_vouchers" :key="i">
-                <td>{{row.number}}</td>
-                <td class="text-right">{{rsView.item.unit.code}}</td>
-                <td class="text-right">{{$app.number_format(row.quantity)}}</td>
-              </tr>
-              <tr>
-                <td class="text-right" colspan="2">{{$tc('items.stock_init')}}</td>
-                <td class="text-right">{{$app.number_format(rsView.init_amount)}}</td>
-              </tr>
-              <tr>
-                <td class="text-right" colspan="2">{{$tc('items.stock_final')}}</td>
-                <td class="text-right">{{$app.number_format(rsView.final_amount)}}</td>
-                <!-- <td>K=>{{rsView.final_amount}}</td> -->
-              </tr>
-            </tbody>
-          </q-markup-table>
+        <div class="col-12">
+          <list-opname-stock :opname="rsView"
+            class="no-shadow no-padding" bordered/>
         </div>
       </div>
       <div class="row q-gutter-xs print-hide q-mt-lg">
         <q-btn :label="$tc('form.list')" icon="list" color="dark" :to="`${VIEW.resource.uri}?return`" />
         <q-btn :label="$tc('form.print')" color="grey" icon="print" @click.native="print()" />
+        <q-btn :label="$tc('form.edit')" color="green" icon="edit" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"
+          v-if="IS_EDITABLE && isCanUpdate" />
         <q-space />
-        <ux-btn-dropdown v-show="false" color="blue-grey" no-caps
+        <ux-btn-dropdown color="blue-grey" no-caps
           :label="$tc('label.others')"
           :options="[
             { label: $tc('form.add_new'), color:'green', icon: 'add',
@@ -118,17 +88,17 @@
 
 import MixView from '@/mixins/mix-view.vue'
 import PagePrint from '@/components/page-print'
-import PagePrintBreak from '@/components/page-print-break'
+import ListOpnameStock from '@/pages/admin/warehouses/opname-stocks/list.vue'
 
 export default {
   mixins: [MixView],
-  components: { PagePrint, PagePrintBreak },
+  components: { PagePrint, ListOpnameStock },
   data () {
     return {
       VIEW: {
         resource:{
-          api: '/api/v1/warehouses/opname-stocks',
-          uri: '/admin/warehouses/opname-stocks',
+          api: '/api/v1/warehouses/opnames',
+          uri: '/admin/warehouses/opnames',
           params: '?mode=view'
         }
       },

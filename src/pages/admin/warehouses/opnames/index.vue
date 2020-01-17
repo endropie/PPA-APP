@@ -19,13 +19,13 @@
             :TABLE.sync="TABLE"
             :filter.sync="TABLE.filter"
             :menus="[
-              // { label: $tc('form.add'),
-              //   detail: $tc('messages.form_new'),
-              //   icon: 'add',
-              //   shortcut: true,
-              //   hidden:!$app.can('incoming-goods-create'),
-              //   to: `${TABLE.resource.uri}/create`
-              // },
+              { label: $tc('form.add'),
+                detail: $tc('messages.form_new'),
+                icon: 'add',
+                shortcut: true,
+                hidden:!$app.can('incoming-goods-create'),
+                to: `${TABLE.resource.uri}/create`
+              },
               { label: $tc('label.trash'),
                 detail:  $tc('messages.show_deleted'),
                 shortcut: true,
@@ -40,16 +40,6 @@
             ]">
 
             <div class="row items-start q-col-gutter-xs" >
-              <q-select class="col-12 col-sm-6" v-if="OpnamePeriodOptions"
-                v-model="FILTERABLE.fill.opname_id.value" clearable
-                :options="OpnamePeriodOptions"
-                :label=" $tc('general.opname_stock')"
-                emit-value map-options
-                dense hide-bottom-space hide-dropdown-icon
-                standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark"
-                @input="FILTERABLE.submit" />
 
               <q-select class="col-12 col-sm-6" autocomplete="off"
                 multiple use-chips use-input new-value-mode="add"
@@ -75,12 +65,14 @@
         <!-- slot name syntax: body-cell-<column_name> -->
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
           <q-btn flat dense color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" />
-          <q-btn v-if="isCanUpdate && isEditable(rs.row)" flat dense color="light" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" />
-          <q-btn v-if="isCanDelete && isEditable(rs.row)" flat dense color="light" icon="delete"  @click.native="TABLE.delete(rs.row)" />
+          <!-- <q-btn v-if="isCanUpdate && isEditable(rs.row)" flat dense color="light" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" /> -->
+          <!-- <q-btn v-if="isCanDelete && isEditable(rs.row)" flat dense color="light" icon="delete"  @click.native="TABLE.delete(rs.row)" /> -->
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" style="width:35px">
-          <ux-badge-status :row="rs.row.opname" />
+          <div class="row justify-center">
+            <ux-chip-status dense square :row="rs.row" />
+          </div>
         </q-td>
 
         <q-td slot="body-cell-part" slot-scope="rs" :props="rs" class="no-padding">
@@ -104,7 +96,7 @@ export default {
     return {
       SHEET: {
         // customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
-        opnames: { api:'/api/v1/warehouses/opnames?mode=all' },
+        // opnames: { api:'/api/v1/warehouses/opnames?mode=all' },
       },
       FILTERABLE: {
         fill: {
@@ -121,17 +113,13 @@ export default {
       TABLE: {
         mode: 'index',
         resource:{
-          api: '/api/v1/warehouses/opname-stocks',
-          uri: '/admin/warehouses/opname-stocks',
+          api: '/api/v1/warehouses/opnames',
+          uri: '/admin/warehouses/opnames',
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},
-          { name: 'part', label: this.$tc('items.part_name'), field:(v) => v.item, align: 'left'},
-          { name: 'number', label: this.$tc('label.number'), field: 'opname_number', align: 'left', sortable: true },
+          { name: 'number', label: this.$tc('label.number'), field: (item)=> item.fullnumber || item.number  , align: 'left', sortable: true },
           { name: 'status', label: '', field: 'status', align: 'left'},
-          { name: 'stockist', label: 'Stockist', field:'stockist', format:(v) => v, align: 'center'},
-          { name: 'init_amount', label: this.$tc('items.stock_init'), field:'init_amount', format:(v) => v, align: 'center'},
-          { name: 'final_amount', label: this.$tc('items.stock_final'), field:'final_amount', format:(v) => v, align: 'center'},
           { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', format:(v) => this.$app.moment(v).format('DD/MM/YYYY HH:mm'), align: 'center', sortable: true },
         ],
       },
@@ -139,9 +127,6 @@ export default {
   },
   created () {
     this.INDEX.load()
-    setTimeout(() => {
-      this.TABLE.data
-    }, 1000);
   },
   computed: {
     isCanUpdate(){
@@ -149,9 +134,6 @@ export default {
     },
     isCanDelete(){
       return this.$app.can('opname-stocks-delete')
-    },
-    OpnamePeriodOptions() {
-      return (this.SHEET.opnames.data.map(item => ({label: item.number, value: item.id, stamp: item.status})) || [])
     },
     CustomerOptions() {
       return (this.SHEET.customers.data.map(item => ({label: `${item.code} - ${item.name}`, value: item.id})) || [])

@@ -2,7 +2,7 @@ import moment from 'moment'
 
 const config = {
   general: {
-    // baseURL: 'http://576740ef.ngrok.io'
+    // baseURL: 'http://10.20.10.2:8000' // 'http://560234d3.ngrok.io'
   },
   options: {
     state_colors: {

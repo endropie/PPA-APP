@@ -19,13 +19,13 @@
             :TABLE.sync="TABLE"
             :filter.sync="TABLE.filter"
             :menus="[
-              // { label: $tc('form.add'),
-              //   detail: $tc('messages.form_new'),
-              //   icon: 'add',
-              //   shortcut: true,
-              //   hidden:!$app.can('incoming-goods-create'),
-              //   to: `${TABLE.resource.uri}/create`
-              // },
+              { label: $tc('form.add'),
+                detail: $tc('messages.form_new'),
+                icon: 'add',
+                shortcut: true,
+                hidden:!$app.can('incoming-goods-create'),
+                to: `${TABLE.resource.uri}/create`
+              },
               { label: $tc('label.trash'),
                 detail:  $tc('messages.show_deleted'),
                 shortcut: true,
@@ -40,11 +40,19 @@
             ]">
 
             <div class="row items-start q-col-gutter-xs" >
-              <q-select class="col-12 col-sm-6" v-if="OpnamePeriodOptions"
-                v-model="FILTERABLE.fill.opname_id.value" clearable
-                :options="OpnamePeriodOptions"
-                :label=" $tc('general.opname_stock')"
-                emit-value map-options
+              <ux-date class="col-8 col-sm-4"
+                stack-label :label="$tc('label.date')"
+                v-model="FILTERABLE.fill.date.value" type="date"  clearable
+                dense hide-bottom-space
+                standout="bg-blue-grey-5 text-white"
+                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
+                :dark="LAYOUT.isDark"
+                @input="FILTERABLE.submit"/>
+
+              <q-select class="col-4 col-sm-2 "
+                v-model="FILTERABLE.fill.status.value" clearable
+                :options="['OPEN','VALIDATED','VOID','DELETE']"
+                :label=" $tc('label.state')"
                 dense hide-bottom-space hide-dropdown-icon
                 standout="bg-blue-grey-5 text-white"
                 :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
@@ -80,15 +88,25 @@
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" style="width:35px">
-          <ux-badge-status :row="rs.row.opname" />
+          <div class="row q-gutter-xs no-wrap">
+            <ux-badge-status :row="rs.row" class="shadow-1" />
+            <q-badge label="RET" class="shadow-1 q-pa-xs"
+              dense color="blue-grey" text-color="white"
+              v-if="rs.row.transaction == 'RETURN'"
+            />
+          </div>
         </q-td>
 
-        <q-td slot="body-cell-part" slot-scope="rs" :props="rs" class="no-padding">
-          <div v-if="rs.row.item" class="column text-body2">
-            <span>{{ rs.row.item.part_name }}</span>
-            <small class="text-weight-light">{{ rs.row.item.part_number }}</small>
-          </div>
-          <div v-else class="text-caption text-italic">undefined!</div>
+        <q-td slot="body-cell-number" slot-scope="rs" :props="rs">
+          <span v-if="rs.row.number"> {{ rs.row.number }}</span>
+          <span v-else>-</span>
+        </q-td>
+
+        <q-td slot="body-cell-opname_number" slot-scope="rs" :props="rs">
+          <q-chip v-if="rs.row.opname_number" dense square outline color="blue-grey" :label="rs.row.opname_number"/>
+          <span v-else class="row justify-center">
+            <ux-chip-status :row="rs.row" dense square />
+          </span>
         </q-td>
       </q-table>
     </q-pull-to-refresh>
@@ -104,11 +122,10 @@ export default {
     return {
       SHEET: {
         // customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
-        opnames: { api:'/api/v1/warehouses/opnames?mode=all' },
       },
       FILTERABLE: {
         fill: {
-          opname_id: {
+          status: {
             value: null,
             transform: (value) => { return null }
           },
@@ -121,17 +138,16 @@ export default {
       TABLE: {
         mode: 'index',
         resource:{
-          api: '/api/v1/warehouses/opname-stocks',
-          uri: '/admin/warehouses/opname-stocks',
+          api: '/api/v1/warehouses/opname-vouchers',
+          uri: '/admin/warehouses/opname-vouchers',
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},
-          { name: 'part', label: this.$tc('items.part_name'), field:(v) => v.item, align: 'left'},
-          { name: 'number', label: this.$tc('label.number'), field: 'opname_number', align: 'left', sortable: true },
-          { name: 'status', label: '', field: 'status', align: 'left'},
+          { name: 'number', label: this.$tc('label.no',1, {v:'voucher'}), field: 'number', align: 'left', sortable: true },
+          { name: 'part_name', label: this.$tc('items.part_name'), field:(v) => v.item.part_name, align: 'left'},
+          { name: 'part_number', label: this.$tc('items.part_number'), field:(v) => v.item.part_number, align: 'left'},
           { name: 'stockist', label: 'Stockist', field:'stockist', format:(v) => v, align: 'center'},
-          { name: 'init_amount', label: this.$tc('items.stock_init'), field:'init_amount', format:(v) => v, align: 'center'},
-          { name: 'final_amount', label: this.$tc('items.stock_final'), field:'final_amount', format:(v) => v, align: 'center'},
+          { name: 'opname_number', label: 'STO #', field:'opname_number', align: 'left'},
           { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', format:(v) => this.$app.moment(v).format('DD/MM/YYYY HH:mm'), align: 'center', sortable: true },
         ],
       },
@@ -139,19 +155,13 @@ export default {
   },
   created () {
     this.INDEX.load()
-    setTimeout(() => {
-      this.TABLE.data
-    }, 1000);
   },
   computed: {
     isCanUpdate(){
-      return this.$app.can('opname-stocks-update')
+      return this.$app.can('opname-vouchers-update')
     },
     isCanDelete(){
-      return this.$app.can('opname-stocks-delete')
-    },
-    OpnamePeriodOptions() {
-      return (this.SHEET.opnames.data.map(item => ({label: item.number, value: item.id, stamp: item.status})) || [])
+      return this.$app.can('opname-vouchers-delete')
     },
     CustomerOptions() {
       return (this.SHEET.customers.data.map(item => ({label: `${item.code} - ${item.name}`, value: item.id})) || [])

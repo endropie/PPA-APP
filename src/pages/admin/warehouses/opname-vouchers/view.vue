@@ -1,73 +1,66 @@
 <template>
-  <q-page padding class="contentable-sm column justify-start" :dark="LAYOUT.isDark">
-    <page-print v-if="VIEW.show">
+  <q-page padding class="column contentable" style="max-width:600px" :dark="LAYOUT.isDark">
+    <page-print v-if="VIEW.show" class="shadow-2">
       <span slot="header-title">Priuk Perkasa Abadi, PT</span>
-      <span slot="header-subtitle">Warehouses - Stock Opname</span>
+      <span slot="header-subtitle">Warehouses - voucher stocks</span>
       <div slot="header-tags" class="print-hide">
-        <ux-chip-status :row="{...rsView, status: rsView.opname.status}" tag outline small square icon='bookmark' />
+      <q-chip class="shadow-1" square outline
+        color="blue-grey" text-color="white"
+        label="RET" v-if="rsView.transaction === 'RETURN'" />
+        <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
       <div class="row q-col-gutter-md" >
         <div class="col-12">
           <div class="row justify-between q-gutter-sm" >
-            <div class="col items-end q-pt-md">
+            <div class="items-end q-pt-md">
               <div class="text-h6 text-uppercase">
-                {{$tc('general.opname_part')}}
+                {{$tc('general.opname_voucher', 2)}}
               </div>
-              <q-list style="max-width:300px">
-                <q-item>
-                  <q-item-section>
-                    <span>{{rsView.item.part_name}}</span>
-                    <small>[{{rsView.item.customer_code}}] {{rsView.item.part_number}}</small>
-                  </q-item-section>
-                  <q-item-section side>{{rsView.stockist}}</q-item-section>
-                </q-item>
-              </q-list>
+              <span class="text-subtitle2" v-show="rsView.number">
+                #{{rsView.number}}
+              </span>
             </div>
-            <div class="col-auto">
-              <q-markup-table dense bordered class="no-shadow">
-                <tbody>
-                  <tr>
-                    <td>{{$tc('label.number')}}</td>
-                    <td>{{rsView.opname_number}}</td>
-                  </tr>
-                </tbody>
+            <div>
+              <q-markup-table separator="cell" :dark="LAYOUT.isDark"
+                class="super-dense bordered no-shadow"
+                v-if="rsView.opname_stock">
+                <tr>
+                  <th>{{$tc('label.number')}}</th>
+                  <td>
+                    {{rsView.opname_stock.full_number || rsView.opname_stock.number}}
+                  </td>
+                </tr>
+                <tr>
+                  <th>{{$tc('label.date')}}</th>
+                  <td>{{ $app.date_format(rsView.opname_stock.date) }}</td>
+                </tr>
               </q-markup-table>
             </div>
           </div>
         </div>
-        <div class="col-12 column">
-          <q-markup-table dense bordered class="no-shadow" separator="cell" :dark="LAYOUT.isDark">
-            <thead>
-              <tr>
-                <th>{{$tc('label.no',1,{v: 'Voucher'})}}</th>
-                <th>{{$tc('label.unit')}}</th>
-                <th>{{$tc('label.quantity')}}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, i) in rsView.opname_vouchers" :key="i">
-                <td>{{row.number}}</td>
-                <td class="text-right">{{rsView.item.unit.code}}</td>
-                <td class="text-right">{{$app.number_format(row.quantity)}}</td>
-              </tr>
-              <tr>
-                <td class="text-right" colspan="2">{{$tc('items.stock_init')}}</td>
-                <td class="text-right">{{$app.number_format(rsView.init_amount)}}</td>
-              </tr>
-              <tr>
-                <td class="text-right" colspan="2">{{$tc('items.stock_final')}}</td>
-                <td class="text-right">{{$app.number_format(rsView.final_amount)}}</td>
-                <!-- <td>K=>{{rsView.final_amount}}</td> -->
-              </tr>
-            </tbody>
-          </q-markup-table>
+        <div class="col-12">
+          <div class="row  items-center">
+            <div class="col column">
+              <span class="text-weight-medium">{{rsView.item.part_name}}</span>
+              <span class="text-caption">[{{rsView.item.customer_code}}] {{rsView.item.part_number}}</span>
+            </div>
+            <div class="col text-center">
+              <q-chip dense square color="blue-grey" text-color="white" :label="rsView.stockist" />
+            </div>
+            <div class="col no-wrap text-right">
+              <span class="text-weight-medium">{{$app.number_format(rsView.quantity)}}
+                <span class="on-right">{{rsView.item.unit.name}}</span>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="row q-gutter-xs print-hide q-mt-lg">
+      <div class="row q-gutter-xs print-hide" style="padding-top:50px">
         <q-btn :label="$tc('form.list')" icon="list" color="dark" :to="`${VIEW.resource.uri}?return`" />
         <q-btn :label="$tc('form.print')" color="grey" icon="print" @click.native="print()" />
+        <q-btn :label="$tc('form.edit')" color="green" icon="edit" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`" v-if="IS_EDITABLE && isCanUpdate" />
         <q-space />
-        <ux-btn-dropdown v-show="false" color="blue-grey" no-caps
+        <ux-btn-dropdown color="blue-grey" no-caps
           :label="$tc('label.others')"
           :options="[
             { label: $tc('form.add_new'), color:'green', icon: 'add',
@@ -85,17 +78,10 @@
               }
             },
             { label: $tc('form.validation').toUpperCase(), color:'teal', icon: 'check',
-              hidden: !IS_EDITABLE || !this.$app.can('opname-stocks-validation'),
+              hidden: !IS_EDITABLE || !this.$app.can('opname-vouchers-validation'),
               detail:$tc('messages.process_validation'),
               actions: () => {
                 setValidation()
-              }
-            },
-            { label: (`${$tc('form.revision')}`).toUpperCase(), color:'teal', icon: 'check',
-              hidden: !IS_REVISE || rsView.status !== 'VALIDATED' || !this.$app.can('opname-stocks-revision'),
-              // detail:$tc('messages.process_revision'),
-              actions: () => {
-                setRevision()
               }
             },
             { label: 'VOID', color:'red', icon: 'block',
@@ -111,6 +97,7 @@
     <q-inner-loading :showing="VIEW.loading">
       <q-spinner-dots size="50px" color="primary" />
     </q-inner-loading>
+
   </q-page>
 </template>
 
@@ -127,8 +114,8 @@ export default {
     return {
       VIEW: {
         resource:{
-          api: '/api/v1/warehouses/opname-stocks',
-          uri: '/admin/warehouses/opname-stocks',
+          api: '/api/v1/warehouses/opname-vouchers',
+          uri: '/admin/warehouses/opname-vouchers',
           params: '?mode=view'
         }
       },
@@ -141,13 +128,13 @@ export default {
   },
   computed: {
     isCanCreate() {
-      return this.$app.can('opname-stocks-create')
+      return this.$app.can('opname-vouchers-create')
     },
     isCanUpdate() {
-      return this.$app.can('opname-stocks-update')
+      return this.$app.can('opname-vouchers-update')
     },
     isCanDelete() {
-      return this.$app.can('opname-stocks-delete')
+      return this.$app.can('opname-vouchers-delete')
     },
     IS_REVISE() {
       if (this.IS_EDITABLE) return false
@@ -158,7 +145,7 @@ export default {
     IS_VOID() {
       if (this.IS_EDITABLE) return false
       if (this.rsView.deleted_at) return false
-      if (!this.$app.can('opname-stocks-void')) return false
+      if (!this.$app.can('opname-vouchers-void')) return false
       if (['VOID'].find(x => x === this.rsView.status)) return false
       return true
     },
@@ -174,7 +161,6 @@ export default {
     },
     setValidation () {
       const submit = () => {
-
         this.VIEW.loading = true
         let apiUrl = this.VIEW.resource.api + '/' + this.ROUTE.params.id
         apiUrl += '?mode=validation&nodata=true'

@@ -123,15 +123,40 @@ const warehouses = [
     ]
   },
   {
-    name: 'Stock Opname',
+    name: 'Opname Stoks',
     icon: 'move_to_inbox',
-    path: 'opname-stocks',
-    lang: 'general.opname_stocks',
+    path: 'opnames',
+    lang: 'general.opname_stock',
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'opname-stocks-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'opname-stocks-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'opname-stocks-update' } },
+      { page: 'form', path: 'create', icon: 'list', meta: {mode: 'create', permission: 'opname-stocks-create' } },
+      { page: 'form', path: ':id/edit', icon: 'list', meta: {mode: 'edit', permission: 'opname-stocks-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'opname-stocks-read' } }
+    ]
+  },
+  {
+    name: 'Opname Parts',
+    icon: 'move_to_inbox',
+    path: 'opname-stocks',
+    lang: 'general.opname_part',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'opname-stocks-read' } },
+      { page: 'create', path: 'create', meta: { mode: 'create', permission: 'opname-stocks-create' } },
+      // { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'opname-stocks-update' } },
+      { page: 'view-period', path: 'period/:id', meta: { mode: 'view', permission: 'opname-stocks-read' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'opname-stocks-read' } }
+    ]
+  },
+  {
+    name: 'Stock Voucers',
+    icon: 'move_to_inbox',
+    path: 'opname-vouchers',
+    lang: 'general.opname_voucher',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'opname-vouchers-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'opname-vouchers-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'opname-vouchers-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'opname-vouchers-read' } }
     ]
   }
 ]

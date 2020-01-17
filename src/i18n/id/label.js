@@ -36,6 +36,7 @@ export default {
   only: 'Hanya {v}',
   owner: 'Pemilik | Dimiliki | Kepemilikan',
   part: 'Part',
+  period: 'Periode',
   phone: 'No. HP',
   plan: 'Plan',
   price: 'Harga',
