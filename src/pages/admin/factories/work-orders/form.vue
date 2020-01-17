@@ -123,7 +123,7 @@
                 v-model="row.target"
                 :dark="LAYOUT.isDark" color="blue-grey-4"
                 outlined dense hide-bottom-space no-error-icon
-                v-validate="`required|gt_value:0|max_value:${MaxStock[index]}`"
+                v-validate="`required|gt_value:0`"
                 :error="errors.has(`work_order_items.${index}.target`)"
                 @input="() => { row.quantity = calcQuantity(row)}"
               />
@@ -147,9 +147,9 @@
                 :dark="LAYOUT.isDark" color="blue-grey-6"
                 v-model="row.quantity" disable
                 outlined dense hide-bottom-space no-error-icon align="right"
-                v-validate="`required|gt_value:0|max_value:${MaxStock[index]}`"
+                v-validate="`required|gt_value:0|max_value:${Math.ceil(MaxStock[index] / (row.unit_rate || 1))}`"
                 :error="errors.has(`work_order_items.${index}.quantity`)"
-                :suffix="' / '+ convertStock(row, MaxStock[index])"
+                :suffix="' / '+ Math.ceil((MaxStock[index] || 0) / (row.unit_rate || 1))"
               />
             </q-td>
           </q-tr>
@@ -373,8 +373,9 @@ export default {
         })
       }
     },
-    convertStock(row, val = 0) {
+    stockFormat(row, val = 0) {
       if(val < 0) return '(-)'
+      val = Math.ceil(val)
       return this.$app.number_format(Number(val || 0) / Number(row.unit_rate || 1))
     },
     calcQuantity(row) {
