@@ -127,11 +127,11 @@ export default {
         columns: [
           { name: 'prefix', label: '', align: 'left'},
           { name: 'part', label: this.$tc('items.part_name'), field:(v) => v.item, align: 'left'},
-          { name: 'number', label: this.$tc('label.number'), field: 'opname_number', align: 'left', sortable: true },
-          { name: 'status', label: '', field: 'status', align: 'left'},
           { name: 'stockist', label: 'Stockist', field:'stockist', format:(v) => v, align: 'center'},
           { name: 'init_amount', label: this.$tc('items.stock_init'), field:'init_amount', format:(v) => v, align: 'center'},
           { name: 'final_amount', label: this.$tc('items.stock_final'), field:'final_amount', format:(v) => v, align: 'center'},
+          { name: 'number', label: this.$tc('label.number'), field: 'opname_number', align: 'left', sortable: true },
+          { name: 'status', label: '', field: 'status', align: 'left'},
           { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', format:(v) => this.$app.moment(v).format('DD/MM/YYYY HH:mm'), align: 'center', sortable: true },
         ],
       },

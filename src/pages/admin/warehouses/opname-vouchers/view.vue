@@ -145,6 +145,7 @@ export default {
     IS_VOID() {
       if (this.IS_EDITABLE) return false
       if (this.rsView.deleted_at) return false
+      console.warn('rsView.status', this.rsView.status)
       if (!this.$app.can('opname-vouchers-void')) return false
       if (['VOID'].find(x => x === this.rsView.status)) return false
       return true

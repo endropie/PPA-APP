@@ -87,19 +87,11 @@
           <q-btn v-if="isCanDelete && isEditable(rs.row)" flat dense color="light" icon="delete"  @click.native="TABLE.delete(rs.row)" />
         </q-td>
 
-        <q-td slot="body-cell-status" slot-scope="rs" :props="rs" style="width:35px">
-          <div class="row q-gutter-xs no-wrap">
-            <ux-badge-status :row="rs.row" class="shadow-1" />
-            <q-badge label="RET" class="shadow-1 q-pa-xs"
-              dense color="blue-grey" text-color="white"
-              v-if="rs.row.transaction == 'RETURN'"
-            />
+        <q-td slot="body-cell-item" slot-scope="rs" :props="rs" class="no-padding" style="width:35px">
+          <div class="column text-">
+            <span class="text-weight-light">{{rs.row.item.part_name}}</span>
+            <span class="text-small">{{rs.row.item.part_number}}</span>
           </div>
-        </q-td>
-
-        <q-td slot="body-cell-number" slot-scope="rs" :props="rs">
-          <span v-if="rs.row.number"> {{ rs.row.number }}</span>
-          <span v-else>-</span>
         </q-td>
 
         <q-td slot="body-cell-opname_number" slot-scope="rs" :props="rs">
@@ -144,9 +136,10 @@ export default {
         columns: [
           { name: 'prefix', label: '', align: 'left'},
           { name: 'number', label: this.$tc('label.no',1, {v:'voucher'}), field: 'number', align: 'left', sortable: true },
-          { name: 'part_name', label: this.$tc('items.part_name'), field:(v) => v.item.part_name, align: 'left'},
-          { name: 'part_number', label: this.$tc('items.part_number'), field:(v) => v.item.part_number, align: 'left'},
+          { name: 'item', label: this.$tc('items.part_name'), align: 'left'},
           { name: 'stockist', label: 'Stockist', field:'stockist', format:(v) => v, align: 'center'},
+          { name: 'quantity', label: this.$tc('label.quantity'), field:'quantity', align: 'right'},
+          { name: 'unit', label: this.$tc('label.unit'), field:(row)=>row.item.unit.code, align: 'right'},
           { name: 'opname_number', label: 'STO #', field:'opname_number', align: 'left'},
           { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', format:(v) => this.$app.moment(v).format('DD/MM/YYYY HH:mm'), align: 'center', sortable: true },
         ],
