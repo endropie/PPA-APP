@@ -65,7 +65,7 @@
       <a class="ribbon" :title="`PPA Administration Built on v${$q.version}`" />
     </div>
     <div class="fixed-top-left q-ma-md">
-      <q-btn-dropdown color="lime-8" label="EXAMPLE USER">
+      <q-btn-dropdown color="lime-8" label="EXAMPLE USER" v-show="false">
         <q-list v-for="(user, index) in userlists" :key="index" style="max-width:200px">
           <q-item clickable v-close-popup
             @click="rsLogin = {email: `${String(user)}@ppa.com`, password: `${String(user)}ppa`}">
