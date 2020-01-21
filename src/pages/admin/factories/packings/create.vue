@@ -309,10 +309,7 @@ export default {
         })
       })
     },
-    EmployeeOptions() {
-      return (this.SHEET.employees.data.map(item => ({label: `[${item.code}] ${item.name}`, value: item.id})) || [])
-    },
-    TypeFaultOptions() {
+  TypeFaultOptions() {
       return (this.SHEET.type_faults.data.map(item => ({label: item.name, value: item.id})) || [])
     },
     FaultOptions() {
