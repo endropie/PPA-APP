@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="page-index" >
     <q-pull-to-refresh @refresh="TABLE.refresh" inline>
-      <q-table ref="table" dense class="table-index th-uppercase" color="primary" :dark="LAYOUT.isDark"
+      <q-table ref="table" class="table-index th-uppercase" color="primary" :dark="LAYOUT.isDark"
         :data="TABLE.rowData"
         :columns="TABLE.columns"
         :filter="TABLE.filter"
@@ -122,20 +122,27 @@
         </q-td>
 
         <q-td slot="body-cell-schedule" slot-scope="rs" :props="rs">
-          {{$app.moment(`${rs.row.date} ${rs.row.time}`).format('DD/MM/YY HH.mm')}}
+          <!-- {{$app.moment(`${rs.row.date} ${rs.row.time}`).format('lll')}} -->
+          <div>
+            <span>{{$app.moment(`${rs.row.date} ${rs.row.time}`).format('ll')}}</span>
+            <q-space />
+            <q-icon name="timer" />
+            <span>{{$app.moment(`${rs.row.date} ${rs.row.time}`).format('h:mm')}}</span>
+          </div>
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
           <ux-chip-status dense square :row="rs.row"
             :dark="LAYOUT.isDark"
             :colorOptions="{'DEPARTED' : 'green-7', 'ARRIVED': 'blue-grey-9'}"
-            v-if="rs.row.status !== 'OPEN'"/>
+            :labelOptions="{'OPEN': getOntimeLabel(rs.row)}"
+          />
           <q-chip dense square class="text-weight-medium"
             :dark="LAYOUT.isDark"
             :label="getOntimeLabel(rs.row)"
             :color="getOntimeColor(rs.row)"
             text-color="white"
-            v-if="!Boolean(rs.row.deleted_at)"/>
+            v-if="!Boolean(rs.row.deleted_at) && getOntimeLabel(rs.row) === 'DELAYED'"/>
         </q-td>
 
         <q-td slot="body-cell-vehicle_id" slot-scope="rs" :props="rs">
@@ -151,7 +158,7 @@
           <span v-else>-</span>
         </q-td>
 
-        <q-td slot="body-cell-customers" slot-scope="rs" :props="rs">
+        <q-td slot="body-cell-customers" slot-scope="rs" :props="rs" class="no-padding">
           <span v-if="rs.row.customers && rs.row.customers.length > 0" class="row flex">
             <q-chip dense square v-for="(customer, i) in rs.row.customers" :key="i">
               {{customer.name || 'no-name'}}

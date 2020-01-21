@@ -60,18 +60,22 @@
         :error-message="errors.first('rit')" />
 
       <div class="col-12">
-        <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
-          dense separator="horizontal"
-          :dark="LAYOUT.isDark">
-          <q-tr>
-            <q-th key="prefix"></q-th>
-            <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
-            <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
-            <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
-            <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
-            <q-th key="encasement">{{$tc('label.encasement')}}</q-th>
-          </q-tr>
-          <q-tr v-for="(row, index) in rsForm.pre_delivery_items" :key="index">
+        <q-markup-table class="main-box no-shadow no-highlight th-uppercase"
+          separator="horizontal"
+          :dark="LAYOUT.isDark"
+          bordered >
+          <thead>
+            <q-tr>
+              <q-th key="prefix"></q-th>
+              <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
+              <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
+              <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+              <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
+              <q-th key="encasement">{{$tc('label.encasement')}}</q-th>
+            </q-tr>
+          </thead>
+          <tbody>
+            <q-tr v-for="(row, index) in rsForm.pre_delivery_items" :key="index">
               <q-td key="prefix">
                 <q-btn dense flat round icon="close" color="red" @click="removeItem(index)"/>
               </q-td>
@@ -129,30 +133,49 @@
                   :dark="LAYOUT.isDark" />
               </q-td>
             </q-tr>
-
-          <q-tr>
-            <td></td>
-            <q-td>
-              <q-btn dense outline color="primary" :label="$tc('form.add')" icon="add_circle_outline" class="full-width" @click="addNewItem()"/>
-            </q-td>
-            <td colspan="100%"></td>
-          </q-tr>
+            <q-tr>
+              <td></td>
+              <q-td>
+                <q-btn dense outline color="primary" :label="$tc('form.add')" icon="add_circle_outline" class="full-width" @click="addNewItem()"/>
+              </q-td>
+              <td colspan="100%"></td>
+            </q-tr>
+          </tbody>
         </q-markup-table>
       </div>
       <!-- COLUMN::4th Description -->
-      <q-input class="col-12"
-        name="description" type="textarea" rows="3"
-        stack-label :label="$tc('label.description')"
-        filled
-        :dark="LAYOUT.isDark"
-        v-model="rsForm.description" />
+      <div class="col-12">
+        <!-- <q-btn icon="add" label="sechedule" color="blue-grey-5" /> -->
+        <ux-select ref="schedules" filter multiple use-chips
+          :label="$tc('general.schedule_board')"
+          :disable="!Boolean(rsForm.customer_id)"
+          v-model="rsForm.schedules"
+          :source="`api/v1/transports/schedule-boards?mode=all&--limit=50&${sechduleFilter.join('&')}`"
+          :source-keys="['number']"
+          :option-value="(item) => item.id"
+          :option-label="(item) => item.number"
+          :option-sublabel="(item) => $app.moment(`${item.date} ${item.time}`).format('D MMM YYYY HH.mm')"
+        >
+          <div slot="selected">
+            test
+          </div>
+        </ux-select>
+      </div>
+      <div class="col-12">
+        <q-input
+          name="description" type="textarea" rows="3"
+          stack-label :label="$tc('label.description')"
+          filled
+          :dark="LAYOUT.isDark"
+          v-model="rsForm.description" />
+      </div>
 
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
     <q-card-actions class="q-mx-lg">
-      <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()" />
-      <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)" />
-      <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()" v-if="IS_EDITABLE"
+      <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" :class="{'full-width q-mb-sm': $q.screen.lt.sm}" @click="FORM.toBack()" />
+      <q-btn :label="$tc('form.reset')" icon="refresh" color="light" :class="{'full-width q-mb-sm': $q.screen.lt.sm}" @click="setForm(FORM.data)" />
+      <q-btn :label="$tc('form.save')" icon="save" color="positive" :class="{'full-width q-mb-sm': $q.screen.lt.sm}" @click="onSave()" v-if="IS_EDITABLE"
       :loading="FORM.loading"/>
       <!-- <q-btn label="test" @click="test()"></q-btn>      -->
     </q-card-actions>
@@ -208,7 +231,8 @@ export default {
               encasement: null,
               request_order_item_id: null
             }
-          ]
+          ],
+          schedules: []
         }
       }
     }
@@ -231,10 +255,16 @@ export default {
             if(items[i].item_id) return true
           }
         }
+
+        if (this.rsForm.schedules.length) return true
+
         return false
     },
     IssetCustomerID() {
       return (this.rsForm.customer_id ? true : false)
+    },
+    sechduleFilter() {
+      return ['status=OPEN',`customer_in=${this.rsForm.customer_id}`]
     },
     RitOptions() {
       let rits = []
@@ -411,7 +441,8 @@ export default {
         this.rsForm.order_mode = null
       }
       else {
-
+        console.warn('object', this.$refs);
+        this.$refs['schedules'].setOptions([])
         this.SHEET.load('items', 'customer_id='+ val)
         if (this.MAPINGKEY['customers'].hasOwnProperty(val)) {
           this.rsForm.order_mode = this.MAPINGKEY['customers'][val].order_mode

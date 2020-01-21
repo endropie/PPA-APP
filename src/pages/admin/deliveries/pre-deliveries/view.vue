@@ -1,6 +1,6 @@
 <template>
-  <q-page padding class="row justify-center"  style="min-width:210mm;">
-    <page-print v-if="VIEW.show" :class="{'header-minimaze':$q.screen.lt.sm}" style="max-width:210mm;">
+  <q-page padding class="column justify-start">
+    <page-print v-if="VIEW.show">
       <div slot="header-title">PPA - Pre Delivery </div>
       <template slot="header-tags hide-print">
         <q-chip square outline color="blue-grey" text-color="white"
@@ -61,6 +61,18 @@
             </q-tr>
             </tbody>
           </q-markup-table>
+        </div>
+        <div class="col-12 print-hide">
+          <!-- =>{{rsView.schedules}} -->
+          <div class="row q-gutter-sm items-center ">
+            <span class="on-left">SCHEDULE</span>
+            <q-badge dense outline color="faded" v-cloak v-for="(schedule, i) in rsView.schedules" :key="i">
+              <div class="text-large">{{schedule.number}}<br>
+                <span class="text-small">{{$app.moment(schedule.date+' '+schedule.time).format('lll')}}</span>
+              </div>
+
+            </q-badge>
+          </div>
         </div>
         <div class="col-12">
             <div class="q-mb-sm text-italic">{{$tc('label.description')}}:</div>
