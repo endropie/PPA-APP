@@ -176,7 +176,7 @@ export default {
   },
   computed: {
     CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: item.name, value: item.id})) || [])
+      return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
     },
   },
   methods: {

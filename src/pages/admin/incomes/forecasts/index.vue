@@ -156,7 +156,7 @@ export default {
       return this.$app.can('forecasts-delete')
     },
     CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: item.name, value: item.id})) || [])
+      return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
     },
   },
   created () {

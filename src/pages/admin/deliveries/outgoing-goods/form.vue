@@ -304,7 +304,7 @@ export default {
       return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
     },
     EmployeeOptions() {
-      return (this.SHEET.employees.data.map(item => ({label: `[${item.code}] ${item.name}`, value: item.id})) || [])
+      return (this.SHEET.employees.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
     },
     VehicleOptions() {
       return (this.SHEET.vehicles.data.map(item => ({label: item.number, value: item.id})) || [])

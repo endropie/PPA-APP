@@ -40,14 +40,16 @@
             ]">
 
             <div class="row items-start q-col-gutter-xs" >
-              <ux-date class="col-8 col-sm-4"
-                stack-label :label="$tc('label.date')"
-                v-model="FILTERABLE.fill.date.value" type="date"  clearable
-                dense hide-bottom-space
+
+              <ux-select-filter class="col-12 col-sm-4"
+                v-model="FILTERABLE.fill.customer_id.value" clearable
+                :label="$tc('general.customer')"
+                dense hide-bottom-space hide-dropdown-icon
                 standout="bg-blue-grey-5 text-white"
                 :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark"
-                @input="FILTERABLE.submit"/>
+                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                :options="CustomerOptions"
+                @input="FILTERABLE.submit" />
 
               <q-select class="col-4 col-sm-2 "
                 v-model="FILTERABLE.fill.status.value" clearable
@@ -88,9 +90,9 @@
         </q-td>
 
         <q-td slot="body-cell-item" slot-scope="rs" :props="rs" class="no-padding" style="width:35px">
-          <div class="column text-">
-            <span class="text-weight-light">{{rs.row.item.part_name}}</span>
-            <span class="text-small">{{rs.row.item.part_number}}</span>
+          <div v-if="rs.row.item" class="column text-body2">
+            <span>{{ rs.row.item.part_name }}</span>
+            <small class="text-weight-light">[{{rs.row.item.customer_code}}] {{rs.row.item.part_number}}</small>
           </div>
         </q-td>
 
@@ -113,7 +115,7 @@ export default {
   data () {
     return {
       SHEET: {
-        // customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
+        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
       },
       FILTERABLE: {
         fill: {
@@ -121,7 +123,7 @@ export default {
             value: null,
             transform: (value) => { return null }
           },
-          date: {
+          customer_id: {
             value: null,
             transform: (value) => { return null }
           }

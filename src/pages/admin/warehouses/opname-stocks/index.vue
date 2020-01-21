@@ -19,13 +19,6 @@
             :TABLE.sync="TABLE"
             :filter.sync="TABLE.filter"
             :menus="[
-              // { label: $tc('form.add'),
-              //   detail: $tc('messages.form_new'),
-              //   icon: 'add',
-              //   shortcut: true,
-              //   hidden:!$app.can('incoming-goods-create'),
-              //   to: `${TABLE.resource.uri}/create`
-              // },
               { label: $tc('label.trash'),
                 detail:  $tc('messages.show_deleted'),
                 shortcut: true,
@@ -40,7 +33,17 @@
             ]">
 
             <div class="row items-start q-col-gutter-xs" >
-              <q-select class="col-12 col-sm-6" v-if="OpnamePeriodOptions"
+              <ux-select-filter class="col-12 col-sm-6"
+                v-model="FILTERABLE.fill.customer_id.value" clearable
+                :label="$tc('general.customer')"
+                dense hide-bottom-space hide-dropdown-icon
+                standout="bg-blue-grey-5 text-white"
+                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
+                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                :options="CustomerOptions"
+                @input="FILTERABLE.submit" />
+
+              <q-select class="col-12 col-sm-6"
                 v-model="FILTERABLE.fill.opname_id.value" clearable
                 :options="OpnamePeriodOptions"
                 :label=" $tc('general.opname_stock')"
@@ -51,7 +54,7 @@
                 :dark="LAYOUT.isDark"
                 @input="FILTERABLE.submit" />
 
-              <q-select class="col-12 col-sm-6" autocomplete="off"
+              <q-select class="col-12 col-sm-stretch" autocomplete="off"
                 multiple use-chips use-input new-value-mode="add"
                 dense hide-dropdown-icon
                 v-model="FILTERABLE.search" emit-value
@@ -86,7 +89,7 @@
         <q-td slot="body-cell-part" slot-scope="rs" :props="rs" class="no-padding">
           <div v-if="rs.row.item" class="column text-body2">
             <span>{{ rs.row.item.part_name }}</span>
-            <small class="text-weight-light">{{ rs.row.item.part_number }}</small>
+            <small class="text-weight-light">[{{rs.row.item.customer_code}}] {{rs.row.item.part_number}}</small>
           </div>
           <div v-else class="text-caption text-italic">undefined!</div>
         </q-td>
@@ -103,7 +106,7 @@ export default {
   data () {
     return {
       SHEET: {
-        // customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
+        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
         opnames: { api:'/api/v1/warehouses/opnames?mode=all' },
       },
       FILTERABLE: {
@@ -112,7 +115,7 @@ export default {
             value: null,
             transform: (value) => { return null }
           },
-          date: {
+          customer_id: {
             value: null,
             transform: (value) => { return null }
           }

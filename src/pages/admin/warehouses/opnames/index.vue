@@ -95,7 +95,6 @@ export default {
   data () {
     return {
       SHEET: {
-        // customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
         // opnames: { api:'/api/v1/warehouses/opnames?mode=all' },
       },
       FILTERABLE: {
@@ -104,10 +103,6 @@ export default {
             value: null,
             transform: (value) => { return null }
           },
-          date: {
-            value: null,
-            transform: (value) => { return null }
-          }
         }
       },
       TABLE: {
@@ -134,10 +129,7 @@ export default {
     },
     isCanDelete(){
       return this.$app.can('opname-stocks-delete')
-    },
-    CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: `${item.code} - ${item.name}`, value: item.id})) || [])
-    },
+    }
   },
   methods:{
     isEditable(row) {

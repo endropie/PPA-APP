@@ -142,7 +142,7 @@ export default {
       return this.$app.can('outgoing-verifications-delete')
     },
     CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: item.name, value: item.id})) || [])
+      return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
     },
     ItemOptions() {
       return (this.SHEET.items.data.map(item => ({

@@ -230,7 +230,7 @@ export default {
       return (this.SHEET.lines.data.map(item => ({label: item.name, value: item.id})) || [])
     },
     CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: item.code, value: item.id})) || [])
+      return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
     },
     ItemOptions() {
       return (this.SHEET.items.data.map(item => ({
