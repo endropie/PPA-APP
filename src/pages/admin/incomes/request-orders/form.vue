@@ -300,7 +300,7 @@ export default {
     },
     ItemOptions() {
       let items = this.SHEET.items.data.filter((item) => item.customer_id === this.rsForm.customer_id)
-      return (items.map(item => ({label: item.part_name, sublabel: `[${item.customer_code}] No.${item.part_number}`, value: item.id})) || [])
+      return (items.map(item => ({label: item.part_name, sublabel: `[${item.customer_code}] No.${item.part_number}`, value: item.id, disable: !item.enable})) || [])
     },
     ItemUnitOptions() {
       let vars = []
