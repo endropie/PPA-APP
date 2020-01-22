@@ -3,6 +3,18 @@
     <page-print v-if="VIEW.show">
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
+        <span v-if="!rsView.deleted_at && Number(rsView.total_unit_delivery) > 0 && ['OPEN','CLOSED'].some(x => x === rsView.status)">
+            <q-chip square outline icon="local_shipping"
+              label="Delivered"
+              color="orange-10"
+              v-if="Math.round(rsView.total_unit_amount) === Math.round(rsView.total_unit_delivery)" >
+            </q-chip>
+            <q-chip square outline icon="local_shipping"
+              label="semi-Delivered"
+              color="orange"
+              v-else>
+            </q-chip>
+        </span>
       </div>
       <div class="row justify-around q-col-gutter-y-sm" >
         <div class="col-12">

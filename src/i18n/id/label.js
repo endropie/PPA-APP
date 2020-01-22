@@ -47,6 +47,7 @@ export default {
   reference: 'Referensi',
   second: 'Detik',
   shift: 'Shift',
+  shipping: 'Kirim | Dikirim',
   size: 'Ukuran',
   state: 'Status',
   summary: 'Total ',
