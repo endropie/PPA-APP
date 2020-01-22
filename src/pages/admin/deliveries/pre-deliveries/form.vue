@@ -291,6 +291,7 @@ export default {
         label: `${item.part_name}`,
         sublabel: `[${item.customer_code}] ${item.part_number}`,
         value: item.id,
+        disable: !item.enable,
         data: item
       })) || [])
     },

@@ -246,8 +246,9 @@ export default {
 
       return (data.map(item => ({
         label: `${item.part_name}`,
-        sublabel: `${item.code} ${item.part_number}`,
+        sublabel: `[${item.customer_code}] ${item.part_number}`,
         value: item.id,
+        disable: !item.enable,
         data: item
       })) || [])
     },

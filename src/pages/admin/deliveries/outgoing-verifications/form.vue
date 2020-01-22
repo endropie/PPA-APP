@@ -133,7 +133,7 @@ export default {
       if (!this.rsForm.item) return []
 
       let Items = [this.rsForm.item]
-      return (Items.map(item => ({label: `${item.code} - ${item.part_name}`, value: item.id})) || [])
+      return (Items.map(item => ({label: `${item.code} - ${item.part_name}`, value: item.id, disable: !item.enable})) || [])
     },
     ItemUnitOptions() {
       if(!this.rsForm.item) return []

@@ -209,9 +209,8 @@ export default {
     },
     ItemOptions() {
       return (this.SHEET.items.data.map(item => ({
-        // item: item,
         label: item.part_name,
-        sublabel:`[${item.code}] ${item.part_number}`,
+        sublabel:`[${item.customer_code}] ${item.part_number}`,
         value: item.id
       })) || [])
     },

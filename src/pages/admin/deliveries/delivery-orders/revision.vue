@@ -339,6 +339,7 @@ export default {
         sublabel: `[${row.item.code}] ${row.item.part_number}`,
         stamp: `#${row.id}`,
         value: row.id,
+        disable: !row.enable,
         item_id: row.item_id
       }))
     },
