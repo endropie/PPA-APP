@@ -1,11 +1,10 @@
 <template>
-  <q-page padding class="row justify-center" >
-    <page-print v-if="VIEW.show" class="q-pa-md q-pr-lg shadow-2" style="max-width:210mm;">
+  <q-page padding class="column justify-start items-center" >
+    <page-print v-if="VIEW.show">
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
       <div class="row justify-around q-col-gutter-y-sm" >
-
         <div class="col-12">
           <div class="row justify-between q-gutter-sm" >
             <div class="items-end q-pt-lg">
@@ -22,7 +21,7 @@
               </q-markup-table>
             </div>
             <div>
-              <q-markup-table class="super-dense bordered no-shadow" separator="cell" :dark="LAYOUT.isDark">
+              <q-markup-table dense bordered class="super-dense no-shadow" separator="cell" :dark="LAYOUT.isDark">
                 <tr>
                   <th>{{$tc('label.number')}}</th>
                   <td>

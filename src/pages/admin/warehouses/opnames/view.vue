@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="contentable-sm column justify-start" :dark="LAYOUT.isDark">
+  <q-page padding class="column justify-start items-center" :dark="LAYOUT.isDark">
     <page-print v-if="VIEW.show">
       <span slot="header-title">Priuk Perkasa Abadi, PT</span>
       <span slot="header-subtitle">Warehouses - Periode Opname</span>

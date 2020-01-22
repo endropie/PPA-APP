@@ -117,6 +117,8 @@ export default {
   .q-page-container
     padding-top: unset !important
     // padding 5px !important
+  .q-page.items-center, .q-page.flex-center
+    align-items normal
 
   .page-print
     padding 0 !important

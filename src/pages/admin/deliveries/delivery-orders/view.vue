@@ -1,7 +1,6 @@
 <template>
-  <q-page padding class="contentable-sm content-center"  v-if="VIEW.show">
-    <div class="column q-gutter-sm">
-      <q-card  v-if="VIEW.show" class="print-hide modal-hide">
+  <q-page padding class="column justify-start items-center q-gutter-sm"  v-if="VIEW.show">
+      <q-card  v-if="VIEW.show" class="no-shadow print-hide modal-hide">
         <q-card-actions class="q-px-lg q-gutter-xs" >
             <q-btn :label="$tc('form.list')" icon="list"  color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
             <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
@@ -40,38 +39,40 @@
             />
         </q-card-actions>
       </q-card>
-      <page-print class="shadow-2 q-pa-sm" :class="{'multi-page':getArrayPage(rsView.customer).length > 1}"
+      <page-print :class="{'multi-page':getArrayPage(rsView.customer).length > 1}"
         v-for="(mode, pi) in getArrayPage(rsView.customer)" :key="pi">
         <div slot="header-tags" class="print-hide">
           <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
         </div>
-        <div class="row justify-between q-col-gutter-sm" >
-          <div class="profile col-stretch">
-            <div class="text-weight-regular uppercase">To: {{rsView.customer_name}}</div>
-            <address class="text-weight-light">{{rsView.customer_address}}</address>
-            <div class="text-weight-light" v-if="rsView.customer_phone">Phone: {{rsView.customer_phone}}</div>
-            <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
+        <div class="column" >
+          <div class="row justify-between q-col-gutter-sm q-pb-sm">
+            <div class="profile col-stretch">
+              <div class="text-weight-regular uppercase">To: {{rsView.customer_name}}</div>
+              <address class="text-weight-light">{{rsView.customer_address}}</address>
+              <div class="text-weight-light" v-if="rsView.customer_phone">Phone: {{rsView.customer_phone}}</div>
+              <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
+            </div>
+            <div class="info col-auto">
+              <q-markup-table bordered separator="cell" :dark="LAYOUT.isDark"
+                class="super-dense no-shadow no-margin th-uppercase">
+                <tr>
+                  <td>No. SJ-OUT</td>
+                  <td>
+                    {{ rsView.number }}
+                    <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
+                  </td>
+                </tr>
+                <tr>
+                  <td>{{$tc('label.date')}}</td>
+                  <td>{{$app.date_format(rsView.date)}}</td>
+                </tr>
+                <tr>
+                  <td>No. SO</td><td>{{ rsView.request_order ? rsView.request_order.number : '-' }}</td>
+                </tr>
+              </q-markup-table>
+            </div>
           </div>
-          <div class="info col-auto">
-            <q-markup-table bordered separator="cell" :dark="LAYOUT.isDark"
-              class="super-dense no-shadow no-margin th-uppercase">
-              <tr>
-                <td>No. SJ-OUT</td>
-                <td>
-                  {{ rsView.number }}
-                  <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
-                </td>
-              </tr>
-              <tr>
-                <td>{{$tc('label.date')}}</td>
-                <td>{{$app.date_format(rsView.date)}}</td>
-              </tr>
-              <tr>
-                <td>No. SO</td><td>{{ rsView.request_order ? rsView.request_order.number : '-' }}</td>
-              </tr>
-            </q-markup-table>
-          </div>
-          <div class="col-12">
+          <div>
             <q-markup-table dense bordered class="table-print no-shadow no-highlight th-uppercase" separator="cell">
               <thead>
               <q-tr>
@@ -122,11 +123,11 @@
               <small class="text-weight-light">{{`MODE: ${rsView.customer.delivery_mode}`}}</small>
             </q-chip>
           </div>
-          <div class="col-12" v-show="Boolean(rsView.description)">
+          <div v-show="Boolean(rsView.description)">
               <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
               <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
           </div>
-          <div class="col-12 page-break-inside">
+          <div class="page-break-inside">
             <q-markup-table class="no-shadow text-weight-light" style="">
               <tr class="text-center">
                 <td width="21%">
@@ -150,7 +151,6 @@
           </div>
         </div>
       </page-print>
-    </div>
     <q-inner-loading :showing="VIEW.loading">
         <q-spinner-dots size="50px" color="primary" />
     </q-inner-loading>

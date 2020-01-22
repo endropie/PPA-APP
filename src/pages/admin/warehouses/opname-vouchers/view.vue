@@ -1,6 +1,6 @@
 <template>
-  <q-page padding class="column contentable" style="max-width:600px" :dark="LAYOUT.isDark">
-    <page-print v-if="VIEW.show" class="shadow-2">
+  <q-page padding class="column justify-start items-center" :dark="LAYOUT.isDark">
+    <page-print v-if="VIEW.show">
       <span slot="header-title">Priuk Perkasa Abadi, PT</span>
       <span slot="header-subtitle">Warehouses - voucher stocks</span>
       <div slot="header-tags" class="print-hide">
@@ -16,7 +16,7 @@
               <div class="text-h6 text-uppercase">
                 {{$tc('general.opname_voucher', 2)}}
               </div>
-              <span class="text-subtitle2" v-show="rsView.number">
+              <span class="text-subtitle2 text-no-wrap" v-show="rsView.number">
                 #{{rsView.number}}
               </span>
             </div>
@@ -39,8 +39,8 @@
           </div>
         </div>
         <div class="col-12">
-          <div class="row  items-center">
-            <div class="col column">
+          <div class="row  items-center q-gutter-sm">
+            <div class="col column  text-no-wrap">
               <span class="text-weight-medium">{{rsView.item.part_name}}</span>
               <span class="text-caption">[{{rsView.item.customer_code}}] {{rsView.item.part_number}}</span>
             </div>
@@ -97,7 +97,6 @@
     <q-inner-loading :showing="VIEW.loading">
       <q-spinner-dots size="50px" color="primary" />
     </q-inner-loading>
-
   </q-page>
 </template>
 
@@ -144,8 +143,6 @@ export default {
     },
     IS_VOID() {
       if (this.IS_EDITABLE) return false
-      if (this.rsView.deleted_at) return false
-      console.warn('rsView.status', this.rsView.status)
       if (!this.$app.can('opname-vouchers-void')) return false
       if (['VOID'].find(x => x === this.rsView.status)) return false
       return true
