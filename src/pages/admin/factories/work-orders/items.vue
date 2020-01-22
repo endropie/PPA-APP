@@ -139,7 +139,7 @@
           <span v-if="rs.row.work_order_item.work_order.date"> {{ $app.moment(rs.row.work_order_item.work_order.date).format('DD/MM/YY') }}</span>
         </q-td>
 
-        <template v-slot:bottom-row="rs">
+        <template v-slot:bottom-row>
           <q-tr class="bg-blue-grey-2 text-weight-medium">
             <q-td key="prefix"></q-td>
             <q-td key="part_name" class="text-right">{{ $tc('label.grandtotal') }}</q-td>
