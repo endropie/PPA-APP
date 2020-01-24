@@ -116,7 +116,7 @@
                 setValidation()
               }
             },
-            { label: (`${$tc('form.revision')}`).toUpperCase(), color:'teal', icon: 'check',
+            { label: (`${$tc('form.revision')}`).toUpperCase(), color:'orange', icon: 'edit',
               hidden: !IS_REVISE || rsView.status !== 'VALIDATED' || !this.$app.can('incoming-goods-revision'),
               // detail:$tc('messages.process_revision'),
               actions: () => {

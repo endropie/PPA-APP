@@ -197,10 +197,10 @@
                 label: 'CLOSE', color:'green', icon: 'done_all',
                 detail: $tc('messages.process_close'),
                 hidden: !IS_CLOSE || !$app.can('work-orders-close'),
-                actions: () => setClosing()
+                actions: () => setClosed()
               },
               {
-                label: String($tc('form.revision')).toUpperCase(), color:'red-8', icon: 'cached',
+                label: String($tc('form.revision')).toUpperCase(), color:'orange', icon: 'edit',
                 detail: $tc('messages.process_revise'),
                 hidden: !IS_REVISE || !$app.can('work-orders-revision'),
                 actions: () => setRevision()
@@ -447,7 +447,7 @@ export default {
         })
     },
 
-    setClosing () {
+    setClosed () {
       const submit = () => {
         this.VIEW.show = false
         this.VIEW.loading = true

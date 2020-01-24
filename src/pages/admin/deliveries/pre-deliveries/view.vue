@@ -99,7 +99,7 @@
                   VIEW.delete()
                 }
               },
-              { label: $tc('form.revision').toUpperCase(), color:'red', icon: 'block',
+              { label: $tc('form.revision').toUpperCase(), color:'orange', icon: 'edit',
                 detail: $tc('messages.process_revise'),
                 hidden: !IS_VOID || !$app.can('pre-deliveries-revision'),
                 actions: () => {
