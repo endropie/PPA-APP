@@ -81,7 +81,7 @@
           </table-header>
         </template>
 
-        <template slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
+        <template slot="body-cell-prefix" slot-scope="rs" :props="rs" class="no-padding" style="width:35px">
           <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" />
         </template>
 
@@ -94,10 +94,11 @@
           <span v-if="rs.row.number" class="text-weight-medium" :class="{'text-strike text-faded': rs.row.revise_id}">
             {{ rs.row.number }} {{ rs.row.revise_number ? ' - REV.' + rs.row.revise_number : '' }}</span>
           <span v-else>- undifined -</span>
+          <q-chip dense square label="RET" color="black" text-color="white" v-if="rs.row.transaction === 'RETURN'"/>
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
-          <ux-badge-status :row="rs.row" class="shadow-1"/>
+          <ux-chip-status dense square :row="rs.row"/>
         </q-td>
 
         <q-td slot="body-cell-operator_id" slot-scope="rs" :props="rs">
