@@ -64,9 +64,9 @@
             <q-tr v-for="(row, index) in rsView.request_order_items" :key="index">
               <q-td>{{row.item.part_name}}</q-td>
               <q-td>{{row.item.part_number}}</q-td>
-              <q-td>{{row.unit.name}}</q-td>
-              <q-td>{{$app.number_format(row.quantity)}}</q-td>
-              <q-td>{{$app.number_format(row.total_delivery_order_item)}}</q-td>
+              <q-td class="text-center">{{row.unit.name}}</q-td>
+              <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
+              <q-td class="text-right">{{$app.number_format(row.amount_delivery)}}</q-td>
             </q-tr>
             </tbody>
           </q-markup-table>
@@ -93,6 +93,12 @@
               detail: $tc('messages.process_create'),
               actions: () => {
                 $router.push(`${VIEW.resource.uri}/create`)
+              }
+            },
+            { label: 'CLOSED', color:'green', icon: 'done_all', hidden: !IS_CLOSE || !$app.can('request-orders-close'),
+              detail: $tc('messages.process_close'),
+              actions: () => {
+                setClosed()
               }
             },
             { label: 'DELETE', color:'red', icon: 'delete',
@@ -144,6 +150,12 @@ export default {
       '$route' : 'init',
   },
   computed: {
+    IS_CLOSE() {
+      // if (this.rsView.order_mode === 'NONE') return false
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'OPEN') return false
+      return true
+    },
     IS_VOID() {
       if (this.IS_EDITABLE) return false
       if (['VOID'].find(x => x === this.rsView.status)) return false
@@ -173,12 +185,38 @@ export default {
     print() {
       window.print()
     },
-    getBaseUnit(detail) {
-      if(detail.unit_rate == 1) return ''
-      return `(${detail.unit_amount} ${detail.item.unit.code})`
-    },
     setView(data) {
       this.rsView =  data
+    },
+    setClosed() {
+      const submit = () => {
+        this.VIEW.show = false
+        this.VIEW.loading = true
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=closed&nodata=true`
+        this.$axios.put(url)
+          .then((response) => {
+            const data = response.data
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'FORM CLOSED')
+          })
+          .finally(()=>{
+            this.VIEW.show = true
+            setTimeout(() => {
+              this.VIEW.loading = false
+            }, 1000);
+          })
+      }
+
+      this.$q.dialog({
+        title: this.$tc('form.confirm', 1, {v:'CLOSE'}),
+        message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_close')}),
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        submit()
+      })
     }
   }
 }
