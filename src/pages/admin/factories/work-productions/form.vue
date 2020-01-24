@@ -152,12 +152,11 @@
             filled
             :dark="LAYOUT.isDark"
             v-model="rsForm.description"/>
-
-
           <q-field borderless dense v-if="ROUTE.meta.mode === 'create'"
+            :dark="LAYOUT.isDark"
             :error="errors.has('multiple')"
             :error-message="errors.first('multiple')">
-            <q-checkbox slot="prepend" v-model="rsForm.isMultiple"  />
+            <q-checkbox slot="prepend" v-model="rsForm.isMultiple" :dark="LAYOUT.isDark" />
             <span slot="prepend" class="text-caption">Multiple Hanger / Barel</span>
             <template slot="prepend">
               <q-input  type="number" class="q-mx-md"
@@ -447,7 +446,7 @@ export default {
     },
     loadItemOptions(data = this.rsForm) {
       if (data.line_id && data.shift_id && data.date) {
-        let params = [`date=${data.date}`, `shift_id=${data.shift_id}`]
+        let params = [`ondate=${data.date}`, `onshift=${data.shift_id}`]
         if (this.FORM.data.work_production_items) {
           let orKeys = this.FORM.data.work_production_items.map(x => x.work_order_item_line_id)
           params.push(`or_detail_line_ids=${orKeys.join(',')}`)
