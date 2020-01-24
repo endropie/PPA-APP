@@ -308,7 +308,7 @@ export default {
       },
       FORM:{
         resource:{
-          uri: '/admin/incomes/customers',
+          uri: '/admin/common/customers',
           api: '/api/v1/incomes/customers',
         },
       },

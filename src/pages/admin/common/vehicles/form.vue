@@ -87,7 +87,7 @@ export default {
       },
       FORM: {
         resource: {
-          uri: '/admin/references/vehicles',
+          uri: '/admin/common/vehicles',
           api: '/api/v1/references/vehicles',
         },
       },

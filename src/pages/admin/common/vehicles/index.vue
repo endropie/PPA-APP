@@ -69,7 +69,7 @@ export default {
         show:false,
         resource:{
           api: '/api/v1/references/vehicles',
-          uri: '/admin/references/vehicles',
+          uri: '/admin/common/vehicles',
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},

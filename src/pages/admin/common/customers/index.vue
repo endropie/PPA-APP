@@ -80,7 +80,7 @@ export default {
         mode: 'index',
         resource:{
           api: '/api/v1/incomes/customers',
-          uri: '/admin/incomes/customers',
+          uri: '/admin/common/customers',
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},

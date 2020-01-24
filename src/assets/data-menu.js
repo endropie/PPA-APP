@@ -2,6 +2,18 @@
 
 const common = [
   {
+    name: 'Customers',
+    icon: 'group',
+    path: 'customers',
+    lang: 'general.customer',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'items-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'customers-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'customers-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'customers-read' } }
+    ]
+  },
+  {
     name: 'Part Items',
     path: 'items',
     icon: 'style',
@@ -22,24 +34,23 @@ const common = [
       { page: 'index', path: '', icon: 'mdi-account-group', meta: { permission: 'employees-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'employees-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'employees-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'items-read' } }
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'employees-read' } }
+    ]
+  },
+  {
+    name: 'Vehicles',
+    icon: 'mdi-car-multiple',
+    path: 'vehicles',
+    lang: 'general.vehicle',
+    resources: [
+      { page: 'index', path: '', meta: { permission: 'vehicles-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'vehicles-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'vehicles-update' } }
     ]
   }
 ]
 
 const incomes = [
-  {
-    name: 'Customers',
-    icon: 'group',
-    path: 'customers',
-    lang: 'general.customer',
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'items-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'customers-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'customers-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'customers-read' } }
-    ]
-  },
   {
     name: 'Forecasts',
     icon: 'timeline',
@@ -300,17 +311,6 @@ const references = [
       { page: 'index', path: '', meta: { permission: 'positions-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'positions-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'positions-update' } }
-    ]
-  },
-  {
-    name: 'Vehicles',
-    icon: 'mdi-car-multiple',
-    path: 'vehicles',
-    lang: 'general.vehicle',
-    resources: [
-      { page: 'index', path: '', meta: { permission: 'brands-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'brands-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'brands-update' } }
     ]
   },
   {
