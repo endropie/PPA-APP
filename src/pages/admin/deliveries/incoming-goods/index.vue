@@ -183,7 +183,7 @@ export default {
         mode: 'index',
         resource:{
           api: '/api/v1/warehouses/incoming-goods',
-          uri: '/admin/warehouses/incoming-goods',
+          uri: '/admin/deliveries/incoming-goods',
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},

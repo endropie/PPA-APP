@@ -118,22 +118,6 @@ const expenses = [
 
 const warehouses = [
   {
-    name: 'Incoming Good',
-    icon: 'move_to_inbox',
-    path: 'incoming-goods',
-    lang: 'general.incoming_good',
-    param: `?status=OPEN`,
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'incoming-goods-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'incoming-goods-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'incoming-goods-update' } },
-      { page: 'restoration', path: ':id/restoration', meta: { mode: 'edit', permission: 'incoming-goods-create' } },
-      { page: 'validation', path: ':id/validation', meta: { mode: 'edit', permission: 'incoming-goods-validation' } },
-      { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'incoming-goods-validation' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'incoming-goods-read' } }
-    ]
-  },
-  {
     name: 'Opname Stoks',
     icon: 'move_to_inbox',
     path: 'opnames',
@@ -173,6 +157,22 @@ const warehouses = [
 ]
 
 const deliveries = [
+  {
+    name: 'Incoming Good',
+    icon: 'move_to_inbox',
+    path: 'incoming-goods',
+    lang: 'general.incoming_good',
+    param: `?status=OPEN`,
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'incoming-goods-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'incoming-goods-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'incoming-goods-update' } },
+      { page: 'restoration', path: ':id/restoration', meta: { mode: 'edit', permission: 'incoming-goods-create' } },
+      { page: 'validation', path: ':id/validation', meta: { mode: 'edit', permission: 'incoming-goods-validation' } },
+      { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'incoming-goods-validation' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'incoming-goods-read' } }
+    ]
+  },
   {
     name: 'Pre-Delivery Orders',
     icon: 'assignment',
@@ -505,20 +505,6 @@ export default [
     lang: 'general.common',
     children: common
   },
-  { // Warehouse
-    name: 'Warehouse',
-    icon: 'kitchen',
-    path: 'warehouses',
-    lang: 'general.warehouse',
-    children: warehouses
-  },
-  { // Factory
-    name: 'Factories',
-    icon: 'group_work',
-    path: 'factories',
-    lang: 'general.factory',
-    children: factories
-  },
   { // Incomes
     name: 'Incomes',
     icon: 'monetization_on',
@@ -534,12 +520,26 @@ export default [
     lang: 'general.expense',
     children: expenses
   },
-  { // Warehouse
-    name: 'Deliveries',
+  { // Factory
+    name: 'Factories',
+    icon: 'group_work',
+    path: 'factories',
+    lang: 'general.factory',
+    children: factories
+  },
+  { // Receipt & Delivery
+    name: 'Receipt & Delivery',
     icon: 'local_shipping',
     path: 'deliveries',
-    lang: 'general.delivery',
+    lang: 'general.receipt_delivery',
     children: deliveries
+  },
+  { // Warehouse
+    name: 'Warehouse',
+    icon: 'kitchen',
+    path: 'warehouses',
+    lang: 'general.warehouse',
+    children: warehouses
   },
   { // References
     name: 'References',

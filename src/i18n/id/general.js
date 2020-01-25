@@ -21,15 +21,15 @@ export default {
 
   documentation: 'Dokumentasi',
 
-  incoming_good: 'Incoming Good | Kedatangan - Part Material',
   opname_part: 'Part Opname',
   opname_stock: 'Stok Opname | Penyesuaian stock',
   opname_voucher: 'Voucher Entri | Voucher Stock',
   transfer_stock: 'Migrasi Stok | Pemindahan stock',
 
+  receipt_delivery: 'Penerimaan & Pengiriman',
+  incoming_good: 'Incoming Good | Kedatangan - Material',
   outgoing_good: 'Outgoing Good | Keberangkatan - Part',
   outgoing_verification: 'Outgoing Verification | Verifikasi Part Keluar',
-
   pre_delivery: 'Pre Delivery | Permintaan Pengiriman',
   sj_delivery: 'Delivery (SJDO) | Surat Jalan Pengiriman',
   schedule_board: 'Penjadwalan |Jadwal Pengiriman & Penjemputan',

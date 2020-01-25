@@ -225,7 +225,7 @@ export default {
       if (data) {
         let link = null
         switch (type) {
-          case 'App\\Models\\Warehouse\\IncomingGoodItem': link = '/admin/warehouses/incoming-goods/'+ data.id
+          case 'App\\Models\\Warehouse\\IncomingGoodItem': link = '/admin/deliveries/incoming-goods/'+ data.id
           break;
 
           case 'App\\Models\\Warehouse\\OutgoingGoodItem': link = '/admin/warehouses/outgoing-goods/'+ data.id

@@ -11,7 +11,7 @@
 <script>
 import MixPage from '@/mixins/mix-page.vue'
 import ItemHistories from '@/pages/admin/common/items/dashboard-histories'
-import IncomingValidation from '@/pages/admin/warehouses/incoming-goods/dashboard-validation'
+import IncomingValidation from '@/pages/admin/deliveries/incoming-goods/dashboard-validation'
 import WorkOrderValidation from '@/pages/admin/factories/work-orders/dashboard-validation'
 
 export default {

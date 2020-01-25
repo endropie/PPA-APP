@@ -168,7 +168,7 @@ export default {
       VIEW: {
         resource:{
           api: '/api/v1/warehouses/incoming-goods',
-          uri: '/admin/warehouses/incoming-goods',
+          uri: '/admin/deliveries/incoming-goods',
           params: '?mode=view'
         }
       },

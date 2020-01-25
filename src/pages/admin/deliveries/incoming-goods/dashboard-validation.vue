@@ -55,7 +55,7 @@ export default {
     return {
       resource: {
         api: '/api/v1/warehouses/incoming-goods',
-        uri: '/admin/incoming-goods',
+        uri: '/admin/deliveries/incoming-goods',
       },
       show: true,
       loading: false,
