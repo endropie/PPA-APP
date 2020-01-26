@@ -118,7 +118,7 @@
             },
             { label: (`${$tc('form.revision')}`).toUpperCase(), color:'orange', icon: 'edit',
               hidden: !IS_REVISE || rsView.status !== 'VALIDATED' || !this.$app.can('incoming-goods-revision'),
-              // detail:$tc('messages.process_revision'),
+              detail:$tc('messages.process_revise'),
               actions: () => {
                 setRevision()
               }
@@ -138,7 +138,7 @@
               }
             },
             { label: 'PDO', color:'blue-10', icon: 'assignment',
-              hidden: !this.$app.can('pre-deliveries-create'),
+              hidden: !this.$app.can('pre-deliveries-create') || rsView.order_mode !== 'NONE',
               detail: $tc('form.add_new',1, {v:'PDO'}),
               actions: () => {
                 $router.push(`/admin/deliveries/pre-deliveries/create?incoming_good_id=${ROUTE.params.id}`)

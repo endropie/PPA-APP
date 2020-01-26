@@ -39,7 +39,7 @@ export default {
   process_clone: 'Proses Salin data.',
   process_validation: 'Proses Validasi data.',
   process_confirm: 'Proses Konfirmasi data.',
-  process_revise: 'Proses perubahan Revisi data.',
+  process_revise: 'Proses Revisi dokumen.',
   process_void: 'Proses Pembatalan data.',
   process_producted: 'Tandai Proses produksi telah selesai.',
   process_packed: 'Tandai Proses Packing telah selesai.',
