@@ -1,7 +1,6 @@
 <template>
-  <q-page padding class="row justify-center" >
-    <page-print v-if="VIEW.show" class="q-pa-md q-pr-lg shadow-2" :class="{'header-minimaze': $q.screen.lt.md} " style="max-width:210mm;">
-      <!-- AVAILBLE "slot" = [header, header-icon, header-title, header-subtitle, header-tags] -->
+  <q-page padding class="column justify-start items-center q-gutter-sm" >
+    <page-print v-if="VIEW.show" class="" >
       <div slot="header-title">
         OUTGOING GOOD
       </div>
@@ -16,22 +15,20 @@
               <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
             </div>
             <div class="col-auto info">
-              <q-markup-table class="bordered super-dense no-highlight no-shadow" separator="cell">
-                <tr>
-                  <td class="text-weight-light">No</td>
-                  <td>
-                    {{ rsView.number }}
-                    <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text-weight-light">{{$tc('label.date')}}</td>
-                  <td>{{$app.date_format(rsView.date)}}</td>
-                </tr>
-                 <tr>
-                  <td class="text-weight-light">{{$tc('label.transaction')}}</td>
-                  <td>{{ rsView.transaction }}</td>
-                </tr>
+              <q-markup-table dense bordered class="no-highlight no-shadow" separator="cell">
+                <tbody>
+                  <tr>
+                    <td class="text-weight-light">No</td>
+                    <td>
+                      {{ rsView.number }}
+                      <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-weight-light">{{$tc('label.date')}}</td>
+                    <td>{{$app.date_format(rsView.date)}}</td>
+                  </tr>
+                </tbody>
               </q-markup-table>
             </div>
           </div>

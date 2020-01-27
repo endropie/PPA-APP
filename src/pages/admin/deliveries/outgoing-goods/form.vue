@@ -107,106 +107,110 @@
       </div>
       <!-- COLUMN::3th Part items lists -->
       <div class="col-12 q-my-md" >
-        <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
+        <q-markup-table bordered class="main-box no-shadow no-highlight th-uppercase"
           dense separator="horizontal"
           :dark="LAYOUT.isDark">
-          <q-tr>
-            <q-th key="prefix"></q-th>
-            <q-th key="item_id" class="text-left">{{$tc('items.part_name')}}</q-th>
-            <q-th key="part_number" class="text-left">{{$tc('items.part_number')}}</q-th>
-            <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
-            <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
-          </q-tr>
-          <q-tr v-for="(row, index) in rsForm.outgoing_good_items" :key="index">
-            <q-td key="prefix" width="50px" class="q-gutter-x-xs">
-              <q-btn dense round flat color="red" icon="clear" @click="exclude(index, row)"/>
-            </q-td>
-            <q-td key="part_name">
-              <span v-if="Boolean(row.item)" class="">
-                {{row.item.part_name}}
-              </span>
-            </q-td>
-            <q-td key="part_number">
-              <span v-if="Boolean(row.item)" class="">
-                {{row.item.part_number}}
-              </span>
-            </q-td>
-            <q-td key="unit_id" width="15%" >
-              <q-select :name="`outgoing_good_items.${index}.unit_id`"
-                style="min-width:60px"
-                v-model="row.unit_id"
-                outlined dense hide-bottom-space
-                :dark="LAYOUT.isDark" color="blue-grey-5"
-                :options="ItemUnitOptions[index]"
-                map-options emit-value
-                v-validate="row.item_id ? 'required' : ''"
-                :error="errors.has(`outgoing_good_items.${index}.unit_id`)"
-                @input="(val)=>{ setUnitReference(index, val) }"/>
-            </q-td>
-            <q-td key="quantity" width="25%" >
-              <q-input :name="`outgoing_good_items.${index}.quantity`"
-                style="min-width:120px"
-                v-model="row.quantity" type="number" :min="0"
-                outlined dense hide-bottom-space no-error-icon align="center"
-                :dark="LAYOUT.isDark" color="blue-grey-5"
-                v-validate="`required|gt_value:0|max_value: ${row.MAX / row.unit_rate}`"
-                :error="errors.has(`outgoing_good_items.${index}.quantity`)">
-
-                <span slot="append" class="text-subtitle2">
-                  {{`/ ${$app.number_format(row.MAX / row.unit_rate)}`}}
+          <thead>
+            <q-tr style="line-height:30px">
+              <q-th key="prefix"></q-th>
+              <q-th key="item_id" class="text-left">{{$tc('items.part_name')}}</q-th>
+              <q-th key="part_number" class="text-left">{{$tc('items.part_number')}}</q-th>
+              <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
+              <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+            </q-tr>
+          </thead>
+          <tbody>
+            <q-tr v-for="(row, index) in rsForm.outgoing_good_items" :key="index">
+              <q-td key="prefix" width="50px" class="q-gutter-x-xs">
+                <q-btn dense round flat color="red" icon="clear" @click="exclude(index, row)"/>
+              </q-td>
+              <q-td key="part_name">
+                <span v-if="Boolean(row.item)" class="">
+                  {{row.item.part_name}}
                 </span>
-
-                <q-btn slot="after"
-                  dense flat color="primary"
-                  icon="done_all"
-                  v-if="!row.quantity"
-                  @click="row.quantity = row.MAX" >
-                  <q-tooltip>{{$tc('label.all')}}</q-tooltip>
-                </q-btn>
-              </q-input>
-            </q-td>
-          </q-tr>
-          <q-tr v-for="(exItem, index) in rsForm.exclude_items" :key="index"
-            style="background-color: rgba(125, 125, 125, 0.2)">
-            <q-td key="prefix" class="q-gutter-x-xs">
-              <q-btn dense glossy color="green-5" icon="add" @click="include(index, exItem)"/>
-            </q-td>
-            <q-td key="part_name">
-              <span v-if="Boolean(exItem.item)" class="text-strike">
-                {{exItem.item.part_name}}
-              </span>
-            </q-td>
-            <q-td key="part_number">
-              <span v-if="Boolean(exItem.item)" class="text-strike">
-                {{exItem.item.part_number}}
-              </span>
-            </q-td>
-            <q-td key="unit_id" width="20%" >
-            </q-td>
-            <q-td key="quantity" width="20%" >
-            </q-td>
-          </q-tr>
-          <q-tr v-show="rsForm.outgoing_good_items.length <= 0">
-            <q-td colspan="100%">
-              <q-banner  inline-actions class="main-box"
-                :class="{
-                  'bg-grey-2 text-faded': !LAYOUT.isDark,
-                  'text-white': LAYOUT.isDark
-                }">
-                <template v-slot:avatar>
-                  <q-icon v-show="errors.has('totals')" name="warning" color="warning" />
-                </template>
-                <span class="text-body2">
-                  <input type="number" class="hidden"
-                    name="totals" :data-vv-as="$tc('label.total', 1, {v:$tc('label.quantity')})"
-                    :value="ITEMS_LENGTH"
-                    v-validate="`required|gt_value:0`">
-                  <span v-if="!rsForm.customer_id">{{ $tc('form.select_a',1,{v:$tc('general.customer')}) }}</span>
-                  <span v-else-if="errors.has('totals')" class="text-red">{{ $tc('messages.no_details') }}</span>
+              </q-td>
+              <q-td key="part_number">
+                <span v-if="Boolean(row.item)" class="">
+                  {{row.item.part_number}}
                 </span>
-              </q-banner>
-            </q-td>
-          </q-tr>
+              </q-td>
+              <q-td key="unit_id" width="15%" >
+                <q-select :name="`outgoing_good_items.${index}.unit_id`"
+                  style="min-width:60px"
+                  v-model="row.unit_id"
+                  outlined dense hide-bottom-space
+                  :dark="LAYOUT.isDark" color="blue-grey-5"
+                  :options="ItemUnitOptions[index]"
+                  map-options emit-value
+                  v-validate="row.item_id ? 'required' : ''"
+                  :error="errors.has(`outgoing_good_items.${index}.unit_id`)"
+                  @input="(val)=>{ setUnitReference(index, val) }"/>
+              </q-td>
+              <q-td key="quantity" width="25%" >
+                <q-input :name="`outgoing_good_items.${index}.quantity`"
+                  style="min-width:120px"
+                  v-model="row.quantity" type="number" :min="0"
+                  outlined dense hide-bottom-space no-error-icon align="center"
+                  :dark="LAYOUT.isDark" color="blue-grey-5"
+                  v-validate="`required|gt_value:0|max_value: ${row.MAX / row.unit_rate}`"
+                  :error="errors.has(`outgoing_good_items.${index}.quantity`)">
+
+                  <span slot="append" class="text-subtitle2">
+                    {{`/ ${$app.number_format(row.MAX / row.unit_rate)}`}}
+                  </span>
+
+                  <q-btn slot="after"
+                    dense flat color="primary"
+                    icon="done_all"
+                    v-if="!row.quantity"
+                    @click="row.quantity = row.MAX" >
+                    <q-tooltip>{{$tc('label.all')}}</q-tooltip>
+                  </q-btn>
+                </q-input>
+              </q-td>
+            </q-tr>
+            <q-tr v-for="(exItem, index) in rsForm.exclude_items" :key="index"
+              style="background-color: rgba(125, 125, 125, 0.2)">
+              <q-td key="prefix"  width="50px" class="q-gutter-x-xs">
+                <q-btn dense glossy color="green-5" icon="add" @click="include(index, exItem)"/>
+              </q-td>
+              <q-td key="part_name">
+                <span v-if="Boolean(exItem.item)" class="text-strike">
+                  {{exItem.item.part_name}}
+                </span>
+              </q-td>
+              <q-td key="part_number">
+                <span v-if="Boolean(exItem.item)" class="text-strike">
+                  {{exItem.item.part_number}}
+                </span>
+              </q-td>
+              <q-td key="unit_id" width="20%" >
+              </q-td>
+              <q-td key="quantity" width="20%" >
+              </q-td>
+            </q-tr>
+            <q-tr v-show="rsForm.outgoing_good_items.length <= 0">
+              <q-td colspan="100%">
+                <q-banner  inline-actions class="main-box"
+                  :class="{
+                    'bg-grey-2 text-faded': !LAYOUT.isDark,
+                    'text-white': LAYOUT.isDark
+                  }">
+                  <template v-slot:avatar>
+                    <q-icon v-show="errors.has('totals')" name="warning" color="warning" />
+                  </template>
+                  <span class="text-body2">
+                    <input type="number" class="hidden"
+                      name="totals" :data-vv-as="$tc('label.total', 1, {v:$tc('label.quantity')})"
+                      :value="ITEMS_LENGTH"
+                      v-validate="`required|gt_value:0`">
+                    <span v-if="!rsForm.customer_id">{{ $tc('form.select_a',1,{v:$tc('general.customer')}) }}</span>
+                    <span v-else-if="errors.has('totals')" class="text-red">{{ $tc('messages.no_details') }}</span>
+                  </span>
+                </q-banner>
+              </q-td>
+            </q-tr>
+          </tbody>
         </q-markup-table>
       </div>
       <!-- COLUMN::4th Description -->
@@ -468,7 +472,7 @@ export default {
         })
         .catch((error) => {
           this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error, 'Submit')
+          this.FORM.response.error(error.response || error, 'CREATE')
         })
         .finally(()=>{
           setTimeout(() => {
