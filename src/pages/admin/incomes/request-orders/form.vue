@@ -11,9 +11,10 @@
               ? CONFIG.options.order_mode.find(x => x.value === rsForm.order_mode).label : rsForm.order_mode}}
           </span>
         </q-chip>
-        <ux-chip-status square slot="optional" :row="rsForm" outline/>
+        <ux-chip-status square slot="optional" :row="rsForm" outline v-if="rsForm.status"/>
       </form-header>
     </q-card-section>
+    <q-separator />
     <!-- COLUMN::1st customer Identitity -->
     <q-card-section class="row q-col-gutter-sm">
       <div class="col-12 col-sm-6" >
@@ -59,13 +60,6 @@
                 v-if="rsForm.is_estimate"/>
 
           </q-field>
-          <div class="col-12 q-px-lg">
-            <q-btn outline class="full-width"
-              :label="$tc('messages.release_customer_order')"
-              color="primary"
-              @click="isFinished = true"
-              v-if="rsForm.id && rsForm.is_estimate && !Boolean(isFinished)"/>
-          </div>
           <q-input name="reference_number" class="col-12"
             stack-label label="PO / Qoutation / Memo"
             v-model="rsForm.reference_number"
@@ -76,12 +70,26 @@
             v-if="!rsForm.is_estimate || isFinished">
             <q-btn slot="after" flat round icon="clear" v-if="isFinished" @click="setCancelFinished" />
           </q-input>
+          <ux-date name="actived_date" class="col-12" v-if="rsForm.order_mode === 'PO'"
+            stack-label :label="$tc('label.expired',2) + ' PO'"
+            v-model="rsForm.actived_date"
+            :dark="LAYOUT.isDark"
+            v-validate="rsForm.order_mode == 'PO' ? 'required' : ''"
+            :error="errors.has('actived_date')"
+            :error-message="errors.first('actived_date')" />
+
+          <div class="col-12 q-px-lg" v-if="rsForm.id && rsForm.is_estimate && !Boolean(isFinished)">
+            <q-btn outline class="full-width"
+              :label="$tc('messages.release_customer_order')"
+              color="primary"
+              @click="isFinished = true"/>
+          </div>
         </div>
       </div>
     </q-card-section>
     <!-- COLUMN::2th Incoming Items lists -->
-    <q-card-section class="row q-col-gutter-sm q-col-gutter-x-md">
-      <div class="col-12 q-my-md">
+    <q-card-section class="row">
+      <div class="col-12 q-pb-md">
         <q-markup-table class="main-box no-shadow no-highlight th-uppercase"
           dense bordered separator="horizontal"
           :dark="LAYOUT.isDark">
@@ -223,15 +231,13 @@ export default {
       setDefault:()=>{
         return {
           number: null,
-          begin_date: this.$app.moment().format('YYYY-MM-DD'),
-          until_date: this.$app.moment().format('YYYY-MM-DD'),
-
           customer_id: null,
           date: null,
           reference_number: null,
           transaction: 'REGULER',
           order_mode: null,
           description: null,
+          actived_date: null,
           is_estimate: 0,
           estimate_number: null,
 

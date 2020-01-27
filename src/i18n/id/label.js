@@ -20,6 +20,7 @@ export default {
   encasement: 'Kemasan',
   email: 'Email',
   estimate: 'Estimasi | Estimasi (Bayangan)',
+  expired: 'Kadaluwarsa | Masa Berlaku',
   field: 'Kolom',
   grandtotal: 'Grand Total',
   general: 'Umum',
