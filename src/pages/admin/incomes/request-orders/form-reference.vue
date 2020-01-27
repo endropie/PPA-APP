@@ -83,90 +83,37 @@
     <q-card-section class="row q-col-gutter-sm q-col-gutter-x-md">
       <div class="col-12 q-my-md">
         <q-markup-table class="main-box no-shadow no-highlight th-uppercase"
-          dense bordered separator="horizontal"
+          dense bordered separator="vertical"
           :dark="LAYOUT.isDark">
           <thead>
             <q-tr style="line-height:30px">
-              <q-th key="prefix" width="50px"></q-th>
-              <q-th key="item">{{$tc('items.part_name')}}</q-th>
-              <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
-              <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
-              <q-th key="price">{{$tc('label.price')}}</q-th>
-              <q-th key="total">{{$tc('label.total')}}</q-th>
+              <q-th key="item" class="text-left">{{$tc('items.part_name')}}</q-th>
+              <q-th key="quantity" class="text-right">{{$tc('label.quantity')}}</q-th>
+              <q-th key="unit_id" class="text-left">{{$tc('label.unit')}}</q-th>
+              <q-th key="price" class="text-right">{{$tc('label.price')}}</q-th>
+              <q-th key="total" class="text-right">{{$tc('label.total')}}</q-th>
             </q-tr>
           </thead>
           <tbody>
             <q-tr v-for="(row, index) in rsForm.request_order_items" :key="index">
-              <q-td key="prefix" style="width:50px">
-                <q-btn dense flat icon="clear" color="negative" @click="removeItem(index)" v-if="!Boolean(row.id)"/>
+              <q-td key="item" width="30%" style="min-width:150px">
+                <div class="column">
+                  <span>{{row.item.part_name}}</span>
+                  <small class="text-light">{{row.item.part_number}}</small>
+                </div>
               </q-td>
-              <q-td key="item" width="45%" style="min-width:150px">
-                <ux-select class="field-native-top"
-                  :name="`request_order_items.${index}.item_id`"
-                  v-model="row.item_id"
-                  v-validate="'required'"
-                  outlined dense hide-bottom-space color="blue-grey-5"
-                  :options="ItemOptions"
-                  filter emit-value map-options
-                  :readonly="!IssetCustomerID"
-                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                  :error="errors.has(`request_order_items.${index}.item_id`)"
-                  :loading="SHEET['items'].loading"
-                  @input="(val)=>{ setItemReference(index, val) }"
-                >
-                  <small v-if="row.item" class="absolute-bottom text-weight-light"> {{row.item.part_number}} </small>
-                  <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
-                </ux-select>
-              </q-td>
-              <q-td key="quantity" width="20%">
-                <q-input :name="`request_order_items.${index}.quantity`"
-                  v-model="row.quantity" type="number" min="0"
-                  outlined dense hide-bottom-space
-                  color="blue-grey-5" style="min-width:80px"
-                  v-validate="row.item_id ? `required|gt_value:0|min_value:${getMinQuantity(index)}` : ''"
-                  :dark="LAYOUT.isDark"
-                  :error="errors.has(`request_order_items.${index}.quantity`)"
-                />
+              <q-td key="quantity" width="10%" class="text-right">
+                {{$app.number_format(row.quantity)}}
               </q-td>
               <q-td key="unit_id" width="10%">
-                <q-select :name="`request_order_items.${index}.unit_id`"
-                  v-model="row.unit_id"
-                  :options="ItemUnitOptions[index]"
-                  map-options emit-value
-                  outlined dense hide-bottom-space
-                  color="blue-grey-5" style="width:80px"
-                  v-validate="row.item_id ? 'required' : ''"
-                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                  :error="errors.has(`request_order_items.${index}.unit_id`)"
-                  @input="(val)=> { setUnitReference(index, val) }" />
-                <q-input v-model="row.unit_rate" class="hidden" />
+                {{row.unit.code}}
               </q-td>
-              <q-td key="price" width="20%" style="min-width:120px">
-                <ux-numeric type="number" :name="`request_order_items.${index}.price`"
-                  v-model="row.price"
-                  outlined dense hide-bottom-space
-                  color="blue-grey-5" style="min-width:120px"
-                  v-validate="row.item_id ? 'required' : ''"
-                  :dark="LAYOUT.isDark"
-                  :error="errors.has(`request_order_items.${index}.price`)" />
+              <q-td key="price" width="20%" class="text-right" style="min-width:120px">
+                {{$app.number_format(row.price)}}
               </q-td>
-              <q-td key="total" width="25%" style="min-width:150px">
-                <ux-numeric :name="`total-${index}`"
-                  :value="Number(row.quantity) * Number(row.price)"
-                  readonly dense borderless hide-bottom-space
-                  color="blue-grey-5" style="width:120px"
-                  v-validate="row.item_id ? '' : ''"
-                  :dark="LAYOUT.isDark"
-                  :error="errors.has(`total-${index}`)"
-                />
+              <q-td key="total" width="20%" class="text-right" style="min-width:150px">
+                {{$app.number_format(Number(row.quantity) * Number(row.price))}}
               </q-td>
-            </q-tr>
-            <q-tr>
-              <q-td></q-td>
-              <q-td>
-                <q-btn dense outline :label="$tc('form.add')" icon="add_circle_outline" color="blue-grey" class="full-width" @click="addNewItem()"/>
-              </q-td>
-              <q-td colspan="100%"></q-td>
             </q-tr>
           </tbody>
         </q-markup-table>
@@ -256,12 +203,8 @@ export default {
   },
   computed: {
     IS_EDITABLE() {
-      if (this.rsForm.order_mode === 'NONE') return false
       if (this.rsForm.deleted_at) return false
-      if (Object.keys(this.rsForm.has_relationship|| {}).length > 0) {
-        if (!Boolean(this.rsForm.is_estimate)) return false
-      }
-
+      if (this.rsForm.status === 'CLOSE') return false
       return true
     },
     IssetItemDetails() {
@@ -274,9 +217,6 @@ export default {
 
         return false
     },
-    IssetCustomerID() {
-      return (this.rsForm.customer_id ? true : false)
-    },
     CustomerOptions() {
 
       let data = this.SHEET.customers.data
@@ -285,40 +225,6 @@ export default {
       }
 
       return (data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
-    },
-    BrandOptions() {
-      return (this.SHEET.brands.data.map(item => ({label: item.name, value: item.id})) || [])
-    },
-    TransportOptions() {
-      return (this.SHEET.vehicles.data.map(item => ({label: item.name, value: item.id})) || [])
-    },
-    UnitOptions() {
-      return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
-    },
-    ItemOptions() {
-      let items = this.SHEET.items.data.filter((item) => item.customer_id === this.rsForm.customer_id)
-      return (items.map(item => ({label: item.part_name, sublabel: `[${item.customer_code}] No.${item.part_number}`, value: item.id, disable: !item.enable})) || [])
-    },
-    ItemUnitOptions() {
-      let vars = []
-      for (const i in this.rsForm.request_order_items) {
-        if (this.rsForm.request_order_items.hasOwnProperty(i)) {
-          let rsItem = this.rsForm.request_order_items[i]
-          vars[i] = ( this.UnitOptions || [])
-          vars[i] = vars[i].filter((unit)=> {
-            if(!rsItem.item_id) return false
-            if(rsItem.item) {
-              if(rsItem.item.unit_id === unit.value) return true
-              if(rsItem.item.item_units) {
-                let filtered = rsItem.item.item_units.filter((fill)=> fill.unit_id == unit.value)
-                if(filtered.length > 0) return true
-              }
-            }
-            return false;
-          })
-        }
-      }
-      return vars
     },
     MAPINGKEY() {
       let variables = {
@@ -376,37 +282,6 @@ export default {
         }
       }
     },
-    setItemReference(index, val) {
-      if(!val) {
-        this.rsForm.request_order_items[index].unit_id = null
-        this.rsForm.request_order_items[index].price = null
-        this.rsForm.request_order_items[index].unit = {}
-        this.rsForm.request_order_items[index].item = {}
-      }
-      else {
-        this.rsForm.request_order_items[index].item = this.MAPINGKEY['items'][val]
-        this.rsForm.request_order_items[index].price = this.MAPINGKEY['items'][val].price
-
-        let baseUnitID = this.MAPINGKEY['items'][val].unit_id
-        this.rsForm.request_order_items[index].unit_id = baseUnitID
-        this.rsForm.request_order_items[index].unit_rate = 1
-        this.rsForm.request_order_items[index].unit = this.MAPINGKEY['units'][baseUnitID]
-      }
-    },
-    setUnitReference(index, val) {
-
-      if(!val) return;
-      else if (this.rsForm.request_order_items[index].item.unit_id === val) {
-        this.rsForm.request_order_items[index].unit_rate = 1
-      }
-      else {
-        if(this.rsForm.request_order_items[index].item.item_units) {
-          this.rsForm.request_order_items[index].item.item_units.map((unitItem)=> {
-            if (unitItem.unit_id == val) this.rsForm.request_order_items[index].unit_rate = unitItem.rate
-          })
-        }
-      }
-    },
     routing() {
       if(this.ROUTE.meta.mode === 'edit') {
 
@@ -434,22 +309,6 @@ export default {
         this.FORM.show = true;
       }
     },
-    getMinQuantity(index) {
-      if (this.FORM.data.request_order_items) {
-        const details = this.FORM.data.request_order_items
-        if (details[index]) return details[index].quantity || 0
-      }
-      return 0
-    },
-    addNewItem(autofocus = true){
-      let newEntri = this.setDefault().request_order_items[0] // {id:null, item_id: null, quantity: null};
-
-      this.rsForm.request_order_items.push(newEntri)
-    },
-    removeItem(index) {
-        this.rsForm.request_order_items.splice(index, 1)
-        if(this.rsForm.request_order_items.length < 1) this.addNewItem()
-    },
     setCancelFinished() {
       this.rsForm.reference_number = null
       this.$nextTick(()=> {
@@ -467,14 +326,8 @@ export default {
           return;
         }
         this.FORM.loading = true
-        let {method, mode, apiUrl} = this.FORM.meta();
-
-        if (this.rsForm.is_estimate) {
-          apiUrl = this.isFinished
-            ? `${apiUrl}?mode=estimate_finished`
-            : `${apiUrl}?mode=estimate_updated`
-        }
-
+        let {method, mode, apiUrl} = this.FORM.meta()
+        apiUrl =  `${apiUrl}?mode=referenced`
         console.warn('URL',apiUrl)
 
         this.$axios.set(method, apiUrl, this.rsForm)
@@ -496,8 +349,3 @@ export default {
   },
 }
 </script>
-<style lang="stylus">
-.field-native-top
-  .q-field__native
-    align-items flex-start
-</style>

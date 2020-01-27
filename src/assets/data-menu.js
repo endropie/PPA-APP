@@ -72,6 +72,7 @@ const incomes = [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'request-orders-read;pre-deliveries-create' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'request-orders-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'request-orders-update' } },
+      { page: 'form-reference', path: ':id/edit-reference', meta: { mode: 'edit', permission: 'request-orders-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'request-orders-read;pre-deliveries-create' } }
     ]
   }

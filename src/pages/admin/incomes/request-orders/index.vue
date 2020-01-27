@@ -118,7 +118,8 @@
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
           <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`"/>
           <q-btn v-if="isCanUpdate && isEditable(rs.row)" dense flat color="light" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" />
-          <q-btn v-if="isCanDelete && isEditable(rs.row)" dense flat color="light" icon="delete" @click.native="TABLE.delete(rs.row)" />
+          <!-- <q-btn v-if="isCanDelete && isEditable(rs.row)" dense flat color="light" icon="delete" @click.native="TABLE.delete(rs.row)" /> -->
+          <q-btn v-if="isCanUpdate && isEditRef(rs.row)" flat dense color="light" icon="link" :to="`${TABLE.resource.uri}/${rs.row.id}/edit-reference`" />
         </q-td>
 
         <q-td slot="body-cell-date" slot-scope="rs" :props="rs" class="text-uppercase">
@@ -137,12 +138,8 @@
             </small>
           </div>
         </q-td>
-
       </q-table>
     </q-pull-to-refresh>
-
-
-
   </q-page>
 </template>
 
@@ -209,13 +206,20 @@ export default {
   },
   methods: {
     isEditable(row) {
-      if (row.order_mode === 'NONE') return false
+      if(row.deleted_at) return false
+      if (row.order_mode !== 'PO') return false
       if (row.status !== 'OPEN') return false
       if (row.hasOwnProperty('is_relationship') && row.is_relationship) {
         if (!Boolean(row.is_estimate)) return false
       }
       return true
-    }
+    },
+    isEditRef (row) {
+      if(row.deleted_at) return false
+      if(row.order_mode === 'PO') return false
+      if(row.status === 'CLOSE') return false
+      return true
+    },
   }
 }
 </script>

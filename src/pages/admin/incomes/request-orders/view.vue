@@ -5,7 +5,7 @@
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
         <span v-if="!rsView.deleted_at && Number(rsView.total_unit_delivery) > 0 && ['OPEN','CLOSED'].some(x => x === rsView.status)">
             <q-chip square outline icon="local_shipping"
-              label="Delivered"
+              label="DELIVERED"
               color="orange-10"
               v-if="Math.round(rsView.total_unit_amount) === Math.round(rsView.total_unit_delivery)" >
             </q-chip>

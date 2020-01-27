@@ -32,9 +32,9 @@ const config = {
       { label: 'OVERTIME', value: 'OVERTIME', color: 'secondary' }
     ],
     order_mode: [
-      { label: 'None', value: 'NONE' },
+      { label: 'HARIAN', value: 'NONE' },
       { label: 'PO', value: 'PO' },
-      { label: 'PO Accumulate', value: 'ACCUMULATE' }
+      { label: 'AKUMULASI', value: 'ACCUMULATE' }
     ],
     invoice_mode: [
       { value: 'JOIN', label: 'JOIN', detail: 'Service & material are joined', color: 'positive' },
