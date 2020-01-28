@@ -472,7 +472,7 @@ export default {
         })
         .catch((error) => {
           this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error, 'CREATE')
+          this.FORM.response.error(error.response || error, 'CREATE FAILED')
         })
         .finally(()=>{
           setTimeout(() => {
