@@ -11,7 +11,7 @@
               ? CONFIG.options.order_mode.find(x => x.value === rsForm.order_mode).label : rsForm.order_mode}}
           </span>
         </q-chip>
-        <ux-chip-status square slot="optional" :row="rsForm" outline v-if="rsForm.status"/>
+        <ux-chip-status square slot="optional" :row="rsForm" outline v-if="rsForm.id"/>
       </form-header>
     </q-card-section>
     <q-separator />
@@ -31,13 +31,24 @@
             :loading="SHEET['customers'].loading">
             <q-tooltip v-if="IssetItemDetails" :offset="[0, 10]">To change: Please delete Part items first!</q-tooltip>
           </ux-select-filter>
-          <ux-date class="col-12" name="date"
+          <ux-date class="col" style="min-width:150px" name="date"
             stack-label :label="$tc('label.date')"
             v-model="rsForm.date"
             :dark="LAYOUT.isDark"
             v-validate="'required'"
             :error="errors.has('date')"
-            :error-message="errors.first('date')" />
+            :error-message="errors.first('date')"
+          />
+          <q-space />
+          <ux-date name="actived_date" class="col" style="min-width:150px"
+            stack-label :label="$tc('label.expired',2) + ' PO'"
+            v-model="rsForm.actived_date"
+            :dark="LAYOUT.isDark"
+            v-validate="rsForm.order_mode == 'PO' ? 'required' : ''"
+            :error="errors.has('actived_date')"
+            :error-message="errors.first('actived_date')"
+             v-if="rsForm.order_mode === 'PO'"
+          />
         </div>
       </div>
       <div class="col-12 col-sm-6" >
@@ -70,13 +81,6 @@
             v-if="!rsForm.is_estimate || isFinished">
             <q-btn slot="after" flat round icon="clear" v-if="isFinished" @click="setCancelFinished" />
           </q-input>
-          <ux-date name="actived_date" class="col-12" v-if="rsForm.order_mode === 'PO'"
-            stack-label :label="$tc('label.expired',2) + ' PO'"
-            v-model="rsForm.actived_date"
-            :dark="LAYOUT.isDark"
-            v-validate="rsForm.order_mode == 'PO' ? 'required' : ''"
-            :error="errors.has('actived_date')"
-            :error-message="errors.first('actived_date')" />
 
           <div class="col-12 q-px-lg" v-if="rsForm.id && rsForm.is_estimate && !Boolean(isFinished)">
             <q-btn outline class="full-width"
