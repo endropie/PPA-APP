@@ -14,7 +14,7 @@
         :loading="TABLE.loading">
 
         <!-- Table Header -->
-        <template v-slot:top>
+        <template v-slot:top="props">
           <table-header hide-search
             :title="TABLE.getTitle()"
             :TABLE.sync="TABLE"
@@ -36,7 +36,12 @@
                   FILTERABLE.toggleTrash()
                   FILTERABLE.submit()
                 }
-              }
+              },
+              { label: 'Fullscreen',
+                icon: props.inFullscreen ? 'fullscreen_exit' : 'fullscreen',
+                shortcut: true,
+                actions:props.toggleFullscreen
+              },
             ]">
 
             <div class="row q-col-gutter-xs" >
@@ -98,15 +103,14 @@
           </table-header>
         </template>
 
-        <template slot="body" slot-scope="rs">
-          <tr rs="rs">
             <!-- slot name syntax: body-cell-<column_name> -->
-            <q-td slot="body-cell-prefix"  style="width:35px">
+            <q-td slot="body-cell-prefix" slot-scope="rs"  style="width:35px">
               <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" />
             </q-td>
-            <q-td>
+            <q-td slot="body-cell-number" slot-scope="rs">
               <!-- <q-btn flat dense icon="keyboard_arrow_down" color="primary" @click="rs.expand = !rs.expand" /> -->
-              <q-btn-dropdown flat dense round color="primary"
+              <q-btn-dropdown flat dense round color="dark"
+                :label="`${rs.row.number} (${rs.row.delivery_orders.length})`"
                 menu-anchor="bottom left" menu-self="top left">
                 <div class="row q-pa-md">
                   <div class="column">
@@ -125,39 +129,9 @@
                   </div>
                 </div>
               </q-btn-dropdown>
-              {{ rs.row.number }}
               <!-- <q-checkbox color="primary" v-model="rs.expand" checked-icon="remove" unchecked-icon="add" class="q-mr-md" /> -->
-              <ux-badge-status :row="rs.row" class=" on-right shadow-0" />
+              <ux-chip-status dense square :row="rs.row" class=" on-right shadow-0" />
             </q-td>
-            <q-td>
-              <span v-if="rs.row.customer"> {{ rs.row.customer.name }}</span>
-              <span v-else>- undifined -</span>
-            </q-td>
-            <q-td>
-              <span v-if="rs.row.operator"> {{ rs.row.operator.name }}</span>
-              <span v-else>- undifined -</span>
-            </q-td>
-            <q-td>
-              {{ rs.row.date }}
-            </q-td>
-            <q-td>
-              {{ rs.row.due_date }}
-            </q-td>
-          </tr>
-
-          <q-tr v-show="rs.expand" :rs="rs">
-            <q-td>&nbsp;</q-td>
-            <q-td colspan="100%" class="group">
-              <template v-for="(link, index) in rs.row.delivery_orders">
-                <q-btn dense color="secondary" icon="open_in_new" :to="TABLE.resource.delivery_orders +'/'+link.id" :key="index">
-                  {{link.number}} {{ link.revise_number ? ' - REV.' + link.revise_number : '' }}
-                </q-btn>
-              </template>
-
-
-            </q-td>
-          </q-tr>
-        </template>
       </q-table>
     </q-pull-to-refresh>
 
@@ -208,13 +182,13 @@ export default {
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},
-
+          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true,
+            format:(v)=> v ? this.$app.moment(v).format('ll') : '-', classes: 'text-uppercase'},
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
-          // { name: 'vehicle_id', label: 'Vehicle', field: 'vehicle_id', align: 'left', sortable: true },
-          { name: 'operator_id', label: 'Operator', field: 'operator_id', align: 'left', sortable: true },
-          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'left', sortable: true},
-          { name: 'due_date', label: this.$tc('label.due_date'), field: 'due_date', align: 'left', sortable: true},
+          { name: 'customer_id', label: this.$tc('general.customer'), field: (val) => val.customer.name , align: 'left', sortable: true },
+          { name: 'operator_id', label: 'Operator', field: (val) => val.operator ? val.operator.name : '-', align: 'left', sortable: true },
+          { name: 'activated_date', label: this.$tc('label.expired'), field: 'activated_date', align: 'center', sortable: true,
+            format:(v)=> v ? this.$app.moment(v).format('ll') : '-', classes: 'text-uppercase'},
 
         ]
       },

@@ -1,6 +1,6 @@
 <template>
 <q-page padding class="form-page justify-center">
-  <q-card inline class="main-box q-ma-sm " v-if="FORM.show">
+  <q-card inline class="main-box" v-if="FORM.show">
     <q-card-section>
       <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" >
 
@@ -450,7 +450,7 @@ export default {
       this.rsForm.outgoing_good_items.push(row)
       this.rsForm.exclude_items.splice(index, 1)
     },
-    onSave() {
+    onSave(values = {}) {
       this.$validator.validate().then(result => {
 
         if (!result) {
@@ -464,13 +464,30 @@ export default {
         this.FORM.loading = true
         let {method, mode, apiUrl} = this.FORM.meta();
 
-        this.$axios.set(method, apiUrl, this.rsForm)
+        this.$axios.set(method, apiUrl, {...this.rsForm, ...values})
         .then((response) => {
           let message = response.data.number + ' - #' + response.data.id
           this.FORM.response.success({message:message})
           this.FORM.toView(response.data.id)
         })
         .catch((error) => {
+          if (error.response && error.response.status === 422 ) {
+            if (error.response.data.errors.hasOwnProperty('delivery_order_intern')) {
+              return this.$q.dialog({
+                title: 'Surat Jalan Delivery Internal',
+                message: 'Proses ini akan membuat Surat Jalan Internal',
+                ok: this.$tc('form.next', 2),
+                cancel: this.$tc('form.cancel')
+              })
+              .onOk(() => {
+                this.onSave({delivery_order_intern:true})
+                console.warn('GEN OK');
+              })
+              onCancel(() => {
+                console.warn('GEN CANCEL');
+              })
+            }
+          }
           this.FORM.response.fields(error.response)
           this.FORM.response.error(error.response || error, 'CREATE FAILED')
         })
