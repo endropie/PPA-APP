@@ -7,7 +7,7 @@
             <td :class="{'header-line': true}">
               <div class="page-print-header header">
                 <slot name="header">
-                  <div class="row no-wrap" >
+                  <div class="row" >
                     <div class="head-icon self-center">
                       <slot name="'header-icon'">
                         <q-avatar color="transparent" text-color="primary" rounded class="q-mr-sm">
@@ -18,7 +18,7 @@
                         </div> -->
                       </slot>
                     </div>
-                    <div class=" head-brand col-grow text-no-wrap ">
+                    <div class="head-brand col-grow text-no-wrap ">
                       <div  class="title text-weight-bolder uppercase ellipsis text-truncate" style="opacity:0.8">
                         <slot name="header-title">
                           <span>Priuk Perkasa Abadi, PT</span>
@@ -31,7 +31,7 @@
                       </div>
                     </div>
                     <q-space />
-                    <div class="col-auto no-print">
+                    <div class="col-auto no-print self-end items-end">
                       <slot name="header-tags"></slot>
                     </div>
                   </div>
@@ -93,11 +93,15 @@ export default {
 
 
 .super-dense .q-table
+  tbody
+    tr, th, td
+      height unset
   th:last-child,
   td:last-child
     padding-right: 8px
-  th, td
-    padding: 2px 6px
+  th,
+  td
+    padding: 3px 6px
 
 .profile, .info
   // font-size:12px

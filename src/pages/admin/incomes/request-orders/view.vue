@@ -10,7 +10,7 @@
               v-if="Math.round(rsView.total_unit_amount) === Math.round(rsView.total_unit_delivery)" >
             </q-chip>
             <q-chip square outline icon="local_shipping"
-              label="semi-Delivered"
+              label="SEMI-DELIVERY"
               color="orange"
               v-else>
             </q-chip>
@@ -50,9 +50,9 @@
           </div>
         </div>
         <div class="col-12">
-          <q-markup-table dense bordered class="no-shadow no-highlight" separator="cell">
+          <q-markup-table dense bordered separator="cell" class="no-shadow no-highlight"  :dark="LAYOUT.isDark">
             <thead>
-            <q-tr>
+            <q-tr style="line-height:30px">
               <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th>{{ $tc('label.unit') }}</q-th>
@@ -79,14 +79,36 @@
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
             <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
         </div>
+        <div class="col-12">
+          <q-btn dense flat color="secondary" class="print-hide float-right"
+            :label="$tc('form.show',1, {v:$tc('general.sj_delivery')})"
+            v-show="!show_delivery" @click="show_delivery = true"/>
+          <q-list v-show="show_delivery" bordered :dark="LAYOUT.isDark" class="main-box">
+            <q-item>
+              <q-item-section>{{$tc('general.sj_delivery', 2)}} ({{rsView.delivery_orders.length}})</q-item-section>
+              <q-item-section side>
+                <q-btn flat dense icon="clear" @click="show_delivery = !show_delivery"/>
+              </q-item-section>
+            </q-item>
+            <q-separator />
+            <q-item clickable v-ripple @click="showDO(link.id)" :dark="LAYOUT.isDark"
+              v-for="(link, index) in rsView.delivery_orders" :key="index">
+              <q-item-section>
+                {{link.fullnumber || link.number}}
+              </q-item-section>
+              <q-item-section side>
+                <ux-chip-status dense square :row="link" />
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </div>
       </div>
-      <div class="q-gutter-xs print-hide " style="padding-top:50px">
-        <q-btn :label="$tc('form.back')" :icon-right="btnIcon('cancel')"  color="dark" :to="`${VIEW.resource.uri}?return`" />
-        <q-btn :label="$tc('form.edit')" :icon-right="btnIcon('edit')" color="positive" v-if="IS_EDITABLE" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"  />
-        <q-btn :label="$tc('form.print')" :icon-right="btnIcon('print')" color="grey" @click.native="print()" />
-        <!-- <q-btn :label="$tc('form.delete')" :icon-right="btnIcon('delete')" color="negative" v-if="IS_EDITABLE" @click="VIEW.delete" outline
-          :class="{'float-right':$q.screen.gt.md}" /> -->
-        <ux-btn-dropdown :label="$tc('label.others')" :split="false" color="blue-grey" class="float-right"
+      <div class="row q-gutter-xs print-hide " style="padding-top:50px">
+        <q-btn :label="$tc('form.back')" icon="cancel" color="dark" :class="{'full-width': $q.screen.lt.sm}" :to="`${VIEW.resource.uri}?return`" />
+        <q-btn :label="$tc('form.edit')" icon="edit" color="positive" :class="{'full-width': $q.screen.lt.sm}" v-if="IS_EDITABLE" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"  />
+        <q-btn :label="$tc('form.print')" icon="print" color="grey" :class="{'full-width': $q.screen.lt.sm}" @click.native="print()" />
+        <q-space />
+        <ux-btn-dropdown  color="blue-grey" :class="{'full-width': $q.screen.lt.sm}"
           :options="[
            { label: $tc('form.add_new'), color:'green', icon: 'add',
               hidden: !$app.can('request-orders-create'),
@@ -116,8 +138,41 @@
             }
           ]">
         </ux-btn-dropdown>
+
+        <q-btn-dropdown v-show="false" dense round color="blue-grey" :class="{'full-width': $q.screen.lt.sm}"
+          :label="`DELIVERY (${rsView.delivery_orders.length})`"
+          menu-anchor="bottom left" menu-self="top left" v-if="rsView.delivery_orders.length">
+          <q-list :dark="LAYOUT.isDark" class="main-box">
+            <q-item clickable v-ripple @click="showDO(link.id)" :dark="LAYOUT.isDark"
+              v-for="(link, index) in rsView.delivery_orders" :key="index">
+              <q-item-section>
+                {{link.fullnumber || link.number}}
+              </q-item-section>
+              <q-item-section side>
+                <ux-badge-status :row="link" />
+              </q-item-section>
+            </q-item>
+          </q-list>
+          <!-- <div class="row q-pa-md">
+            <div class="column">
+              <div class="text-subtitle2 q-mb-md">SJ-DELIVERY ORDER</div>
+              <template v-for="(link, index) in rsView.delivery_orders">
+                <q-btn dense class="q-ma-xs" :key="index"
+                  color="secondary" icon="open_in_new"
+                  :label="`${link.number} ${link.revise_number ? ' - REV.' + link.revise_number : ''}`"
+                  @click="showDO(link.id)" />
+              </template>
+            </div>
+
+            <q-separator vertical inset class="q-mx-lg" v-show="false" />
+
+            <div class="column">
+            </div>
+          </div> -->
+        </q-btn-dropdown>
       </div>
     </page-print>
+    <ux-modal-view ref="modal" fit icon="local_shipping" :title="$tc('general.sj_delivery')" :dark="LAYOUT.isDark" />
   </q-page>
 </template>
 
@@ -140,7 +195,7 @@ export default {
         }
       },
       rsView: {},
-      count: 0,
+      show_delivery: false,
     }
   },
   created() {
@@ -184,6 +239,18 @@ export default {
     },
     print() {
       window.print()
+    },
+    showDO(id) {
+      let params = {
+        path: '/admin/deliveries/delivery-orders/view',
+        params: { id: id },
+        meta: { mode: 'view'},
+        actions: {
+          // actions
+        }
+      }
+
+      this.$refs.modal.show(params);
     },
     setView(data) {
       this.rsView =  data

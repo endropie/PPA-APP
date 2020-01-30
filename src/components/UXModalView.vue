@@ -3,7 +3,9 @@
     v-bind="$attrs"
     v-on="$listeners"
     v-model="opened"
-    :persistent="persistent">
+    :persistent="persistent"
+    :full-width="fit"
+    :full-height="fit">
     <q-layout class="bg-white" container  :class="'scroll'" >
       <q-header class="bg-primary">
         <q-toolbar>
@@ -51,6 +53,7 @@
 <script>
 export default {
   props: {
+    fit: Boolean,
     hideFotter: Boolean,
     hideHeader: Boolean,
     noBtnClose: Boolean,

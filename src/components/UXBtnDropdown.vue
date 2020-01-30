@@ -1,8 +1,7 @@
 <template>
-  <q-btn-dropdown v-show="!EMPTY"
-    split
+  <q-btn-dropdown split
+    v-show="!EMPTY"
     :label="$attrs.label || FIRST.label || '=='"
-    @click="firstCall()"
     v-bind="$attrs"
     v-on="$listeners"
   >
