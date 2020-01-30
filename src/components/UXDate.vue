@@ -12,6 +12,7 @@
               v-model="value"
               v-on="$listeners"
               :options="dateOptions"
+              :dark="$attrs.dark"
               @input="() => $refs.qDateProxy.hide()" />
           </q-popup-proxy>
         </q-btn>

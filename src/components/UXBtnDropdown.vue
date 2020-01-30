@@ -1,7 +1,7 @@
 <template>
   <q-btn-dropdown v-show="!EMPTY"
     split
-    :label="(FIRST && FIRST.label) || $attrs.label"
+    :label="$attrs.label || FIRST.label || '=='"
     @click="firstCall()"
     v-bind="$attrs"
     v-on="$listeners"
@@ -13,7 +13,7 @@
     <q-list style="min-width:200px">
       <template v-for="(item, index) in OPTIONS">
       <q-item :key="index"
-        v-if="!item.hidden && index !== 0"
+        v-if="!item.hidden && ($attrs.label || index !== 0)"
         clickable
         v-close-popup
         @click="actionsCall(item)" >
