@@ -1,157 +1,155 @@
 <template>
 <q-page padding class="form-page justify-center">
-  <q-card inline class="q-ma-sm " v-if="FORM.show">
+  <q-card inline class="main-box" v-if="FORM.show">
     <q-card-section>
-      <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" >
-          <q-chip label="Revised" slot="menu-prepend" small color="negative" v-if="rsForm.revise_id" />
+      <form-header :title="FORM.title()" :subtitle="rsForm.number ? `# ${rsForm.number}` : FORM.subtitle()" hide-menu>
+        <template  slot="menu-append">
+          <q-chip class="text-uppercase" label="Revised" small color="negative" v-if="rsForm.revise_id" />
+
+          <q-chip class="text-uppercase" square outline
+            :label="$tc('form.temporary')"
+            :dark="LAYOUT.isDark"
+            color="orange-10"
+            v-if="rsForm.is_internal" />
+
+          <q-chip class="text-uppercase" square outline
+            :label="rsForm.customer.order_mode"
+            :dark="LAYOUT.isDark"
+            color="blue-grey"
+            v-if="rsForm.transaction === 'REGULER' && rsForm.customer.order_mode == 'ACCUMULATE'"
+          />
+
+          <ux-chip-status square outline :row="rsForm" />
+        </template>
       </form-header>
     </q-card-section>
-    <q-card-section>
-      <div class="row q-col-gutter-x-xl">
-        <!-- COLUMN::Base Document -->
-        <!-- <q-field class="col-12"
-          :label="$tc('label.mode',1, {v:$tc('label.transaction')})" stack-label
-          :data-vv-as="$tc('label.mode',1, {v:$tc('label.transaction')})"
-          borderless
-          :error="errors.has('transaction')"
-          :error-message="errors.first('transaction')">
-          <div slot="control" class="q-mt-sm">
-            <q-option-group type="radio" disable
-              name="transaction"
-              v-model="rsForm.transaction"
-              dense inline color="secondary"
-              :options="CONFIG.options['transaction_mode']"
-              v-validate="'required'"/>
-          </div>
-        </q-field> -->
-        <q-input class="col-12  col-sm-6"
-          name="number" disable
-          stack-label label="No Transaction"
-          dense hide-bottom-space
-          v-model="rsForm.number"
-          v-validate="ROUTE.meta.mode == 'edit' ? 'required':''"
-          :error="errors.has('number')"
-          :error-message="errors.first('number')">
-          <template slot="append">
-            <q-badge v-if="rsForm.revise_number">{{ `REV.${rsForm.revise_number}` }} </q-badge>
-          </template>
-        </q-input>
+    <q-separator />
+    <q-card-section class="row q-col-gutter-x-md">
+      <!-- COLUMN::1st delivery detail -->
+      <div class="col-12 col-md-6" >
+        <q-input disable hint=""
+          :label="$tc('general.customer')"
+          :dark="LAYOUT.isDark"
+          :value="rsForm.customer ? `${rsForm.customer.code} - ${rsForm.customer.name}` : null"
+        />
+        <div class="row q-col-gutter-x-sm">
+          <ux-date class="col-12 col-sm-6"
+            name="date" type="date"
+            stack-label label="Date"
+            v-model="rsForm.date"
+            :dark="LAYOUT.isDark"
+            v-validate="'required'"
+            :error="errors.has('date')"
+            :error-message="errors.first('date')"/>
 
-        <ux-select-filter class="col-12 col-sm-6"
-          :name="`request_order_id`"
-          :label="$tc('label.no',1,{v:$tc('general.request_order')}) + `[${rsForm.request_order_id}]`"
-          v-model="rsForm.request_order_id"
-          readonly hide-dropdown-icon
-          v-validate="'required'"
-          :options="RequestOrderOptions"
-          :error="errors.has(`request_order_id`)"
-          :error-message="errors.first(`request_order_id`)"
-          :loading="SHEET['request_orders'].loading">
-          <q-chip slot="after" square
-            class="self-end items-end"
-            :label="rsForm.transaction"
-            text-color="white"
-            :class="rsForm.transaction === 'RETURN' ? 'bg-faded' : 'bg-primary'"/>
-        </ux-select-filter>
-
-        <!-- COLUMN::1st customer Identitity -->
-        <div class="col-12 col-md-6" >
-          <div class="row q-col-gutter-x-sm content-between">
-            <q-input  class="col-12"
-              :label="$tc('general.customer')" readonly
-              :value="rsForm.customer ? `${rsForm.customer.code} - ${rsForm.customer.name}` : null"/>
-            <ux-date class="col-12 col-sm-6"
-              name="date" type="date"
-              stack-label label="Date"
-              v-model="rsForm.date"
-              :dark="LAYOUT.isDark"
-              v-validate="'required'"
-              :error="errors.has('date')"
-              :error-message="errors.first('date')"/>
-
-            <ux-date class="col-12 col-sm-6"
-              name="due_date" type="date"
-              stack-label label="Due Date"
-              v-model="rsForm.due_date"
-              :dark="LAYOUT.isDark"
-              v-validate="'required'"
-              :error="errors.has('due_date')"
-              :error-message="errors.first('due_date')"/>
-
-            <ux-select-filter class="col-12 self-end"
-              name="operator_id"
-              stack-label label="Operator"
-              v-model="rsForm.operator_id"
-              :options="EmployeeOptions"
-              :dark="LAYOUT.isDark"
-              v-validate="'required'"
-              :error="errors.has(`operator_id`)"
-              :error-message="errors.first(`operator_id`)"/>
-          </div>
+          <ux-date class="col-12 col-sm-6"
+            name="due_date" type="date"
+            stack-label label="Due Date"
+            v-model="rsForm.due_date"
+            :dark="LAYOUT.isDark"
+            v-validate="'required'"
+            :error="errors.has('due_date')"
+            :error-message="errors.first('due_date')"/>
         </div>
-        <!-- COLUMN::2nd Transaction details -->
-        <div class="col-12 col-md-6" >
-          <div class="column">
-            <q-input name="customer_name"
-              :label="$tc('label.name')"  stack-label
-              v-model="rsForm.customer_name"
-              v-validate="'required'"/>
-            <q-input name="customer_phone"
-              :label="$tc('label.phone')"  stack-label
-              v-model="rsForm.customer_phone"
-              v-validate="'required'"/>
-            <q-input type="textarea" rows="3"
-              name="customer_address"
-              :label="$tc('label.address')"  stack-label
-              v-model="rsForm.customer_address"
-              autogrow />
-
-          </div>
+      </div>
+      <!-- COLUMN::2nd Customer Identity -->
+      <div class="col-12 col-md-6" >
+        <div class="row q-col-gutter-x-sm">
+          <q-input class="col" name="customer_name"
+            :label="$tc('label.name')"  stack-label
+            v-model="rsForm.customer_name"
+            :dark="LAYOUT.isDark"
+            v-validate="'required'"/>
+          <q-input class="col-12 col-sm-auto" name="customer_phone"
+            :label="$tc('label.phone')"  stack-label
+            v-model="rsForm.customer_phone"
+            :dark="LAYOUT.isDark"
+            v-validate="'required'"/>
         </div>
-        <!-- COLUMN::3th Part items lists -->
-        <div class="col-12 q-my-md">
-          <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
-            dense separator="horizontal"
-            :dark="LAYOUT.isDark">
-            <q-tr>
-              <q-th key="prefix"></q-th>
-              <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
-              <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
-              <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
-              <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+        <q-input type="textarea" autogrow rows="3"
+          name="customer_address"
+          :label="$tc('label.address')"  stack-label
+          :dark="LAYOUT.isDark"
+          v-model="rsForm.customer_address"
+        />
+      </div>
+      <!-- COLUMN::3th Part items lists -->
+      <div class="col-12 q-my-sm">
+
+        <div class="row items-center">
+          <ux-select v-if="WITH_RO && rsForm.customer_id"
+            name="request_order"
+            stack-label :label="$tc('general.request_order')"
+            :data-vv-as="$tc('general.request_order')"
+            v-model="rsForm.request_order"
+            filter :source="`/api/v1/incomes/request-orders?mode=all&customer_id=${rsForm.customer_id}`"
+            :option-label="(item) => item.number"
+            :option-value="(item) => item"
+            :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+            v-validate="'required'"
+            :error="errors.has(`request_order`)"
+            :error-message="errors.first(`request_order`)"
+            @input="setRequestOrder"
+          />
+          <q-space />
+          <ux-select filter
+            name="operator_id"
+            stack-label label="Operator"
+            v-model="rsForm.operator_id"
+            emit-value map-options
+            :options="EmployeeOptions"
+            :dark="LAYOUT.isDark"
+            v-validate="'required'"
+            :error="errors.has(`operator_id`)"
+            :error-message="errors.first(`operator_id`)"
+          />
+        </div>
+        <q-markup-table bordered class="main-box no-shadow no-highlight"
+          dense separator="horizontal"
+          :dark="LAYOUT.isDark">
+          <thead>
+            <q-tr class="text-uppercase" style="line-height:30px">
+              <q-th key="prefix" width="50px"></q-th>
+              <q-th key="part" width="50%">{{$tc('items.part_name')}}</q-th>
+              <q-th key="quantity" width="30%">{{$tc('label.quantity')}}</q-th>
+              <q-th key="unit_id" width="20%">{{$tc('label.unit')}}</q-th>
             </q-tr>
+          </thead>
+          <tbody>
             <q-tr v-for="(row, index) in rsForm.delivery_order_items" :key="index">
               <q-td key="prefix" style="width:50px">
                 <q-btn dense flat round icon="clear" color="red" @click="removeItem(index)"/>
               </q-td>
-              <q-td key="request_order_item_id" width="30%" >
-                <ux-select-filter v-if="WITH_RO" style="min-width:150px"
+              <q-td key="part" width="30%" >
+                <ux-select v-if="WITH_RO" class="native-top" style="min-width:150px"
                   :name="`delivery_order_items.${index}.item_id`"
                   v-model="row.request_order_item_id"
                   outlined dense color="blue-grey-5"
                   hide-bottom-space no-error-icon
-                  :options="RequestOrderItemOptions" clearable
+                  filter emit-value map-options clearable
+                  :options="RequestOrderItemOptions"
+                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                   v-validate="`required`"
                   :error="errors.has(`delivery_order_items.${index}.item_id`)"
-                  @input="(val)=>{ setRequestOrderItem(index, val) }" />
+                  @input="(val)=>{ setRequestOrderItem(index, val) }" >
+                  <small v-if="row.item.part_number" class="absolute-bottom">{{row.item.part_number}} (RO)</small>
+                </ux-select>
 
-                <ux-select-filter v-else style="min-width:150px"
+                <ux-select v-else class="native-top" style="min-width:150px"
                   :name="`delivery_order_items.${index}.item_id`"
                   v-model="row.item_id"
                   outlined dense color="blue-grey-5"
                   hide-bottom-space no-error-icon
+                  filter emit-value map-options
                   :options="ItemOptions"
+                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                   v-validate="`required`"
                   :error="errors.has(`delivery_order_items.${index}.item_id`)"
                   @input="(val)=>{ setItemReference(index, val) }"
-                  :loading="SHEET['items'].loading"/>
-              </q-td>
-              <q-td key="item_id" width="30%" >
+                  :loading="SHEET['items'].loading" >
+                  <small v-if="row.item.part_number" class="absolute-bottom">[{{row.item.customer_code}}] {{row.item.part_number}}</small>
+                </ux-select>
 
-                <q-input readonly
-                  :value="row.item ? row.item.part_number : null"
-                  outlined dense hide-bottom-space color="blue-grey-5"
-                  :dark="LAYOUT.isDark" />
               </q-td>
               <q-td key="quantity" width="25%">
                 <q-input type="number" v-if="WITH_RO" style="min-width:120px"
@@ -159,6 +157,7 @@
                   v-model="row.quantity"
                   outlined dense color="blue-grey-5"
                   hide-bottom-space no-error-icon
+                  :dark="LAYOUT.isDark"
                   v-validate="`required|max_value:${numUnitConvertion(row, MaxMount[index])}`"
                   :error="errors.has(`delivery_order_items.${index}.quantity`)">
                   <span slot="append" class="text-body2">
@@ -171,6 +170,7 @@
                   v-model="row.quantity"
                   outlined dense color="blue-grey-5"
                   hide-bottom-space no-error-icon
+                  :dark="LAYOUT.isDark"
                   v-validate="`required|gt_value:0`"
                   :error="errors.has(`delivery_order_items.${index}.quantity`)" />
               </q-td>
@@ -180,8 +180,9 @@
                   v-model="row.unit_id"
                   outlined dense color="blue-grey-5"
                   hide-bottom-space no-error-icon
-                  :options="ItemUnitOptions[index]"
                   map-options emit-value
+                  :options="ItemUnitOptions[index]"
+                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                   v-validate="row.item_id ? 'required' : ''"
                   :error="errors.has(`delivery_order_items.${index}.unit_id`)"
                   @input="(val)=>{ setUnitReference(index, val) }"
@@ -209,17 +210,17 @@
                 </q-btn-dropdown>
               </q-td>
             </q-tr>
-          </q-markup-table>
-        </div>
-        <!-- COLUMN::4th Description -->
-        <div class="col-12">
-          <q-input type="textarea" rows="3"
-            name="description"
-            :data-vv-as="$tc('label.description')"
-            :label="$tc('label.description')" stack-label
-            filled
-            v-model="rsForm.description"/>
-        </div>
+          </tbody>
+        </q-markup-table>
+      </div>
+      <!-- COLUMN::4th Description -->
+      <div class="col-12">
+        <q-input type="textarea" rows="3"
+          name="description"
+          :data-vv-as="$tc('label.description')"
+          :label="$tc('label.description')" stack-label
+          filled :dark="LAYOUT.isDark"
+          v-model="rsForm.description"/>
       </div>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
@@ -270,13 +271,9 @@ export default {
           customer_address: null,
 
           operator_id: null,
-          // transport_number: null,
-          // transport_rate: null,
 
           date: this.$app.moment().format('YYYY-MM-DD'),
           due_date: this.$app.moment().format('YYYY-MM-DD'),
-          time: this.$app.moment().format('HH:mm'),
-          due_time: this.$app.moment().format('HH:mm'),
 
           revise_id: 0,
           revise_number: null,
@@ -306,25 +303,15 @@ export default {
       return !this.rsForm.revise_id
     },
     WITH_RO() {
+      console.warn('CEK', this.rsForm.transaction, this.rsForm.customer.order_mode);
+      if (this.rsForm.is_internal) return false
       if (this.rsForm.request_order) {
-        if(this.rsForm.request_order.transaction == 'REGULER' && this.rsForm.request_order.order_mode == 'ACCUMULATE') {
+        if(this.rsForm.transaction == 'REGULER' && this.rsForm.customer.order_mode == 'ACCUMULATE') {
           return false
         }
       }
 
       return true
-    },
-    RequestOrderOptions() {
-      if (!this.rsForm.customer_id) return []
-
-      let data = this.SHEET.request_orders.data || []
-      // data = data.filter(row => row.customer_id === this.rsForm.customer_id)
-
-      return data.map(row => ({
-        data: row,
-        label: `${row.number}`,
-        value: row.id
-      }))
     },
     RequestOrderItemOptions() {
       if (!this.rsForm.customer_id) return []
@@ -339,8 +326,8 @@ export default {
         sublabel: `[${row.item.code}] ${row.item.part_number}`,
         stamp: `#${row.id}`,
         value: row.id,
-        disable: !row.enable,
-        item_id: row.item_id
+        disable: !row.item.enable,
+        item: row.item
       }))
     },
     EmployeeOptions() {
@@ -375,7 +362,7 @@ export default {
       return vars
     },
     MaxMount() {
-      if(this.RequestOrderOptions.length == 0) return []
+      // if(this.RequestOrderOptions.length == 0) return []
       let maxitem = {}
       let moveItem = {
         set: function (id, val) {
@@ -387,13 +374,17 @@ export default {
         }
       }
 
-      this.RequestOrderOptions.map((opt) => {
-        opt.data.request_order_items.map((detail) => {
-          if(!maxitem.hasOwnProperty(detail.item_id)) maxitem[detail.item_id] = 0
-           maxitem[detail.item_id] += Number(detail.unit_amount || 0)
-           maxitem[detail.item_id] -= Number(detail.total_delivery_item || 0)
-        })
+      this.SHEET['request_order_items'].data.map(detail => {
+        if (!maxitem[detail.item_id]) maxitem[detail.item_id] = 0
+        maxitem[detail.item_id] += Number(detail.unit_amount) - Number(detail.amount_delivery)
       })
+
+      if (this.FORM.data.request_order.id == this.rsForm.request_order.id) {
+        this.FORM.data.delivery_order_items.map(detail => {
+          if (!maxitem[detail.item_id]) maxitem[detail.item_id] = 0
+          maxitem[detail.item_id] += Number(detail.unit_amount)
+        })
+      }
 
       let data = []
       if(this.rsForm.delivery_order_items) {
@@ -410,47 +401,14 @@ export default {
 
       return data
     },
-    MaxStock() {
-      let stockItem =  JSON.parse(JSON.stringify(this.MAPINGKEY['itemstocks']))
-      let moveItem = {
-        set: function (id, val) {
-          if (!this.hasOwnProperty(id)) this[id] = 0
-            this[id] += Number(val)
-        },
-        get: function (id) {
-          return this.hasOwnProperty(id) ? this[id] : 0
-        }
-      }
-      this.FORM.data.delivery_order_items.forEach(item => {
-        if (stockItem.hasOwnProperty(item.item_id)) {
-          stockItem[item.item_id].totals['FG'] += Number(item.quantity)
-        }
-      })
-
-      let data = {}
-      this.rsForm.delivery_order_items.map((detail, index) => {
-        if (stockItem[detail.item_id] && detail.item_id) {
-          data[index] = Number(stockItem[detail.item_id].totals['FG'] || 0) - Number(moveItem.get(detail.item_id) || 0)
-          moveItem.set(detail.item_id, detail.quantity)
-        }
-
-      })
-
-      return data
-    },
     MAPINGKEY(){
       let variables = {
         'request_order_items': {},
-        'customers' : {},
         'units': {},
         'items': {},
-        'itemstocks': {}
       }
-
-      this.SHEET['customers'].data.map(value => { variables['customers'][value.id] = value })
       this.SHEET['units'].data.map(value => { variables['units'][value.id] = value })
       this.SHEET['items'].data.map(value => { variables['items'][value.id] = value })
-      this.SHEET['items'].data.map(value => { variables['itemstocks'][value.id] = value })
       this.SHEET['request_order_items'].data.map(value => { variables['request_order_items'][value.id] = value })
 
       return variables;
@@ -467,6 +425,11 @@ export default {
     },
     numUnitConvertion(row, val = 0) {
       return Number(val) / Number(row.unit_rate || 1)
+    },
+    setRequestOrder(val) {
+      if (val) {
+        this.loadRequestOrderItems(val.id)
+      }
     },
     setRequestOrderItem(index, val) {
       if(!val){
@@ -523,20 +486,11 @@ export default {
     },
     setForm(data) {
       this.rsForm =  Object.assign({},this.setDefault(), data)
-      this.loadRequestOrderItems(data.request_order_id)
-      this.SHEET.load('request_orders',`id=${this.rsForm.request_order_id}`,
-        (res)=> {
-          if(res && res.hasOwnProperty('data')) {
-            const parameter = this.WITH_RO
-              ? `or_ids=${[...res.data[0].request_order_items.map(x => x.item_id)].join(',')}`
-              : `customer_id=${this.rsForm.customer_id}`
-            if (res.data[0].request_order_items.length) {
-              this.SHEET.load('items', parameter)
-            }
-          }
-        }
-      )
+      this.SHEET.load('items', `customer_id=${this.rsForm.customer_id}`)
 
+      if (this.WITH_RO) {
+        this.loadRequestOrderItems(data.request_order_id)
+      }
     },
 
     addNewItem() {

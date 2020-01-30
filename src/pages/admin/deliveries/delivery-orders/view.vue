@@ -5,25 +5,18 @@
             <q-btn :label="$tc('form.list')" icon="list"  color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
             <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
             <q-space />
-            <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" no-caps class="float-right"
+            <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" class="float-right"
               :options="[
-                { label: 'Delete', color:'red', icon: 'delete',
-                  detail: $tc('messages.process_delete'),
-                  hidden: !IS_EDITABLE || !$app.can('sj-delivery-orders-delete'),
-                  actions: () => {
-                    VIEW.delete()
-                  }
-                },
-                { label: $tc('form.confirm').toUpperCase(), color:'green', icon: 'block',
+                { label: $tc('form.confirm').toUpperCase(), color:'green', icon: 'done_all',
                   detail: $tc('messages.process_confirm'),
-                  hidden: !IS_VOID || !$app.can('sj-delivery-orders-confirm'),
+                  hidden: !IS_CONFIRM || !$app.can('sj-delivery-orders-confirm'),
                   actions: () => {
                     setConfirmation()
                   }
                 },
                 { label: $tc('form.revision').toUpperCase(), color:'orange', icon: 'edit',
                   detail: $tc('messages.process_revise'),
-                  hidden: !IS_VOID || !$app.can('sj-delivery-orders-revision'),
+                  hidden: !IS_REVISE || !$app.can('sj-delivery-orders-revision'),
                   actions: () => {
                     setRevision()
                   }
@@ -180,15 +173,23 @@ export default {
     this.init()
   },
   computed: {
+    IS_CONFIRM() {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'OPEN') return false
+      return true
+    },
+    IS_REVISE() {
+      if (this.rsView.deleted_at) return false
+      return true
+    },
     IS_VOID() {
-      if (this.IS_EDITABLE) return false
-      if (['VOID'].find(x => x === this.rsView.status)) return false
+      if (this.rsView.deleted_at) return false
       return true
     },
     IS_EDITABLE() {
       if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'OPEN') return false
       if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
-      if (this.rsView.hasOwnProperty('revise_id') && !this.rsView.revise_id) return false
       return true
     },
   },

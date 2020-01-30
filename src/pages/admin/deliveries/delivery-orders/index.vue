@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="page-index" >
     <q-pull-to-refresh @refresh="TABLE.refresh" inline>
-      <q-table ref="table" inline class="table-index th-uppercase" color="primary" :dark="LAYOUT.isDark"
+      <q-table ref="table" class="table-index th-uppercase" color="primary" :dark="LAYOUT.isDark"
         :title="TABLE.getTitle()"
         subtitle="cskc"
         :data="TABLE.rowData"
@@ -81,9 +81,9 @@
           </table-header>
         </template>
 
-        <template slot="body-cell-prefix" slot-scope="rs" :props="rs" class="no-padding" style="width:35px">
+        <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:40px">
           <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" />
-        </template>
+        </q-td>
 
         <q-td slot="body-cell-customer_id" slot-scope="rs" :props="rs">
           <span v-if="rs.row.customer"> {{ rs.row.customer.name }}</span>
@@ -148,14 +148,12 @@ export default {
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},
-
+          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true,
+            format:(v)=> this.$app.moment(v).format('ll'), classes: 'text-uppercase', style:'width:150px'},
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
           { name: 'status', label: '', field: 'status', align: 'left', sortable: true },
+          { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
           { name: 'operator_id', label: 'Operator', field: 'operator_id', align: 'left', sortable: true },
-          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'left', sortable: true},
-          { name: 'due_date', label: this.$tc('label.due_date'), field: 'due_date', align: 'left', sortable: true},
-
         ],
         rowData:[],
         resData:[],
