@@ -32,6 +32,7 @@ export default {
   outgoing_verification: 'Outgoing Verification | Verifikasi Part Keluar',
   pre_delivery: 'Pre Delivery | Permintaan Pengiriman',
   sj_delivery: 'Delivery (SJDO) | Surat Jalan Pengiriman',
+  sj_internal: 'Delivery (Intern) | Surat Jalan Sementara',
   schedule_board: 'Penjadwalan |Jadwal Pengiriman & Penjemputan',
 
   work_order: 'SPK | Surat Perintah Kerja',

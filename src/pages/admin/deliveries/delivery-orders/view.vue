@@ -1,41 +1,49 @@
 <template>
   <q-page padding class="column justify-start items-center q-gutter-sm"  v-if="VIEW.show">
-      <q-card  v-if="VIEW.show" class="no-shadow print-hide modal-hide">
+      <q-card :dark="LAYOUT.isDark" v-if="VIEW.show" class="no-shadow print-hide modal-hide">
         <q-card-actions class="q-px-lg q-gutter-xs" >
-            <q-btn :label="$tc('form.list')" icon="list"  color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
-            <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
-            <q-space />
-            <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" class="float-right"
-              :options="[
-                { label: $tc('form.confirm').toUpperCase(), color:'green', icon: 'done_all',
-                  detail: $tc('messages.process_confirm'),
-                  hidden: !IS_CONFIRM || !$app.can('sj-delivery-orders-confirm'),
-                  actions: () => {
-                    setConfirmation()
-                  }
-                },
-                { label: $tc('form.revision').toUpperCase(), color:'orange', icon: 'edit',
-                  detail: $tc('messages.process_revise'),
-                  hidden: !IS_REVISE || !$app.can('sj-delivery-orders-revision'),
-                  actions: () => {
-                    setRevision()
-                  }
-                },
-                { label: 'VOID', color:'red', icon: 'block',
-                  detail: $tc('messages.process_void'),
-                  hidden: !IS_VOID || !$app.can('sj-delivery-orders-void'),
-                  actions: () => {
-                    VIEW.void(()=> init() )
-                  }
+          <q-btn :label="$tc('form.list')" icon="list"  color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
+          <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
+          <q-space />
+          <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" class="self-end"
+            :options="[
+              { label: $tc('form.confirm').toUpperCase(), color:'green', icon: 'done_all',
+                detail: $tc('messages.process_confirm'),
+                hidden: !IS_CONFIRM || !$app.can('sj-delivery-orders-confirm'),
+                actions: () => {
+                  setConfirmation()
                 }
-              ]"
-            />
+              },
+              { label: $tc('form.revision').toUpperCase(), color:'orange', icon: 'save',
+                detail: $tc('messages.process_revise'),
+                hidden: !IS_REVISE || !$app.can('sj-delivery-orders-revision'),
+                actions: () => {
+                  setRevision()
+                }
+              },
+              { label: $tc('form.reconciliation').toUpperCase(), color:'indigo-10', icon: 'swap_horiz',
+                detail: $tc('messages.process_reconcile'),
+                hidden: !IS_RECON || !$app.can('sj-delivery-orders-create'),
+                actions: () => {
+                  setReconciliation()
+                }
+              },
+              { label: 'VOID', color:'red', icon: 'block',
+                detail: $tc('messages.process_void'),
+                hidden: !IS_VOID || !$app.can('sj-delivery-orders-void'),
+                actions: () => {
+                  VIEW.void(()=> init() )
+                }
+              }
+            ]"
+          />
         </q-card-actions>
       </q-card>
-      <page-print :class="{'multi-page':getArrayPage(rsView.customer).length > 1}"
+      <page-print :dark="LAYOUT.isDark" style="min-width:75%" :class="{'multi-page':getArrayPage(rsView.customer).length > 1}"
         v-for="(mode, pi) in getArrayPage(rsView.customer)" :key="pi">
         <div slot="header-tags" class="print-hide">
           <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
+          <q-chip tag outline small square color="orange-10" class="text-uppercase" :label="$tc('form.temporary')" v-if="rsView.is_internal" />
         </div>
         <div class="column" >
           <div class="row justify-between q-col-gutter-sm q-pb-sm">
@@ -45,34 +53,49 @@
               <div class="text-weight-light" v-if="rsView.customer_phone">Phone: {{rsView.customer_phone}}</div>
               <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
             </div>
-            <div class="info col-auto">
-              <q-markup-table bordered separator="cell" :dark="LAYOUT.isDark"
-                class="super-dense no-shadow no-margin th-uppercase">
-                <tr>
-                  <td>No. SJ-OUT</td>
-                  <td>
-                    {{ rsView.number }}
-                    <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
-                  </td>
-                </tr>
-                <tr>
-                  <td>{{$tc('label.date')}}</td>
-                  <td>{{$app.date_format(rsView.date)}}</td>
-                </tr>
-                <tr>
-                  <td>No. SO</td><td>{{ rsView.request_order ? rsView.request_order.number : '-' }}</td>
-                </tr>
-              </q-markup-table>
+            <div class="col-auto">
+              <div class=" row no-wrap">
+                <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
+                  class="super-dense no-shadow th-uppercase q-mx-sm">
+                  <tbody>
+                    <tr>
+                      <td>{{$tc('label.number')}}</td>
+                      <td>{{ rsView.fullnumber || rsView.number }}</td>
+                    </tr>
+                    <tr>
+                      <td>{{$tc('label.date')}}</td>
+                      <td>{{$app.date_format(rsView.date)}}</td>
+                    </tr>
+                  </tbody>
+                </q-markup-table>
+                <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
+                  class="super-dense no-shadow no-margin no-highlight th-uppercase"
+                  v-if="!rsView.is_internal">
+                  <tbody>
+                    <tr>
+                      <td>No. SO</td>
+                      <td>{{ rsView.request_order ? (rsView.request_order.fullnumber || rsView.request_order.number) : '-' }}</td>
+                    </tr>
+                    <tr>
+                      <td>REF. PO/SJ</td>
+                      <td>{{ rsView.request_order ? rsView.request_order.reference_number : '-' }}</td>
+                    </tr>
+                  </tbody>
+                </q-markup-table>
+              </div>
             </div>
           </div>
           <div>
-            <q-markup-table dense bordered class="table-print no-shadow no-highlight th-uppercase" separator="cell">
+            <q-markup-table dense bordered square separator="cell"
+              :dark="LAYOUT.isDark"
+              class="table-print no-shadow no-highlight th-uppercase">
               <thead>
               <q-tr>
                 <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
                 <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
                 <q-th>{{ $tc('label.unit') }}</q-th>
                 <q-th>{{ $tc('label.quantity') }}</q-th>
+                <q-th v-if="rsView.is_internal" class="print-hide">Reconcile</q-th>
                 <q-th>{{ $tc('label.encasement') }}</q-th>
               </q-tr>
               </thead>
@@ -108,6 +131,7 @@
                 <q-td>{{row.item.part_number}}</q-td>
                 <q-td class="text-center">{{row.unit.name}}</q-td>
                 <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
+                <q-td class="print-hide text-right" v-if="rsView.is_internal">{{$app.number_format(row.amount_reconcile)}}</q-td>
                 <q-td>{{row.encasement}}</q-td>
               </q-tr>
               </tbody>
@@ -121,7 +145,7 @@
               <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
           </div>
           <div class="page-break-inside">
-            <q-markup-table class="no-shadow text-weight-light" style="">
+            <q-markup-table :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
               <tr class="text-center">
                 <td width="21%">
                   <div class="sign-name">Diterima Oleh</div>
@@ -178,6 +202,12 @@ export default {
       if (this.rsView.status !== 'OPEN') return false
       return true
     },
+    IS_RECON() {
+      if (this.rsView.deleted_at) return false
+      if (!this.rsView.is_internal) return false
+      if (this.rsView.status !== 'CONFIRMED') return false
+      return true
+    },
     IS_REVISE() {
       if (this.rsView.deleted_at) return false
       return true
@@ -215,6 +245,9 @@ export default {
     },
     setRevision() {
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/revision`)
+    },
+    setReconciliation() {
+      this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/reconcile`)
     },
     setConfirmation() {
       const submit = () => {

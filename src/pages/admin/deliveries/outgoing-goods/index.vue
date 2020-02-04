@@ -134,8 +134,7 @@
             </q-td>
       </q-table>
     </q-pull-to-refresh>
-
-    <ux-modal-view ref="modal" />
+    <ux-modal-view ref="modal"  fit icon="local_shipping" :title="$tc('general.sj_delivery')" />
   </q-page>
 </template>
 

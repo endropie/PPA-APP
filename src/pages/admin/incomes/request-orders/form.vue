@@ -446,8 +446,8 @@ export default {
     },
     getMinQuantity(index) {
       if (this.FORM.data.request_order_items) {
-        const details = this.FORM.data.request_order_items
-        if (details[index]) return details[index].quantity || 0
+        const detail = this.FORM.data.request_order_items
+        if (detail[index]) return (detail[index].amount_delivery || 0) / (detail.unit_rate || 1)
       }
       return 0
     },

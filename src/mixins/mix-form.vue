@@ -26,7 +26,7 @@ export default {
         // show: false,
         loading: false,
         data: {},
-        title: () => this.FORM__Title,
+        title: (mode) => String(`${mode || 'FORM'} - ${this.FORM__Title}`).toUpperCase(),
         subtitle: () => this.FORM__Subtitle,
         toIndex: () => this.FORM__toIndex(),
         toBack: () => this.FORM__toBack(),
@@ -62,11 +62,7 @@ export default {
       return this.route || this.$route
     },
     FORM__Title () {
-      const title = (this.ROUTE.meta.title || '').toUpperCase()
-      if (this.ROUTE.meta.mode === 'revision') {
-        return 'REVISION - ' + title
-      }
-      else return 'FORM - ' + title
+      return (this.ROUTE.meta.title || '').toUpperCase()
     },
     FORM__Subtitle () {
       if (this.ROUTE.meta.mode === 'edit') {
