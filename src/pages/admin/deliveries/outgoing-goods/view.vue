@@ -15,7 +15,9 @@
               <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
             </div>
             <div class="col-auto info">
-              <q-markup-table dense bordered class="no-highlight no-shadow" separator="cell">
+              <q-markup-table dense bordered separator="cell"
+                :dark="LAYOUT.isDark" class="bg-transparent no-shadow no-highlight"
+              >
                 <tbody>
                   <tr>
                     <td class="text-weight-light">No</td>
@@ -34,21 +36,30 @@
           </div>
         </div>
         <div class="col-12" >
-          <q-markup-table dense bordered class="no-shadow" separator="cell">
+          <q-markup-table dense bordered separator="cell"
+            :dark="LAYOUT.isDark" class="bg-transparent no-shadow"
+          >
             <thead>
-            <q-tr>
-              <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th>{{ $tc('label.quantity') }}</q-th>
-              <q-th>{{ $tc('label.unit') }}</q-th>
+            <q-tr  class="text-uppercase" style="line-height:30px">
+              <q-th width="20%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+              <!-- <q-th width="20%">{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th> -->
+              <q-th width="20%" class="text-right">{{ $tc('label.quantity') }}</q-th>
+              <q-th width="15%">{{ $tc('label.unit') }}</q-th>
+              <q-th width="30%">{{ $tc('label.encasement') }}</q-th>
             </q-tr>
             </thead>
             <tbody>
             <q-tr v-for="(row, index) in rsView.outgoing_good_items" :key="index">
-              <q-td>{{row.item.part_name}}</q-td>
-              <q-td>{{row.item.part_number}}</q-td>
-              <q-td>{{$app.number_format(row.quantity)}}</q-td>
+              <q-td>
+                <div style="line-height:normal">
+                  <span>{{row.item.part_name}}</span><br/>
+                  <small>No. {{row.item.part_number}}</small>
+                </div>
+              </q-td>
+              <!-- <q-td>{{row.item.part_number}}</q-td> -->
+              <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
               <q-td>{{row.unit.name}}</q-td>
+              <q-td>{{row.encasement}}</q-td>
             </q-tr>
             </tbody>
           </q-markup-table>
@@ -65,7 +76,7 @@
           <q-btn :label="$tc('form.cancel')" :icon="btnIcon('cancel')"  color="dark" :to="`${VIEW.resource.uri}?return`" />
           <q-btn :label="$tc('form.print')" :icon="btnIcon('print')" color="grey" @click.native="print()" />
 
-          <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" no-caps class="float-right"
+          <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" class="float-right"
             :options="[
               { label: $tc('form.add_new'), color:'green', icon: 'add',
                 hidden: !$app.can('outgoing-goods-create'),

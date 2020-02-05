@@ -107,16 +107,17 @@
       </div>
       <!-- COLUMN::3th Part items lists -->
       <div class="col-12 q-my-md" >
-        <q-markup-table bordered class="main-box no-shadow no-highlight th-uppercase"
-          dense separator="horizontal"
-          :dark="LAYOUT.isDark">
+        <q-markup-table bordered dense separator="horizontal"
+          :dark="LAYOUT.isDark"
+          class="bg-transparent no-shadow no-highlight"
+        >
           <thead>
-            <q-tr style="line-height:30px">
+            <q-tr class="text-uppercase" style="line-height:30px">
               <q-th key="prefix"></q-th>
-              <q-th key="item_id" class="text-left">{{$tc('items.part_name')}}</q-th>
-              <q-th key="part_number" class="text-left">{{$tc('items.part_number')}}</q-th>
+              <q-th key="item" class="text-left">{{$tc('items.part_name')}}</q-th>
               <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
               <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+              <q-th key="encasement">{{$tc('label.encasement')}}</q-th>
             </q-tr>
           </thead>
           <tbody>
@@ -124,29 +125,13 @@
               <q-td key="prefix" width="50px" class="q-gutter-x-xs">
                 <q-btn dense round flat color="red" icon="clear" @click="exclude(index, row)"/>
               </q-td>
-              <q-td key="part_name">
-                <span v-if="Boolean(row.item)" class="">
-                  {{row.item.part_name}}
-                </span>
+              <q-td key="item" width="40%">
+                <div v-if="Boolean(row.item)" style="line-height:normal">
+                  <span>{{row.item.part_name}}</span><br/>
+                  <small>No. {{row.item.part_number}}</small>
+                </div>
               </q-td>
-              <q-td key="part_number">
-                <span v-if="Boolean(row.item)" class="">
-                  {{row.item.part_number}}
-                </span>
-              </q-td>
-              <q-td key="unit_id" width="15%" >
-                <q-select :name="`outgoing_good_items.${index}.unit_id`"
-                  style="min-width:60px"
-                  v-model="row.unit_id"
-                  outlined dense hide-bottom-space
-                  :dark="LAYOUT.isDark" color="blue-grey-5"
-                  :options="ItemUnitOptions[index]"
-                  map-options emit-value
-                  v-validate="row.item_id ? 'required' : ''"
-                  :error="errors.has(`outgoing_good_items.${index}.unit_id`)"
-                  @input="(val)=>{ setUnitReference(index, val) }"/>
-              </q-td>
-              <q-td key="quantity" width="25%" >
+              <q-td key="quantity" width="20%" >
                 <q-input :name="`outgoing_good_items.${index}.quantity`"
                   style="min-width:120px"
                   v-model="row.quantity" type="number" :min="0"
@@ -167,6 +152,26 @@
                     <q-tooltip>{{$tc('label.all')}}</q-tooltip>
                   </q-btn>
                 </q-input>
+              </q-td>
+              <q-td key="unit_id" width="15%" >
+                <q-select :name="`outgoing_good_items.${index}.unit_id`"
+                  style="min-width:60px"
+                  v-model="row.unit_id"
+                  outlined dense hide-bottom-space
+                  :dark="LAYOUT.isDark" color="blue-grey-5"
+                  :options="ItemUnitOptions[index]"
+                  map-options emit-value
+                  v-validate="row.item_id ? 'required' : ''"
+                  :error="errors.has(`outgoing_good_items.${index}.unit_id`)"
+                  @input="(val)=>{ setUnitReference(index, val) }"/>
+              </q-td>
+              <q-td key="encasement" width="30%" >
+                <q-input :name="`outgoing_good_items.${index}.encasement`"
+                  style="min-width:60px"
+                  v-model="row.encasement"
+                  outlined dense hide-bottom-space
+                  :dark="LAYOUT.isDark" color="blue-grey-5"
+                />
               </q-td>
             </q-tr>
             <q-tr v-for="(exItem, index) in rsForm.exclude_items" :key="index"
@@ -423,6 +428,7 @@ export default {
               unit_id: item.unit_id,
               unit_rate: 1,
               quantity: null,
+              encasement: null,
               MAX: maximum
             }
           })
