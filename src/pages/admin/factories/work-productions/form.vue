@@ -343,7 +343,7 @@ export default {
       if (!this.rsForm.multiple) return ''
 
       let failed = this.rsForm.work_production_items.some((x,i,a) => {
-        return (x.quantity * this.rsForm.multiple) > this.MaxStock[i]
+        return (x.quantity * x.unit_rate * this.rsForm.multiple) > this.MaxStock[i]
       })
       return failed ? `is_not:${this.rsForm.multiple}` : ``
     },
