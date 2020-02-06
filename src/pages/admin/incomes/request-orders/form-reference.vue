@@ -32,7 +32,7 @@
           </ux-select-filter>
           <ux-date class="col-12" name="date"
             stack-label :label="$tc('label.date')"
-            v-model="rsForm.date"
+            v-model="rsForm.date" disable
             :dark="LAYOUT.isDark"
             v-validate="'required'"
             :error="errors.has('date')"
@@ -170,11 +170,9 @@ export default {
       setDefault:()=>{
         return {
           number: null,
-          begin_date: this.$app.moment().format('YYYY-MM-DD'),
-          until_date: this.$app.moment().format('YYYY-MM-DD'),
-
           customer_id: null,
           date: null,
+          actived_date: null,
           reference_number: null,
           transaction: 'REGULER',
           order_mode: null,
@@ -252,14 +250,6 @@ export default {
     setForm(data) {
       this.rsData = JSON.parse(JSON.stringify(data))
       this.rsForm = JSON.parse(JSON.stringify(data))
-
-      if(data.id && Object.keys(data['has_relationship']).length > 0 && !Boolean(data['is_estimate'])) {
-        this.FORM.response.relationship({
-          title: 'Sale Orders has relations!',
-          messages: data['has_relationship'],
-          then: () => this.$router.push(`${this.FORM.resource.uri}/${data.id}`)
-        })
-      }
 
       if (data.customer_id) {
         this.SHEET.load('items', `customer_id=${data.customer_id}`)

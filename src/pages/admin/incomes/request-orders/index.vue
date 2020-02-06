@@ -89,7 +89,7 @@
 
         <!-- slot name syntax: body-cell-<column_name> -->
         <q-td slot="body-cell-number" slot-scope="rs" :props="rs" class="no-padding" style="width:35px">
-          {{ rs.row.number  }}
+          {{ rs.row.fullnumber || rs.row.number  }}
           <q-chip dense square label="RET"
             color="dark" text-color="white"
             v-if="rs.row.transaction == 'RETURN'"/>
@@ -98,12 +98,12 @@
           <ux-chip-status dense square :row="rs.row" class="" />
           <span v-if="!rs.row.deleted_at && Number(rs.row.total_unit_delivery) > 0 && ['OPEN','CLOSED'].some(x => x === rs.row.status)">
             <q-chip dense square icon="local_shipping"
-              label="Delivered"
+              label="DELIVERED"
               color="orange-10" text-color="white"
               v-if="Math.round(rs.row.total_unit_amount) === Math.round(rs.row.total_unit_delivery)" >
             </q-chip>
             <q-chip dense square icon="local_shipping"
-              label="semi-Delivered"
+              label="SEMI-DELIVERED"
               color="orange" text-color="white"
               v-else>
             </q-chip>
@@ -180,9 +180,9 @@ export default {
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},
+          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', label: '', align: 'left', field: 'status'},
-          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true },
           { name: 'customer_id', label: this.$tc('general.customer'), align: 'left', field: (row) => row.customer.name , sortable: true },
           { name: 'reference_number', label: 'No. Reference', field: 'reference_number', align: 'left', sortable: true },
           { name: 'created_at', label: this.$tc('form.create',2), align: 'center', sortable: true, field: 'created_at'},
@@ -209,15 +209,13 @@ export default {
       if(row.deleted_at) return false
       if (row.order_mode !== 'PO') return false
       if (row.status !== 'OPEN') return false
-      if (row.hasOwnProperty('is_relationship') && row.is_relationship) {
-        if (!Boolean(row.is_estimate)) return false
-      }
+      if (row.hasOwnProperty('is_relationship') && row.is_relationship) return false
       return true
     },
     isEditRef (row) {
       if(row.deleted_at) return false
       if(row.order_mode === 'PO') return false
-      if(row.status === 'CLOSE') return false
+      if(row.status === 'CLOSED') return false
       return true
     },
   }

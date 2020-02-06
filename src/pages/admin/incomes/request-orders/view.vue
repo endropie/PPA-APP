@@ -20,31 +20,27 @@
         <div class="col-12">
           <div class="row justify-between q-gutter-sm" >
             <div class="items-end q-pt-lg">
-              <div class="text-h6">REQUEST ORDER</div>
-              <q-markup-table class="super-dense no-shadow" :dark="LAYOUT.isDark">
-                <tr>
-                  <th class="text-left">{{$tc('general.customer')}}</th>
-                  <td>{{ rsView.customer.name }}</td>
-                </tr>
-                <tr>
-                  <th class="text-left">{{$tc('label.reference')}} PO/SJ</th>
-                  <td>{{ rsView.reference_number || '-'}}</td>
-                </tr>
+              <div class="text-h6 q-px-xs">SALES ORDER</div>
+              <q-markup-table class="super-dense no-shadow" separator="none" :dark="LAYOUT.isDark">
+                <tbody>
+                  <tr>
+                    <td class="text-uppercase">{{$tc('general.customer')}}</td>
+                    <td>{{ rsView.customer.name }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-uppercase">{{$tc('label.transaction')}}</td>
+                    <td class="text-weight-bold">{{ rsView.transaction || '-'}}</td>
+                  </tr>
+                </tbody>
               </q-markup-table>
             </div>
-            <div>
-              <q-markup-table dense bordered class="super-dense no-shadow" separator="cell" :dark="LAYOUT.isDark">
-                <tr>
-                  <th>{{$tc('label.number')}}</th>
-                  <td>
-                    {{rsView.number}}
-                    <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
-                  </td>
-                </tr>
-                <tr>
-                  <th>{{$tc('label.date')}}</th>
-                  <td>{{ $app.date_format(rsView.date) }}</td>
-                </tr>
+            <div class="row items-start q-gutter-sm">
+              <q-markup-table dense square bordered class="super-dense no-shadow text-subtitle2" separator="cell" :dark="LAYOUT.isDark">
+                <tbody>
+                  <tr><td>{{$tc('label.number')}}</td><td>{{rsView.fullnumber || rsView.number}}</td></tr>
+                  <tr><td>{{$tc('label.date')}}</td><td>{{ $app.date_format(rsView.date) }}</td></tr>
+                  <tr><td>{{$tc('label.no', 1, {v:'PO'})}}</td><td>{{rsView.reference_number}}</td></tr>
+                </tbody>
               </q-markup-table>
             </div>
           </div>
@@ -52,7 +48,7 @@
         <div class="col-12">
           <q-markup-table dense bordered separator="cell" class="no-shadow no-highlight"  :dark="LAYOUT.isDark">
             <thead>
-            <q-tr style="line-height:30px">
+            <q-tr style="line-height:25px">
               <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th>{{ $tc('label.unit') }}</q-th>

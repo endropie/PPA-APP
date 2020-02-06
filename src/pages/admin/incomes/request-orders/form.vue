@@ -237,11 +237,11 @@ export default {
           number: null,
           customer_id: null,
           date: null,
+          actived_date: null,
           reference_number: null,
           transaction: 'REGULER',
           order_mode: null,
           description: null,
-          actived_date: null,
           is_estimate: 0,
           estimate_number: null,
 
