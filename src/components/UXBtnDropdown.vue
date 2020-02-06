@@ -4,6 +4,7 @@
     :label="$attrs.label || FIRST.label || '=='"
     v-bind="$attrs"
     v-on="$listeners"
+    @click="firstCall"
   >
     <template v-slot:label>
       <slot name="label"></slot>
@@ -48,9 +49,8 @@ export default {
       return this.options.filter(x => !x.hidden)
     },
     FIRST() {
-      let find = {}
+      let find = null
       if(this.OPTIONS) find = this.OPTIONS.find(x => !x.hidden)
-
       return find
     },
     EMPTY() {
@@ -59,6 +59,7 @@ export default {
   },
   methods: {
     firstCall() {
+      if (this.$attrs.label) return
       if (this.FIRST.hasOwnProperty('actions')) this.FIRST.actions()
     },
     actionsCall(item) {
