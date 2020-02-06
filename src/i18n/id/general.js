@@ -23,7 +23,7 @@ export default {
 
   opname_part: 'Part Opname',
   opname_stock: 'Stok Opname | Penyesuaian stock',
-  opname_voucher: 'Voucher Entri | Voucher Stock',
+  opname_voucher: 'Voucher Entry | Voucher Stock',
   transfer_stock: 'Migrasi Stok | Pemindahan stock',
 
   receipt_delivery: 'Penerimaan & Pengiriman',

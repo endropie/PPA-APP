@@ -109,10 +109,11 @@
             </q-td>
             <q-td slot="body-cell-number" slot-scope="rs">
               <!-- <q-btn flat dense icon="keyboard_arrow_down" color="primary" @click="rs.expand = !rs.expand" /> -->
-              <q-btn-dropdown flat dense round color="dark"
+              <q-btn-dropdown flat dense round
                 :label="`${rs.row.number} (${rs.row.delivery_orders.length})`"
+                :color="LAYOUT.isDark ? 'white' : 'dark'"
                 menu-anchor="bottom left" menu-self="top left">
-                <div class="row q-pa-md">
+                <div class="row q-pa-md" :class="{'bg-faded text-white': LAYOUT.isDark}">
                   <div class="column">
                     <div class="text-subtitle2 q-mb-md">SJ-DELIVERY ORDER</div>
                     <template v-for="(link, index) in rs.row.delivery_orders">

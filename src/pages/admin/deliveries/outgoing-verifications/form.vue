@@ -20,14 +20,6 @@
           </td>
         </tr>
         <tr>
-          <th>{{$tc('label.code', 1, {v:$tc('label.part')})}}</th>
-          <td>
-            <div v-if="rsForm.item">
-              {{rsForm.item.code}}
-            </div>
-          </td>
-        </tr>
-        <tr>
           <th>{{$tc('label.unit')}}</th>
           <td>
             <q-select style="max-width:120px"

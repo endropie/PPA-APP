@@ -59,6 +59,14 @@
           <q-btn v-if="isCanDelete && isEditRow(rs.row)" dense flat color="light" icon="delete" @click.native="TABLE.delete(rs.row)"/>
         </q-td>
 
+
+        <q-td slot="body-cell-item" slot-scope="rs" style="width:35px">
+          <div style="line-height:normal">
+            <span>{{ rs.row.item.part_name }}</span><br/>
+            <small>No.{{ rs.row.item.part_number }}</small>
+          </div>
+        </q-td>
+
         <q-td slot="body-cell-outgoing_good_id" slot-scope="rs" :props="rs" style="width:35px">
           <span v-if="rs.row.outgoing_good" v-text=" rs.row.outgoing_good.number" />
           <q-badge v-else dense
@@ -117,8 +125,7 @@ export default {
           { name: 'validated_at', label: 'Outgoing', field: 'validated_at', align: 'center', sortable: true,
              format:(v)=> v ? `${v}` : '-'
           },
-          { name: 'part_name', label: this.$tc('items.part_name'), field: (v)=> v.item.part_name, align: 'left', sortable: true },
-          { name: 'part_number', label: this.$tc('items.part_number'), field:(v)=> v.item.part_number, align: 'left', sortable: true },
+          { name: 'item', label: this.$tc('items.part_name'), align: 'left', sortable: true },
           { name: 'quantity', label: this.$tc('label.quantity'), field: 'quantity', align: 'center', sortable: true },
           { name: 'unit_id', label: this.$tc('label.unit'), field: (v) => v.unit.code, align: 'left', sortable: true},
           { name: 'encasement', label: this.$tc('label.encasement'), field: 'encasement', align: 'left', sortable: true },

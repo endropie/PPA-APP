@@ -78,12 +78,12 @@
             <div class="q-mb-sm text-italic">{{$tc('label.description')}}:</div>
             <div class="q-mb-md text-weight-light" style="">{{ rsView.description }}</div>
         </div>
-        <div class="col-12 q-gutter-xs print-hide " style="padding-top:50px">
+        <div class="col-12 row q-gutter-xs print-hide " style="padding-top:50px">
           <q-btn :label="$tc('form.back')" icon="cancel"  color="dark" :to="`${VIEW.resource.uri}?return`" />
           <q-btn :label="$tc('form.edit')" icon="edit" color="positive" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"  v-if="IS_EDITABLE && $app.can('pre-deliveries-update')" />
           <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="VIEW.print()" />
-
-          <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" no-caps class="float-right"
+          <q-space />
+          <ux-btn-dropdown color="blue-grey"
             :options="[
               { label: $tc('form.add_new'), color:'green', icon: 'add',
                 detail: $tc('messages.process_create'),
