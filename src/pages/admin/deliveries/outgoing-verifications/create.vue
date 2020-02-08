@@ -18,10 +18,11 @@
         :error-message="errors.first('customer_id')"
         :loading="SHEET['customers'].loading"/>
 
-      <ux-select-filter class="col-12 col-sm-4"
+      <ux-select class="col-12 col-sm-4"
         name="pre_delivery_id"
         v-model="rsForm.pre_delivery_id"
         stack-label label="No. PDO"
+        filter emit-value map-options
         :options="PreDeliveryOptions" clearable
         @input="setPreDelivery"
         v-validate="'required'"
@@ -57,10 +58,6 @@
         <tbody>
           <q-tr v-for="(row, index) in rsForm.outgoing_good_verifications" :key="index">
             <q-td key="item_id" width="35%" >
-              <!-- <q-input readonly
-                :value="row.item ? row.item.part_name : null"
-                outlined dense hide-bottom-space color="blue-grey-5"
-                :dark="LAYOUT.isDark" /> -->
               <div v-if="row.item" class="column text-body2">
                 <span class="text-subtitle2">{{row.item.part_name}}</span>
                 <span class="text-small" v-if="row.item.part_number">No. {{row.item.part_number}}</span>
@@ -102,7 +99,7 @@
               />
             </q-td>
           </q-tr>
-          <q-tr  v-if="AllDetail && AllDetail.length == 0">
+          <q-tr  v-if="rsForm.outgoing_good_verifications.length == 0">
             <q-td colspan="100%" class="text-center">
               <div v-show="!Boolean(rsForm.outgoing_good_verifications.length)" class="q-pa-sm">{{$tc('messages.no_details')}}</div>
             </q-td>
@@ -203,52 +200,19 @@ export default {
 
       })
     },
-    AllDetail() {
-      if(! this.rsForm.customer_id || this.SHEET.items.data.length == 0) return []
-
-      let data = []
-      data.slice()
-      const maxi = (sto, pdo) => {
-        if(Number(sto) >= Number(pdo)) return Number(pdo)
-        return Number(sto)
-      }
-
-      this.SHEET.items.data.map((detail, index) => {
-
-        const available = Number(detail.totals['FG']) - Number(detail.totals['VDO'])
-
-        if (detail.customer_id !== this.rsForm.customer_id) return
-        if (Number(detail.totals['PDO']) <= 0) return
-
-        data.push({
-          item_id: detail.id,
-          unit_id: detail.unit_id,
-          unit_rate: 1,
-          quantity: null,
-          maximum: maxi(available, detail.totals['PDO']),
-          PDO: Number(detail.totals['PDO']),
-          AVA: available,
-          item: detail,
-        })
-      })
-
-      this.rsForm.outgoing_good_verifications = data
-      return data
-    },
     STOCKS() {
       if (!this.rsForm.outgoing_good_verifications.length) return []
 
-      let Stocks = Object.assign({}) // JSON.parse(JSON.stringify(this.MapItems))
+      let stock = Object.assign({}) // JSON.parse(JSON.stringify(this.MapItems))
       for (const i in this.MapItems) {
         if (this.MapItems.hasOwnProperty(i)) {
-          Stocks[i] = Number(this.MapItems[i]['FG']) - Number(this.MapItems[i]['VDO'])
-
+          stock[i] = Number(this.MapItems[i]['FG']) - Number(this.MapItems[i]['VDO'])
         }
       }
 
       return this.rsForm.outgoing_good_verifications.map(detail => {
-        const available = Number(Stocks[detail.item_id])
-        Stocks[detail.item_id] -= detail.quantity * detail.unit_rate
+        const available = Number(stock[detail.item_id])
+        stock[detail.item_id] -= detail.quantity * detail.unit_rate
         return available
       })
     }
@@ -303,7 +267,6 @@ export default {
 
       if(this.rsForm.customer_id) {
         this.SHEET.load('pre_deliveries', `customer_id=${val}&available_outgoing_verification=true`)
-        this.rsForm.outgoing_good_verifications = this.AllDetail
       }
     },
     setUnitReference(index, val) {

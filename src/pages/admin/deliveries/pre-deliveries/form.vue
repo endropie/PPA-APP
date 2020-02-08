@@ -18,7 +18,6 @@
         <q-option-group slot="control" type="radio" inline
           name="transaction"
           v-model="rsForm.transaction"
-          :disable="IssetItemDetails"
           :options="CONFIG.options.transaction_mode"
           :dark="LAYOUT.isDark"
           v-validate="'required'"
@@ -60,18 +59,17 @@
         :error-message="errors.first('rit')" />
 
       <div class="col-12">
-        <q-markup-table class="main-box no-shadow no-highlight th-uppercase"
-          separator="horizontal"
+        <q-markup-table dense bordered separator="horizontal"
           :dark="LAYOUT.isDark"
-          bordered >
+          class="bg-transparent no-shadow no-highlight th-uppercase"
+        >
           <thead>
-            <q-tr>
-              <q-th key="prefix"></q-th>
-              <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
-              <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
-              <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
-              <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
-              <q-th key="encasement">{{$tc('label.encasement')}}</q-th>
+            <q-tr style="line-height:30px">
+              <q-th key="prefix" width="50px"></q-th>
+              <q-th key="item" width="50%">{{$tc('items.part_name')}}</q-th>
+              <q-th key="unit_id" width="15%">{{$tc('label.unit')}}</q-th>
+              <q-th key="quantity" width="20%">{{$tc('label.quantity')}}</q-th>
+              <q-th key="encasement" width="30%">{{$tc('label.encasement')}}</q-th>
             </q-tr>
           </thead>
           <tbody>
@@ -79,12 +77,13 @@
               <q-td key="prefix">
                 <q-btn dense flat round icon="close" color="red" @click="removeItem(index)"/>
               </q-td>
-              <q-td key="item_id" width="25%" style="min-width:150px">
-                <ux-select-filter autofocus
+              <q-td key="item" width="45%" style="min-width:150px">
+                <ux-select  autofocus class="field-native-top"
                   :name="`pre_delivery_items.${index}.item_id`"
                   v-model="row.item_id"
                   outlined dense hide-bottom-space no-error-icon hide-dropdown-icon color="blue-grey-5"
                   :readonly="!IssetCustomerID"
+                  filter emit-value map-options clearable
                   :options="ItemOptions"
                   :loading="SHEET.items.loading"
                   :data-vv-as="$tc('general.item')"
@@ -92,16 +91,13 @@
                   :dark="LAYOUT.isDark"
                   :error="errors.has(`pre_delivery_items.${index}.item_id`)"
                   :error-message="errors.first(`pre_delivery_items.${index}.item_id`)"
-                  @input="(val)=>{ setItemReference(index, val) }" />
-                <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
+                  @input="(val)=>{ setItemReference(index, val) }"
+                >
+                  <small class="absolute-bottom" v-if="row.item_id">No. {{row.item.part_number}}</small>
+                  <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
+                </ux-select>
               </q-td>
-              <q-td key="part_number" width="25%" style="min-width:150px">
-                <q-input readonly
-                  :value="row.item ? row.item.part_number : null"
-                  outlined dense hide-bottom-space color="blue-grey-5"
-                  :dark="LAYOUT.isDark" />
-              </q-td>
-              <q-td key="unit_id" width="10%">
+              <q-td key="unit_id" width="15%">
                 <q-select style="min-width:80px"
                   :name="`pre_delivery_items.${index}.unit_id`"
                   v-model="row.unit_id"
@@ -114,7 +110,7 @@
                   @input="(val)=> { setUnitReference(index, val) }"
                 />
               </q-td>
-              <q-td key="quantity" width="15%">
+              <q-td key="quantity" width="20%">
                 <q-input style="min-width:100px"
                   :name="`pre_delivery_items.${index}.quantity`"
                   v-model="row.quantity" type="number" min="0"
@@ -125,8 +121,8 @@
                   :error="errors.has(`pre_delivery_items.${index}.quantity`)"
                   @input="(val)=> {row.unit_qty = (val) * (row.unit_rate)}"/>
               </q-td>
-              <q-td key="encasement" width="25%">
-                <q-input style="min-width:100px"
+              <q-td key="encasement" width="30%">
+                <q-input style="min-width:150px"
                   :name="`pre_delivery_items.${index}.encasement`"
                   outlined dense hide-bottom-space  color="blue-grey-5"
                   v-model="row.encasement"
@@ -278,13 +274,11 @@ export default {
       return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
     },
     ItemOptions() {
-      // if (this.MAPINGKEY['itemstocks'].length == 0) return []
-      const STOCKIST = this.rsForm.transaction === 'RETURN' ? 'RDO.RET' : 'RDO.REG'
       let olditems = this.FORM.data.pre_delivery_items.map(x => x.item_id)
       let data = this.SHEET.items.data.filter((item) => {
-        if (this.rsForm.transaction == this.FORM.data.transaction && olditems.some(x => x === item.id)) return true
+        if (olditems.some(x => x === item.id)) return true
         if (item.customer_id !== this.rsForm.customer_id) return false
-        return (Number(item.totals[STOCKIST]) > 0)
+        return ((Number(item.totals['*']) - (Number(item.totals['PDO.REG']) + Number(item.totals['PDO.RET']))) > 0)
       })
 
       return (data.map(item => ({
@@ -308,6 +302,8 @@ export default {
     },
     MaxMount() {
       let stockItem =  JSON.parse(JSON.stringify(this.MAPINGKEY['itemstocks']))
+      const STOCKIST = this.rsForm.transaction === 'RETURN' ? 'PDO.RET' : 'PDO.REG'
+
       let moveItem = {
         set: function (id, val) {
           if (!this.hasOwnProperty(id)) this[id] = 0
@@ -318,18 +314,19 @@ export default {
         }
       }
 
-      const OLDSTOCKIST = this.FORM.data.transaction === 'RETURN' ? 'RDO.RET' : 'RDO.REG'
       this.FORM.data.pre_delivery_items.forEach(item => {
         if (stockItem.hasOwnProperty(item.item_id)) {
-          stockItem[item.item_id][OLDSTOCKIST] += Number(item.quantity)
+          stockItem[item.item_id][STOCKIST] -= Number(item.unit_amount)
         }
       })
 
-      const NEWSTOCKIST = this.rsForm.transaction === 'RETURN' ? 'RDO.RET' : 'RDO.REG'
       let data = {}
       this.rsForm.pre_delivery_items.map((detail, index) => {
         if (stockItem[detail.item_id] && detail.item_id) {
-          data[index] = Number(stockItem[detail.item_id][NEWSTOCKIST] || 0) - Number(moveItem.get(detail.item_id) || 0)
+          const stockin = Number(stockItem[detail.item_id]['*'])
+                        - Number(stockItem[detail.item_id]['PDO.REG'])
+                        - Number(stockItem[detail.item_id]['PDO.RET'])
+          data[index] = stockin - Number(moveItem.get(detail.item_id) || 0)
           moveItem.set(detail.item_id, detail.quantity)
         }
       })
@@ -442,7 +439,6 @@ export default {
         this.rsForm.order_mode = null
       }
       else {
-        console.warn('object', this.$refs);
         this.$refs['schedules'].setOptions([])
         this.SHEET.load('items', 'customer_id='+ val)
         if (this.MAPINGKEY['customers'].hasOwnProperty(val)) {
@@ -463,12 +459,19 @@ export default {
       this.setItemReference(index, itemID)
     },
     setItemReference(index, val) {
-      this.rsForm.pre_delivery_items[index].item = this.MAPINGKEY['items'][val]
-
-      let unitID = this.MAPINGKEY['items'][val].unit_id
-      this.rsForm.pre_delivery_items[index].unit_id = unitID
-      this.rsForm.pre_delivery_items[index].unit_rate = 1
-      this.rsForm.pre_delivery_items[index].unit = this.MAPINGKEY['units'][unitID]
+      if (val) {
+        this.rsForm.pre_delivery_items[index].item = this.MAPINGKEY['items'][val]
+        let unitID = this.MAPINGKEY['items'][val].unit_id
+        this.rsForm.pre_delivery_items[index].unit_id = unitID
+        this.rsForm.pre_delivery_items[index].unit_rate = 1
+        this.rsForm.pre_delivery_items[index].unit = this.MAPINGKEY['units'][unitID]
+      }
+      else {
+        this.rsForm.pre_delivery_items[index].item = null
+        this.rsForm.pre_delivery_items[index].unit_id = null
+        this.rsForm.pre_delivery_items[index].unit_rate = 1
+        this.rsForm.pre_delivery_items[index].unit = null
+      }
     },
     setUnitReference(index, val) {
       let detail = this.rsForm.pre_delivery_items[index]
