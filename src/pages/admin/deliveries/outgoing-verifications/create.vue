@@ -12,6 +12,7 @@
         v-model="rsForm.customer_id"
         stack-label :label="$tc('general.customer')"
         :options="CustomerOptions" clearable
+        :dark="LAYOUT.isDark" option-dark="LAYOUT.isDark"
         @input="setCustomerReference"
         v-validate="'required'"
         :error="errors.has('customer_id')"
@@ -24,6 +25,7 @@
         stack-label label="No. PDO"
         filter emit-value map-options
         :options="PreDeliveryOptions" clearable
+        :dark="LAYOUT.isDark" option-dark="LAYOUT.isDark"
         @input="setPreDelivery"
         v-validate="'required'"
         :error="errors.has('pre_delivery_id')"
@@ -156,21 +158,8 @@ export default {
     this.init()
   },
   computed: {
-    IssetIncomeItems() {
-        let items = this.rsForm.outgoing_good_verifications
-        for (const i in items) {
-          if (items.hasOwnProperty(i) && items[i].item_id) {
-            return true
-          }
-        }
-
-        return false
-    },
-    IssetCustomerID() {
-      return (this.rsForm.customer_id ? true : false)
-    },
     PreDeliveryOptions() {
-      return (this.SHEET.pre_deliveries.data.map(item => ({label: item.number, value: item.id, stamp:item.transaction === 'RETURN' ? 'RET' : undefined})) || [])
+      return (this.SHEET.pre_deliveries.data.map(item => ({label: item.fullnumber || item.number, value: item.id, stamp:item.transaction === 'RETURN' ? 'RETURN' : 'REGULER'})) || [])
     },
     CustomerOptions() {
       return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])

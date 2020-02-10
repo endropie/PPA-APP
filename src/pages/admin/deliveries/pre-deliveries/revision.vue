@@ -74,7 +74,7 @@
           </q-tr>
           <q-tr v-for="(row, index) in rsForm.pre_delivery_items" :key="index">
             <q-td key="prefix">
-              <q-btn dense flat round icon="close" color="red" @click="removeItem(index)"/>
+              <q-btn dense flat round icon="close" color="red" @click="removeItem(index)" v-show="Number(row.amount_verification) <= 0"/>
             </q-td>
             <q-td key="item_id" width="35%" style="min-width:150px">
               <ux-select-filter autofocus
@@ -355,6 +355,9 @@ export default {
       this.rsForm.pre_delivery_items[index].outgoing_verifications.push(newEntri)
     },
     removeItem(index) {
+        if (Number(this.rsForm.pre_delivery_items[index].amount_verification) > 0) {
+          return this.$q.notify('Part has verifications. Remove not allowed!')
+        }
         this.rsForm.pre_delivery_items.splice(index, 1)
         if(this.rsForm.pre_delivery_items.length < 1) this.addNewItem()
     },

@@ -79,7 +79,7 @@
           <span :class="{'text-weight-light highlight-and-fade':!rs.row.outgoing_good_id}">{{ rs.row.quantity }}</span>
         </q-td>
 
-        <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
+        <q-td slot="body-cell-created" slot-scope="rs" :props="rs" class="no-padding">
           <div class="column text-body">
             <span class="text-uppercase text-grey-8">
               {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
@@ -133,12 +133,13 @@ export default {
         },
         columns: [
           { name: 'prefix', label:''},
-          { name: 'item', label: this.$tc('items.part_name'), align: 'left', sortable: true },
+          { name: 'created_at', label: this.$tc('label.date'), field: 'created_at', format: (v) => this.$app.moment(v).format('DD/MM/YYYY'), align: 'center', sortable: true },
           { name: 'pre_delivery_number', label: 'No. PDO', field: 'pre_delivery_number', align: 'left', sortable: true },
+          { name: 'item', label: this.$tc('items.part_name'), align: 'left', sortable: true },
           { name: 'quantity', label: this.$tc('label.quantity'), field: 'quantity', align: 'center', sortable: true },
           { name: 'unit_id', label: this.$tc('label.unit'), field: (v) => v.unit.code, align: 'left', sortable: true},
           { name: 'encasement', label: this.$tc('label.encasement'), field: 'encasement', align: 'left', sortable: true },
-          { name: 'created_at', label: this.$tc('form.create',2), field: 'created_at', align: 'center', sortable: true },
+          { name: 'created', label: this.$tc('form.create',2), field: 'created_at', align: 'center', sortable: true },
         ]
       },
       rsForm: {

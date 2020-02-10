@@ -116,10 +116,12 @@
                   v-model="row.quantity" type="number" min="0"
                   outlined dense hide-bottom-space no-error-icon color="blue-grey-5"
                   :dark="LAYOUT.isDark"
-                  :suffix="' / ' + strUnitConvertion(row, MaxMount[index])"
-                  v-validate="`required|gt_value:0|max_value:${numUnitConvertion(row, MaxMount[index])}`"
+                  v-validate="`required|gt_value:0|${rsForm.order_mode!=='PO' ? 'max_value:'+numUnitConvertion(row, MaxMount[index]) : ''}`"
                   :error="errors.has(`pre_delivery_items.${index}.quantity`)"
-                  @input="(val)=> {row.unit_qty = (val) * (row.unit_rate)}"/>
+                  @input="(val)=> {row.unit_qty = (val) * (row.unit_rate)}"
+                >
+                <span slot="append" class="text-body2" v-if="rsForm.order_mode!=='PO'"> / {{strUnitConvertion(row, MaxMount[index])}}</span>
+                </q-input>
               </q-td>
               <q-td key="encasement" width="30%">
                 <q-input style="min-width:150px"
@@ -278,6 +280,7 @@ export default {
       let data = this.SHEET.items.data.filter((item) => {
         if (olditems.some(x => x === item.id)) return true
         if (item.customer_id !== this.rsForm.customer_id) return false
+        if (this.rsForm.order_mode == 'PO') return true
         return ((Number(item.totals['*']) - (Number(item.totals['PDO.REG']) + Number(item.totals['PDO.RET']))) > 0)
       })
 
