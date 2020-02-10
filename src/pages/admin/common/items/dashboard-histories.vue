@@ -274,7 +274,7 @@ export default {
             return `[#${data.id}]`;
         }
       }
-      return data.full_number || data.number || others(data.id)
+      return data.fullnumber || data.number || others(data.id)
     }
   }
 }

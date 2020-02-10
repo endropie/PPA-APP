@@ -278,7 +278,7 @@ export default {
 
         if (itemline.work_order_item.unit_rate) total = total / itemline.work_order_item.unit_rate
         return ({
-          label: work_order.full_number || work_order.number,
+          label: work_order.fullnumber || work_order.number,
           value: itemline.id,
           stamp: this.$app.number_format(total),
           item_id: (itemline.work_order_item.item_id || null),

@@ -302,7 +302,7 @@ export default {
         let total = (Number(item.amount_process) - Number(item.amount_packing))
         if (item.id === this.rsForm.packing_items.item_id) total = total / UnitRate
         return ({
-          label: item.work_order.full_number || item.work_order.number,
+          label: item.work_order.fullnumber || item.work_order.number,
           value: item.id,
           rowdata: item,
           stamp: this.$app.number_format(total)

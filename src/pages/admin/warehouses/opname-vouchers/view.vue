@@ -27,7 +27,7 @@
                 <tr>
                   <th>{{$tc('label.number')}}</th>
                   <td>
-                    {{rsView.opname_stock.full_number || rsView.opname_stock.number}}
+                    {{rsView.opname_stock.fullnumber || rsView.opname_stock.number}}
                   </td>
                 </tr>
                 <tr>

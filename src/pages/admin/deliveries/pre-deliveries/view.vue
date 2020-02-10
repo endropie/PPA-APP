@@ -29,7 +29,7 @@
             <tbody>
               <tr>
                 <td class="text-weight-medium">{{$tc('label.number')}}</td>
-                <td>{{ rsView.full_number || rsView.number }}</td>
+                <td>{{ rsView.fullnumber || rsView.number }}</td>
               </tr>
               <tr>
                 <td class="text-weight-medium">{{$tc('label.date')}}</td>
