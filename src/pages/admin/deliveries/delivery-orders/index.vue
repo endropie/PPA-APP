@@ -101,10 +101,18 @@
           <ux-chip-status dense square :row="rs.row"/>
         </q-td>
 
-        <q-td slot="body-cell-operator_id" slot-scope="rs" :props="rs">
-          <span v-if="rs.row.operator"> {{ rs.row.operator.name }}</span>
-          <span v-else>- undifined -</span>
+        <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
+          <div class="column text-body">
+            <span class="text-uppercase text-grey-8">
+              {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
+            </span>
+            <small v-if="rs.row.created_at" class="text-grey">
+              <q-icon name="mdi-earth"></q-icon>
+              {{ $app.moment(rs.row.created_at).fromNow() }}
+            </small>
+          </div>
         </q-td>
+
       </q-table>
     </q-pull-to-refresh>
 
@@ -153,7 +161,7 @@ export default {
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', label: '', field: 'status', align: 'left', sortable: true },
           { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
-          { name: 'operator_id', label: 'Operator', field: 'operator_id', align: 'left', sortable: true },
+          { name: 'created_at', label: this.$tc('form.create',2), field:'created_at', align: 'center' },
         ],
         rowData:[],
         resData:[],

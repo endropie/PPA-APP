@@ -82,17 +82,6 @@
             <small class="absolute-bottom text-grey" v-if="rsForm.request_order">REF: {{rsForm.request_order.reference_number}}</small>
             <q-btn slot="after" dense flat icon="open_in_new" color="blue-grey"  v-if="rsForm.request_order" @click="showRequestOrder = true"/>
           </ux-select>
-          <!-- <ux-select filter disable
-            name="operator_id"
-            stack-label label="Operator"
-            v-model="rsForm.operator_id"
-            emit-value map-options
-            :options="EmployeeOptions"
-            :dark="LAYOUT.isDark"
-            v-validate="''"
-            :error="errors.has(`operator_id`)"
-            :error-message="errors.first(`operator_id`)"
-          /> -->
         </div>
         <q-markup-table bordered class="main-box no-shadow no-highlight"
           dense separator="horizontal"
@@ -323,13 +312,12 @@ export default {
       setDefault:()=>{
         return {
           number: null,
-          date: this.$app.moment().format('YYYY-MM-DD'),
+          date: null,
           customer_id: null,
           transaction: null,
           customer_name: null,
           customer_phone: null,
           customer_address: null,
-          operator_id: null,
           revise_id: 0,
           revise_number: null,
           description: null,

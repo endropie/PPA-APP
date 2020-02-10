@@ -33,7 +33,7 @@
           :value="rsForm.customer ? `${rsForm.customer.code} - ${rsForm.customer.name}` : null"
         />
         <div class="row q-col-gutter-x-sm">
-          <ux-date class="col-12 col-sm-6"
+          <ux-date class="col-12 col-sm-12"
             name="date" type="date"
             stack-label label="Date"
             v-model="rsForm.date"
@@ -42,14 +42,6 @@
             :error="errors.has('date')"
             :error-message="errors.first('date')"/>
 
-          <ux-date class="col-12 col-sm-6"
-            name="due_date" type="date"
-            stack-label label="Due Date"
-            v-model="rsForm.due_date"
-            :dark="LAYOUT.isDark"
-            v-validate="'required'"
-            :error="errors.has('due_date')"
-            :error-message="errors.first('due_date')"/>
         </div>
       </div>
       <!-- COLUMN::2nd Customer Identity -->
@@ -92,17 +84,6 @@
             @input="setRequestOrder"
           />
           <q-space />
-          <ux-select filter
-            name="operator_id"
-            stack-label label="Operator"
-            v-model="rsForm.operator_id"
-            emit-value map-options
-            :options="EmployeeOptions"
-            :dark="LAYOUT.isDark"
-            v-validate="'required'"
-            :error="errors.has(`operator_id`)"
-            :error-message="errors.first(`operator_id`)"
-          />
         </div>
         <q-markup-table bordered class="main-box no-shadow no-highlight"
           dense separator="horizontal"
@@ -264,16 +245,12 @@ export default {
         return {
           number: null,
           transaction: null,
+          date: this.$app.moment().format('YYYY-MM-DD'),
 
           customer_id: null,
           customer_name: null,
           customer_phone: null,
           customer_address: null,
-
-          operator_id: null,
-
-          date: this.$app.moment().format('YYYY-MM-DD'),
-          due_date: this.$app.moment().format('YYYY-MM-DD'),
 
           revise_id: 0,
           revise_number: null,
@@ -303,7 +280,6 @@ export default {
       return !this.rsForm.revise_id
     },
     WITH_RO() {
-      console.warn('CEK', this.rsForm.transaction, this.rsForm.customer.order_mode);
       if (this.rsForm.is_internal) return false
       if (this.rsForm.request_order) {
         if(this.rsForm.transaction == 'REGULER' && this.rsForm.customer.order_mode == 'ACCUMULATE') {
@@ -329,9 +305,6 @@ export default {
         disable: !row.item.enable,
         item: row.item
       }))
-    },
-    EmployeeOptions() {
-      return (this.SHEET.employees.data.map(item => ({label: `[${item.code}] ${item.name}`, value: item.id})) || [])
     },
     UnitOptions() {
       return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
