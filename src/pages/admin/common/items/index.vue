@@ -69,7 +69,8 @@
                 :placeholder="`${$tc('form.search',2)}...`"
                 standout="bg-blue-grey-5 text-white"
                 :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark">
+                :dark="LAYOUT.isDark"
+                @input="FILTERABLE.submit" >
 
                 <template slot="append">
                   <q-btn flat dense icon="search" dark-percentage color="fadded" @click="FILTERABLE.submit"/>
@@ -155,16 +156,7 @@ export default {
           // { name: 'enable', label:this.$tc('label.active'), field: 'enable', align: 'center', sortable: true },
 
           // Item stocks
-          { name: 'ALL', label: 'ALL', sortable: true, style:'text-weight-medium', format:(v) => Boolean(v) ? this.$app.number_format(v) : '-',
-            field: (item)=> (
-              Number(item.totals['FM'])
-              + Number(item.totals['WO'])
-              + Number(item.totals['WIP'])
-              + Number(item.totals['FG'])
-              + Number(item.totals['NG'])
-              + Number(item.totals['RET'])
-            )
-          },
+          { name: 'ALL', label: 'ALL', sortable: true, field: (item)=> Number(item.totals['*']), format:(v) => Boolean(v) ? this.$app.number_format(v) : '-', style:'text-weight-medium'},
           { name: 'FM', label: 'FM', sortable: true, field: (item)=> item.totals['FM'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-' },
           { name: 'WO', label: 'WO', sortable: true, field: (item)=> item.totals['WO'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'WIP', label: 'WIP', sortable: true, field: (item)=> item.totals['WIP'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
@@ -172,9 +164,9 @@ export default {
           { name: 'NG', label: 'NC', sortable: true, field: (item)=> item.totals['NG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'RET', label: 'NCR', sortable: true, field: (item)=> item.totals['RET'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
 
-          { name: 'PDOREG', label: 'PDO [REG]', align: 'center', clases:'bg-faded', hidden:  (!process.env.DEV && !this.$route.query.DEV),
+          { name: 'PDOREG', label: 'PDO [REG]', sortable: true, align: 'center', clases:'bg-faded', hidden:  (!process.env.DEV && !this.$route.query.DEV),
             field: (item) => item.totals['PDO.REG'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'PDORET', label: 'PDO [RET]', align: 'center', clases:'bg-faded', hidden:  (!process.env.DEV && !this.$route.query.DEV),
+          { name: 'PDORET', label: 'PDO [RET]', sortable: true, align: 'center', clases:'bg-faded', hidden:  (!process.env.DEV && !this.$route.query.DEV),
             field: (item) => item.totals['PDO.RET'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'VDO', label: 'VDO', sortable: true, hidden:  (!process.env.DEV && !this.$route.query.DEV),
             field: (item)=> item.totals['VDO'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
