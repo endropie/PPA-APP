@@ -30,13 +30,23 @@
             :loading="SHEET['customers'].loading">
             <q-tooltip v-if="IssetItemDetails" :offset="[0, 10]">To change: Please delete Part items first!</q-tooltip>
           </ux-select-filter>
-          <ux-date class="col-12" name="date"
+          <ux-date class="col-12 col-sm-6" name="date"
             stack-label :label="$tc('label.date')"
             v-model="rsForm.date" disable
             :dark="LAYOUT.isDark"
             v-validate="'required'"
             :error="errors.has('date')"
             :error-message="errors.first('date')" />
+          <ux-date  class="col-12 col-sm-6" style="min-width:150px"
+            name="actived_date"
+            stack-label :label="$tc('label.expired',2) + ' PO'"
+            v-model="rsForm.actived_date"
+            :dark="LAYOUT.isDark"
+            v-validate="rsForm.order_mode == 'PO' ? 'required' : ''"
+            :error="errors.has('actived_date')"
+            :error-message="errors.first('actived_date')"
+             v-if="rsForm.order_mode === 'PO'"
+          />
         </div>
       </div>
       <div class="col-12 col-sm-6" >

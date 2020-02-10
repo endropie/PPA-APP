@@ -118,12 +118,12 @@
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
           <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`"/>
           <q-btn v-if="isCanUpdate && isEditable(rs.row)" dense flat color="light" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" />
-          <!-- <q-btn v-if="isCanDelete && isEditable(rs.row)" dense flat color="light" icon="delete" @click.native="TABLE.delete(rs.row)" /> -->
-          <q-btn v-if="isCanUpdate && isEditRef(rs.row)" flat dense color="light" icon="link" :to="`${TABLE.resource.uri}/${rs.row.id}/edit-reference`" />
+          <q-btn v-if="isCanUpdate && isEditRef(rs.row)" flat dense color="light" icon="mdi-link-plus" :to="`${TABLE.resource.uri}/${rs.row.id}/edit-reference`" />
+          <q-btn v-if="isCanUpdate && isEditRefExpired(rs.row)" flat dense color="light" icon="mdi-link" :to="`${TABLE.resource.uri}/${rs.row.id}/edit-reference`" />
         </q-td>
 
         <q-td slot="body-cell-date" slot-scope="rs" :props="rs" class="text-uppercase">
-          <span v-if="rs.row.date"> {{ $app.moment(rs.row.date).format('DD MMM YYYY') }}</span>
+          <span v-if="rs.row.date"> {{ $app.moment(rs.row.date).format('DD/MM/YYYY') }}</span>
           <span v-else>-</span>
         </q-td>
 
@@ -185,6 +185,8 @@ export default {
           { name: 'status', label: '', align: 'left', field: 'status'},
           { name: 'customer_id', label: this.$tc('general.customer'), align: 'left', field: (row) => row.customer.name , sortable: true },
           { name: 'reference_number', label: 'No. Reference', field: 'reference_number', align: 'left', sortable: true },
+          { name: 'actived_date', label: this.$tc('label.expired'), field: 'actived_date', align: 'center', sortable: true,
+            format:(v)=> v ? this.$app.moment(v).format('ll') : '-', classes: 'text-uppercase'},
           { name: 'created_at', label: this.$tc('form.create',2), align: 'center', sortable: true, field: 'created_at'},
         ]
       },
@@ -217,6 +219,13 @@ export default {
       if(row.order_mode === 'PO') return false
       if(row.status === 'CLOSED') return false
       return true
+    },
+    isEditRefExpired (row) {
+      if(row.deleted_at) return false
+      if(row.order_mode !== 'PO') return false
+      if(row.status === 'CLOSED') return false
+      console.warn(row.order_mode, row.number, row.is_relationship);
+      return row.is_relationship
     },
   }
 }
