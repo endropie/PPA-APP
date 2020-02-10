@@ -150,9 +150,7 @@ export default {
       return Number(total)
     },
     StockistOptions() {
-      let excluded = ['WO', 'RDO.REG', 'RDO.RET', 'PDO.REG', 'PDO.RET', 'VDO']
-
-      if (this.ROUTE.query && this.ROUTE.query.DEV) excluded = []
+      let excluded = ['WO', 'PDO.REG', 'PDO.RET', 'VDO']
       return this.$store.state['admin'].CONFIG.items.stockists
         .filter(x => !excluded.some(e => e === x.value))
     },

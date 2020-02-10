@@ -172,10 +172,6 @@ export default {
           { name: 'NG', label: 'NC', sortable: true, field: (item)=> item.totals['NG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'RET', label: 'NCR', sortable: true, field: (item)=> item.totals['RET'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
 
-          // { name: 'RDOREG', label: 'RDO [REG]', hidden: (!process.env.DEV && !this.$route.query.DEV),
-          //   field: (item) => item.totals['RDO.REG'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          // { name: 'RDORET', label: 'RDO [RET]', hidden: (!process.env.DEV && !this.$route.query.DEV),
-          //   field: (item) => item.totals['RDO.RET'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'PDOREG', label: 'PDO [REG]', align: 'center', clases:'bg-faded', hidden:  (!process.env.DEV && !this.$route.query.DEV),
             field: (item) => item.totals['PDO.REG'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'PDORET', label: 'PDO [RET]', align: 'center', clases:'bg-faded', hidden:  (!process.env.DEV && !this.$route.query.DEV),
