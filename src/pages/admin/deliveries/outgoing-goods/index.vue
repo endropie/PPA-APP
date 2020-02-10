@@ -110,7 +110,7 @@
             <q-td slot="body-cell-number" slot-scope="rs">
               <!-- <q-btn flat dense icon="keyboard_arrow_down" color="primary" @click="rs.expand = !rs.expand" /> -->
               <q-btn-dropdown flat dense round
-                :label="`${rs.row.number} (${rs.row.delivery_orders.length})`"
+                :label="`${rs.row.fullnumber || rs.row.number} (${rs.row.delivery_orders.length})`"
                 :color="LAYOUT.isDark ? 'white' : 'dark'"
                 menu-anchor="bottom left" menu-self="top left">
                 <div class="row q-pa-md" :class="{'bg-faded text-white': LAYOUT.isDark}">
@@ -132,6 +132,17 @@
               </q-btn-dropdown>
               <!-- <q-checkbox color="primary" v-model="rs.expand" checked-icon="remove" unchecked-icon="add" class="q-mr-md" /> -->
               <ux-chip-status dense square :row="rs.row" class=" on-right shadow-0" />
+            </q-td>
+            <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
+              <div class="column text-body">
+                <span class="text-uppercase text-grey-8">
+                  {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
+                </span>
+                <small v-if="rs.row.created_at" class="text-grey">
+                  <q-icon name="mdi-earth"></q-icon>
+                  {{ $app.moment(rs.row.created_at).fromNow() }}
+                </small>
+              </div>
             </q-td>
       </q-table>
     </q-pull-to-refresh>
@@ -186,9 +197,7 @@ export default {
             format:(v)=> v ? this.$app.moment(v).format('ll') : '-', classes: 'text-uppercase'},
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'customer_id', label: this.$tc('general.customer'), field: (val) => val.customer.name , align: 'left', sortable: true },
-          { name: 'operator_id', label: 'Operator', field: (val) => val.operator ? val.operator.name : '-', align: 'left', sortable: true },
-          { name: 'activated_date', label: this.$tc('label.expired'), field: 'activated_date', align: 'center', sortable: true,
-            format:(v)=> v ? this.$app.moment(v).format('ll') : '-', classes: 'text-uppercase'},
+          { name: 'created_at', label: this.$tc('form.create',2), field:'created_at', align: 'center' },
 
         ]
       },
