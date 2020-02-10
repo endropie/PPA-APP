@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="page-index" >
     <q-pull-to-refresh @refresh="TABLE.refresh" inline>
-      <q-table ref="table" inline class="table-index th-uppercase" color="primary" :dark="LAYOUT.isDark"
+      <q-table ref="table" class="table-index th-uppercase" color="primary" :dark="LAYOUT.isDark"
         :title="TABLE.getTitle()"
         :data="TABLE.rowData"
         :columns="TABLE.columns"
@@ -103,47 +103,60 @@
           </table-header>
         </template>
 
-            <!-- slot name syntax: body-cell-<column_name> -->
-            <q-td slot="body-cell-prefix" slot-scope="rs"  style="width:35px">
-              <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" />
-            </q-td>
-            <q-td slot="body-cell-number" slot-scope="rs">
-              <!-- <q-btn flat dense icon="keyboard_arrow_down" color="primary" @click="rs.expand = !rs.expand" /> -->
-              <q-btn-dropdown flat dense round
-                :label="`${rs.row.fullnumber || rs.row.number} (${rs.row.delivery_orders.length})`"
-                :color="LAYOUT.isDark ? 'white' : 'dark'"
-                menu-anchor="bottom left" menu-self="top left">
-                <div class="row q-pa-md" :class="{'bg-faded text-white': LAYOUT.isDark}">
-                  <div class="column">
-                    <div class="text-subtitle2 q-mb-md">SJ-DELIVERY ORDER</div>
-                    <template v-for="(link, index) in rs.row.delivery_orders">
-                      <q-btn dense class="q-ma-xs" :key="index"
-                        color="secondary" icon="open_in_new"
-                        :label="`${link.number} ${link.revise_number ? ' - REV.' + link.revise_number : ''}`"
-                        @click="showDO(link.id)" />
-                    </template>
-                  </div>
-
-                  <q-separator vertical inset class="q-mx-lg" v-show="false" />
-
-                  <div class="column">
-                  </div>
-                </div>
-              </q-btn-dropdown>
-              <!-- <q-checkbox color="primary" v-model="rs.expand" checked-icon="remove" unchecked-icon="add" class="q-mr-md" /> -->
-              <ux-chip-status dense square :row="rs.row" class=" on-right shadow-0" />
-            </q-td>
-            <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
-              <div class="column text-body">
-                <span class="text-uppercase text-grey-8">
-                  {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
-                </span>
-                <small v-if="rs.row.created_at" class="text-grey">
-                  <q-icon name="mdi-earth"></q-icon>
-                  {{ $app.moment(rs.row.created_at).fromNow() }}
-                </small>
+        <!-- slot name syntax: body-cell-<column_name> -->
+        <q-td slot="body-cell-prefix" slot-scope="rs" style="width:35px">
+          <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" />
+        </q-td>
+        <q-td slot="body-cell-number" slot-scope="rs">
+          <!-- <q-btn flat dense icon="keyboard_arrow_down" color="primary" @click="rs.expand = !rs.expand" /> -->
+          <q-btn-dropdown flat dense round class="no-dropdown-icon"
+            :color="LAYOUT.isDark ? 'white' : 'dark'"
+            menu-anchor="bottom left" menu-self="top left">
+            <span slot="label">
+              {{`${rs.row.fullnumber || rs.row.number} (${rs.row.delivery_orders.length})`}}
+            </span>
+            <div class="row q-pa-md" :class="{'bg-faded text-white': LAYOUT.isDark}">
+              <div class="column">
+                <div class="text-subtitle2 q-mb-md">SJ-DELIVERY ORDER</div>
+                <template v-for="(link, index) in rs.row.delivery_orders">
+                  <q-btn dense class="q-ma-xs" :key="index"
+                    color="secondary" icon="open_in_new"
+                    :label="`${link.number} ${link.revise_number ? ' - REV.' + link.revise_number : ''}`"
+                    @click="showDO(link.id)" />
+                </template>
               </div>
-            </q-td>
+
+              <q-separator vertical inset class="q-mx-lg" v-show="false" />
+
+              <div class="column">
+              </div>
+            </div>
+          </q-btn-dropdown>
+          <q-chip dense square label="RET" color="dark" text-color="white" v-if="rs.row.transaction === 'RETURN'"/>
+        </q-td>
+
+        <q-td slot="body-cell-status" slot-scope="rs" class="no-padding">
+          <ux-chip-status dense square :row="rs.row" />
+        </q-td>
+
+        <q-td slot="body-cell-transaction" slot-scope="rs" :props="rs"  class="no-padding">
+          <q-chip dense square
+            color="blue-grey" text-color="white"
+            :label="rs.row.transaction"
+            :outline="rs.row.transaction === 'RETURN'" />
+        </q-td>
+
+        <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
+          <div class="column text-body">
+            <span class="text-uppercase text-grey-8">
+              {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
+            </span>
+            <small v-if="rs.row.created_at" class="text-grey">
+              <q-icon name="mdi-earth"></q-icon>
+              {{ $app.moment(rs.row.created_at).fromNow() }}
+            </small>
+          </div>
+        </q-td>
       </q-table>
     </q-pull-to-refresh>
     <ux-modal-view ref="modal"  fit icon="local_shipping" :title="$tc('general.sj_delivery')" />
@@ -192,11 +205,13 @@ export default {
           delivery_orders: '/admin/deliveries/delivery-orders',
         },
         columns: [
-          { name: 'prefix', label: '', align: 'left'},
+          { name: 'prefix', label: '', align: 'left', style:'width:50px'},
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true,
-            format:(v)=> v ? this.$app.moment(v).format('ll') : '-', classes: 'text-uppercase'},
+            format:(v)=> v ? this.$app.moment(v).format('DD/MM/YYYY') : '-', classes: 'text-uppercase'},
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'customer_id', label: this.$tc('general.customer'), field: (val) => val.customer.name , align: 'left', sortable: true },
+          { name: 'status', label: '', align: 'left', field: 'status'},
+          { name: 'transaction', label: this.$tc('label.transaction'), field: 'transaction', align: 'center', sortable: true },
+          { name: 'customer_id', label: this.$tc('general.customer'), field: (val) => val.customer.name , align: 'left', sortable: true, style:"width:50%" },
           { name: 'created_at', label: this.$tc('form.create',2), field:'created_at', align: 'center' },
 
         ]
@@ -227,3 +242,7 @@ export default {
   },
 }
 </script>
+<style lang="stylus">
+.no-dropdown-icon .q-btn-dropdown__arrow
+  display none
+</style>

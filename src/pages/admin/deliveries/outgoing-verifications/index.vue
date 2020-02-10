@@ -79,6 +79,18 @@
           <span :class="{'text-weight-light highlight-and-fade':!rs.row.outgoing_good_id}">{{ rs.row.quantity }}</span>
         </q-td>
 
+        <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
+          <div class="column text-body">
+            <span class="text-uppercase text-grey-8">
+              {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
+            </span>
+            <small v-if="rs.row.created_at" class="text-grey">
+              <q-icon name="mdi-earth"></q-icon>
+              {{ $app.moment(rs.row.created_at).fromNow() }}
+            </small>
+          </div>
+        </q-td>
+
       </q-table>
     </q-pull-to-refresh>
   </q-page>
@@ -121,15 +133,12 @@ export default {
         },
         columns: [
           { name: 'prefix', label:''},
-          { name: 'id',  label: '#', field:'id', format:(v)=> `${v}`},
-          { name: 'validated_at', label: 'Outgoing', field: 'validated_at', align: 'center', sortable: true,
-             format:(v)=> v ? `${v}` : '-'
-          },
           { name: 'item', label: this.$tc('items.part_name'), align: 'left', sortable: true },
+          { name: 'pre_delivery_number', label: 'No. PDO', field: 'pre_delivery_number', align: 'left', sortable: true },
           { name: 'quantity', label: this.$tc('label.quantity'), field: 'quantity', align: 'center', sortable: true },
           { name: 'unit_id', label: this.$tc('label.unit'), field: (v) => v.unit.code, align: 'left', sortable: true},
           { name: 'encasement', label: this.$tc('label.encasement'), field: 'encasement', align: 'left', sortable: true },
-          { name: 'pre_delivery_number', label: 'No. PDO', field: 'pre_delivery_number', align: 'left', sortable: true },
+          { name: 'created_at', label: this.$tc('form.create',2), field: 'created_at', align: 'center', sortable: true },
         ]
       },
       rsForm: {

@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="page-index" >
     <q-pull-to-refresh @refresh="TABLE.refresh" inline>
-      <q-table ref="table" dense class="table-index th-uppercase" color="primary" :dark="LAYOUT.isDark"
+      <q-table ref="table" class="table-index th-uppercase" color="primary" :dark="LAYOUT.isDark"
         :title="TABLE.getTitle()"
         :data="TABLE.rowData"
         :columns="TABLE.columns"
@@ -90,10 +90,10 @@
         </template>
 
         <!-- slot name syntax: body-cell-<column_name> -->
-        <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
+        <q-td slot="body-cell-prefix" slot-scope="rs" style="width:35px">
           <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" />
-          <q-btn v-if="isCanUpdate && isEditable(rs.row)" dense flat color="light" icon="edit"   :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" :class="{'hidden': rs.row.is_relationship === true}" />
-          <q-btn v-if="isCanDelete && isEditable(rs.row)" dense flat color="light" icon="delete" @click.native="TABLE.delete(rs.row)" :class="{'hidden': rs.row.is_relationship === true}" />
+          <!-- <q-btn v-if="isCanUpdate && isEditable(rs.row)" dense flat color="light" icon="edit"   :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" :class="{'hidden': rs.row.is_relationship === true}" /> -->
+          <!-- <q-btn v-if="isCanDelete && isEditable(rs.row)" dense flat color="light" icon="delete" @click.native="TABLE.delete(rs.row)" :class="{'hidden': rs.row.is_relationship === true}" /> -->
         </q-td>
 
         <q-td slot="body-cell-number" slot-scope="rs" :props="rs" style="width:35px">
@@ -103,12 +103,12 @@
           </div>
         </q-td>
 
-        <q-td slot="body-cell-status" slot-scope="rs" :props="rs" style="width:35px" class="no-padding">
-          <ux-badge-status :row="rs.row" class="shadow-0" />
+        <q-td slot="body-cell-status" slot-scope="rs" class="no-padding">
+          <ux-chip-status dense square :row="rs.row" />
         </q-td>
 
-        <q-td slot="body-cell-transaction" slot-scope="rs" :props="rs" style="width:35px">
-          <q-chip class="shadow-1" dense square
+        <q-td slot="body-cell-transaction" slot-scope="rs"  class="no-padding" style="width:35px">
+          <q-chip dense square
             color="blue-grey" text-color="white"
             :label="rs.row.transaction"
             :outline="rs.row.transaction === 'RETURN'" />
@@ -117,6 +117,18 @@
         <q-td slot="body-cell-customer_id" slot-scope="rs" :props="rs">
           <span v-if="rs.row.customer"> {{ rs.row.customer.name }}</span>
           <span v-else>- undifined -</span>
+        </q-td>
+
+        <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
+          <div class="column text-body">
+            <span class="text-uppercase text-grey-8">
+              {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
+            </span>
+            <small v-if="rs.row.created_at" class="text-grey">
+              <q-icon name="mdi-earth"></q-icon>
+              {{ $app.moment(rs.row.created_at).fromNow() }}
+            </small>
+          </div>
         </q-td>
 
       </q-table>
@@ -163,13 +175,12 @@ export default {
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},
+          { name: 'date', label: this.$tc('label.date'), field: 'date', format:(v) => this.$app.moment(v).format('DD/MM/YYYY'), align: 'center', sortable: true},
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', label: '', field: 'status', align: 'left'},
-          { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
-          { name: 'date', label: this.$tc('label.date'), field: 'date', format:(v) => this.$app.moment(v).format('DD/MM/YY'), align: 'center', sortable: true},
           { name: 'transaction', label: this.$tc('label.transaction'), field: 'transaction', align: 'center', sortable: true },
-          { name: 'rit', label: 'RIT', field: 'rit', align: 'center' },
-
+          { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
+          { name: 'created_at', label: this.$tc('form.create',2), field: 'created_at', align: 'center', sortable: true },
         ]
       },
     }

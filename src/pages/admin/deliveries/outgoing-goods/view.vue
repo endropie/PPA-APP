@@ -75,7 +75,7 @@
           <q-btn :label="$tc('form.cancel')" :icon="btnIcon('cancel')"  color="dark" :to="`${VIEW.resource.uri}?return`" />
           <q-btn :label="$tc('form.print')" :icon="btnIcon('print')" color="grey" @click.native="print()" />
 
-          <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" class="float-right"
+          <ux-btn-dropdown color="blue-grey" class="float-right"
             :options="[
               { label: $tc('form.add_new'), color:'green', icon: 'add',
                 hidden: !$app.can('outgoing-goods-create'),

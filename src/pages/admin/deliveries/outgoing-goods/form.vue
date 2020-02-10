@@ -7,7 +7,7 @@
       </form-header>
     </q-card-section>
     <!-- COLUMN::1st customer Identitity -->
-    <q-card-section class="row q-col-gutter-x-md">
+    <q-card-section class="row q-col-gutter-x-md q-py-none">
       <q-field class="col-12"
         borderless stack-label hide-bottom-space
         :label="$tc('label.mode',1, {v:$tc('label.transaction')})"
@@ -27,7 +27,7 @@
         />
       </q-field>
     </q-card-section>
-    <q-card-section class="row q-col-gutter-x-md" :class="{'light-dimmed': !rsForm.transaction}">
+    <q-card-section class="row q-col-gutter-x-md q-pt-none" :class="{'light-dimmed': !rsForm.transaction}">
       <div class="col-12 col-sm-6" >
         <div class="row q-col-gutter-x-sm">
           <ux-select-filter name="customer_id" class="col-12" hide-bottom-space
@@ -48,32 +48,28 @@
             :error="errors.has('date')"
             :error-message="errors.first('date')"/>
 
-          <ux-date name="due_date" type="date" class="col-12 col-sm-6" hide-bottom-space
-            stack-label label="Due Date"
-            v-model="rsForm.due_date"
-            :dark="LAYOUT.isDark"
-            v-validate="'required'"
-            :error="errors.has('due_date')"
-            :error-message="errors.first('due_date')"/>
+          <div class="col-12 col-sm-6 row">
+            <ux-select-filter class="col col-stretch"
+              name="vehicle_id"
+              :label="$tc('transports.seri')" stack-label
+              v-model="rsForm.transport_number"
+              hide-bottom-space autocomplete="off"
+              filter emit-value map-options
+              :options="VehicleOptions"
+              :dark="LAYOUT.isDark"
+              :error="errors.has('vehicle_id')"
+              :error-message="errors.first('vehicle_id')" />
 
-          <ux-select-filter class="col-9"
-            name="vehicle_id"
-            :label="$tc('transports.seri')" stack-label
-            v-model="rsForm.transport_number"
-            hide-bottom-space autocomplete="off"
-            :options="VehicleOptions"
-            :dark="LAYOUT.isDark"
-            :error="errors.has('vehicle_id')"
-            :error-message="errors.first('vehicle_id')" />
+            <q-select class="col col-auto" slot="after" style="width:80px"
+              name="rit" label="RIT"
+              v-model="rsForm.rit" clearable
+              hide-bottom-space no-error-icon hide-dropdown-icon
+              :options="RitOptions" options-dense
+              :options-dark="LAYOUT.isDark" :dark="LAYOUT.isDark"
+              v-validate="'min_value:0'"
+              :error="errors.has('rit')" />
+          </div>
 
-          <q-select class="col-3"
-            name="rit" label="RIT"
-            v-model="rsForm.rit" clearable
-            hide-bottom-space no-error-icon hide-dropdown-icon
-            :options="RitOptions" options-dense
-            :options-dark="LAYOUT.isDark" :dark="LAYOUT.isDark"
-            v-validate="'min_value:0'"
-            :error="errors.has('rit')" />
 
           <q-input name="customer_note" class="col-12"
             stack-label :label="$tc('label.no',1, {v:'DN'})"
@@ -87,13 +83,13 @@
       <div class="col-12 col-sm-6" >
         <div class="row q-col-gutter-x-sm">
 
-          <q-input name="customer_name" class="col-12"
+          <q-input name="customer_name" class="col-12 col-sm-9"
             stack-label label="Name"
             v-model="rsForm.customer_name"
             :dark="LAYOUT.isDark"
             v-validate="'required'" />
 
-          <q-input name="customer_phone" class="col-12"
+          <q-input name="customer_phone" class="col-12 col-sm-3"
             stack-label label="phone"
             v-model="rsForm.customer_phone"
             :dark="LAYOUT.isDark" />
@@ -252,7 +248,6 @@ export default {
     return {
       SHEET: {
         customers: { api:'/api/v1/incomes/customers?mode=all'},
-        employees: { api:'/api/v1/common/employees?mode=all'},
         vehicles: { api:'/api/v1/references/vehicles?mode=all'},
         units: { api:'/api/v1/references/units?mode=all'},
         items: {autoload:false, api:'/api/v1/common/items?mode=all'},
@@ -268,7 +263,6 @@ export default {
         return {
           number: null,
           date: this.$app.moment().format('YYYY-MM-DD'),
-          time: this.$app.moment().format('HH:mm'),
 
           customer_id: null,
           customer_name: null,
@@ -278,9 +272,6 @@ export default {
 
           vehicle_id: null,
           rit: null,
-
-          due_date: this.$app.moment().format('YYYY-MM-DD'),
-          due_time: this.$app.moment().format('HH:mm'),
 
           description: null,
           revise_id: 0,
@@ -349,13 +340,9 @@ export default {
     MAPINGKEY(){
       let variables = {
         'customers' : {},
-        // 'units': {},
-        // 'items': {},
       }
 
       this.SHEET['customers'].data.map(value => { variables['customers'][value.id] = value })
-      // this.SHEET['units'].data.map(value => { variables['units'][value.id] = value })
-      // this.SHEET['items'].data.map(value => { variables['items'][value.id] = value })
 
       return variables;
     }
@@ -413,6 +400,7 @@ export default {
       this.rsForm.exclude_items = []
       this.SHEET.load('items', params.join('&'),
       (res) => {
+        console.warn('load', res);
         if (res.status === 200 && res.data.length > 0) {
           this.rsForm.outgoing_good_items = res.data.map(item => {
 
