@@ -125,11 +125,11 @@
           </div>
         </q-td>
 
-        <q-td slot="body-cell-status" slot-scope="rs" :props="rs" style="width:35px">
+        <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding" style="width:35px">
           <div class="row q-gutter-xs no-wrap">
-            <ux-badge-status :row="rs.row" class="shadow-1" />
-            <q-badge label="RET" class="shadow-1 q-pa-xs"
-              dense color="blue-grey" text-color="white"
+            <ux-chip-status dense square :row="rs.row"/>
+            <q-chip dense square label="RET"
+              color="blue-grey" text-color="white"
               v-if="rs.row.transaction == 'RETURN'"
             />
           </div>
@@ -138,6 +138,18 @@
         <q-td slot="body-cell-customer_id" slot-scope="rs" :props="rs">
           <span v-if="rs.row.customer"> {{ rs.row.customer.name }}</span>
           <span v-else>- undifined -</span>
+        </q-td>
+
+        <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
+          <div class="column text-body">
+            <span class="text-uppercase text-grey-8">
+              {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
+            </span>
+            <small v-if="rs.row.created_at" class="text-grey">
+              <q-icon name="mdi-earth"></q-icon>
+              {{ $app.moment(rs.row.created_at).fromNow() }}
+            </small>
+          </div>
         </q-td>
       </q-table>
     </q-pull-to-refresh>
@@ -187,10 +199,10 @@ export default {
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},
+          { name: 'date', label: this.$tc('label.date'), field: 'date', format:(v)=> this.$app.moment(v).format('DD/MM/YYYY'), align: 'center', sortable: true},
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', label: '', field: 'status', align: 'left'},
           { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
-          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true},
           { name: 'reference_number', label: this.$tc('warehouses.reference_number'), field: 'reference_number', align: 'left', sortable: true },
           { name: 'reference_date', label: this.$tc('warehouses.reference_date'), field: 'reference_date', align: 'center', sortable: true },
           { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center', sortable: true },
