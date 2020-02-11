@@ -17,7 +17,7 @@
                 {{$tc('general.opname_voucher', 2)}}
               </div>
               <span class="text-subtitle2 text-no-wrap" v-show="rsView.number">
-                #{{rsView.number}}
+                #{{rsView.fullnumber || rsView.number}}
               </span>
             </div>
             <div>
@@ -49,7 +49,7 @@
             </div>
             <div class="col no-wrap text-right">
               <span class="text-weight-medium">{{$app.number_format(rsView.quantity)}}
-                <span class="on-right">{{rsView.item.unit.name}}</span>
+                <span class="on-right">{{rsView.unit.code}}</span>
               </span>
             </div>
           </div>
@@ -60,8 +60,7 @@
         <q-btn :label="$tc('form.print')" color="grey" icon="print" @click.native="print()" />
         <q-btn :label="$tc('form.edit')" color="green" icon="edit" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`" v-if="IS_EDITABLE && isCanUpdate" />
         <q-space />
-        <ux-btn-dropdown color="blue-grey" no-caps
-          :label="$tc('label.others')"
+        <ux-btn-dropdown color="blue-grey"
           :options="[
             { label: $tc('form.add_new'), color:'green', icon: 'add',
               hidden: !isCanCreate,

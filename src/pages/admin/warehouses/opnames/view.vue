@@ -37,8 +37,7 @@
         <q-btn :label="$tc('form.edit')" color="green" icon="edit" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"
           v-if="IS_EDITABLE && isCanUpdate" />
         <q-space />
-        <ux-btn-dropdown color="blue-grey" no-caps
-          :label="$tc('label.others')"
+        <ux-btn-dropdown color="blue-grey"
           :options="[
             { label: $tc('form.add_new'), color:'green', icon: 'add',
               hidden: !isCanCreate,

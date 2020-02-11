@@ -71,21 +71,19 @@
           v-model="rsForm.quantity"
           v-validate="'required'"
           :dark="LAYOUT.isDark"
-          @input="rsForm.unit_id = (rsForm.item) ? rsForm.item.unit_id : null"
           :error="errors.has(`quantity`)"
           :error-message="errors.first(`quantity`)">
-
           <q-select slot="after" class="no-padding" style="min-width:50px"
             :name="`unit_id`"
             :data-vv-as="$tc('label.unit')"
-            v-model="rsForm.unit_id" disable
+            v-model="rsForm.unit_id"
             map-options emit-value no-error-icon hide-dropdown-icon
             :options="ItemUnitOptions"
             :options-dark="LAYOUT.isDark"
             :dark="LAYOUT.isDark"
             v-validate="rsForm.item_id ? 'required' : ''"
             :error="errors.has(`unit_id`)"
-            @input="(val)=> { setUnitReference(index, val) }"/>
+            @input="(val)=> { setUnitReference(val) }"/>
         </q-input>
 
         <q-input class="hidden" v-model="rsForm.unit_rate" />
@@ -164,8 +162,7 @@ export default {
       const item = this.rsForm.item
       return this.UnitOptions.filter(unit => {
         if (unit.value === item.unit_id) return true
-        // return item.item_units.find(x => x.unit_id === unit.value)
-        return false
+        return item.item_units.find(x => x.unit_id === unit.value)
       })
     }
   },
@@ -194,24 +191,27 @@ export default {
       this.rsForm.init_amount = 0
       this.rsForm.item = (val) ? opt : null
 
-      if (this.rsForm.item && this.rsForm.stockist) {
-        this.setStockistReference(this.rsForm.stockist)
+      if (this.rsForm.item) {
+        this.rsForm.unit_id = this.rsForm.item.unit_id
+        this.rsForm.unit_rate = 1
+
+        if (this.rsForm.stockist) this.setStockistReference(this.rsForm.stockist)
       }
     },
     setStockistReference(val) {
       const totals = this.rsForm.item.totals || {}
       this.rsForm.init_amount = Number(totals[val] || 0)
     },
-    setUnitReference(index, val) {
-
+    setUnitReference(val) {
       if(!val) return;
       else if (this.rsForm.item.unit_id === val) {
-        this.rsForm.opname_vouchers[index].unit_rate = 1
+        this.rsForm.unit_rate = 1
       }
       else {
         if(this.rsForm.item.item_units) {
           this.rsForm.item.item_units.map((unitItem)=> {
-            if (unitItem.unit_id == val) this.rsForm.opname_vouchers[index].unit_rate = unitItem.rate
+            if (unitItem.unit_id == val) this.rsForm.unit_rate = unitItem.rate
+            console.warn('rate', this.rsForm.unit_rate);
           })
         }
       }

@@ -102,6 +102,18 @@
             <ux-chip-status :row="rs.row" dense square />
           </span>
         </q-td>
+
+        <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
+          <div class="column text-body">
+            <span class="text-uppercase text-grey-8">
+              {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
+            </span>
+            <small v-if="rs.row.created_at" class="text-grey">
+              <q-icon name="mdi-earth"></q-icon>
+              {{ $app.moment(rs.row.created_at).fromNow() }}
+            </small>
+          </div>
+        </q-td>
       </q-table>
     </q-pull-to-refresh>
   </q-page>
@@ -141,9 +153,9 @@ export default {
           { name: 'item', label: this.$tc('items.part_name'), align: 'left'},
           { name: 'stockist', label: 'Stockist', field:'stockist', format:(v) => v, align: 'center'},
           { name: 'quantity', label: this.$tc('label.quantity'), field:'quantity', align: 'right'},
-          { name: 'unit', label: this.$tc('label.unit'), field:(row)=>row.item.unit.code, align: 'right'},
+          { name: 'unit', label: this.$tc('label.unit'), field:(row)=>row.unit.code, align: 'right'},
           { name: 'opname_number', label: 'STO #', field:'opname_number', align: 'left'},
-          { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', format:(v) => this.$app.moment(v).format('DD/MM/YYYY HH:mm'), align: 'center', sortable: true },
+          { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center', sortable: true },
         ],
       },
     }

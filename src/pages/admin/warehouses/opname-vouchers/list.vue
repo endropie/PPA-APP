@@ -54,8 +54,8 @@
           <span v-else class="text-grey">undifined!</span>
         </q-td>
         <q-td slot="body-cell-unit" slot-scope="rs" :props="rs">
-          <span v-if="rs.row.item.unit">
-            {{rs.row.item.unit.code}}
+          <span v-if="rs.row.unit">
+            {{rs.row.unit.code}}
           </span>
         </q-td>
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
