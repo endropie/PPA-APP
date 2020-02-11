@@ -24,13 +24,14 @@
         />
       </q-field>
 
-      <ux-select-filter class="col-12 col-sm-6"
+      <ux-select class="col-12 col-sm-6"
         name="customer"
         :label="$tc('general.customer')"
         v-model="rsForm.customer_id"
         v-validate="'required'"
         :disable="IssetItemDetails"
-        :options="CustomerOptions" filter clearable
+        filter emit-value map-options
+        :options="CustomerOptions" clearable
         @input="setCustomerReference"
         :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
         :error="errors.has('customer')"
@@ -38,7 +39,7 @@
         <q-badge slot="counter"
           :label="String($tc(`customers.order_${rsForm.order_mode}`).toUpperCase())"
           v-if="rsForm.order_mode"  />
-      </ux-select-filter>
+      </ux-select>
       <ux-date class="col-6 col-sm-3"
         name="date"  type="date"
         stack-label :label="$tc('label.date')"
