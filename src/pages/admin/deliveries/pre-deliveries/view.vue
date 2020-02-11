@@ -2,15 +2,13 @@
   <q-page padding class="column justify-start">
     <page-print v-if="VIEW.show">
       <div slot="header-title">PPA - Pre Delivery </div>
-      <template slot="header-tags hide-print">
-        <q-chip square outline color="blue-grey" text-color="white"
-          label="RETURN" v-if="rsView.transaction === 'RETURN'" />
+      <template slot="header-tags">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </template>
 
       <div class="row justify-between q-col-gutter-y-sm" >
         <div class="profile self-bottom">
-          <q-markup-table dense class="super-dense no-shadow text-weight-medium">
+          <q-markup-table dense class="super-dense no-shadow no-highlight text-weight-medium">
             <tr>
               <td>{{$tc('general.customer')}}</td>
               <td>
@@ -25,7 +23,7 @@
           </q-markup-table>
         </div>
         <div class="info">
-          <q-markup-table dense bordered class="super-dense no-shadow " separator="cell">
+          <q-markup-table dense square bordered class="super-dense no-shadow no-highlight" separator="cell">
             <tbody>
               <tr>
                 <td class="text-weight-medium">{{$tc('label.number')}}</td>
@@ -39,7 +37,7 @@
           </q-markup-table>
         </div>
         <div class="col-12">
-          <q-markup-table dense bordered class="no-shadow th-uppercase" separator="cell">
+          <q-markup-table dense bordered class="no-shadow no-highlight th-uppercase" separator="cell">
             <thead>
             <q-tr>
               <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
@@ -54,7 +52,7 @@
             <q-tr v-for="(row, index) in rsView.pre_delivery_items" :key="index">
               <q-td>{{row.item.part_name}}</q-td>
               <q-td>{{row.item.part_number}}</q-td>
-              <q-td>{{row.unit.name}}</q-td>
+              <q-td>{{row.unit.code}}</q-td>
               <q-td>{{$app.number_format(row.quantity)}}</q-td>
               <q-td>{{$app.number_format(row.amount_verification)}}</q-td>
               <q-td>{{row.encasement || '-'}}</q-td>
@@ -106,6 +104,13 @@
                   $router.push(`${VIEW.resource.uri}/${ROUTE.params.id}/revision`)
                 }
               },
+              { label: 'CLOSE', color:'red-10', icon: 'lock',
+                detail: $tc('messages.process_close'),
+                hidden: !IS_CLOSE || !$app.can('pre-deliveries-revision'),
+                actions: () => {
+                  setClose()
+                }
+              },
               { label: 'VOID', color:'red', icon: 'block',
                 detail: $tc('messages.process_void'),
                 hidden: !IS_VOID || !$app.can('pre-deliveries-void'),
@@ -146,15 +151,21 @@ export default {
     this.init()
   },
   computed: {
+    IS_CLOSE() {
+      if (this.rsView.deleted_at) return false
+      if (['CLOSED'].find(x => x === this.rsView.status)) return false
+      return true
+    },
     IS_VOID() {
       if (this.IS_EDITABLE) return false
       if (this.rsView.deleted_at) return false
-      if (['VOID'].find(x => x === this.rsView.status)) return false
+      if (['VOID', 'REVISED', 'CLOSED'].find(x => x === this.rsView.status)) return false
       return true
     },
     IS_EDITABLE() {
-      if (this.rsView.revise_id) return false
       if (this.rsView.deleted_at) return false
+      if (this.rsView.revise_id) return false
+      if (this.rsView.status !== 'OPEN') return false
       if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
       return true
     },
@@ -167,6 +178,37 @@ export default {
     },
     setView(data) {
       this.rsView =  data
+    },
+    setClose() {
+
+      const submit = () => {
+        this.VIEW.show = false
+        this.VIEW.loading = true
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=close&nodata=true`
+        this.$axios.put(url)
+          .then((response) => {
+            const data = response.data
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'FORM CLOSED')
+          })
+          .finally(()=>{
+            this.VIEW.show = true
+            setTimeout(() => {
+              this.VIEW.loading = false
+            }, 1000);
+          })
+      }
+
+      this.$q.dialog({
+        title: this.$tc('form.confirm', 1, {v:'CLOSE'}),
+        message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_close')}),
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        submit()
+      })
     }
   }
 }
