@@ -15,7 +15,7 @@
               <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
             </div>
             <div class="col-auto info">
-              <q-markup-table dense bordered separator="cell"
+              <q-markup-table dense square bordered separator="cell"
                 :dark="LAYOUT.isDark" class="bg-transparent no-shadow no-highlight"
               >
                 <tbody>
@@ -36,7 +36,7 @@
         </div>
         <div class="col-12" >
           <q-markup-table dense bordered separator="cell"
-            :dark="LAYOUT.isDark" class="bg-transparent no-shadow"
+            :dark="LAYOUT.isDark" class="bg-transparent no-shadow no-highlight"
           >
             <thead>
             <q-tr  class="text-uppercase" style="line-height:30px">
@@ -71,11 +71,35 @@
           <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
           <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
         </div>
-        <div class="col-12 q-gutter-xs print-hide " style="padding-top:50px">
+        <div class="col-12 q-gutter-xs print-hide row" style="padding-top:50px">
           <q-btn :label="$tc('form.cancel')" :icon="btnIcon('cancel')"  color="dark" :to="`${VIEW.resource.uri}?return`" />
           <q-btn :label="$tc('form.print')" :icon="btnIcon('print')" color="grey" @click.native="print()" />
 
-          <ux-btn-dropdown color="blue-grey" class="float-right"
+          <q-space />
+          <q-btn-dropdown outline class="no-dropdown-icon"
+            :color="'secondary'" icon="local_shipping"
+            menu-anchor="bottom left" menu-self="top left">
+            <span slot="label" class="on-right">
+              {{`SJDO (${rsView.delivery_orders.length})`}}
+            </span>
+            <div class="row q-pa-md" :class="{'bg-faded text-white': LAYOUT.isDark}">
+              <div class="column">
+                <div class="text-subtitle2 q-mb-md">SJ-DELIVERY ORDER</div>
+                <template v-for="(link, index) in rsView.delivery_orders">
+                  <q-btn dense class="q-ma-xs" :key="index"
+                    color="secondary" icon="open_in_new"
+                    :label="`${link.number} ${link.revise_number ? ' - REV.' + link.revise_number : ''}`"
+                    @click="showDO(link.id)" />
+                </template>
+              </div>
+
+              <q-separator vertical inset class="q-mx-lg" v-show="false" />
+
+              <div class="column">
+              </div>
+            </div>
+          </q-btn-dropdown>
+          <ux-btn-dropdown color="blue-grey"
             :options="[
               { label: $tc('form.add_new'), color:'green', icon: 'add',
                 hidden: !$app.can('outgoing-goods-create'),
