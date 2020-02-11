@@ -40,13 +40,14 @@
             ]">
 
             <div class="row q-col-gutter-xs" >
-              <ux-select-filter class="col-12 col-sm-6"
+              <ux-select class="col-12 col-sm-6"
                 v-model="FILTERABLE.fill.customer_id.value" clearable
                 :label="$tc('general.customer')"
                 dense hide-bottom-space hide-dropdown-icon
                 standout="bg-blue-grey-5 text-white"
                 :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
                 :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                filter emit-value map-options
                 :options="CustomerOptions"
                 @input="FILTERABLE.submit" />
 
