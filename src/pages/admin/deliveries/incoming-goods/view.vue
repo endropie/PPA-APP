@@ -1,12 +1,12 @@
 <template>
-  <q-page class="row justify-center" :dark="LAYOUT.isDark" style="min-width:210mm;">
-    <page-print v-if="VIEW.show" class="q-ma-md q-pr-lg shadow-2" style="max-width:210mm;">
-      <span slot="header-title" style="font-size:26px">Priuk Perkasa Abadi, PT</span>
-      <span slot="header-subtitle" style="font-size:16px">Warehouses - Incoming Good</span>
+  <q-page padding class="column justify-start items-center" :dark="LAYOUT.isDark">
+    <page-print v-if="VIEW.show">
+      <span slot="header-title">Priuk Perkasa Abadi, PT</span>
+      <span slot="header-subtitle">Warehouses - Incoming Good</span>
       <div slot="header-tags" class="print-hide">
-      <q-chip class="shadow-1" square outline
-        color="blue-grey" text-color="white"
-        label="RET" v-if="rsView.transaction === 'RETURN'" />
+        <q-chip class="shadow-1" square outline
+          color="blue-grey" text-color="white"
+          label="RET" v-if="rsView.transaction === 'RETURN'" />
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
       <div class="row q-col-gutter-md" >
@@ -27,20 +27,10 @@
                 </tr>
               </q-markup-table>
             </div>
-            <div>
-              <q-markup-table bordered dense class="super-dense no-shadow" separator="cell" :dark="LAYOUT.isDark">
+            <div class="row items-start q-gutter-x-sm">
+              <q-markup-table class="super-dense no-shadow no-highlight"
+                dense square bordered separator="cell" :dark="LAYOUT.isDark">
                 <tbody>
-                  <tr>
-                    <td>{{$tc('label.number')}}</td>
-                    <td>
-                      {{rsView.number}}
-                      <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>{{$tc('label.date')}}</td>
-                    <td>{{ $app.date_format(rsView.date) }}</td>
-                  </tr>
                   <tr>
                     <td>{{$tc('warehouses.registration')}}</td>
                     <td>{{rsView.registration}}</td>
@@ -58,6 +48,19 @@
                         class="q-py-none" style="line-height:normal"
                         :to="`/admin/incomes/request-orders/${rsView.request_order.id}`"/>
                     </td>
+                  </tr>
+                </tbody>
+              </q-markup-table>
+              <q-markup-table class="super-dense no-shadow no-highlight"
+                dense square bordered separator="cell" :dark="LAYOUT.isDark">
+                <tbody>
+                  <tr>
+                    <td>{{$tc('label.number')}}</td>
+                    <td>{{rsView.fullnumber || rsView.number}}</td>
+                  </tr>
+                  <tr>
+                    <td>{{$tc('label.date')}}</td>
+                    <td>{{ $app.date_format(rsView.date) }}</td>
                   </tr>
                 </tbody>
               </q-markup-table>
@@ -86,14 +89,13 @@
             <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
         </div>
       </div>
-      <div class="q-gutter-xs print-hide" style="padding-top:50px">
+      <div class="row q-gutter-xs print-hide" style="padding-top:50px">
         <q-btn :label="$tc('form.back')" color="dark" icon="cancel" :to="`${VIEW.resource.uri}?return`" />
         <q-btn :label="$tc('form.print')" color="grey" icon="print" @click.native="print()" />
         <q-btn :label="$tc('form.edit')" color="green" icon="edit" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"
           v-if="IS_EDITABLE && isCanUpdate" />
-
-        <ux-btn-dropdown color="blue-grey" no-caps class="float-right"
-          :label="$tc('label.others')"
+        <q-space />
+        <ux-btn-dropdown color="blue-grey"
           :options="[
             { label: $tc('form.add_new'), color:'green', icon: 'add',
               hidden: !isCanCreate,
@@ -150,7 +152,6 @@
     <q-inner-loading :showing="VIEW.loading">
       <q-spinner-dots size="50px" color="primary" />
     </q-inner-loading>
-
   </q-page>
 </template>
 

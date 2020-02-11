@@ -125,94 +125,97 @@
     <q-card-section class="row q-col-gutter-sm">
 
       <div class="col-12">
-        <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
+        <q-markup-table class="main-box bordered no-shadow no-highlight"
           dense separator="horizontal"
           :dark="LAYOUT.isDark">
-          <q-tr>
-            <q-th key="prefix"></q-th>
-            <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
-            <q-th key="part_name">{{$tc('items.part_number')}}</q-th>
-            <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
-            <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
-          </q-tr>
+          <thead>
+            <q-tr class="text-uppercase">
+              <q-th key="prefix"></q-th>
+              <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
+              <q-th key="part_name">{{$tc('items.part_number')}}</q-th>
+              <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
+              <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+            </q-tr>
+          </thead>
+          <tbody>
+            <q-tr v-for="(row, index) in rsForm.incoming_good_items" :key="index">
+              <q-td  style="width:50px">
+                <q-btn dense flat round icon="clear" color="red" @click="removeItem(index)"/>
+              </q-td>
+              <q-td width="45%">
+                <ux-select
+                  :name="`items.${index}.item_id`"
+                  :data-vv-as="$tc('items.part_name')"
+                  dense outlined hide-bottom-space color="blue-grey-5"
+                  v-model="row.item_id"
+                  v-validate="'required'"
+                  filter map-options emit-value
+                  :options="ItemOptions" clearable
+                  :options-dark="LAYOUT.isDark"
+                  :dark="LAYOUT.isDark"
+                  :readonly="Boolean(row.request_order_item_id)"
+                  @input="(val)=>{ setItemReference(index, val) }"
+                  :loading="SHEET['items'].loading"
+                  :error="errors.has(`items.${index}.item_id`)"
+                  :error-message="errors.first(`items.${index}.item_id`)"
+                />
+                <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
 
-          <q-tr v-for="(row, index) in rsForm.incoming_good_items" :key="index">
-            <q-td  style="width:50px">
-              <q-btn dense flat round icon="clear" color="red" @click="removeItem(index)"/>
-            </q-td>
-            <q-td width="45%">
-              <ux-select-filter
-                :name="`items.${index}.item_id`"
-                :data-vv-as="$tc('items.part_name')"
-                dense outlined hide-bottom-space color="blue-grey-5"
-                v-model="row.item_id"
-                v-validate="'required'"
-                map-options emit-value
-                :options="ItemOptions" clearable
-                :options-dark="LAYOUT.isDark"
-                :dark="LAYOUT.isDark"
-                :readonly="Boolean(row.request_order_item_id)"
-                @input="(val)=>{ setItemReference(index, val) }"
-                :loading="SHEET['items'].loading"
-                :error="errors.has(`items.${index}.item_id`)"
-                :error-message="errors.first(`items.${index}.item_id`)"
-              />
-              <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
+              </q-td>
+              <q-td key="part_number" width="35%" style="min-width:150px">
+                <q-input readonly
+                  :value="row.item ? row.item.part_number : null"
+                  outlined dense hide-bottom-space color="blue-grey-5"
+                  :dark="LAYOUT.isDark" />
+              </q-td>
+              <q-td width="25%">
+                <q-input type="number" min="0" style="min-width:120px"
+                  :name="`items.${index}.quantity`"
+                  :data-vv-as="$tc('label.quantity')"
+                  v-model="row.quantity"
+                  v-validate="row.item_id ? 'required' : ''"
+                  dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has(`items.${index}.quantity`)"/>
+              </q-td>
+              <q-td width="25%">
+                <q-select style="min-width:100px"
+                  :name="`items.${index}.unit_id`"
+                  :data-vv-as="$tc('label.unit')"
+                  v-model="row.unit_id"
+                  dense outlined hide-bottom-space color="blue-grey-5"
+                  @input="(val)=> { setUnitReference(index, val) }"
+                  :options="ItemUnitOptions[index]"
+                  map-options emit-value
+                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                  v-validate="row.item_id ? 'required' : ''"
+                  :error="errors.has(`items.${index}.unit_id`)"/>
+                <q-input class="hidden" v-model="row.unit_rate" />
+              </q-td>
+            </q-tr>
+            <q-tr >
+              <q-td colspan="100%">
+                <q-btn-dropdown split dense icon="add" color="green"
+                  :label="$tc('form.add')"
+                  :disable-dropdown="!Boolean(rsForm.exclude_items.length)"
+                  @click="addNewItem()">
+                  <q-list>
+                    <q-item v-for="(row, index) in rsForm.exclude_items" :key="index"
+                      clickable v-close-popup @click="includeItem(index)">
+                      <q-item-section>
+                        <q-item-label>{{row.item.part_number}}</q-item-label>
+                        <q-item-label caption>{{row.item.part_name}}</q-item-label>
+                      </q-item-section>
+                      <q-item-section side>
+                        <q-badge :label="row.quantity" />
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-btn-dropdown>
+              </q-td>
+            </q-tr>
+          </tbody>
 
-            </q-td>
-            <q-td key="part_number" width="35%" style="min-width:150px">
-              <q-input readonly
-                :value="row.item ? row.item.part_number : null"
-                outlined dense hide-bottom-space color="blue-grey-5"
-                :dark="LAYOUT.isDark" />
-            </q-td>
-            <q-td width="25%">
-              <q-input type="number" min="0" style="min-width:120px"
-                :name="`items.${index}.quantity`"
-                :data-vv-as="$tc('label.quantity')"
-                v-model="row.quantity"
-                v-validate="row.item_id ? 'required' : ''"
-                dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
-                :dark="LAYOUT.isDark"
-                :error="errors.has(`items.${index}.quantity`)"/>
-            </q-td>
-            <q-td width="25%">
-              <q-select style="min-width:100px"
-                :name="`items.${index}.unit_id`"
-                :data-vv-as="$tc('label.unit')"
-                v-model="row.unit_id"
-                dense outlined hide-bottom-space color="blue-grey-5"
-                @input="(val)=> { setUnitReference(index, val) }"
-                :options="ItemUnitOptions[index]"
-                map-options emit-value
-                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                v-validate="row.item_id ? 'required' : ''"
-                :error="errors.has(`items.${index}.unit_id`)"/>
-              <q-input class="hidden" v-model="row.unit_rate" />
-            </q-td>
-          </q-tr>
-
-          <q-tr >
-            <q-td colspan="100%">
-              <q-btn-dropdown split dense icon="add" color="green"
-                :label="$tc('form.add')"
-                :disable-dropdown="!Boolean(rsForm.exclude_items.length)"
-                @click="addNewItem()">
-                <q-list>
-                  <q-item v-for="(row, index) in rsForm.exclude_items" :key="index"
-                    clickable v-close-popup @click="includeItem(index)">
-                    <q-item-section>
-                      <q-item-label>{{row.item.part_number}}</q-item-label>
-                      <q-item-label caption>{{row.item.part_name}}</q-item-label>
-                    </q-item-section>
-                    <q-item-section side>
-                      <q-badge :label="row.quantity" />
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-btn-dropdown>
-            </q-td>
-          </q-tr>
         </q-markup-table>
       </div>
       <!-- COLUMN::4th Description -->
