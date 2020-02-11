@@ -91,8 +91,10 @@
         </q-td>
 
         <q-td slot="body-cell-number" slot-scope="rs" :props="rs">
-          <span v-if="rs.row.number" class="text-weight-medium" :class="{'text-strike text-faded': rs.row.revise_id}">
-            {{ rs.row.fullnumber || rs.row.number }}</span>
+          <span v-if="rs.row.number" class="column text-weight-medium" :class="{'text-strike text-faded': rs.row.revise_id}">
+            <span>{{ rs.row.fullnumber || rs.row.number }}</span>
+            <small class="text-grey" v-if="rs.row.reconcile_number">REC.{{rs.row.reconcile_number}}</small>
+          </span>
           <span v-else>- undifined -</span>
           <q-chip dense square label="RET" color="black" text-color="white" v-if="rs.row.transaction === 'RETURN'"/>
         </q-td>

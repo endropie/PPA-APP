@@ -54,9 +54,9 @@
               <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
             </div>
             <div class="col-auto">
-              <div class=" row no-wrap">
+              <div class=" row no-wrap items-start">
                 <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
-                  class="super-dense no-shadow th-uppercase q-mx-sm">
+                  class="super-dense no-highlight no-shadow th-uppercase q-mx-sm">
                   <tbody>
                     <tr>
                       <td>{{$tc('label.number')}}</td>
@@ -65,6 +65,10 @@
                     <tr>
                       <td>{{$tc('label.date')}}</td>
                       <td>{{$app.date_format(rsView.date)}}</td>
+                    </tr>
+                    <tr v-if="rsView.reconcile_number">
+                      <td>{{$tc('form.reconciliation')}}</td>
+                      <td>{{rsView.reconcile_number}}</td>
                     </tr>
                   </tbody>
                 </q-markup-table>
