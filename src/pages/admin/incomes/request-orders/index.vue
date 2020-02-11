@@ -224,7 +224,6 @@ export default {
       if(row.deleted_at) return false
       if(row.order_mode !== 'PO') return false
       if(row.status === 'CLOSED') return false
-      console.warn(row.order_mode, row.number, row.is_relationship);
       return row.is_relationship
     },
   }

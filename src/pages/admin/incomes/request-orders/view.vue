@@ -113,10 +113,11 @@
                 $router.push(`${VIEW.resource.uri}/create`)
               }
             },
-            { label: 'CLOSED', color:'green', icon: 'done_all', hidden: !IS_CLOSE || !$app.can('request-orders-close'),
+            { label: 'CLOSED', color:'red-10', icon: 'lock',
+              hidden: !IS_CLOSE || !$app.can('request-orders-close'),
               detail: $tc('messages.process_close'),
               actions: () => {
-                setClosed()
+                setClose()
               }
             },
             { label: 'DELETE', color:'red', icon: 'delete',
@@ -251,11 +252,11 @@ export default {
     setView(data) {
       this.rsView =  data
     },
-    setClosed() {
+    setClose() {
       const submit = () => {
         this.VIEW.show = false
         this.VIEW.loading = true
-        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=closed&nodata=true`
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=close&nodata=true`
         this.$axios.put(url)
           .then((response) => {
             const data = response.data

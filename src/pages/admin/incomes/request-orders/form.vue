@@ -53,41 +53,13 @@
       </div>
       <div class="col-12 col-sm-6" >
         <div class="row q-col-gutter-x-sm">
-          <q-field  class="col-12" borderless hint=""
-            :class="{'hidden': Boolean(rsForm.id) && !rsForm.is_estimate}">
-            <q-toggle slot="before" name="is_estimate"
-              :label="$tc('label.estimate')" left-label
-              v-model="rsForm.is_estimate"
-              :true-value="1" :false-value="0"
-              :disable="Boolean(rsForm.id)"/>
-            <q-input name="estimate_number" class="no-padding fit"
-                stack-label :label="$tc('label.no', 1, {v: 'PO '+$tc('label.estimate', 2)})"
-                v-model="rsForm.estimate_number"
-                :dark="LAYOUT.isDark"
-                v-validate="rsForm.is_estimate ? 'required' :''"
-                :error="errors.has('estimate_number')"
-                :error-message="errors.first('estimate_number')"
-                :disable="Boolean(rsForm.id)"
-                v-if="rsForm.is_estimate"/>
-
-          </q-field>
           <q-input name="reference_number" class="col-12"
-            stack-label label="PO / Qoutation / Memo"
+            stack-label label="Referense PO/SJ"
             v-model="rsForm.reference_number"
             :dark="LAYOUT.isDark"
             v-validate="rsForm.order_mode === 'PO' ? 'required' :''"
             :error="errors.has('reference_number')"
-            :error-message="errors.first('reference_number')"
-            v-if="!rsForm.is_estimate || isFinished">
-            <q-btn slot="after" flat round icon="clear" v-if="isFinished" @click="setCancelFinished" />
-          </q-input>
-
-          <div class="col-12 q-px-lg" v-if="rsForm.id && rsForm.is_estimate && !Boolean(isFinished)">
-            <q-btn outline class="full-width"
-              :label="$tc('messages.release_customer_order')"
-              color="primary"
-              @click="isFinished = true"/>
-          </div>
+            :error-message="errors.first('reference_number')" />
         </div>
       </div>
     </q-card-section>
@@ -217,7 +189,6 @@ export default {
   mixins: [MixForm],
   data () {
     return {
-      isFinished: false,
       SHEET: {
         customers: {api:'/api/v1/incomes/customers?mode=all'},
         brands: {api:'/api/v1/references/brands?mode=all'},
@@ -242,8 +213,6 @@ export default {
           transaction: 'REGULER',
           order_mode: null,
           description: null,
-          is_estimate: 0,
-          estimate_number: null,
 
           request_order_items:[
             {
@@ -266,12 +235,10 @@ export default {
   },
   computed: {
     IS_EDITABLE() {
-      if (this.rsForm.order_mode === 'NONE') return false
       if (this.rsForm.deleted_at) return false
-      if (Object.keys(this.rsForm.has_relationship|| {}).length > 0) {
-        if (!Boolean(this.rsForm.is_estimate)) return false
-      }
-
+      if (this.rsForm.order_mode === 'NONE') return false
+      if (this.rsForm.order_mode === 'ACCUMULATE') return false
+      if (this.rsForm.is_relationship) return false
       return true
     },
     IssetItemDetails() {
@@ -460,12 +427,6 @@ export default {
         this.rsForm.request_order_items.splice(index, 1)
         if(this.rsForm.request_order_items.length < 1) this.addNewItem()
     },
-    setCancelFinished() {
-      this.rsForm.reference_number = null
-      this.$nextTick(()=> {
-        this.isFinished = false
-      })
-    },
     onSave() {
       this.$validator.validate().then(result => {
         if (!result) {
@@ -478,14 +439,6 @@ export default {
         }
         this.FORM.loading = true
         let {method, mode, apiUrl} = this.FORM.meta();
-
-        if (this.rsForm.is_estimate) {
-          apiUrl = this.isFinished
-            ? `${apiUrl}?mode=estimate_finished`
-            : `${apiUrl}?mode=estimate_updated`
-        }
-
-        console.warn('URL',apiUrl)
 
         this.$axios.set(method, apiUrl, this.rsForm)
         .then((response) => {
