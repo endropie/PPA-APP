@@ -30,15 +30,25 @@
           no-ripple
         />
 
-        <q-btn
-          color="grey-7"
-          label="Read Privacy Policy"
-          @click.native="$refs.privacy.show()"
-          flat
-          rounded
-          no-caps
-          class="q-mt-sm"
-        />
+
+        <div class="fit row q-mt-lg">
+
+          <q-btn flat no-caps color="grey-7"
+            label="Read Privacy Policy"
+            @click.native="$refs.privacy.show()"
+            class="q-mt-sm"
+          />
+          <q-space />
+          <q-btn no-ripple
+            label="PPA SYSTEM APP"
+            color="green-8"
+            icon="android"
+            type="a" href="/statics/apps/ppa-system.apk"
+          >
+            <q-tooltip>Download PPA System Mobile App</q-tooltip>
+          </q-btn>
+        </div>
+
 
         <privacy-policy ref="privacy" />
         <modal ref="modal" >
