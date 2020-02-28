@@ -124,8 +124,7 @@
 
         <q-td slot="body-cell-number" slot-scope="rs" :props="rs" style="width:35px">
           <div :class="{'text-strike': Boolean(rs.row.work_order_item.work_order.revise_id)}">
-            {{ rs.row.work_order_item.work_order.number }}
-            <span v-text="'REV.'+rs.row.work_order_item.work_order.revise_number" v-if="Boolean(rs.row.work_order_item.work_order.revise_number)"/>
+            {{ rs.row.work_order_item.work_order.fullnumber || rs.row.work_order_item.work_order.number }}
           </div>
         </q-td>
 

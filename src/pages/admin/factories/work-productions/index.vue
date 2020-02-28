@@ -137,13 +137,13 @@
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
-          <ux-badge-status :row="rs.row" class="shadow-1"/>
+          <ux-chip-status :row="rs.row" dense square/>
         </q-td>
 
         <q-td slot="body-cell-shift_id" slot-scope="rs" :props="rs">
           <q-badge class="shadow-1 q-pa-xs text-uppercase"
-            :label="rs.row.shift.name"
-            dense color="light" text-color="white"
+            :label="`SHIFT ${rs.row.shift.name}`"
+            dense color="faded" text-color="white"
             v-if="rs.row.shift_id" />
         </q-td>
 
@@ -213,7 +213,6 @@ export default {
           { name: 'status', align: 'right' },
           { name: 'line_id', label: this.$tc('general.line'), field: (rs)=> rs.line.name , align: 'left', sortable: true },
           { name: 'date', label: this.$tc('label.date'), field: (rs)=> rs.date, format: (v) => this.$app.moment(v).format('DD/MM/YY'), align: 'center', sortable: true },
-          { name: 'stockist', label: this.$tc('items.stockist'), field: (rs)=> (rs.stockist) , align: 'center', sortable: true },
           { name: 'shift_id', label: this.$tc('label.shift'), field: (rs)=> rs.shift.name , align: 'center', sortable: true },
         ]
       },

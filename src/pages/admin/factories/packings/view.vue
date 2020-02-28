@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="column justify-start items-center" :dark="LAYOUT.isDark" >
+  <q-page padding class="column content-center justify-start" :dark="LAYOUT.isDark" >
     <page-print v-if="VIEW.show">
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark'/>
@@ -13,7 +13,7 @@
               <span class="text-h6">PACKING GOODS </span>
           </div>
           <div class="col-auto">
-            <q-markup-table dense bordered class="no-shadow" separator="cell" :dark="LAYOUT.isDark">
+            <q-markup-table bordered dense square class="no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
               <tbody>
                 <tr>
                   <td>{{$tc('label.number')}}</td>
@@ -29,7 +29,7 @@
         </div>
         <div class="row justify-between q-col-gutter-sm">
           <div class="col-stretch ">
-            <q-markup-table class="super-dense no-shadow th-text-right" dense :dark="LAYOUT.isDark">
+            <q-markup-table class="super-dense no-shadow transparent th-text-right" dense :dark="LAYOUT.isDark">
               <tr>
                 <th class="text-weight-light">{{$tc('general.customer')}}</th>
                 <td width="35%">{{ rsView.customer.name }}</td>
@@ -41,7 +41,7 @@
             </q-markup-table>
           </div>
           <div class="col-auto ">
-            <q-markup-table class="super-dense no-shadow th-text-right" dense :dark="LAYOUT.isDark">
+            <q-markup-table class="super-dense no-shadow transparent th-text-right" dense :dark="LAYOUT.isDark">
               <tr>
                 <th class="text-weight-light">{{$tc('label.shift')}}</th>
                 <td width="35%">{{ rsView.shift.name }}</td>
@@ -54,38 +54,55 @@
           </div>
         </div>
         <div>
-          <q-table ref="table" class="no-highlight no-shadow"
-           dense hide-bottom bordered
-            color="secondary" separator="vertical" :dark="LAYOUT.isDark"
-            :data="[rsView.packing_items]"
-            no-data-label = "No Production"
-            :columns="[
-              { name: 'work_order_item', label: 'Work Order', align: 'left', field: (v)=> v.work_order_item ? v.work_order_item.work_order.number : null},
-              { name: 'code', label: this.$tc('label.code', 1, {v:this.$tc('label.part')}), align: 'left', field: (v)=> v.item.code},
-              { name: 'part_name', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left', field: (v)=> v.item.part_name},
-              { name: 'unit_id', label: $tc('label.unit'), align: 'center', field: (v)=> v.unit.code},
-              { name: 'quantity', label: 'QTY', align: 'right', field: (v)=> v.quantity},
-              { name: 'faulty', label: 'FAULT', align: 'right', field: (v)=> this.FAULT_TOTALS},
-              { name: 'total', label: $tc('label.total'), align: 'right', field: (v)=> (v.quantity+FAULT_TOTALS)},
-            ]"
-          >
-          <template slot="bottom-row">
-            <tr v-if="FAULT_TOTALS">
-              <q-td colspan="100%" style="border-top-width: 1px">
-                <div class="q-pb-sm text-caption text-weight-light">
-                  {{('FAULTY: ').toUpperCase()}}
-                  <template v-for="(item_fault, index) in rsView.packing_items.packing_item_faults">
-                    <q-chip :key="index" class="bg-white bordered" square dense>
-                      <q-avatar color="faded" text-color="white">{{item_fault.quantity}}</q-avatar>
-                      {{item_fault.fault.name}}
-                    </q-chip>
-                  </template>
-                </div>
+          <q-markup-table bordered dense square class="no-shadow transparent" separator="cell" :dark="LAYOUT.isDark" >
+            <thead>
+              <tr style="line-height:30px">
+                <th>Work Order</th>
+                <th class="text-left">{{this.$tc('label.name', 1, {v:this.$tc('label.part')})}}</th>
+                <th>{{$tc('label.unit')}}</th>
+                <th class="text-right">QTY</th>
+                <th class="text-right">FAULT</th>
+                <th class="text-right">{{$tc('label.summary')}}</th>
+              </tr>
+            </thead>
+            <tbody >
+              <q-tr v-if="rsView.packing_items">
+                <q-td key="work_order_item" width="30%">
+                  {{rsView.packing_items.work_order_item.work_order.number}}
+                </q-td>
+                <q-td key="part" width="30%">
+                  <div>{{rsView.packing_items.item.part_number}}</div>
+                  <small>{{rsView.packing_items.item.part_number}}</small>
+                </q-td>
+                <q-td key="unit_id" class="text-left">
+                  {{rsView.packing_items.unit.code}}
+                </q-td>
+                <q-td key="quantity" class="text-right">
+                  {{rsView.packing_items.quantity}}
+                </q-td>
+                <q-td key="faulty" class="text-right">
+                  {{FAULT_TOTALS}}
+                </q-td>
+                <q-td key="total" class="text-right">
+                  {{rsView.packing_items.quantity+FAULT_TOTALS}}
+                </q-td>
+              </q-tr>
+              <tr v-if="FAULT_TOTALS">
+                <q-td colspan="100%" style="border-top-width: 1px">
+                  <div class="q-pb-sm text-caption text-weight-light">
+                    {{('FAULTY: ').toUpperCase()}}
+                    <template v-for="(item_fault, index) in rsView.packing_items.packing_item_faults">
+                      <q-chip :key="index" class="bg-white bordered" square dense>
+                        <q-avatar color="faded" text-color="white">{{item_fault.quantity}}</q-avatar>
+                        {{item_fault.fault.name}}
+                      </q-chip>
+                    </template>
+                  </div>
 
-              </q-td>
-            </tr>
-          </template>
-          </q-table>
+                </q-td>
+              </tr>
+            </tbody>
+          </q-markup-table>
         </div>
         <div>
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
@@ -97,8 +114,7 @@
           <q-space />
           <q-btn :label="$tc('form.list')" icon-right="list" color="dark" :to="`${VIEW.resource.uri}?return`"/>
           <!-- <q-btn :label="$tc('form.delete')" :icon="btnIcon('delete')" color="negative" outline @click="VIEW.delete" v-if="IS_EDITABLE"></q-btn> -->
-          <ux-btn-dropdown split color="blue-grey" no-caps class="float-right"
-            :label="IS_EDITABLE ?  $tc('form.add_new') : $tc('label.others')"
+          <ux-btn-dropdown split color="blue-grey"
             @click="IS_EDITABLE ? $router.push(`${VIEW.resource.uri}/create`) : false"
             :options="[
               { label: $tc('form.add_new'), color:'green', icon: 'add',
@@ -108,7 +124,7 @@
                   $router.push(`${VIEW.resource.uri}/create`)
                 }
               },
-              { label: 'Delete', color:'red', icon: 'delete',
+              { label: 'DELETE', color:'red', icon: 'delete',
                 detail: $tc('messages.process_delete'),
                 hidden: !IS_EDITABLE || !$app.can('packings-delete'),
                 actions: () => {

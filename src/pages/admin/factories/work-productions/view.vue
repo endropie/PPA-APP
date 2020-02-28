@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="row justify-center" :dark="LAYOUT.isDark">
+  <q-page padding class="row" :dark="LAYOUT.isDark">
     <page-print v-if="VIEW.show" class="q-ma-md shadow-2">
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
@@ -12,65 +12,82 @@
           <div class="row justify-between q-col-gutter-sm" >
             <div class="col-auto self-end">
               <span class="text-h6 text-center q-pt-lg q-pl-sm">PRODUKSI</span>
-
-              <q-markup-table class="super-dense no-shadow"
-                :dark="LAYOUT.isDark">
-                <tr>
-                  <th class="text-left">{{$tc('general.line')}}</th><td>{{ rsView.line.name }}</td>
-                </tr>
-                <tr>
-                  <th class="text-left">Material of</th><td>{{ getStockistFrom(rsView.stockist_from) }}</td>
-                </tr>
+              <q-markup-table dense square class="no-shadow transparent" separator="none" :dark="LAYOUT.isDark">
+                <tbody>
+                  <tr>
+                    <td class="text-left">{{$tc('general.line')}}</td><td>{{ rsView.line.name }}</td>
+                  </tr>
+                  <tr>
+                    <td class="text-left">Material</td><td>{{ getStockistFrom(rsView.stockist_from) }}</td>
+                  </tr>
+                </tbody>
               </q-markup-table>
             </div>
             <div class="col-auto">
-              <q-markup-table class="super-dense bordered no-shadow" separator="cell" :dark="LAYOUT.isDark">
-                <tr>
-                  <th>{{$tc('label.number')}}</th>
-                  <td>{{rsView.number}}</td>
-                </tr>
-                <tr>
-                  <th>{{$tc('label.date')}}</th>
-                  <td>{{$app.date_format(rsView.date)}}</td>
-                </tr>
-                <tr>
-                  <th>{{$tc('label.shift')}}</th>
-                  <td>{{rsView.shift.name}}</td>
-                </tr>
+              <q-markup-table bordered dense square class="super-dense no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
+                <tbody>
+                  <tr>
+                    <td>{{$tc('label.number')}}</td>
+                    <td>{{rsView.number}}</td>
+                  </tr>
+                  <tr>
+                    <td>{{$tc('label.date')}}</td>
+                    <td>{{$app.date_format(rsView.date)}}</td>
+                  </tr>
+                  <tr>
+                    <td>{{$tc('label.shift')}}</td>
+                    <td>{{rsView.shift.name}}</td>
+                  </tr>
+                </tbody>
               </q-markup-table>
             </div>
           </div>
         </div>
         <div class="col-12">
-        </div>
-        <div class="col-12">
-          <q-table class="no-highlight bordered no-shadow"
-            color="secondary"
-            separator="vertical"
-            dense hide-bottom :dark="LAYOUT.isDark"
-            :data="rsView.work_production_items"
-            no-data-label = "No Production"
-            :columns="[
-              { name: 'code', label: 'code', align: 'left', field: (v)=> v.item.customer_code},
-              { name: 'part_name', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left', field: (v)=> v.item.part_name},
-              { name: 'part_number', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left', field: (v)=> v.item.part_number},
-              { name: 'unit_id', label: $tc('label.unit'), align: 'center', field: (v)=> v.unit.code},
-              { name: 'quantity', label: $tc('label.quantity'), align: 'right', format:(v)=> `${Math.round(v)}`, field: (v)=> Number(v.quantity)},
-            ]"
-          />
+          <q-markup-table bordered dense square class="no-shadow transparent" separator="cell" :dark="LAYOUT.isDark" >
+            <thead>
+              <tr>
+                <th>{{this.$tc('general.cust')}}</th>
+                <th class="text-left">{{this.$tc('label.no', 1, {v:this.$tc('label.part')})}}</th>
+                <th class="text-left">{{this.$tc('label.name', 1, {v:this.$tc('label.part')})}}</th>
+                <th>{{$tc('label.unit')}}</th>
+                <th class="text-right">{{$tc('label.quantity')}}</th>
+              </tr>
+            </thead>
+            <tbody v-for="(row, index) in rsView.work_production_items" :key="index">
+              <q-tr>
+                <q-td key="code">
+                  {{row.item.customer_code}}
+                </q-td>
+                <q-td key="part_name" width="30%">
+                  {{row.item.part_name}}
+                </q-td>
+                <q-td key="part_number" width="30%">
+                  {{row.item.part_number}}
+                </q-td>
+                <q-td key="unit_id" class="text-left">
+                  {{row.unit.code}}
+                </q-td>
+                <q-td key="quantity" class="text-right">
+                  {{row.quantity}}
+                </q-td>
+              </q-tr>
+            </tbody>
+          </q-markup-table>
         </div>
         <div class="col-12">
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
             <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
         </div>
       </div>
+      <q-space />
       <div class="row q-gutter-sm print-hide">
         <q-btn :label="$tc('form.edit')" icon="edit" color="green" outline :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`" v-if="IS_EDITABLE"></q-btn>
         <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
         <q-space />
         <q-btn :label="$tc('form.list')" icon-right="list" color="dark" :to="`${VIEW.resource.uri}?return`"/>
         <!-- <q-btn :label="$tc('form.clone')" icon-right="add_circle" color="positive" outline align="right" @click.native="$router.push(`${VIEW.resource.uri}/create?clone=${ROUTE.params.id}`)" ></q-btn> -->
-        <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" no-caps
+        <ux-btn-dropdown color="blue-grey"
           :options="[
             { label: $tc('form.add_new'), color:'primary', icon: 'add',
               detail: $tc('messages.process_create'),
@@ -79,7 +96,7 @@
                 $router.push(`${VIEW.resource.uri}/create`)
               }
             },
-            { label: $tc('form.clone'), color:'positive', icon: 'post_add',
+            { label: $tc('form.clone').toUpperCase(), color:'positive', icon: 'post_add',
               detail: $tc('messages.process_clone'),
               hidden: !$app.can('work-orders-create'),
               actions: () => {

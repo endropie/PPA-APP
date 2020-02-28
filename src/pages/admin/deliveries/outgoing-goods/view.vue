@@ -88,7 +88,7 @@
                 <template v-for="(link, index) in rsView.delivery_orders">
                   <q-btn dense class="q-ma-xs" :key="index"
                     color="secondary" icon="open_in_new"
-                    :label="`${link.number} ${link.revise_number ? ' - REV.' + link.revise_number : ''}`"
+                    :label="`${link.fullnumber || link.number}`"
                     @click="showDO(link.id)" />
                 </template>
               </div>

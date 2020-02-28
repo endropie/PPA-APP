@@ -13,7 +13,7 @@
             <div class="col-auto self-end">
               <span class="text-h6 text-center q-pt-lg q-pl-sm">WORK ORDER</span>
 
-              <q-markup-table dense bordered class="no-shadow transparent" :dark="LAYOUT.isDark">
+              <q-markup-table bordered dense square class="no-shadow transparent" :dark="LAYOUT.isDark">
                 <tbody>
                   <tr>
                     <td class="text-left">{{$tc('general.line')}}</td><td>{{ rsView.line ? rsView.line.name : '-' }}</td>
@@ -25,12 +25,11 @@
               </q-markup-table>
             </div>
             <div class="col-auto">
-              <q-markup-table  dense bordered class="super-dense no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
+              <q-markup-table bordered dense square class="super-dense no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
                 <tr>
                   <th>{{$tc('label.number')}}</th>
                   <td>
-                    {{rsView.number}}
-                    <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
+                    {{ rsView.fullnumber || rsView.number }}
                   </td>
                 </tr>
                 <tr>
@@ -48,7 +47,7 @@
         <div class="col-12">
         </div>
         <div class="col-12">
-          <q-markup-table bordered dense class="no-shadow" separator="cell" >
+          <q-markup-table bordered dense square class="no-shadow transparent" separator="cell" :dark="LAYOUT.isDark" >
             <thead>
               <tr>
                 <th>{{this.$tc('general.cust')}}</th>
@@ -167,7 +166,7 @@
           <q-btn :label="$tc('form.back')" icon="cancel" color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
           <q-btn :label="$tc('form.edit')" icon="edit" color="green" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`" v-if="IS_EDITABLE"></q-btn>
           <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="$router.push(`${VIEW.resource.uri}/${ROUTE.params.id}/prelines`)" ></q-btn>
-          <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" no-caps class="float-right"
+          <ux-btn-dropdown color="blue-grey" no-caps class="float-right"
             :options="[
               {
                 label: String($tc('form.add_new')).toUpperCase(), color:'primary', icon: 'add',

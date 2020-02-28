@@ -43,8 +43,7 @@
                   <tr>
                     <th>{{$tc('label.number')}}</th>
                     <td>
-                      {{rsView.number}}
-                      <span v-text="'REV.'+rsView.revise_number" v-if="Boolean(rsView.revise_number)"/>
+                      {{rsView.fullnumber || rsView.number}}
                     </td>
                   </tr>
                   <tr>
