@@ -6,7 +6,7 @@
       <div slot="header-tags" class="print-hide">
         <q-chip class="shadow-1" square outline
           color="blue-grey" text-color="white"
-          label="RET" v-if="rsView.transaction === 'RETURN'" />
+          label="NCR" v-if="rsView.transaction === 'RETURN'" />
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
       <div class="row q-col-gutter-md" >
@@ -74,8 +74,8 @@
             :rows-per-page-options ="[0]"
             :pagination="{page: null, rowsPerPage: 0 }"
             :columns="[
-              { name: 'part_name', label: this.$tc('items.part_name'), align: 'left', field: (v)=> v.item.part_name},
-              { name: 'part_number', label: this.$tc('items.part_number'), align: 'left', field: (v)=> v.item.part_number},
+              { name: 'part_name', label: $tc('items.part_name'), align: 'left', field: (v)=> v.item.part_name},
+              { name: 'part_number', label: $tc('items.part_number'), align: 'left', field: (v)=> v.item.part_number},
               { name: 'unit_id', label: $tc('label.unit'), align: 'center', field: (v)=> v.unit.code},
               { name: 'quantity', label: $tc('label.quantity'), align: 'right',
                 field: (v)=> v.quantity, format: (v) => $app.number_format(v)},

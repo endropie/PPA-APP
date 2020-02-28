@@ -46,7 +46,7 @@
               <q-select class="col-12 col-sm-6"
                 dense use-chips hide-dropdown-icon
                 placeholder="Stock"
-                :options="['FM','WO','WIP','FG','NG','RET']"
+                :options="['FM','WO','WIP','FG','NC','NCR']"
                 v-model="FILTERABLE.fill.has_stocks.value" multiple
                 standout="bg-blue-grey-5 text-white"
                 :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
@@ -57,7 +57,7 @@
                   dense rounded color="light" size="sm"
                   label="ALL"
                   v-if="!FILTERABLE.fill.has_stocks.value || FILTERABLE.fill.has_stocks.value.length < 6 "
-                  @click="[FILTERABLE.fill.has_stocks.value = ['FM','WO','WIP','FG','NG','RET'], FILTERABLE.submit()]" >
+                  @click="[FILTERABLE.fill.has_stocks.value = ['FM','WO','WIP','FG','NC','NCR'], FILTERABLE.submit()]" >
                   <q-tooltip>{{$tc('label.all')}}</q-tooltip>
                 </q-btn>
               </q-select>
@@ -161,8 +161,8 @@ export default {
           { name: 'WO', label: 'WO', sortable: true, field: (item)=> item.totals['WO'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'WIP', label: 'WIP', sortable: true, field: (item)=> item.totals['WIP'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'FG', label: 'FG', sortable: true, field: (item)=> item.totals['FG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'NG', label: 'NC', sortable: true, field: (item)=> item.totals['NG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'RET', label: 'NCR', sortable: true, field: (item)=> item.totals['RET'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'NC', label: 'NC', sortable: true, field: (item)=> item.totals['NC'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'NCR', label: 'NCR', sortable: true, field: (item)=> item.totals['NCR'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
 
           { name: 'PDOREG', label: 'PDO [REG]', sortable: true, align: 'center', clases:'bg-faded', hidden:  (!process.env.DEV && !this.$route.query.DEV),
             field: (item) => item.totals['PDO.REG'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},

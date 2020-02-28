@@ -90,7 +90,7 @@
         <!-- slot name syntax: body-cell-<column_name> -->
         <q-td slot="body-cell-number" slot-scope="rs" :props="rs" class="no-padding" style="width:35px">
           {{ rs.row.fullnumber || rs.row.number  }}
-          <q-chip dense square label="RET"
+          <q-chip dense square label="NCR"
             color="dark" text-color="white"
             v-if="rs.row.transaction == 'RETURN'"/>
         </q-td>

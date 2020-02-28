@@ -128,7 +128,7 @@
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding" style="width:35px">
           <div class="row q-gutter-xs no-wrap">
             <ux-chip-status dense square :row="rs.row"/>
-            <q-chip dense square label="RET"
+            <q-chip dense square label="NCR"
               color="blue-grey" text-color="white"
               v-if="rs.row.transaction == 'RETURN'"
             />

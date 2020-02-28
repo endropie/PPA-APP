@@ -96,7 +96,7 @@
             <small class="text-grey" v-if="rs.row.reconcile_number">REC.{{rs.row.reconcile_number}}</small>
           </span>
           <span v-else>- undifined -</span>
-          <q-chip dense square label="RET" color="black" text-color="white" v-if="rs.row.transaction === 'RETURN'"/>
+          <q-chip dense square label="NCR" color="black" text-color="white" v-if="rs.row.transaction === 'RETURN'"/>
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">

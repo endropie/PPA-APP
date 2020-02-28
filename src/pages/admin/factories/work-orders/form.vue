@@ -56,7 +56,7 @@
             :disable="IssetWorkOrderItems"
             text-color="primary"
             :dark="LAYOUT.isDark"
-            :options="CONFIG.items['stockists'].map(x => ({...x, color:null})).filter(stockist => ['FM','NG','RET'].indexOf(stockist.value) > -1 )"
+            :options="CONFIG.items['stockists'].map(x => ({...x, color:null})).filter(stockist => ['FM','NC','NCR'].indexOf(stockist.value) > -1 )"
           />
         </div>
         <q-space />

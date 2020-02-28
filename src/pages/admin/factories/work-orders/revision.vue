@@ -60,7 +60,7 @@
           v-validate="'required'"
           :dark="LAYOUT.isDark"
           :disable="IssetWorkOrderItems"
-          :options="CONFIG.items['stockists'].filter(stockist => ['FM','NG','RET'].indexOf(stockist.value) > -1 )" />
+          :options="CONFIG.items['stockists'].filter(stockist => ['FM','NC','NCR'].indexOf(stockist.value) > -1 )" />
       </q-field>
       <div class="col-12">
         <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"

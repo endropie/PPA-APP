@@ -288,7 +288,7 @@ export default {
       })
     },
     StockistOptions() {
-      return this.CONFIG.items['stockists'].filter(stockist => ['FM','NG','RET'].indexOf(stockist.value) > -1 )
+      return this.CONFIG.items['stockists'].filter(stockist => ['FM','NC','NCR'].indexOf(stockist.value) > -1 )
     },
     LineOptions() {
       let data = this.SHEET.lines.data || []

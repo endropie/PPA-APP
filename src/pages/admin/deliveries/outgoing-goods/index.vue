@@ -132,7 +132,7 @@
               </div>
             </div>
           </q-btn-dropdown>
-          <q-chip dense square label="RET" color="dark" text-color="white" v-if="rs.row.transaction === 'RETURN'"/>
+          <q-chip dense square label="NCR" color="dark" text-color="white" v-if="rs.row.transaction === 'RETURN'"/>
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" class="no-padding">

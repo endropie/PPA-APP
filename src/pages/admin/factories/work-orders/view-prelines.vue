@@ -166,8 +166,8 @@ export default {
     getStockistFrom(val) {
       const stockist = [
         {value: 'FM', label: 'FRESH MATERIAL'},
-        {value: 'NG', label: 'NOT GOOD',  color: 'warning' },
-        {value: 'RET', label: 'REPAIR',  color: 'orange-8' },
+        {value: 'NC', label: 'NOT GOOD',  color: 'warning' },
+        {value: 'NCR', label: 'REPAIR',  color: 'orange-8' },
       ]
       const v = stockist.find(x => x.value === val)
       return v ? v.label : 'N/A'

@@ -6,7 +6,7 @@
       <div slot="header-tags" class="print-hide">
       <q-chip class="shadow-1" square outline
         color="blue-grey" text-color="white"
-        label="RET" v-if="rsView.transaction === 'RETURN'" />
+        label="NCR" v-if="rsView.transaction === 'RETURN'" />
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
       <div class="row q-col-gutter-md" >
