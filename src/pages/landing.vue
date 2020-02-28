@@ -37,11 +37,15 @@
           />
           <!-- <q-space /> -->
           <q-btn no-ripple
-            label="PPA SYSTEM APP"
             color="green-8"
             icon="android"
             type="a" href="/statics/apps/ppa-system.apk"
+            aria-multiline
           >
+          <span class="q-ml-sm column" style="line-height:normal">
+            <span>PPA SYSTEM V.1</span>
+            <span style="font-size:70%">Build.7</span>
+          </span>
             <q-tooltip>Download PPA System Mobile App</q-tooltip>
           </q-btn>
         </div>
