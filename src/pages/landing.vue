@@ -12,33 +12,30 @@
           </p>
         <br>
 
-        <q-btn
-          label="PPA Administration"
+        <q-btn no-wrap
+          label="PPA SYSTEM"
           to="/admin"
           color="primary"
           class="full-width"
-          icon="launch"
           no-ripple
         />
 
-        <q-btn outline
+        <q-btn no-wrap outline
           label="Schedule Board"
           to="/schedule-boards"
           color="primary"
           class="full-width"
-          icon="launch"
           no-ripple
         />
 
-
-        <div class="fit row q-mt-lg">
+        <div class="fit row justify-center q-mt-lg" :class="{'justify-between': $q.screen.gt.xs}">
 
           <q-btn flat no-caps color="grey-7"
-            label="Read Privacy Policy"
+            label="Privacy Policy"
             @click.native="$refs.privacy.show()"
             class="q-mt-sm"
           />
-          <q-space />
+          <!-- <q-space /> -->
           <q-btn no-ripple
             label="PPA SYSTEM APP"
             color="green-8"
@@ -82,7 +79,7 @@
         </modal>
       </div>
     </div>
-    <a class="ribbon" :title="`PPA Built on v${$q.version}`" />
+    <a class="ribbon" :title="`PPA SYSTEM V1.0`" />
   </div>
 </template>
 

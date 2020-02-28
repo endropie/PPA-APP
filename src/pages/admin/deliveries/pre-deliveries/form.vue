@@ -21,6 +21,7 @@
           :options="CONFIG.options.transaction_mode"
           :dark="LAYOUT.isDark"
           v-validate="'required'"
+          :disable="Boolean(rsForm.customer_id)"
         />
       </q-field>
 
@@ -29,7 +30,7 @@
         :label="$tc('general.customer')"
         v-model="rsForm.customer_id"
         v-validate="'required'"
-        :disable="IssetItemDetails"
+        :disable="IssetItemDetails || !Boolean(rsForm.transaction)"
         filter emit-value map-options
         :options="CustomerOptions" clearable
         @input="setCustomerReference"

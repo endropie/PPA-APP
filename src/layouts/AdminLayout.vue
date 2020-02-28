@@ -101,7 +101,7 @@ export default {
     this.$axios.validToken(
       (response) => {
         // if(process.env.DEV) console.warn('$axios.validToken', (typeof response).toUpperCase(), response)
-        if(response.status === 401) {
+        if(response.status === 401 || response.status === 500) {
           this.setLogoff()
         }
       }

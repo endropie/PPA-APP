@@ -58,7 +58,7 @@
             v-validate="FORM.ifCreate('','required')"
             :error="errors.has('code')"
             :error-message="errors.first('code')" >
-            <q-toggle slot="after" class="bordered rounded-borders q-pa-xs no-margin"
+            <q-toggle slot="after" class="text-body2 bordered rounded-borders q-pa-xs no-margin"
               :label="rsForm.enable ? 'Enable':'Disable'" left-label
               v-model="rsForm.enable"
               :color="rsForm.enable ? 'primary':'red'"
