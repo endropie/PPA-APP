@@ -273,11 +273,12 @@ export default {
     },
     ItemOptions() {
       if (this.SHEET.items.data.length <= 0) return []
+      if (!this.rsForm.stockist_from) return []
 
-      const stockist = this.rsForm.stockist_from || 'FM'
+      const stockist = this.rsForm.stockist_from
       let OrKeys = this.FORM.data.work_order_items.map(x => x.item_id, [])
 
-      let ITEM = this.SHEET.items.data.filter((item) => {
+      return this.SHEET.items.data.filter((item) => {
         if (!item.item_prelines || !item.item_prelines.length) return false
         if (item.item_prelines[0].line_id !== this.rsForm.line_id) return false
         if(item.totals[stockist] <= 0 && !OrKeys.find(x=> x === item.id)) return false
@@ -285,13 +286,13 @@ export default {
         if (this.rsForm.mode_line === 'MULTI' && item.item_prelines.length < 2) return false
         else return true
       })
-      return (ITEM.map(item => ({
+      .map(item => ({
         label: item.part_name,
         sublabel: `[${item.customer_code}] ${item.part_number}`,
         value: item.id,
         disable: !item.enable,
         row: item
-      })) || [])
+      }))
     },
     ItemUnitOptions() {
       let vars = []
@@ -339,7 +340,8 @@ export default {
       let data = {}
       this.rsForm.work_order_items.map((detail, index) => {
         if (stockItem[detail.item_id] && detail.item_id) {
-          data[index] = Number(stockItem[detail.item_id].totals[stockist] || 0) - Number(moveItem.get(detail.item_id) || 0)
+          const summary = Number(stockItem[detail.item_id].totals[stockist]) - Number(stockItem[detail.item_id].totals['WO'])
+          data[index] = summary - Number(moveItem.get(detail.item_id) || 0)
           moveItem.set(detail.item_id, detail.quantity * detail.unit_rate)
         }
       })
@@ -399,7 +401,7 @@ export default {
       return Math.ceil(Number(row.target) + (Number(row.target) * Number(row.ngratio) / 100))
     },
     loadItemOptions(data = this.rsForm) {
-      let params = ['has_stocks=FM,NG,RET']
+      let params = ['has_stocks=FM,NC,NCR']
 
       if (data.line_id) params.push(`main_line=${data.line_id}`)
 

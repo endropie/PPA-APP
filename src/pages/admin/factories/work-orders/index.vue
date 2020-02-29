@@ -308,11 +308,13 @@ export default {
   },
   methods: {
     isCanUpdate(row){
+      if (row.deleted_at) return false
       if (row.status != 'OPEN') return false
       if (row.is_relationship) return false
       return this.$app.can('work-orders-update')
     },
     isCanDelete(row){
+      if (row.deleted_at) return false
       if (row.status != 'OPEN') return false
       if (row.is_relationship) return false
       return this.$app.can('work-orders-delete')

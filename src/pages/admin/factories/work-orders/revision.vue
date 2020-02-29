@@ -422,7 +422,7 @@ export default {
       return this.$app.number_format(Number(val || 0) / Number(row.unit_rate || 1))
     },
     loadItemOptions(data = this.FORM.data) {
-      let params = ['has_stocks=FM,NG,RET']
+      let params = ['has_stocks=FM,NC,NCR']
 
       if (data.line_id) params.push(`main_line=${data.line_id}`)
 

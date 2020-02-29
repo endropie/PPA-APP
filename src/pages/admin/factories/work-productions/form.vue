@@ -364,11 +364,13 @@ export default {
       })
 
 
-      this.FORM.data.work_production_items.map(detail => {
-        if (this.ROUTE.meta.mode !== 'create' && stockItem.hasOwnProperty(detail.work_order_item_line_id)) {
-          stockItem[detail.work_order_item_line_id] += Number(detail.unit_amount)
-        }
-      })
+      if (this.ROUTE.meta.mode !== 'create') {
+        this.FORM.data.work_production_items.map(detail => {
+          if (stockItem.hasOwnProperty(detail.work_order_item_line_id)) {
+            stockItem[detail.work_order_item_line_id] += Number(detail.unit_amount)
+          }
+        })
+      }
 
       return this.rsForm.work_production_items.map((detail, index) => {
         let max = 0
