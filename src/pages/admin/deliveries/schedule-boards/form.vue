@@ -52,6 +52,19 @@
         </ux-date>
 
         <ux-select class="col-12 col-sm-6 self-start"
+          name="customer_id"
+          :label="$tc('general.customer')"
+          v-model="rsForm.customer_id"
+          filter square
+          option-value="id"
+          :option-label="(cust) => cust === null ? '-None-' : `[${cust.code}] ${cust.name}`"
+          :options="CustomerOptions"
+          map-options emit-value
+          :dark="LAYOUT.isDark"
+          v-validate="'required'"
+          :error="errors.has('customer_id')"
+        />
+        <!-- <ux-select class="col-12 col-sm-6 self-start"
           name="customers"
           :label="$tc('general.customer')"
           v-model="rsForm.customers"
@@ -62,7 +75,7 @@
           :dark="LAYOUT.isDark"
           v-validate="'required'"
           :error="errors.has('customers')"
-        />
+        /> -->
 
         <ux-recurring class="col-12 col-sm-6 self-start"
           v-model="rsForm.recurring"

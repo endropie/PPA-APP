@@ -8,7 +8,7 @@
         :options="frequencies" clearable
         v-on="obListeners"
       >
-      <q-checkbox slot="after"
+      <q-checkbox slot="after" class="text-subtitle2"
         :label="$tc('label.advance')"
         :true-value="1" :false-value="0"
         v-model="value.custom"

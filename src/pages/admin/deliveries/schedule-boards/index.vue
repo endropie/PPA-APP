@@ -158,9 +158,14 @@
         </q-td>
 
         <q-td slot="body-cell-customers" slot-scope="rs" :props="rs" class="no-padding">
-          <span v-if="rs.row.customers && rs.row.customers.length > 0" class="row flex">
+          <!-- <span v-if="rs.row.customers && rs.row.customers.length > 0" class="row flex">
             <q-chip dense square v-for="(customer, i) in rs.row.customers" :key="i">
               {{customer.name || 'no-name'}}
+            </q-chip>
+          </span> -->
+          <span v-if="rs.row.customer" class="row flex">
+            <q-chip dense square >
+              {{rs.row.customer.name || 'no-name'}}
             </q-chip>
           </span>
           <span v-else>-</span>

@@ -53,7 +53,7 @@
     </template>
 
     <template v-slot:selected-item="scope"  v-if="$attrs['use-chips'] === undefined">
-      <slot name="selected-item" :scope="{...scope}">
+      <slot name="selected-item" v-bind="{...scope}">
         {{getOptionLabel(scope.opt)}}
       </slot>
     </template>

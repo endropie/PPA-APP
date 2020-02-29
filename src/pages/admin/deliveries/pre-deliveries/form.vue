@@ -146,19 +146,32 @@
       <!-- COLUMN::4th Description -->
       <div class="col-12">
         <!-- <q-btn icon="add" label="sechedule" color="blue-grey-5" /> -->
-        <ux-select ref="schedules" filter multiple use-chips
+        <ux-select ref="schedules" filter multiple
           :label="$tc('general.schedule_board')"
           :disable="!Boolean(rsForm.customer_id)"
           v-model="rsForm.schedules"
           :source="`api/v1/transports/schedule-boards?mode=all&--limit=50&${sechduleFilter.join('&')}`"
-          :source-keys="['number']"
+          :source-keys="['number','customer']"
           :option-value="(item) => item.id"
           :option-label="(item) => item.number"
           :option-sublabel="(item) => $app.moment(`${item.date} ${item.time}`).format('D MMM YYYY HH.mm')"
         >
-          <div slot="selected">
-            test
-          </div>
+          <template v-slot:selected-item="scope">
+            <q-badge
+              :tabindex="scope.tabindex"
+              color="grey-4"
+              text-color="dark"
+              class="q-py-xs q-my-none q-mr-sm"
+            >
+              <div class="column text-weight-medium">
+                <div class="text-blue-grey">{{scope.opt.date}} {{scope.opt.time}}</div>
+                <small class="text-grey ">{{scope.opt.number}}</small>
+              </div>
+              <q-btn dense round unelevated class="on-right"
+                icon="clear" size="xs" color="grey-6"
+                @click="scope.removeAtIndex(scope.index)" />
+            </q-badge>
+          </template>
         </ux-select>
       </div>
       <div class="col-12">
@@ -264,7 +277,7 @@ export default {
       return (this.rsForm.customer_id ? true : false)
     },
     sechduleFilter() {
-      return ['status=OPEN',`customer_in=${this.rsForm.customer_id}`]
+      return ['status=OPEN',`customer_id=${this.rsForm.customer_id}`]
     },
     RitOptions() {
       let rits = []
