@@ -163,6 +163,7 @@ export default {
           { name: 'FG', label: 'FG', sortable: true, field: (item)=> item.totals['FG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'NC', label: 'NC', sortable: true, field: (item)=> item.totals['NC'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'NCR', label: 'NCR', sortable: true, field: (item)=> item.totals['NCR'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'NG', label: 'NG', sortable: true, field: (item)=> item.totals['NG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
 
           { name: 'PDOREG', label: 'PDO [REG]', sortable: true, align: 'center', clases:'bg-faded', hidden:  (!process.env.DEV && !this.$route.query.DEV),
             field: (item) => item.totals['PDO.REG'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
