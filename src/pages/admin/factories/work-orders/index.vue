@@ -216,9 +216,9 @@ export default {
   data () {
     return {
       stockist_options: [
-        {value:'FM', label:'FM [FRESH]'},
-        {value:'NC', label:'NG [NOTGOOD]'},
-        {value:'NCR', label:'RET [REPAIR]'}
+        {value:'FM', label:'FRESH'},
+        {value:'NC', label:'NC-REPAIR'},
+        {value:'NCR', label:'NCR-REPAIR'}
       ],
       SHEET: {
         lines: {data:[], api:'/api/v1/references/lines?mode=all'},

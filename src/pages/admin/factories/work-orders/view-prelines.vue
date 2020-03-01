@@ -15,7 +15,7 @@
         </q-select>
       </div>
       <template v-for="(group , index) in rsView.MAPLINES">
-      <page-print class=" shadow-2 q-mb-md" :key="index" v-show="printer.indexOf(group.id) > -1">
+      <page-print class=" shadow-2 q-mb-md" :class="{'multi-page':rsView.MAPLINES.length > 1}" :key="index" v-show="printer.indexOf(group.id) > -1">
         <div slot="header-tags" class="print-hide">
           <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
         </div>
@@ -29,37 +29,41 @@
               <div class="col-auto self-end">
                 <span class="text-h6 text-center q-pt-lg q-pl-sm">WORK ORDER</span>
 
-                <q-markup-table bordered dense class="no-shadow transparent" :dark="LAYOUT.isDark">
-                  <tr>
-                    <th class="text-left">{{$tc('general.line')}}</th><td>{{ group.name }}</td>
-                  </tr>
-                  <tr>
-                    <th class="text-left">Material of</th><td>{{ getStockistFrom(rsView.stockist_from) }}</td>
-                  </tr>
+                <q-markup-table dense class="super-dense no-shadow transparent" separator="none" :dark="LAYOUT.isDark">
+                  <tbody>
+                    <tr>
+                      <td class="text-uppercase">{{$tc('general.line')}}</td><td>{{ group.name }}</td>
+                    </tr>
+                    <tr>
+                      <td class="text-uppercase">Material of</td><td>{{ getStockistFrom(rsView.stockist_from) }}</td>
+                    </tr>
+                  </tbody>
                 </q-markup-table>
               </div>
               <div class="col-auto">
-                <q-markup-table bordered dense class="no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
-                  <tr>
-                    <th>{{$tc('label.number')}}</th>
-                    <td>
-                      {{rsView.fullnumber || rsView.number}}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>{{$tc('label.date')}}</th>
-                    <td>{{$app.date_format(rsView.date)}}</td>
-                  </tr>
-                  <tr>
-                    <th>{{$tc('label.shift')}}</th>
-                    <td>{{rsView.shift.name}}</td>
-                  </tr>
+                <q-markup-table bordered dense square class="super-dense no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
+                  <tbody>
+                    <tr>
+                      <td>{{$tc('label.number')}}</td>
+                      <td>
+                        {{rsView.fullnumber || rsView.number}}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{{$tc('label.date')}}</td>
+                      <td>{{$app.date_format(rsView.date)}}</td>
+                    </tr>
+                    <tr>
+                      <td>{{$tc('label.shift')}}</td>
+                      <td>{{rsView.shift.name}}</td>
+                    </tr>
+                  </tbody>
                 </q-markup-table>
               </div>
             </div>
           </div>
           <div class="col-12">
-            <q-markup-table bordered dense class="no-shadow" separator="cell" >
+            <q-markup-table bordered dense class="no-shadow table-print" separator="cell" >
               <thead>
                 <tr>
                   <th>{{$tc('general.cust')}}</th>
@@ -164,9 +168,9 @@ export default {
     },
     getStockistFrom(val) {
       const stockist = [
-        {value: 'FM', label: 'FRESH MATERIAL'},
-        {value: 'NC', label: 'NOT GOOD',  color: 'warning' },
-        {value: 'NCR', label: 'REPAIR',  color: 'orange-8' },
+        {value: 'FM', label: 'FRESH'},
+        {value: 'NC', label: 'NC-REPAIR',  color: 'warning' },
+        {value: 'NCR', label: 'NCR-REPAIR',  color: 'orange-8' },
       ]
       const v = stockist.find(x => x.value === val)
       return v ? v.label : 'N/A'

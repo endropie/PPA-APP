@@ -1,6 +1,6 @@
 <template>
-  <q-page padding class="row justify-center" :dark="LAYOUT.isDark" style="min-width:210mm;">
-    <page-print v-if="VIEW.show" class="q-ma-md shadow-2" style="max-width:210mm;">
+  <q-page padding class="column items-center" :dark="LAYOUT.isDark">
+    <page-print v-if="VIEW.show" class="q-ma-md shadow-2" >
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>

@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="row" :dark="LAYOUT.isDark">
+  <q-page padding class="column items-center" :dark="LAYOUT.isDark">
     <page-print v-if="VIEW.show" class="q-ma-md shadow-2">
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
