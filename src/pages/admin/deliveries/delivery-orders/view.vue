@@ -60,7 +60,7 @@
                   <tbody>
                     <tr>
                       <td>{{$tc('label.number')}}</td>
-                      <td>{{ rsView.fullnumber || rsView.number }}</td>
+                      <td>{{ rsView.fullnumber || rsView.number }}{{(String(mode).toUpperCase() === 'JASA' ? 'A' : '')}}</td>
                     </tr>
                     <tr>
                       <td>{{$tc('label.date')}}</td>
