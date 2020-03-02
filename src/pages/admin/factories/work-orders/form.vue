@@ -281,7 +281,10 @@ export default {
       return this.SHEET.items.data.filter((item) => {
         if (!item.item_prelines || !item.item_prelines.length) return false
         if (item.item_prelines[0].line_id !== this.rsForm.line_id) return false
-        if(item.totals[stockist] <= 0 && !OrKeys.find(x=> x === item.id)) return false
+        if (!OrKeys.find(x=> x === item.id)) {
+          const WOSTOCK = item.totals[stockist] - item.totals['WO'+stockist]
+          if (WOSTOCK <= 0) return false
+        }
         if (this.rsForm.mode_line === 'SINGLE' && item.item_prelines.length > 1) return false
         if (this.rsForm.mode_line === 'MULTI' && item.item_prelines.length < 2) return false
         else return true
