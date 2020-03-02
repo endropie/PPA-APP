@@ -340,7 +340,7 @@ export default {
       let data = {}
       this.rsForm.work_order_items.map((detail, index) => {
         if (stockItem[detail.item_id] && detail.item_id) {
-          const summary = Number(stockItem[detail.item_id].totals[stockist]) - Number(stockItem[detail.item_id].totals['WO'])
+          const summary = Number(stockItem[detail.item_id].totals[stockist]) - Number(stockItem[detail.item_id].totals['WO'+stockist])
           data[index] = summary - Number(moveItem.get(detail.item_id) || 0)
           moveItem.set(detail.item_id, detail.quantity * detail.unit_rate)
         }

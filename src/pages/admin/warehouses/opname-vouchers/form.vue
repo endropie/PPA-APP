@@ -148,9 +148,9 @@ export default {
       return Number(total)
     },
     StockistOptions() {
-      let excluded = ['WO', 'PDO.REG', 'PDO.RET', 'VDO']
+      let include = ['FM', 'WIP', 'FG', 'NC', 'NCR', 'NG']
       return this.$store.state['admin'].CONFIG.items.stockists
-        .filter(x => !excluded.some(e => e === x.value))
+        .filter(x => include.some(e => e === x.value))
     },
     UnitOptions() {
       return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
