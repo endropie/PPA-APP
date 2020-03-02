@@ -51,12 +51,15 @@
             :label="$tc('label.name')"  stack-label
             v-model="rsForm.customer_name"
             :dark="LAYOUT.isDark"
-            v-validate="'required'"/>
+            v-validate="'required'"
+            :error="errors.has('customer_name')" />
+
           <q-input class="col-12 col-sm-auto" name="customer_phone"
             :label="$tc('label.phone')"  stack-label
             v-model="rsForm.customer_phone"
             :dark="LAYOUT.isDark"
-            v-validate="'required'"/>
+            v-validate="''"
+            :error="errors.has('customer_phone')"/>
         </div>
         <q-input type="textarea" autogrow rows="3"
           name="customer_address"
@@ -101,7 +104,7 @@
               <q-td key="prefix" style="width:50px">
                 <q-btn dense flat round icon="clear" color="red" @click="removeItem(index)"/>
               </q-td>
-              <q-td key="part" width="30%" >
+              <q-td key="part" width="30%">
                 <ux-select v-if="WITH_RO" class="native-top" style="min-width:150px"
                   :name="`delivery_order_items.${index}.item_id`"
                   v-model="row.request_order_item_id"
@@ -401,13 +404,24 @@ export default {
     },
     setRequestOrder(val) {
       if (val) {
+        this.rsForm.request_order_id = val.id
         this.loadRequestOrderItems(val.id)
       }
+      else {
+        this.rsForm.request_order_id = null
+        this.loadRequestOrderItems(0)
+      }
+
+      this.rsForm.delivery_order_items.map((detail, index) => {
+        this.setRequestOrderItem(index, null)
+      })
     },
     setRequestOrderItem(index, val) {
-      if(!val){
+      if(!val) {
+        this.rsForm.delivery_order_items[index].request_order_item_id = null
         this.rsForm.delivery_order_items[index].item_id = null
         this.rsForm.delivery_order_items[index].unit_id = null
+        this.rsForm.delivery_order_items[index].request_order_item = {}
         this.rsForm.delivery_order_items[index].unit = {}
         this.rsForm.delivery_order_items[index].item = {}
       }

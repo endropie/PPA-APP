@@ -120,6 +120,7 @@
         </div>
       </div>
     </page-print>
+    <ux-modal-view ref="modal"  fit icon="local_shipping" :title="$tc('general.sj_delivery')" />
   </q-page>
 </template>
 
@@ -178,6 +179,18 @@ export default {
     },
     setView(data) {
       this.rsView =  data
+    },
+    showDO(id) {
+      let mode = {
+        path: '/admin/deliveries/delivery-orders/view',
+        params: { id: id },
+        meta: { mode: 'view'},
+        actions: {
+          // actions
+        }
+      }
+
+      this.$refs.modal.show(mode);
     }
   }
 }
