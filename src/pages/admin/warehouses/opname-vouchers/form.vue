@@ -64,7 +64,7 @@
           :error-message="errors.first(`stockist`)"
           @input="(val) => setStockistReference(val) " />
 
-        <q-input type="number" input-style="text-align:start"
+        <q-input type="number" input-style="text-align:left"
           :name="`quantity`"
           :label="$tc('label.quantity')"
           :data-vv-as="$tc('label.quantity')"
