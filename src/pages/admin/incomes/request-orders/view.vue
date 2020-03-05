@@ -57,7 +57,7 @@
             </q-tr>
             </thead>
             <tbody>
-            <q-tr v-for="(row, index) in rsView.request_order_items" :key="index">
+            <q-tr v-for="(row, index) in rsView.request_order_items" :key="index" :request-order-item-id="row.id">
               <q-td>{{row.item.part_name}}</q-td>
               <q-td>{{row.item.part_number}}</q-td>
               <q-td class="text-center">{{row.unit.name}}</q-td>

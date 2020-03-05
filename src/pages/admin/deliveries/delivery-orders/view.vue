@@ -105,7 +105,7 @@
               </thead>
               <template v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
               <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
-                <q-tr >
+                <q-tr :delivery-order-item-id="row.id">
                   <q-td>
                     <span class="text-weight-medium">Material:&nbsp;</span>
                     {{row.item.part_name}}
@@ -114,7 +114,7 @@
                   <q-td class="text-center">{{row.unit.name}}</q-td>
                   <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
                 </q-tr>
-                <q-tr >
+                <q-tr :delivery-order-item-id="row.id">
                   <q-td>
                     <span class="text-weight-medium">Jasa:&nbsp;</span>
                     {{row.item.part_name}}
@@ -127,7 +127,7 @@
               </tbody>
               </template>
               <tbody v-else>
-              <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index">
+              <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index" :delivery-order-item-id="row.id">
                 <q-td>
                   <span v-if="Boolean(mode)" class="text-weight-medium">{{mode}}:&nbsp;</span>
                   {{row.item.part_name}}
