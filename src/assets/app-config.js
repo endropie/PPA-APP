@@ -8,8 +8,8 @@ const config = {
     state_colors: {
       OPEN: 'blue',
       VALIDATED: 'green',
-      'ON-PROCESS': 'indigo',
-      PROCESSED: 'indigo',
+      PRODUCTED : 'teal',
+      PACKED: 'teal',
       CONFIRMED: 'green-10',
       CLOSED: 'red',
       REJECTED: 'red-9',

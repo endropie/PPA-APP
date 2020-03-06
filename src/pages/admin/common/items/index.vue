@@ -164,13 +164,10 @@ export default {
           { name: 'NCR', label: 'NCR', sortable: true, field: (item)=> item.totals['NCR'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'NG', label: 'NG', sortable: true, field: (item)=> item.totals['NG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
 
-          // { name: 'WO', label: 'WO', sortable: true, field: (item)=> item.totals['WO'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'WO', label: 'WO', sortable: true, hidden:  (!process.env.DEV && !this.$route.query.DEV),
-            field: (item)=> `${item.totals['WOFM']}-${item.totals['WONC']}-${item.totals['WONCR']}`},
-          { name: 'PDOREG', label: 'PDO [REG]', sortable: true, align: 'center', clases:'bg-faded', hidden:  (!process.env.DEV && !this.$route.query.DEV),
-            field: (item) => item.totals['PDO.REG'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'PDORET', label: 'PDO [RET]', sortable: true, align: 'center', clases:'bg-faded', hidden:  (!process.env.DEV && !this.$route.query.DEV),
-            field: (item) => item.totals['PDO.RET'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'WO', label: 'WO', align: 'center', clases:'bg-faded', hidden: (!process.env.DEV && !this.$route.query.DEV),
+            field: (item)=> `${item.totals['WOFM'] + item.totals['WONC'] + item.totals['WONCR']}`, format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'PDO', label: 'PDO', align: 'center', clases:'bg-faded', hidden: (!process.env.DEV && !this.$route.query.DEV),
+            field: (item) => item.totals['PDO.REG'] + item.totals['PDO.RET'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'VDO', label: 'VDO', sortable: true, hidden:  (!process.env.DEV && !this.$route.query.DEV),
             field: (item)=> item.totals['VDO'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
 

@@ -106,9 +106,10 @@
           <div v-if="rs.row.customer"> {{ rs.row.customer.code }}</div>
           <div v-else>- undefined -</div>
         </q-td>
-        <q-td slot="body-cell-item_id" slot-scope="rs" :props="rs">
-          <div v-if="rs.row.packing_items.item">
-            {{ rs.row.packing_items.item.code }}
+        <q-td slot="body-cell-item" slot-scope="rs" :props="rs">
+          <div class="column" v-if="rs.row.packing_items.item">
+            <span>{{ rs.row.packing_items.item.part_name }}</span>
+            <span class="text-weight-light">No. {{ rs.row.packing_items.item.part_number }}</span>
           </div>
         </q-td>
         <q-td slot="body-cell-item_number" slot-scope="rs" :props="rs">
@@ -135,6 +136,18 @@
         <q-td slot="body-cell-date" slot-scope="rs" :props="rs">
           <div v-if="rs.row.date"> {{ $app.moment(rs.row.date).format('DD/MM/YYYY') }}</div>
           <div v-else class="text-center">-</div>
+        </q-td>
+
+        <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
+          <div class="column text-body">
+            <span class="text-uppercase text-grey-8">
+              {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
+            </span>
+            <small v-if="rs.row.created_at" class="text-grey">
+              <q-icon name="mdi-earth"></q-icon>
+              {{ $app.moment(rs.row.created_at).fromNow() }}
+            </small>
+          </div>
         </q-td>
 
       </q-table>
@@ -181,15 +194,15 @@ export default {
         columns: [
           { name: 'prefix', label: '', align: 'left',},
 
-          { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'customer_id', label: `${this.$tc('general.cust')}.`, field: 'customer_id', align: 'left', sortable: true },
-          { name: 'item_name', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left', sortable: true },
-          { name: 'item_number', label: this.$tc('label.number', 1, {v:this.$tc('label.part')}), align: 'left', sortable: false },
-          { name: 'work_order_id', label: 'Work-Order', align: 'left', sortable: false,
-            field: (val) => val.packing_items.work_order_number || 'N/A' },
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'left', sortable: true},
+          { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
+          { name: 'customer_id', label: this.$tc('general.cust'), align: 'left'},
+          { name: 'item', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left' },
+          // { name: 'item_name', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left', sortable: true },
+          // { name: 'item_number', label: this.$tc('label.number', 1, {v:this.$tc('label.part')}), align: 'left', sortable: false },
           { name: 'shift_id', label: 'Shift', field: 'shift_id', align: 'left'},
           { name: 'worktime', label: 'Worktime', field: 'worktime', align: 'left', sortable: true },
+          { name: 'created_at', label: this.$tc('form.create',2), field: 'created_at', align: 'center'},
         ]
       },
     }

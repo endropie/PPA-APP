@@ -11,7 +11,7 @@
         <div class="col-12">
           <div class="row justify-between q-col-gutter-sm" >
             <div class="col-auto self-end">
-              <span class="text-h6 text-center q-pt-lg q-pl-sm">WORK ORDER</span>
+              <span class="text-h6 text-uppercase">{{$tc('general.work_order', 2)}}</span>
 
               <q-markup-table bordered dense square class="no-shadow transparent" :dark="LAYOUT.isDark">
                 <tbody>
@@ -41,13 +41,17 @@
                   <td>{{rsView.shift ? rsView.shift.name : '-'}}</td>
                 </tr>
               </q-markup-table>
+              <q-toggle class="print-hide float-right" v-model="show_preline" :label="$tc('form.show',1,{v:$tc('items.preline')})"/>
             </div>
           </div>
         </div>
         <div class="col-12">
         </div>
+        <div class="row">
+
+        </div>
         <div class="col-12">
-          <q-markup-table bordered dense square class="no-shadow transparent" separator="cell" :dark="LAYOUT.isDark" >
+          <q-markup-table bordered dense square class="table-print no-highlight no-shadow transparent" separator="cell" :dark="LAYOUT.isDark" >
             <thead>
               <tr>
                 <th>{{this.$tc('general.cust')}}</th>
@@ -60,7 +64,7 @@
               </tr>
             </thead>
             <tbody v-for="(row, index) in rsView.work_order_items" :key="index">
-              <q-tr>
+              <q-tr :work-order-item-id="row.id">
                 <q-td key="code">
                   {{row.item.customer_code}}
                 </q-td>
@@ -87,9 +91,11 @@
                 <q-td colspan="100%" style="padding:2px">
                   <div class="row q-col-gutter-sm">
                     <div class="col"  v-for="(itemLine, index) in row.work_order_item_lines" :key="index">
-                      <q-expansion-item dense expand-separator :dark="LAYOUT.isDark"
-                        :label="'Line: '+itemLine.line_id"
-                        class="bordered" :header-class="LAYOUT.isDark ? `bg-blue-grey-10` : `bg-blue-grey-1`">
+                      <q-expansion-item dense expand-separator default-opened :dark="LAYOUT.isDark"
+                        :class="LAYOUT.isDark ? `bg-grey-9` : `bg-grey-2`"
+                        :header-class="LAYOUT.isDark ? `bg-blue-grey-10` : `bg-blue-grey-1`"
+                        :work-order-item-line-id="itemLine.line_id"
+                        >
                         <div slot="header" class="q-item__section column q-item__section--main justify-center">
                           <span v-if="MAPINGKEY['lines']" >
                             {{MAPINGKEY['lines'][itemLine.line_id].name}}
@@ -121,9 +127,9 @@
                       </q-expansion-item>
                     </div>
                     <div class="col" v-if="Boolean(row.item_id)">
-                      <q-expansion-item dense expand-separator :dark="LAYOUT.isDark"
-                        :label="$tc('general.packing')"
-                        class="bordered" :header-class="LAYOUT.isDark ? `bg-blue-grey-10` : `bg-blue-grey-1`">
+                      <q-expansion-item dense expand-separator default-opened :dark="LAYOUT.isDark"
+                        :class="LAYOUT.isDark ? `bg-grey-9` : `bg-grey-2`"
+                        :header-class="LAYOUT.isDark ? `bg-blue-grey-10` : `bg-blue-grey-1`">
                         <div slot="header" class="q-item__section column q-item__section--main justify-center">
                           <span>
                             {{$tc('general.packing')}}
@@ -132,20 +138,22 @@
                           </span>
                         </div>
                         <q-list dense separator>
-                          <q-item v-for="(itemPacking, index) in row.packing_items" :key="index">
+                          <q-item v-for="(packing_item_order, index) in row.packing_item_orders" :key="index"
+                            :packing-item-id="packing_item_order.id"
+                          >
                             <q-item-section>
-                              <span v-if="itemPacking.packing">
-                                {{itemPacking.packing.number}}
+                              <span v-if="packing_item_order.packing_item && packing_item_order.packing_item.packing">
+                                {{packing_item_order.packing_item.packing.number}}
                               </span>
                             </q-item-section>
                             <q-item-section  side>
-                              <span v-if="MAPINGKEY['units'][itemPacking.unit_id]" >
-                                {{$app.number_format(itemPacking.unit_total / (itemPacking.unit_rate || 1))}}
-                                {{MAPINGKEY['units'][itemPacking.unit_id].code}}
+                              <span v-if="MAPINGKEY['units'][packing_item_order.packing_item.unit_id]" >
+                                {{$app.number_format(packing_item_order.unit_total / (packing_item_order.packing_item.unit_rate || 1))}}
+                                {{MAPINGKEY['units'][packing_item_order.packing_item.unit_id].code}}
                               </span>
                             </q-item-section>
                           </q-item>
-                          <q-item-label header v-if="!Boolean(row.packing_items.length)" class="q-pa-sm text-italic text-center">No data</q-item-label>
+                          <q-item-label header v-if="!Boolean(row.packing_item_orders.length)" class="q-pa-sm text-italic text-center">No data</q-item-label>
                         </q-list>
                       </q-expansion-item>
                     </div>
@@ -154,7 +162,6 @@
               </q-tr>
             </tbody>
           </q-markup-table>
-           <q-toggle class="print-hide" v-model="show_preline" :label="$tc('form.show',1,{v:$tc('items.preline')})"/>
         </div>
         <div class="col-12">
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
@@ -344,7 +351,7 @@ export default {
       return Math.round(detail.amount_process)
     },
     totalPacking (detail) {
-      const total = detail.packing_items.reduce((total, item) => total += item.unit_total, 0)
+      const total = detail.packing_item_orders.reduce((total, item) => total += item.unit_total, 0)
       return this.$app.number_abbreviate(Math.round(total))
     },
     totalAmount (detail) {

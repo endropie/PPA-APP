@@ -149,8 +149,8 @@
         <!-- slot name syntax: body-cell-<column_name> -->
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
           <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" />
-          <q-btn v-if="isCanUpdate(rs.row)" dense flat color="light" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" />
-          <q-btn v-if="isCanDelete(rs.row)" dense flat color="light"  icon="delete" @click.native="TABLE.delete(rs.row)" />
+          <!-- <q-btn v-if="isCanUpdate(rs.row)" dense flat color="light" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" />
+          <q-btn v-if="isCanDelete(rs.row)" dense flat color="light"  icon="delete" @click.native="TABLE.delete(rs.row)" /> -->
         </q-td>
 
         <q-td slot="body-cell-number" slot-scope="rs" :props="rs" style="width:35px">
@@ -159,36 +159,62 @@
           </div>
         </q-td>
 
-        <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
-          <div class="column inline q-pb-xs"
-            v-if="['OPEN', 'PRODUCTED', 'PACKED'].find(x => x === rs.row.status) && (rs.row.total_production > 0 || rs.row.total_packing > 0)">
-            <span>
+        <q-td slot="body-cell-status" slot-scope="rs" :props="rs">
+          <ux-chip-status :row="rs.row" dense square />
+        </q-td>
+
+        <q-td slot="body-cell-persentase" slot-scope="rs" :props="rs" class="no-padding">
+           <div class="column q-gutter-xs q-py-xs" style="min-width:205px"
+            v-if="['OPEN', 'PRODUCTED', 'PACKED', 'CLOSED'].find(x => x === rs.row.status) && (rs.row.total_production > 0 || rs.row.total_packing > 0)">
+            <!-- <div class="fit">
               <q-chip  dense square
-                class="status-chip shadow-1 text-uppercase"
+                class="fit q-mb-xs shadow-1 text-uppercase no-margin"
                 color="blue-grey" text-color="white" >
                 {{$tc('factories.production')}}
-                <q-badge class="status-chip-badge"
+                <q-space/>
+                <q-badge class="status-chip-badge text-weight-medium"
                   :color="!Boolean(rs.row.has_producted) ? 'blue-grey-10' : 'red'">
                   <span>{{$app.number_abbreviate(rs.row.total_production)}} </span>
-                  <span v-if="!Boolean(rs.row.has_producted)">&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_amount)}}</span>
+                  <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_amount)}}</span>
                 </q-badge>
               </q-chip>
-            </span>
-            <span>
+            </div>
+            <div class="fit">
               <q-chip dense square
-                class="status-chip shadow-1 text-uppercase no-margin"
+                class="fit q-mb-xs text-uppercase no-margin"
                 color="blue-grey" text-color="white">
                 {{$tc('factories.packing')}}
-                <q-badge class="status-chip-badge"
-                  :color="!Boolean(rs.row.has_packed) !== 'PACKED' ? 'blue-grey-10' : 'red'">
+                <q-space/>
+                <q-badge class="status-chip-badge text-weight-medium"
+                  :color="!Boolean(rs.row.has_packed) ? 'blue-grey-10' : 'red'">
                   <span>{{$app.number_abbreviate(rs.row.total_packing)}} </span>
-                  <span v-if="!Boolean(rs.row.has_packed) !== 'PACKED'">&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_production)}}</span>
+                  <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_production)}}</span>
                 </q-badge>
               </q-chip>
-
-            </span>
+            </div> -->
+            <div class="row no-wrap items-center text-left">
+              <q-chip dense square color="lime-8" text-color="white" class="q-my-none" style="width:50px">WIP</q-chip>
+              <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.total_amount) ? (rs.row.total_production/rs.row.total_amount) : 0">
+                <div class="absolute-full flex flex-center">
+                  <q-badge :color="Boolean(rs.row.has_producted) ? 'red' : 'blue-grey-10'" text-color="white" class="text-weight-medium q-pt-xs">
+                    <span>{{$app.number_abbreviate(rs.row.total_production)}} </span>
+                    <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_amount)}}</span>
+                  </q-badge>
+                </div>
+              </q-linear-progress>
+            </div>
+            <div class="row no-wrap items-center text-left">
+              <q-chip dense square color="lime-8" text-color="white" class="q-my-none" style="width:50px">FG</q-chip>
+              <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.total_production) ? (rs.row.total_packing/rs.row.total_production) : 0">
+                <div class="absolute-full flex flex-center">
+                  <q-badge :color="Boolean(rs.row.has_packed) ? 'red' : 'blue-grey-10'" text-color="white" class="text-weight-medium q-pt-xs">
+                    <span>{{$app.number_abbreviate(rs.row.total_packing)}} </span>
+                    <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_production)}}</span>
+                  </q-badge>
+                </div>
+              </q-linear-progress>
+            </div>
           </div>
-          <ux-badge-status v-else :row="rs.row" class="shadow-1" />
         </q-td>
 
         <q-td slot="body-cell-stockist" slot-scope="rs" :props="rs" style="width:35px">
@@ -199,6 +225,18 @@
 
         <q-td slot="body-cell-date" slot-scope="rs" :props="rs">
           <span v-if="rs.row.date"> {{ $app.moment(rs.row.date).format('DD/MM/YY') }}</span>
+        </q-td>
+
+        <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
+          <div class="column text-body">
+            <span class="text-uppercase text-grey-8">
+              {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
+            </span>
+            <small v-if="rs.row.created_at" class="text-grey">
+              <q-icon name="mdi-earth"></q-icon>
+              {{ $app.moment(rs.row.created_at).fromNow() }}
+            </small>
+          </div>
         </q-td>
 
       </q-table>
@@ -274,12 +312,14 @@ export default {
         columns: [
           { name: 'prefix', label: '', align: 'left'},
 
-          { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'status', label: 'status', align: 'center' },
-          { name: 'line_id', label: 'Line', field: (rs)=> rs.line.name , align: 'left', sortable: true },
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true },
+          { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
+          { name: 'status', label: '', align: 'center' },
+          { name: 'persentase', label: '', align: 'center' },
+          { name: 'line_id', label: 'Line', field: (rs)=> rs.line.name , align: 'left', sortable: true },
           { name: 'shift_id', label: 'Shift', field: (rs)=> rs.shift.name , align: 'center', sortable: true },
           { name: 'stockist', label: 'Stockist', align: 'left'},
+          { name: 'created_at', label: this.$tc('form.create',2), field: 'created_at', align: 'center'},
         ]
       },
     }

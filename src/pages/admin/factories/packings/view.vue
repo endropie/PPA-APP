@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="column content-center justify-start" :dark="LAYOUT.isDark" >
-    <page-print v-if="VIEW.show">
+    <page-print v-if="VIEW.show" style="min-width:75%">
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark'/>
       </div>
@@ -10,10 +10,10 @@
       <div class="column" >
         <div class="row justify-between q-col-gutter-sm" >
           <div class="col-stretch self-end text-no-wrap text-truncate">
-              <span class="text-h6">PACKING GOODS </span>
+            <span class="text-h6 text-uppercase">{{$tc('general.packing', 2)}}</span>
           </div>
           <div class="col-auto">
-            <q-markup-table bordered dense square class="no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
+            <q-markup-table bordered dense square class="no-shadow no-highlight transparent" separator="cell" :dark="LAYOUT.isDark">
               <tbody>
                 <tr>
                   <td>{{$tc('label.number')}}</td>
@@ -29,35 +29,42 @@
         </div>
         <div class="row justify-between q-col-gutter-sm">
           <div class="col-stretch ">
-            <q-markup-table class="super-dense no-shadow transparent th-text-right" dense :dark="LAYOUT.isDark">
-              <tr>
-                <th class="text-weight-light">{{$tc('general.customer')}}</th>
-                <td width="35%">{{ rsView.customer.name }}</td>
-              </tr>
-              <tr>
-                <th class="text-weight-light">Operator</th>
-                <td width="35%">{{ rsView.operator ? rsView.operator.name : '-'}}</td>
-              </tr>
+            <q-markup-table dense separator="none"
+              class="no-shadow no-highlight transparent"
+              :dark="LAYOUT.isDark">
+              <tbody>
+                <tr>
+                  <td class="no-padding text-weight-light">{{$tc('general.customer')}}</td>
+                  <td width="35%">{{ rsView.customer.name }}</td>
+                </tr>
+                <tr>
+                  <td class="no-padding text-weight-light">Operator</td>
+                  <td width="35%">{{ rsView.operator ? rsView.operator.name : '-'}}</td>
+                </tr>
+              </tbody>
             </q-markup-table>
           </div>
           <div class="col-auto ">
-            <q-markup-table class="super-dense no-shadow transparent th-text-right" dense :dark="LAYOUT.isDark">
-              <tr>
-                <th class="text-weight-light">{{$tc('label.shift')}}</th>
-                <td width="35%">{{ rsView.shift.name }}</td>
-              </tr>
-              <tr>
-                <th class="text-weight-light">Worktime</th>
-                <td width="35%">{{ getWorktime(rsView.worktime) }}</td>
-              </tr>
+            <q-markup-table dense separator="none"
+              class="no-shadow no-highlight transparent"
+              :dark="LAYOUT.isDark">
+              <tbody>
+                <tr>
+                  <td class="no-padding text-weight-light">{{$tc('label.shift')}}</td>
+                  <td width="35%">{{ rsView.shift.name }}</td>
+                </tr>
+                <tr>
+                  <td class="no-padding text-weight-light">Worktime</td>
+                  <td width="35%">{{ getWorktime(rsView.worktime) }}</td>
+                </tr>
+              </tbody>
             </q-markup-table>
           </div>
         </div>
         <div>
-          <q-markup-table bordered dense square class="no-shadow transparent" separator="cell" :dark="LAYOUT.isDark" >
+          <q-markup-table bordered dense square class="no-shadow no-highlight transparent" separator="cell" :dark="LAYOUT.isDark" >
             <thead>
               <tr style="line-height:30px">
-                <th>Work Order</th>
                 <th class="text-left">{{this.$tc('label.name', 1, {v:this.$tc('label.part')})}}</th>
                 <th>{{$tc('label.unit')}}</th>
                 <th class="text-right">QTY</th>
@@ -67,9 +74,9 @@
             </thead>
             <tbody >
               <q-tr v-if="rsView.packing_items">
-                <q-td key="work_order_item" width="30%">
+                <!-- <q-td key="work_order_item" width="30%">
                   {{rsView.packing_items.work_order_item.work_order.number}}
-                </q-td>
+                </q-td> -->
                 <q-td key="part" width="30%">
                   <div>{{rsView.packing_items.item.part_number}}</div>
                   <small>{{rsView.packing_items.item.part_number}}</small>
@@ -88,7 +95,7 @@
                 </q-td>
               </q-tr>
               <tr v-if="FAULT_TOTALS">
-                <q-td colspan="100%" style="border-top-width: 1px">
+                <q-td colspan="100%">
                   <div class="q-pb-sm text-caption text-weight-light">
                     {{('FAULTY: ').toUpperCase()}}
                     <template v-for="(item_fault, index) in rsView.packing_items.packing_item_faults">
@@ -98,8 +105,26 @@
                       </q-chip>
                     </template>
                   </div>
-
                 </q-td>
+              </tr>
+              <tr v-if="PACKING_ITEM_ORDERS.length">
+                <td colspan="100%">
+                  <q-list dense>
+                    <q-item v-for="(order, orderIndex) in PACKING_ITEM_ORDERS" :key="orderIndex"
+                      class="no-padding q-my-xs">
+                      <q-item-section>
+                        <q-item-label>{{order.number}}</q-item-label>
+                        <q-item-label caption>
+                          {{$app.moment(order.date).format('D MMMM YYYY')}}
+                        </q-item-label>
+                      </q-item-section>
+                      <q-item-section side top class="text-caption text-weight-medium">
+                        <q-item-label>{{$app.number_format(order.amount_finish / order.unit_rate)}} (FG)</q-item-label>
+                        <q-item-label>{{$app.number_format(order.amount_faulty / order.unit_rate)}} (NC)</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </td>
               </tr>
             </tbody>
           </q-markup-table>
@@ -195,6 +220,17 @@ export default {
         // console.log(total)
         return total + Number(item.quantity)
       },0)
+    },
+    PACKING_ITEM_ORDERS() {
+      if (!this.rsView.packing_items) return []
+      return this.rsView.packing_items.packing_item_orders.map(x => {
+        const number = x.work_order_item.work_order.number
+        const date = x.work_order_item.work_order.date
+        const unit_rate = this.rsView.packing_items.unit_rate
+        return ({
+          ...x, unit_rate, number, date
+        })
+      })
     }
   },
   methods: {

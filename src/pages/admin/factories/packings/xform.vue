@@ -30,55 +30,59 @@
           filter clearable
           :source-keys="['name']"
           source="/api/v1/common/employees?mode=all&limit=15&sort=name"
-          :option-sublabel="(ol) => ol ? `NP: ${ol.code}`  : undefined" option-label="name" option-value="id"
+          option-label="name" option-value="id"
           @selected="(ol) => rsForm.operator_id = (ol ? ol.id : null)"
           :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
           v-validate="'required'" data-vv-as="Operator"
           :error="errors.has('operator_id')" da-vv-as="Operator"
           :error-message="errors.first('operator_id')"/>
+
       </div>
+      <div class="col-12" >
+        <div class="row q-col-gutter-xs">
 
-      <ux-select-filter class="col-12 col-sm-6"
-        name="customer_id"
-        v-model="rsForm.customer_id"
-        :label="$tc('general.customer')"
-        :disable="IssetItemID"
-        :dark="LAYOUT.isDark"
-        v-validate="'required'"
-        :options="CustomerOptions" clearable
-        @input="setCustomerReference"
-        :error="errors.has('customer_id')"
-        :error-message="errors.first('customer_id')"
-        :loading="SHEET['customers'].loading" />
+          <ux-select-filter class="col-12 col-sm-6"
+            name="customer_id"
+            v-model="rsForm.customer_id"
+            :label="$tc('general.customer')"
+            :disable="IssetItemID"
+            :dark="LAYOUT.isDark"
+            v-validate="'required'"
+            :options="CustomerOptions" filter clearable
+            @input="setCustomerReference"
+            :error="errors.has('customer_id')"
+            :error-message="errors.first('customer_id')"
+            :loading="SHEET['customers'].loading" />
 
-      <ux-date class="col-12 col-sm-6" name="date"
-        :label="$tc('label.date')"
-        no-error-icon
-        v-model="rsForm.date" type="date"
-        :dark="LAYOUT.isDark"
-        v-validate="'required'"
-        :error="errors.has('date')"
-        :error-message="errors.first('date')">
+          <ux-date class="col-12 col-sm-6" name="date"
+            :label="$tc('label.date')"
+            no-error-icon
+            v-model="rsForm.date" type="date"
+            :dark="LAYOUT.isDark"
+            v-validate="'required'"
+            :error="errors.has('date')"
+            :error-message="errors.first('date')">
 
-        <q-select slot="after" class="no-padding" style="min-width:100px"
-          name="shift_id"
-          hide-dropdown-icon no-error-icon
-          :label="$tc('label.shift')" stack-label
-          v-model="rsForm.shift_id"
-          v-validate="'required'"
-          :options="ShiftOptions" filter
-          map-options emit-value
-          :error="errors.has('shift_id')"
-        />
+            <q-select slot="after" class="no-padding" style="min-width:100px"
+              name="shift_id"
+              hide-dropdown-icon no-error-icon
+              :label="$tc('label.shift')" stack-label
+              v-model="rsForm.shift_id"
+              v-validate="'required'"
+              :options="ShiftOptions" filter
+              map-options emit-value
+              :error="errors.has('shift_id')"
+            />
 
-        </ux-date>
-
+           </ux-date>
+        </div>
+      </div>
     </q-card-section>
     <q-card-section>
       <div class="q-pa-md bordered">
         <!-- COLUMN::2.1th Items Part -->
         <div class="row q-col-gutter-x-md">
-          <ux-select-filter class="col-12 col-sm-6"
+          <ux-select-filter class="col-12 col-sm-4"
             name="packing_items.item_id"
             :label="$tc('general.item')"
             :data-vv-as="$tc('general.item')"
@@ -92,21 +96,32 @@
             :loading="SHEET['items'].loading || SHEET['work_order_items'].loading"
             @input="setItemReference" />
 
-          <q-input class="col-12 col-sm-6"
+          <ux-select-filter class="col-12 col-sm-4"
+            name="packing_items.work_order_item_id"
+            :label="`${$tc('label.part')} ${$tc('general.work_order')}`"
+            :data-vv-as="`${$tc('label.part')} ${$tc('general.work_order')}`"
+            v-model="rsForm.packing_items.work_order_item_id" clearable
+            :dark="LAYOUT.isDark"
+            v-validate="'required'"
+            :options="WorkOrderItemOptions.filter(opt => opt.rowdata.item_id === rsForm.packing_items.item_id)"
+            :error="errors.has('packing_items.work_order_item_id')"
+            :error-message="errors.first('packing_items.work_order_item_id')"
+            :loading="SHEET['work_order_items'].loading"/>
+
+          <q-input class="col-12 col-sm-4"
             name="packing_items.quantity"
-            :label="$tc('label.quantity')" stack-label
+            :label="$tc('label.quantity')"
             :data-vv-as="$tc('label.quantity')"
             v-model="rsForm.packing_items.quantity" type="number" :min="0"
             :dark="LAYOUT.isDark"
-            v-validate="`required|${MinValidate}|max_value:${MaxUnit}`"
+            v-validate="`required|gt_value:0|max_value:${MaxUnit}`"
             :suffix="rsForm.packing_items.item_id ? `/ ${$app.number_format(MaxUnit)}` : ''"
             :error="errors.has(`packing_items.quantity`)"
             :error-message="errors.first(`packing_items.quantity`)" >
-
+            <!-- <q-badge :label="$app.number_format(MaxUnit)" /> -->
             <q-select slot="after" class="no-padding" style="min-width:80px"
               name="packing_items.unit_id"
-              :label="$tc('label.unit')" stack-label
-              :data-vv-as="$tc('label.unit')"
+              :label="$tc('label.unit')" :data-vv-as="$tc('label.unit')"
               :dark="LAYOUT.isDark"
               no-error-icon
               v-model="rsForm.packing_items.unit_id"
@@ -114,8 +129,8 @@
               map-options emit-value
               v-validate="'required'"
               @input="setUnitReference"
-              :error="errors.has('packing_items.unit_id')"
-            />
+              :error="errors.has('packing_items.unit_id')" />
+
 
           </q-input>
         </div>
@@ -133,6 +148,7 @@
             :error-message="errors.first('type_fault_id')"
             :disable="rsForm.packing_items.packing_item_faults.some(x => Boolean(x.fault_id))" />
 
+
           <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
             dense separator="horizontal"
             :dark="LAYOUT.isDark"
@@ -147,10 +163,10 @@
                 <q-btn dense flat  icon="clear" color="red" @click="removeItemFault(index)"/>
               </q-td>
               <q-td key="quantity">
-                <q-input autofocus input-class="text-center WWW"
+                <q-input autofocus input-class="text-center"
                   :name="`packing_items.packing_item_faults.${index}.quantity`"
                   type="number" min="0" align="center"
-                  outlined dense hide-bottom-space no-error-icon color="blue-grey"
+                  outlined dense hide-bottom-space color="blue-grey"
                   :dark="LAYOUT.isDark"
                   v-model="row.quantity"
                   v-validate="row.fault_id ? 'required|gt_value:0' : ''"
@@ -162,7 +178,7 @@
                 <ux-select-filter
                   :name="`packing_items.packing_item_faults.${index}.fault_id`"
                   outlined style="min-width:150px"
-                  dense hide-bottom-space no-error-icon color="blue-grey"
+                  dense hide-bottom-space color="blue-grey"
                   :dark="LAYOUT.isDark"
                   v-model="row.fault_id"
                   :options="FaultOptions" clearable
@@ -173,14 +189,14 @@
                 />
               </q-td>
             </q-tr>
-
             <q-tr>
               <q-td></q-td>
               <q-td colspan="100%">
-                <q-btn dense outline :label="$tc('form.add')" icon="add_circle_outline" color="blue-grey" class="full-width" @click="addNewItemFault()" />
+                <q-btn dense outline :label="$tc('form.add')" icon="add_circle_outline" class="full-width" color="blue-grey" @click="addNewItemFault()" />
               </q-td>
             </q-tr>
-          </q-markup-table>
+           </q-markup-table>
+
         </div>
       </div>
 
@@ -223,7 +239,6 @@ export default {
         faults: {api:'/api/v1/references/faults?mode=all'},
         type_faults: {api:'/api/v1/references/type-faults?mode=all'},
         customers: {api:'/api/v1/incomes/customers?mode=all'},
-        employees: {api:'/api/v1/common/employees?mode=all', autoload: false},
         items: {autoload:false, api:'/api/v1/common/items?mode=all&enable=true'},
         // work_orders: {autoload:false, api:'/api/v1/factories/work-orders?mode=all&has_amount_packing=true'},
         work_order_items: {autoload:false, api:'/api/v1/factories/work-orders?mode=items&has_amount_packing=true'},
@@ -274,12 +289,6 @@ export default {
     this.init()
   },
   computed: {
-    MinValidate() {
-      if (this.rsForm.packing_items.packing_item_faults.some(x => Boolean(x.fault_id))) {
-        return 'min:0'
-      }
-      return 'gt_value:0'
-    },
     IssetItemID() {
       if(!this.rsForm.hasOwnProperty('packing_items')) return false;
 
@@ -309,7 +318,7 @@ export default {
         })
       })
     },
-  TypeFaultOptions() {
+    TypeFaultOptions() {
       return (this.SHEET.type_faults.data.map(item => ({label: item.name, value: item.id})) || [])
     },
     FaultOptions() {
@@ -386,17 +395,9 @@ export default {
       if(!rsItem.item_id) return 0
       if(this.WorkOrderItemOptions.length == 0) return 0
 
-      const UnitRate = this.rsForm.packing_items.unit_rate || 1
-
-      let total = this.WorkOrderItemOptions.reduce((total, opt) => {
-        return (opt.rowdata.item_id !== rsItem.item_id)
-          ? total
-          : total += (Number(opt.rowdata.amount_process) - Number(opt.rowdata.amount_packing)) / UnitRate
-      }, 0)
-
-      if (Boolean(this.FORM.data.packing_items.unit_total)) {
-        total += Number(this.FORM.data.packing_items.unit_total)
-      }
+      const find = this.WorkOrderItemOptions.find(opt => {
+        return opt.rowdata.id === rsItem.work_order_item_id
+      })
 
       let faults = 0
       if(this.rsForm.packing_items && this.rsForm.packing_items.packing_item_faults) {
@@ -405,8 +406,12 @@ export default {
         }, 0 )
 
       }
-
-      total -= faults
+      const UnitRate = this.rsForm.packing_items.unit_rate || 1
+      let total = 0
+      if (find) {
+        total = (Number(find.rowdata.amount_process) - Number(find.rowdata.amount_packing)) / UnitRate
+        total -= faults
+      }
       return total
     },
     MAPINGKEY() {
@@ -440,8 +445,7 @@ export default {
 
         const params = [
           `customer_id=${data.customer_id}`,
-          // FOR EDIT ONLY
-          // `or_detail_ids=${data.packing_items.work_order_item_id}`,
+          `or_detail_ids=${data.packing_items.work_order_item_id}`,
         ]
         this.SHEET.load('work_order_items', params.join('&') )
       }
@@ -522,16 +526,11 @@ export default {
         }
         this.FORM.loading = true
         let {method, mode, apiUrl} = this.FORM.meta()
-        apiUrl += '?mode=multicreate'
         this.$axios.set(method, apiUrl, this.rsForm)
           .then((response) => {
-            const packings = response.data || []
-            let message = packings.map(packing => {
-              return packing.number + ' - #' + packing.id
-            }).join(',')
-
+            let message = response.data.number + ' - #' + response.data.id
             this.FORM.response.success({message:message})
-            this.FORM.toView(packings.map(x => x.id).join(','))
+            this.FORM.toView(response.data.id)
           })
           .catch((error) => {
             this.FORM.response.fields(error.response)

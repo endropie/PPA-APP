@@ -147,6 +147,18 @@
             v-if="rs.row.shift_id" />
         </q-td>
 
+        <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
+          <div class="column text-body">
+            <span class="text-uppercase text-grey-8">
+              {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
+            </span>
+            <small v-if="rs.row.created_at" class="text-grey">
+              <q-icon name="mdi-earth"></q-icon>
+              {{ $app.moment(rs.row.created_at).fromNow() }}
+            </small>
+          </div>
+        </q-td>
+
       </q-table>
     </q-pull-to-refresh>
 
@@ -209,11 +221,12 @@ export default {
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},
+          { name: 'date', label: this.$tc('label.date'), field: (rs)=> rs.date, format: (v) => this.$app.moment(v).format('DD/MM/YY'), align: 'center', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', align: 'right' },
           { name: 'line_id', label: this.$tc('general.line'), field: (rs)=> rs.line.name , align: 'left', sortable: true },
-          { name: 'date', label: this.$tc('label.date'), field: (rs)=> rs.date, format: (v) => this.$app.moment(v).format('DD/MM/YY'), align: 'center', sortable: true },
           { name: 'shift_id', label: this.$tc('label.shift'), field: (rs)=> rs.shift.name , align: 'center', sortable: true },
+          { name: 'created_at', label: this.$tc('form.create',2), field: 'created_at', align: 'center'},
         ]
       },
     }
