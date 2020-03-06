@@ -103,8 +103,21 @@
           </div>
         </q-td>
 
-        <q-td slot="body-cell-status" slot-scope="rs" class="no-padding">
+        <q-td slot="body-cell-status" slot-scope="rs" class="">
           <ux-chip-status dense square :row="rs.row" />
+        </q-td>
+
+        <q-td slot="body-cell-persentase" slot-scope="rs" class="no-padding">
+          <div class="column " style="min-width:180px">
+            <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.total_amount) ? (rs.row.total_verification/rs.row.total_amount) : 0">
+              <div class="absolute-full flex flex-center">
+                <q-badge :color="Boolean(rs.row.status === 'CLOSED') ? 'red' : 'blue-grey-10'" text-color="white" class="text-weight-medium q-pt-xs">
+                  <span>{{$app.number_abbreviate(rs.row.total_verification)}} </span>
+                  <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_amount)}}</span>
+                </q-badge>
+              </div>
+            </q-linear-progress>
+          </div>
         </q-td>
 
         <q-td slot="body-cell-transaction" slot-scope="rs"  class="no-padding" style="width:35px">
@@ -178,8 +191,9 @@ export default {
           { name: 'date', label: this.$tc('label.date'), field: 'date', format:(v) => this.$app.moment(v).format('DD/MM/YYYY'), align: 'center', sortable: true},
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', label: '', field: 'status', align: 'left'},
-          { name: 'transaction', label: this.$tc('label.transaction'), field: 'transaction', align: 'center', sortable: true },
+          { name: 'persentase', label: '(%)', align: 'center'},
           { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
+          { name: 'transaction', label: this.$tc('label.transaction'), field: 'transaction', align: 'center', sortable: true },
           { name: 'created_at', label: this.$tc('form.create',2), field: 'created_at', align: 'center', sortable: true },
         ]
       },
