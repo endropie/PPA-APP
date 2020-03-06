@@ -122,9 +122,24 @@
 
         </q-td>
 
+        <q-td slot="body-cell-date" slot-scope="rs" :props="rs">
+          <span v-if="rs.row.work_order_item.work_order.date"> {{ $app.moment(rs.row.work_order_item.work_order.date).format('DD/MM/YY') }}</span>
+        </q-td>
+
         <q-td slot="body-cell-number" slot-scope="rs" :props="rs" style="width:35px">
-          <div :class="{'text-strike': Boolean(rs.row.work_order_item.work_order.revise_id)}">
-            {{ rs.row.work_order_item.work_order.fullnumber || rs.row.work_order_item.work_order.number }}
+          <span v-if="!Boolean(rs.row.work_order_item.work_order)" v-text="'-'" />
+          <q-btn v-else dense unelevated type="a" :to="`/admin/factories/work-orders/${rs.row.work_order_item.work_order.id}`">
+            <div :class="{'text-strike': Boolean(rs.row.work_order_item.work_order.revise_id)}">
+              {{ rs.row.work_order_item.work_order.fullnumber || rs.row.work_order_item.work_order.number }}
+            </div>
+          </q-btn>
+        </q-td>
+
+        <q-td slot="body-cell-item" slot-scope="rs" :props="rs" style="width:35px">
+          <!-- <code>({{Object.keys(rs.row)}})</code> -->
+          <div class="column" v-if="rs.row.work_order_item.item">
+            <span>{{rs.row.work_order_item.item.part_name}}</span>
+            <span class="text-weight-light">[{{rs.row.work_order_item.item.customer_code}}]<font>{{rs.row.work_order_item.item.part_number}}</font></span>
           </div>
         </q-td>
 
@@ -134,13 +149,9 @@
           </span>
         </q-td>
 
-        <q-td slot="body-cell-date" slot-scope="rs" :props="rs">
-          <span v-if="rs.row.work_order_item.work_order.date"> {{ $app.moment(rs.row.work_order_item.work_order.date).format('DD/MM/YY') }}</span>
-        </q-td>
-
         <template v-slot:bottom-row>
           <q-tr class="bg-blue-grey-2 text-weight-medium">
-            <q-td key="prefix"></q-td>
+            <q-td key="prefix" colspan="3"></q-td>
             <q-td key="part_name" class="text-right">{{ $tc('label.grandtotal') }}</q-td>
             <q-td key="quantity" class="text-right">
               {{TABLE.rowData.reduce((total, item) => total += (item.work_order_item.quantity), 0) }}
@@ -222,12 +233,12 @@ export default {
         },
         columns: [
           { name: 'prefix', label: '', align: 'left'},
-          { name: 'part_name', label: this.$tc('items.part_name'), field: (rs)=> rs.work_order_item.item.part_name , align: 'left', sortable: true },
+          { name: 'date', label: this.$tc('label.date'), field:(rs) => rs.work_order_item.work_order.date , align: 'center', sortable: true },
+          { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
+          { name: 'item', label: this.$tc('items.part_name'), field: 'part_name', align: 'left'},
           { name: 'quantity', label: this.$tc('label.quantity'), field: (rs)=> rs.work_order_item.quantity, align: 'right', sortable: true },
           { name: 'unit', label: this.$tc('label.unit'), field: (rs)=> rs.work_order_item.unit.name , align: 'left'},
-          { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'line_id', label: 'Line', field: (rs)=> rs.line.name , align: 'left', sortable: true },
-          { name: 'date', label: this.$tc('label.date'), field:(rs) => rs.work_order_item.work_order.date , align: 'center', sortable: true },
+          { name: 'line_id', label: 'Main Line', field: (rs)=> rs.line.name , align: 'left', sortable: true },
           { name: 'shift_id', label: 'Shift', field: (rs)=> rs.work_order_item.work_order.shift.name , align: 'center', sortable: true },
           { name: 'stockist', label:(rs)=> rs.work_order_item.work_order.stockist_from, align: 'left'},
         ]

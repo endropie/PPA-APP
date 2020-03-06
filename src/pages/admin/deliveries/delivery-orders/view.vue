@@ -45,18 +45,19 @@
           <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
           <q-chip tag outline small square color="orange-10" class="text-uppercase" :label="$tc('form.temporary')" v-if="rsView.is_internal" />
         </div>
-        <div class="column" >
-          <div class="row justify-between q-col-gutter-sm q-pb-sm">
-            <div class="profile col-stretch">
+        <div class="column" style="min-height:11cm;height:auto">
+          <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
+            <div class="on-left">
               <div class="text-weight-regular uppercase">To: {{rsView.customer_name}}</div>
               <address class="text-weight-light">{{rsView.customer_address}}</address>
               <div class="text-weight-light" v-if="rsView.customer_phone">Phone: {{rsView.customer_phone}}</div>
               <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
             </div>
-            <div class="col-auto">
-              <div class=" row no-wrap items-start">
+            <q-space/>
+            <div class="">
+              <div class="row no-wrap  q-gutter-x-xs items-start">
                 <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
-                  class="super-dense no-highlight no-shadow th-uppercase q-mx-sm">
+                  class="table-print super-dense no-shadow no-highlight th-uppercase">
                   <tbody>
                     <tr>
                       <td>{{$tc('label.number')}}</td>
@@ -73,7 +74,7 @@
                   </tbody>
                 </q-markup-table>
                 <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
-                  class="super-dense no-shadow no-margin no-highlight th-uppercase"
+                  class="table-print super-dense no-shadow no-highlight th-uppercase"
                   v-if="!rsView.is_internal">
                   <tbody>
                     <tr>
@@ -126,7 +127,7 @@
                 </q-tr>
               </tbody>
               </template>
-              <tbody v-else>
+              <tbody v-else >
               <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index" :delivery-order-item-id="row.id">
                 <q-td>
                   <span v-if="Boolean(mode)" class="text-weight-medium">{{mode}}:&nbsp;</span>
@@ -140,14 +141,12 @@
               </q-tr>
               </tbody>
             </q-markup-table>
-            <q-chip dense square class="float-right print-hide">
-              <small class="text-weight-light">{{`MODE: ${rsView.customer.delivery_mode}`}}</small>
-            </q-chip>
           </div>
           <div v-show="Boolean(rsView.description)">
               <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
               <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
           </div>
+          <q-space />
           <div class="page-break-inside">
             <q-markup-table :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
               <tr class="text-center">
