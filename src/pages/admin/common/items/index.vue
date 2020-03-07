@@ -108,6 +108,29 @@
             :icon="rs.row.enable ? 'mdi-check-outline' : 'block'" />
           </div>
 
+          <div v-else-if="rs.col.name === 'WO'">
+            <span v-if="Boolean(rs.value !== 0)">
+              {{rs.value}}
+              <q-tooltip>
+                FM({{$app.number_format(rs.row.totals['WOFM'])}})
+                NC({{$app.number_format(rs.row.totals['WONC'])}})
+                NCR({{$app.number_format(rs.row.totals['WONCR'])}})
+              </q-tooltip>
+            </span>
+            <span v-else v-text="'-'" />
+          </div>
+
+          <div v-else-if="rs.col.name === 'PDO'">
+            <span v-if="Boolean(rs.value !== 0)">
+              {{rs.value}}
+              <q-tooltip>
+                REGULER({{$app.number_format(rs.row.totals['PDO.REG'])}})
+                RETURN({{$app.number_format(rs.row.totals['PDO.RET'])}})
+              </q-tooltip>
+            </span>
+            <span v-else v-text="'-'" />
+          </div>
+
           <div v-else>{{rs.value}}</div>
 
         </q-td>
@@ -165,9 +188,9 @@ export default {
           { name: 'NG', label: 'NG', sortable: true, field: (item)=> item.totals['NG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
 
           { name: 'WO', label: 'WO', align: 'center', clases:'bg-faded', hidden: (!process.env.DEV && !this.$route.query.DEV),
-            field: (item)=> `${item.totals['WOFM'] + item.totals['WONC'] + item.totals['WONCR']}`, format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+            field: (item)=> (item.totals['WOFM'] + item.totals['WONC'] + item.totals['WONCR']), Xformat: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'PDO', label: 'PDO', align: 'center', clases:'bg-faded', hidden: (!process.env.DEV && !this.$route.query.DEV),
-            field: (item) => item.totals['PDO.REG'] + item.totals['PDO.RET'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+            field: (item) => item.totals['PDO.REG'] + item.totals['PDO.RET'], Xformat: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'VDO', label: 'VDO', sortable: true, hidden:  (!process.env.DEV && !this.$route.query.DEV),
             field: (item)=> item.totals['VDO'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
 
