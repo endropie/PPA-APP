@@ -52,7 +52,7 @@
             <ux-select-filter class="col col-stretch"
               name="vehicle_id"
               :label="$tc('transports.seri')" stack-label
-              v-model="rsForm.transport_number"
+              v-model="rsForm.vehicle_id"
               hide-bottom-space autocomplete="off"
               filter emit-value map-options
               :options="VehicleOptions"

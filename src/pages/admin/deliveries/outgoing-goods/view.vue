@@ -2,7 +2,7 @@
   <q-page padding class="column justify-start items-center q-gutter-sm" >
     <page-print v-if="VIEW.show" class="" >
       <div slot="header-title">
-        OUTGOING GOOD
+        PPA - PACKING LIST
       </div>
 
       <div class="row q-col-gutter-sm" >

@@ -77,6 +77,10 @@ import('./quasar.variables.styl')
     border-right-style solid
     border-right-width 1px
     border-right-color inherit
+@media print
+  .table-print
+    .q-table thead, .q-table tr, .q-table th, .q-table td
+      border-color #000000
 
 .th-uppercase .q-table
   th

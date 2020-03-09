@@ -41,17 +41,23 @@
       </q-card>
       <page-print :dark="LAYOUT.isDark" style="min-width:75%" :class="{'multi-page':getArrayPage(rsView.customer).length > 1}"
         v-for="(mode, pi) in getArrayPage(rsView.customer)" :key="pi">
-        <div slot="header-tags" class="print-hide">
-          <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
-          <q-chip tag outline small square color="orange-10" class="text-uppercase" :label="$tc('form.temporary')" v-if="rsView.is_internal" />
+        <div slot="header-tags" class="row no-wrap">
+          <div class="print-hide">
+            <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
+            <!-- <q-chip tag outline small square color="orange-10" class="text-uppercase" :label="$tc('form.temporary')" v-if="rsView.is_internal" /> -->
+          </div>
+          <div class="text-h6 text-uppercase text-center on-right">
+            <span v-if="rsView.is_internal">{{$tc('general.sj_internal',2)}}</span>
+            <span v-else>{{$tc('general.sj_delivery',2)}} {{rsView.transaction}}</span>
+          </div>
         </div>
         <div class="column" style="min-height:11cm;height:auto">
           <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
-            <div class="on-left">
-              <div class="text-weight-regular uppercase">To: {{rsView.customer_name}}</div>
+            <div class="on-left" style="max-width:50%">
+              <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
               <address class="text-weight-light">{{rsView.customer_address}}</address>
-              <div class="text-weight-light" v-if="rsView.customer_phone">Phone: {{rsView.customer_phone}}</div>
-              <div class="text-weight-light" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
+              <div class="text-weight-medium" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
+              <div class="text-weight-medium" v-if="rsView.vehicle">{{$tc('label.transport')}}: {{rsView.vehicle.number}}</div>
             </div>
             <q-space/>
             <div class="">
@@ -123,11 +129,13 @@
                   <q-td>{{row.item.part_number}}</q-td>
                   <q-td class="text-center">{{row.unit.name}}</q-td>
                   <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
-                  <q-td>{{row.encasement}}</q-td>
+                  <q-td>
+                    {{row.encasement}}
+                  </q-td>
                 </q-tr>
               </tbody>
               </template>
-              <tbody v-else >
+              <tbody v-else>
               <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index" :delivery-order-item-id="row.id">
                 <q-td>
                   <span v-if="Boolean(mode)" class="text-weight-medium">{{mode}}:&nbsp;</span>
@@ -137,7 +145,9 @@
                 <q-td class="text-center">{{row.unit.name}}</q-td>
                 <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
                 <q-td class="print-hide text-right" v-if="rsView.is_internal">{{$app.number_format(row.amount_reconcile)}}</q-td>
-                <q-td>{{row.encasement}}</q-td>
+                <q-td>
+                  {{row.encasement}}
+                </q-td>
               </q-tr>
               </tbody>
             </q-markup-table>
@@ -152,19 +162,20 @@
               <tr class="text-center">
                 <td width="21%">
                   <div class="sign-name">Diterima Oleh</div>
-                  <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+                  <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
                 </td>
                 <td width="21%">
                   <div class="sign-name">Outgoing Oleh</div>
-                  <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+                  <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
                 </td>
                 <td width="21%">
                   <div class="sign-name">Security</div>
-                  <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+                  <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
                 </td>
-                <td width="35%">
+                <td width="21%" class="text-capitalize">
                   <div class="sign-name">Hormat Kami</div>
-                  <div class="sign-tag">( . . . . . . . . . . . . . . )</div>
+                  <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.user_by">(<q-space/>{{rsView.user_by.name}}<q-space/>)</div>
+                  <div class="sign-tag row no-wrap q-mx-lg" v-else>( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
                 </td>
               </tr>
             </q-markup-table>

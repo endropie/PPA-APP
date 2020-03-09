@@ -54,6 +54,7 @@ export default {
   summary: 'Total ',
   total: 'Total {v}',
   transaction: 'Transaksi',
+  transport: 'Transport',
   trash: 'Sampah',
   time: 'Waktu',
   type: 'Tipe',

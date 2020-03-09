@@ -31,7 +31,7 @@
                       </div>
                     </div>
                     <q-space />
-                    <div class="col-auto no-print self-end items-end">
+                    <div class="col-auto self-end items-end">
                       <slot name="header-tags"></slot>
                     </div>
                   </div>
