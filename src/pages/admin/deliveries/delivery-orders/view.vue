@@ -110,18 +110,44 @@
                 <q-th>{{ $tc('label.encasement') }}</q-th>
               </q-tr>
               </thead>
-              <template v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
               <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
                 <q-tr :delivery-order-item-id="row.id">
                   <q-td>
-                    <span class="text-weight-medium">Material:&nbsp;</span>
+                    <span class="text-weight-medium" v-if="Boolean(mode)">{{mode}}:&nbsp;</span>
+                    <span class="text-weight-medium" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">Material:&nbsp;</span>
                     {{row.item.part_name}}
                   </q-td>
                   <q-td>{{row.item.part_number}}</q-td>
                   <q-td class="text-center">{{row.unit.name}}</q-td>
                   <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
+                  <q-td class="print-hide text-right" v-if="rsView.is_internal">
+                    {{$app.number_format(row.amount_reconcile)}}
+                  </q-td>
+                  <q-td>
+                    <div class="row cursor-pointer">
+                      <span>{{row.encasement}}</span>
+                      <template v-if="String(mode).toUpperCase() !== 'JASA' && rsView.status === 'OPEN'">
+                        <q-popup-edit v-model="row.encasement" content-class="" :cover="false" :offset="[0, 10]"
+                          @save="(val,init) => setEncasement(index, val, init)"
+                          >
+                          <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
+                            <q-input autofocus dense :value="value" :label="$tc('label.encasement')" stack-label
+                              @input="emitValue"
+                            >
+                              <template v-slot:after>
+                                <q-btn flat dense color="negative" icon="cancel" @click.stop="cancel" />
+                                <q-btn flat dense color="positive" icon="check_circle" @click.stop="set" />
+                              </template>
+                            </q-input>
+                          </template>
+                        </q-popup-edit>
+                        <q-space/>
+                        <q-icon name="edit" class="print-hide cursor-pointer self-end text-grey"/>
+                      </template>
+                    </div>
+                  </q-td>
                 </q-tr>
-                <q-tr :delivery-order-item-id="row.id">
+                <q-tr :delivery-order-item-id="row.id" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
                   <q-td>
                     <span class="text-weight-medium">Jasa:&nbsp;</span>
                     {{row.item.part_name}}
@@ -129,26 +155,8 @@
                   <q-td>{{row.item.part_number}}</q-td>
                   <q-td class="text-center">{{row.unit.name}}</q-td>
                   <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
-                  <q-td>
-                    {{row.encasement}}
-                  </q-td>
+                  <q-td></q-td>
                 </q-tr>
-              </tbody>
-              </template>
-              <tbody v-else>
-              <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index" :delivery-order-item-id="row.id">
-                <q-td>
-                  <span v-if="Boolean(mode)" class="text-weight-medium">{{mode}}:&nbsp;</span>
-                  {{row.item.part_name}}
-                </q-td>
-                <q-td>{{row.item.part_number}}</q-td>
-                <q-td class="text-center">{{row.unit.name}}</q-td>
-                <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
-                <q-td class="print-hide text-right" v-if="rsView.is_internal">{{$app.number_format(row.amount_reconcile)}}</q-td>
-                <q-td>
-                  {{row.encasement}}
-                </q-td>
-              </q-tr>
               </tbody>
             </q-markup-table>
           </div>
@@ -158,7 +166,7 @@
           </div>
           <q-space />
           <div class="page-break-inside">
-            <q-markup-table :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
+            <q-markup-table dense :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
               <tr class="text-center">
                 <td width="21%">
                   <div class="sign-name">Diterima Oleh</div>
@@ -301,6 +309,30 @@ export default {
           submit()
         })
       })
+    },
+    setEncasement(index, val, init) {
+      const save = () => this.rsView.delivery_order_items[index].encasement = val
+      const cancel = () => this.rsView.delivery_order_items[index].encasement = init
+      if (this.rsView.delivery_order_items[index].id) {
+        const row = this.rsView.delivery_order_items[index]
+        this.VIEW.loading = true
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=item-encasement&nodata=true`
+        this.$axios.put(url, {id: row.id, encasement: val})
+          .then((response) => {
+            save()
+            this.$app.notify.success('Data Updated!')
+          })
+          .catch(error => {
+            cancel()
+            this.$app.response.error(error.response, 'Update Encasement')
+          })
+          .finally(()=>{
+            setTimeout(() => {
+              this.VIEW.loading = false
+            }, 1000);
+          })
+      }
+      else cancel()
     }
   }
 }
