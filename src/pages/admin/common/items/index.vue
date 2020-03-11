@@ -46,7 +46,7 @@
               <q-select class="col-12 col-sm-6"
                 dense use-chips hide-dropdown-icon
                 placeholder="Stock"
-                :options="['FM','WO','WIP','FG','NC','NCR']"
+                :options="['FM','WIP','FG','NC','NCR']"
                 v-model="FILTERABLE.fill.has_stocks.value" multiple
                 standout="bg-blue-grey-5 text-white"
                 :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
@@ -57,7 +57,7 @@
                   dense rounded color="light" size="sm"
                   label="ALL"
                   v-if="!FILTERABLE.fill.has_stocks.value || FILTERABLE.fill.has_stocks.value.length < 6 "
-                  @click="[FILTERABLE.fill.has_stocks.value = ['FM','WO','WIP','FG','NC','NCR'], FILTERABLE.submit()]" >
+                  @click="[FILTERABLE.fill.has_stocks.value = ['FM','WIP','FG','NC','NCR'], FILTERABLE.submit()]" >
                   <q-tooltip>{{$tc('label.all')}}</q-tooltip>
                 </q-btn>
               </q-select>
@@ -187,11 +187,11 @@ export default {
           { name: 'NCR', label: 'NCR', sortable: true, field: (item)=> item.totals['NCR'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
           { name: 'NG', label: 'NG', sortable: true, field: (item)=> item.totals['NG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
 
-          { name: 'WO', label: 'WO', align: 'center', clases:'bg-faded', hidden: (!process.env.DEV && !this.$route.query.DEV),
+          { name: 'WO', label: 'WO', align: 'center', clases:'bg-faded', // hidden: (!process.env.DEV && !this.$route.query.DEV),
             field: (item)=> (item.totals['WOFM'] + item.totals['WONC'] + item.totals['WONCR']), Xformat: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'PDO', label: 'PDO', align: 'center', clases:'bg-faded', hidden: (!process.env.DEV && !this.$route.query.DEV),
+          { name: 'PDO', label: 'PDO', align: 'center', clases:'bg-faded', // hidden: (!process.env.DEV && !this.$route.query.DEV),
             field: (item) => item.totals['PDO.REG'] + item.totals['PDO.RET'], Xformat: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'VDO', label: 'VDO', sortable: true, hidden:  (!process.env.DEV && !this.$route.query.DEV),
+          { name: 'VDO', label: 'VDO', sortable: true, // hidden:  (!process.env.DEV && !this.$route.query.DEV),
             field: (item)=> item.totals['VDO'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
 
           { name: 'price', label: 'Price', field: 'price', sortable: true, hidden: !this.$app.can('items.price') },
