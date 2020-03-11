@@ -214,13 +214,12 @@ export default {
       return true
     },
     IS_EDITABLE() {
-      if (this.rsView.revise_id) return false
-      if (this.rsView.order_mode === 'NONE') return false
       if (this.rsView.deleted_at) return false
+      if (this.rsView.order_mode !== 'PO') return false
       if (this.rsView.status !== 'OPEN') return false
-      if (Object.keys(this.rsView.has_relationship || {}).length > 0) {
-        if (!Boolean(this.rsView.is_estimate)) return false
-      }
+      // if (Object.keys(this.rsView.has_relationship || {}).length > 0) {
+      //   if (!Boolean(this.rsView.is_estimate)) return false
+      // }
 
       return true
     },

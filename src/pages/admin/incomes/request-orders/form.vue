@@ -82,7 +82,8 @@
           <tbody>
             <q-tr v-for="(row, index) in rsForm.request_order_items" :key="index">
               <q-td key="prefix" style="width:50px">
-                <q-btn dense flat icon="clear" color="negative" @click="removeItem(index)" v-if="!Boolean(row.id)"/>
+                <!-- {{row}} -->
+                <q-btn dense flat icon="clear" color="negative" @click="removeItem(index)" v-if="!Boolean(row.amount_delivery > 0)"/>
               </q-td>
               <q-td key="item" width="45%" style="min-width:150px">
                 <ux-select class="field-native-top"
@@ -107,7 +108,7 @@
                   v-model="row.quantity" type="number" min="0"
                   outlined dense hide-bottom-space
                   color="blue-grey-5" style="min-width:80px"
-                  v-validate="row.item_id ? `required|gt_value:0|min_value:${getMinQuantity(index)}` : ''"
+                  v-validate="`required|gt_value:0`"
                   :dark="LAYOUT.isDark"
                   :error="errors.has(`request_order_items.${index}.quantity`)"
                 />
@@ -263,12 +264,6 @@ export default {
 
       return (data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
     },
-    BrandOptions() {
-      return (this.SHEET.brands.data.map(item => ({label: item.name, value: item.id})) || [])
-    },
-    TransportOptions() {
-      return (this.SHEET.vehicles.data.map(item => ({label: item.name, value: item.id})) || [])
-    },
     UnitOptions() {
       return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
     },
@@ -324,9 +319,10 @@ export default {
       this.rsData = JSON.parse(JSON.stringify(data))
       this.rsForm = JSON.parse(JSON.stringify(data))
 
-      if(data.id && Object.keys(data['has_relationship']).length > 0 && !Boolean(data['is_estimate'])) {
+      // if(data.id && Object.keys(data['has_relationship']).length > 0) {
+      if(data.id && data.status !== 'OPEN') {
         this.FORM.response.relationship({
-          title: 'Sale Orders has relations!',
+          title: 'Sale Orders has not OPEN state!',
           messages: data['has_relationship'],
           then: () => this.$router.push(`${this.FORM.resource.uri}/${data.id}`)
         })
@@ -412,9 +408,10 @@ export default {
       }
     },
     getMinQuantity(index) {
-      if (this.FORM.data.request_order_items) {
-        const detail = this.FORM.data.request_order_items
-        if (detail[index]) return (detail[index].amount_delivery || 0) / (detail.unit_rate || 1)
+      const row = this.rsForm.request_order_items[index]
+      if (this.FORM.data.request_order_items.length) {
+        const detail = this.FORM.data.request_order_items.find(x => x.id === row.id)
+        if (detail) return (detail.amount_delivery || 0) / (detail.unit_rate || 1)
       }
       return 0
     },
@@ -429,14 +426,11 @@ export default {
     },
     onSave() {
       this.$validator.validate().then(result => {
-        if (!result) {
-          this.$q.notify({
+        if (!result) return this.$q.notify({
             color:'negative', icon:'error', position:'top-right', timeout: 3000,
             message:this.$tc('messages.to_complete_form')
-          });
+          })
 
-          return;
-        }
         this.FORM.loading = true
         let {method, mode, apiUrl} = this.FORM.meta();
 
