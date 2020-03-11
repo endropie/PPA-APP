@@ -52,9 +52,9 @@
             <q-tr v-for="(row, index) in rsView.pre_delivery_items" :key="index">
               <q-td>{{row.item.part_name}}</q-td>
               <q-td>{{row.item.part_number}}</q-td>
-              <q-td>{{row.unit.code}}</q-td>
-              <q-td>{{$app.number_format(row.quantity)}}</q-td>
-              <q-td>{{$app.number_format(row.amount_verification / (row.unit_rate || 1))}}</q-td>
+              <q-td class="text-center">{{row.unit.code}}</q-td>
+              <q-td class="text-right">{{$app.number_format(row.quantity,2)}}</q-td>
+              <q-td class="text-right">{{$app.number_format(row.amount_verification / (row.unit_rate || 1),0)}}</q-td>
               <q-td>{{row.encasement || '-'}}</q-td>
             </q-tr>
             </tbody>
