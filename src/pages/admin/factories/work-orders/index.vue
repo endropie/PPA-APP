@@ -165,51 +165,25 @@
 
         <q-td slot="body-cell-persentase" slot-scope="rs" :props="rs" class="no-padding">
            <div class="column q-gutter-xs q-py-xs" style="min-width:205px"
-            v-if="['OPEN', 'PRODUCTED', 'PACKED', 'CLOSED'].find(x => x === rs.row.status) && (rs.row.total_production > 0 || rs.row.total_packing > 0)">
-            <!-- <div class="fit">
-              <q-chip  dense square
-                class="fit q-mb-xs shadow-1 text-uppercase no-margin"
-                color="blue-grey" text-color="white" >
-                {{$tc('factories.production')}}
-                <q-space/>
-                <q-badge class="status-chip-badge text-weight-medium"
-                  :color="!Boolean(rs.row.has_producted) ? 'blue-grey-10' : 'red'">
-                  <span>{{$app.number_abbreviate(rs.row.total_production)}} </span>
-                  <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_amount)}}</span>
-                </q-badge>
-              </q-chip>
-            </div>
-            <div class="fit">
-              <q-chip dense square
-                class="fit q-mb-xs text-uppercase no-margin"
-                color="blue-grey" text-color="white">
-                {{$tc('factories.packing')}}
-                <q-space/>
-                <q-badge class="status-chip-badge text-weight-medium"
-                  :color="!Boolean(rs.row.has_packed) ? 'blue-grey-10' : 'red'">
-                  <span>{{$app.number_abbreviate(rs.row.total_packing)}} </span>
-                  <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_production)}}</span>
-                </q-badge>
-              </q-chip>
-            </div> -->
+            v-if="['OPEN', 'PRODUCTED', 'PACKED', 'CLOSED'].find(x => x === rs.row.status) && (rs.row.summary_productions > 0 || rs.row.summary_packings > 0)">
             <div class="row no-wrap items-center text-left">
               <q-chip dense square color="lime-8" text-color="white" class="q-my-none" style="width:50px">WIP</q-chip>
-              <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.total_amount) ? (rs.row.total_production/rs.row.total_amount) : 0">
+              <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.summary_items) ? (rs.row.summary_productions/rs.row.summary_items) : 0">
                 <div class="absolute-full flex flex-center">
                   <q-badge :color="Boolean(rs.row.has_producted) ? 'red' : 'blue-grey-10'" text-color="white" class="text-weight-medium q-pt-xs">
-                    <span>{{$app.number_abbreviate(rs.row.total_production)}} </span>
-                    <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_amount)}}</span>
+                    <span>{{$app.number_abbreviate(rs.row.summary_productions)}} </span>
+                    <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.summary_items)}}</span>
                   </q-badge>
                 </div>
               </q-linear-progress>
             </div>
             <div class="row no-wrap items-center text-left">
-              <q-chip dense square color="lime-8" text-color="white" class="q-my-none" style="width:50px">FG</q-chip>
-              <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.total_production) ? (rs.row.total_packing/rs.row.total_production) : 0">
+              <q-chip dense square color="lime-8" text-color="white" class="q-my-none" style="width:50px">PAK</q-chip>
+              <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.summary_productions) ? (rs.row.summary_packings/rs.row.summary_productions) : 0">
                 <div class="absolute-full flex flex-center">
                   <q-badge :color="Boolean(rs.row.has_packed) ? 'red' : 'blue-grey-10'" text-color="white" class="text-weight-medium q-pt-xs">
-                    <span>{{$app.number_abbreviate(rs.row.total_packing)}} </span>
-                    <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_production)}}</span>
+                    <span>{{$app.number_abbreviate(rs.row.summary_packings)}} </span>
+                    <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.summary_productions)}}</span>
                   </q-badge>
                 </div>
               </q-linear-progress>
@@ -233,8 +207,9 @@
               {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
             </span>
             <small v-if="rs.row.created_at" class="text-grey">
-              <q-icon name="mdi-earth"></q-icon>
-              {{ $app.moment(rs.row.created_at).fromNow() }}
+              <q-icon name="mdi-calendar-clock"></q-icon>
+              {{ $app.moment(rs.row.created_at).format('DD/MM/YYYY hh:mm') }}
+              <q-tooltip>{{ $app.moment(rs.row.created_at).fromNow() }}</q-tooltip>
             </small>
           </div>
         </q-td>
@@ -315,7 +290,7 @@ export default {
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', label: '', align: 'center' },
-          { name: 'persentase', label: '', align: 'center' },
+          { name: 'persentase', label: '(%)', align: 'center' },
           { name: 'line_id', label: 'Line', field: (rs)=> rs.line.name , align: 'left', sortable: true },
           { name: 'shift_id', label: 'Shift', field: (rs)=> rs.shift.name , align: 'center', sortable: true },
           { name: 'stockist', label: 'Stockist', align: 'left'},

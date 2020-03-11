@@ -237,7 +237,7 @@ export default {
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'item', label: this.$tc('items.part_name'), field: 'part_name', align: 'left'},
           { name: 'quantity', label: this.$tc('label.quantity'), field: (rs)=> rs.work_order_item.quantity, align: 'right', sortable: true },
-          { name: 'unit', label: this.$tc('label.unit'), field: (rs)=> rs.work_order_item.unit.name , align: 'left'},
+          { name: 'unit', label: this.$tc('label.unit'), field: (rs)=> rs.work_order_item.unit.code , align: 'left'},
           { name: 'line_id', label: 'Main Line', field: (rs)=> rs.line.name , align: 'left', sortable: true },
           { name: 'shift_id', label: 'Shift', field: (rs)=> rs.work_order_item.work_order.shift.name , align: 'center', sortable: true },
           { name: 'stockist', label:(rs)=> rs.work_order_item.work_order.stockist_from, align: 'left'},

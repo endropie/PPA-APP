@@ -100,7 +100,7 @@
                           <span v-if="MAPINGKEY['lines']" >
                             {{MAPINGKEY['lines'][itemLine.line_id].name}}
                             <q-badge v-if="itemLine.work_production_items"
-                              :label="`${totalLine(itemLine, row)} / ${totalAmount(row)}`"
+                              :label="`${$app.number_format(itemLine.amount_line / (row.unit_rate||1),0)} / ${$app.number_format(itemLine.unit_amount / (row.unit_rate||1),0)}`"
                               :color="rsView.has_producted ? 'red-10' : 'primary'"/>
                           </span>
                           <span v-else>
@@ -133,7 +133,8 @@
                         <div slot="header" class="q-item__section column q-item__section--main justify-center">
                           <span>
                             {{$tc('general.packing')}}
-                            <q-badge :label="`${totalPacking(row)} / ${totalProduction(row)}`"
+                            <q-badge
+                              :label="`${$app.number_format(row.amount_packing / (row.unit_rate||1),0)} / ${$app.number_format(row.amount_process / (row.unit_rate||1),0)}`"
                               :color="rsView.has_packed ? 'red-10' : 'primary'"/>
                           </span>
                         </div>
