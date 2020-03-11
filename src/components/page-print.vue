@@ -26,7 +26,7 @@
                       </div>
                       <div class="subtitle text-weight-light ellipsis text-truncate">
                         <slot name="header-subtitle">
-                          <span>Jalan Jati Raya Blok J3 No.7, Cikarang Selatan, Bekasi, Jawa Barat 17530</span>
+                          <span>Jati Raya Blok J3 No. 7 Kawasan Industri Newton Techno Park Lippo Cikarang</span>
                         </slot>
                       </div>
                     </div>
