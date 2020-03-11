@@ -109,11 +109,11 @@
 
         <q-td slot="body-cell-persentase" slot-scope="rs" class="no-padding">
           <div class="column " style="min-width:180px">
-            <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.total_amount) ? (rs.row.total_verification/rs.row.total_amount) : 0">
+            <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.summary_items) ? (rs.row.summary_verifications/rs.row.summary_items) : 0">
               <div class="absolute-full flex flex-center">
                 <q-badge :color="Boolean(rs.row.status === 'CLOSED') ? 'red' : 'blue-grey-10'" text-color="white" class="text-weight-medium q-pt-xs">
-                  <span>{{$app.number_abbreviate(rs.row.total_verification)}} </span>
-                  <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.total_amount)}}</span>
+                  <span>{{$app.number_abbreviate(rs.row.summary_verifications)}} </span>
+                  <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.summary_items)}}</span>
                 </q-badge>
               </div>
             </q-linear-progress>

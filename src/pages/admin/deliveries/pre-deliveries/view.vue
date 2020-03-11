@@ -2,9 +2,9 @@
   <q-page padding class="column justify-start">
     <page-print v-if="VIEW.show">
       <div slot="header-title">PPA - Pre Delivery </div>
-      <template slot="header-tags">
+      <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
-      </template>
+      </div>
 
       <div class="row justify-between q-col-gutter-y-sm" >
         <div class="profile self-bottom">
@@ -54,7 +54,7 @@
               <q-td>{{row.item.part_number}}</q-td>
               <q-td>{{row.unit.code}}</q-td>
               <q-td>{{$app.number_format(row.quantity)}}</q-td>
-              <q-td>{{$app.number_format(row.amount_verification)}}</q-td>
+              <q-td>{{$app.number_format(row.amount_verification / (row.unit_rate || 1))}}</q-td>
               <q-td>{{row.encasement || '-'}}</q-td>
             </q-tr>
             </tbody>

@@ -51,8 +51,8 @@
           <q-tr>
             <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
             <!-- <q-th key="part_number">{{$tc('items.part_number')}}</q-th> -->
-            <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
             <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+            <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
             <q-th key="AVA"># FG #</q-th>
             <q-th key="encasement">{{$tc('label.encasement')}}</q-th>
           </q-tr>
@@ -81,13 +81,13 @@
                 outlined dense hide-bottom-space no-error-icon align="center"
                 :dark="LAYOUT.isDark" color="blue-grey-5"
                 :suffix="row.item_id ? `/ ${$app.number_format(row.maximum / row.unit_rate)}` : ''"
-                v-validate="`gt_value:0|max_value: ${maximality(row.maximum, STOCKS[index]) / row.unit_rate}`"
+                v-validate="`gt_value:0|max_value: ${maximality(row.maximum, FGSTOCK[index]) / row.unit_rate}`"
                 :error="errors.has(`outgoing_good_verifications.${index}.quantity`)"
               />
             </q-td>
             <q-td key="AVA" width="15%" align="center">
               <q-chip square class="text-weight-medium">
-                {{$app.number_format(STOCKS[index] / row.unit_rate)}}
+                {{$app.number_format(FGSTOCK[index] / row.unit_rate)}}
               </q-chip>
             </q-td>
             <q-td key="encasement" width="35%">
@@ -189,7 +189,7 @@ export default {
 
       })
     },
-    STOCKS() {
+    FGSTOCK() {
       if (!this.rsForm.outgoing_good_verifications.length) return []
 
       let stock = Object.assign({}) // JSON.parse(JSON.stringify(this.MapItems))
