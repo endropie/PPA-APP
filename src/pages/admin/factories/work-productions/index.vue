@@ -153,8 +153,9 @@
               {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
             </span>
             <small v-if="rs.row.created_at" class="text-grey">
-              <q-icon name="mdi-earth"></q-icon>
-              {{ $app.moment(rs.row.created_at).fromNow() }}
+              <q-icon name="mdi-calendar-clock"></q-icon>
+              {{ $app.moment(rs.row.created_at).format('DD/MM/YYYY hh:mm') }}
+              <q-tooltip>{{ $app.moment(rs.row.created_at).fromNow() }}</q-tooltip>
             </small>
           </div>
         </q-td>
