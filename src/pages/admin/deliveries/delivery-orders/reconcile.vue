@@ -38,12 +38,12 @@
             :label="$tc('label.name')"  stack-label
             v-model="rsForm.customer_name"
             :dark="LAYOUT.isDark"
-            v-validate="'required'"/>
+            v-validate="''"/>
           <q-input disable class="col-12 col-sm-auto" name="customer_phone"
             :label="$tc('label.phone')"  stack-label
             v-model="rsForm.customer_phone"
             :dark="LAYOUT.isDark"
-            v-validate="'required'"/>
+            v-validate="''"/>
         </div>
         <q-input disable type="textarea" autogrow
           name="customer_address"
@@ -90,7 +90,6 @@
             <q-tr class="text-uppercase" style="line-height:30px">
               <q-th key="prefix" width="50px"></q-th>
               <q-th key="part" align="left" width="50%">{{$tc('items.part_name')}}</q-th>
-              <q-th></q-th>
               <q-th key="quantity" align="right" width="30%">{{$tc('label.quantity')}}</q-th>
               <q-th key="unit_id" align="left"  width="20%">{{$tc('label.unit')}}</q-th>
             </q-tr>
@@ -116,10 +115,6 @@
                   <small v-if="row.item.part_number" class="absolute-bottom">[{{row.item.customer_code}}] {{row.item.part_number}}</small>
                 </ux-select>
 
-              </q-td>
-              <q-td key="request">
-                [{{row.request_order_item_id}}]
-                <!-- <q-btn icon="assignment_late" @click="showRequestOrder = true"/> -->
               </q-td>
               <q-td key="quantity" width="25%">
                 <q-input type="number" style="min-width:120px"
@@ -550,26 +545,13 @@ export default {
     },
     includeRequest(index) {
       if (this.request_order.request_order_items[index]) {
-        let item = this.request_order.request_order_items[index]
+        let detail = this.request_order.request_order_items[index]
         this.rsForm.delivery_order_items.push({
-          ...item,
+          ...detail,
           id: null,
-          request_order_item_id: item.id,
-          max_request: (item.unit_amount - item.amount_delivery),
-          quantity: (item.unit_amount - item.amount_delivery) / (item.unit_rate || 1)
-        })
-      }
-      else this.$q.notify('Index of list undefined!')
-    },
-    includeItemXX(index) {
-      if (this.reconcile.delivery_order_items[index]) {
-        let item = this.reconcile.delivery_order_items[index]
-        this.rsForm.delivery_order_items.push({
-          ...item,
-          id: null,
-          reconcile_item_id: item.id,
-          max_reconcile: (item.unit_amount - item.amount_reconcile),
-          quantity: (item.unit_amount - item.amount_reconcile) / (item.unit_rate || 1)
+          request_order_item_id: detail.id,
+          max_request: (detail.unit_amount - detail.amount_delivery),
+          quantity: null
         })
       }
       else this.$q.notify('Index of list undefined!')
@@ -597,6 +579,7 @@ export default {
       }
       this.$validator.validate().then(result => {
         if (!result) {
+          console.warn('error', this.$validator)
           return this.$q.notify({
             color:'negative', icon:'error', position:'top-right', timeout: 3000,
             message:this.$tc('messages.to_complete_form')

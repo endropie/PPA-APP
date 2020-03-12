@@ -41,12 +41,12 @@
       </q-card>
       <page-print :dark="LAYOUT.isDark" style="min-width:75%" :class="{'multi-page':getArrayPage(rsView.customer).length > 1}"
         v-for="(mode, pi) in getArrayPage(rsView.customer)" :key="pi">
-        <div slot="header-tags" class="row no-wrap">
-          <div class="print-hide">
-            <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
+        <div slot="header-tags" class="column no-wrap items-end">
+          <div class="print-hide no-padding">
+            <ux-chip-status :row="rsView" tag outline dense square icon='bookmark' class="no-margin" />
             <!-- <q-chip tag outline small square color="orange-10" class="text-uppercase" :label="$tc('form.temporary')" v-if="rsView.is_internal" /> -->
           </div>
-          <div class="text-h6 text-uppercase text-center on-right">
+          <div class="text-subtitle2 text-weight-bold text-uppercase text-center on-right">
             <span v-if="rsView.is_internal">{{$tc('general.sj_internal',2)}}</span>
             <span v-else>{{$tc('general.sj_delivery',2)}} {{rsView.transaction}}</span>
           </div>
