@@ -174,7 +174,8 @@
                   </q-td>
                   <q-td>{{row.item.part_number}}</q-td>
                   <q-td class="text-center">{{row.unit.name}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
+                  <q-td class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
+                  <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only"></q-td>
                   <q-td></q-td>
                 </q-tr>
               </tbody>
