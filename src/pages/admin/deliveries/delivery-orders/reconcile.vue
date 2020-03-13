@@ -332,6 +332,11 @@ export default {
 
       return !this.rsForm.revise_id
     },
+    ISTO_RECONCILED() {
+      if (this.reconcile || !this.reconcile.delivery_order_items.length) return false
+
+      return !this.reconcile.delivery_order_items.find(x => Math.round(x.unit_amount) > Math.round(x.amount_reconcile))
+    },
     EmployeeOptions() {
       return (this.SHEET.employees.data.map(item => ({label: `[${item.code}] ${item.name}`, value: item.id})) || [])
     },
@@ -521,6 +526,7 @@ export default {
     setForm(data) {
 
       this.reconcile = Object.assign({},this.setDefault(), data)
+
       this.rsForm = Object.assign({}, {
         ...data,
         id: null,

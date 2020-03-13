@@ -44,9 +44,9 @@
                 :options="CustomerOptions"
                 @input="FILTERABLE.submit" />
 
-              <q-select class="col-4 col-sm-2 "
+              <q-select class="col-12 col-sm-3 "
                 v-model="FILTERABLE.fill.status.value" clearable
-                :options="['OPEN', 'CONFIRMED']"
+                :options="['OPEN', 'CONFIRMED','RECONCILIATION', 'RECONCILED']"
                 :label=" $tc('label.state')"
                 dense hide-bottom-space hide-dropdown-icon
                 standout="bg-blue-grey-5 text-white"
@@ -54,7 +54,7 @@
                 :dark="LAYOUT.isDark"
                 @input="FILTERABLE.submit" />
 
-              <ux-date class="col-8 col-sm-4"
+              <ux-date class="col-12 col-sm-3"
                 stack-label :label="$tc('label.date')"
                 v-model="FILTERABLE.fill.date.value" type="date"  clearable
                 dense hide-bottom-space
@@ -96,18 +96,28 @@
             <small class="text-grey" v-if="rs.row.reconcile_number">REC.{{rs.row.reconcile_number}}</small>
           </span>
           <span v-else>- undifined -</span>
-          <q-chip dense square label="NCR" color="black" text-color="white" v-if="rs.row.transaction === 'RETURN'"/>
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
           <ux-chip-status dense square :row="rs.row"/>
         </q-td>
 
+
+        <q-td slot="body-cell-persentase" slot-scope="rs" :props="rs" class="no-padding">
+          <q-chip dense square class="text-weight-medium" text-color="white"
+            :color="Math.round(rs.row.summary_reconciles) == Math.round(rs.row.summary_items) ? 'red-10' : 'indigo-10'"
+            :label="Math.round(rs.row.summary_reconciles) == Math.round(rs.row.summary_items) ? 'RECONCILED' : 'RECON'"
+            v-if="rs.row.is_internal">
+            <span class="text-weight-normal q-ml-sm" v-if="rs.row.summary_items > 0 && !(Math.round(rs.row.summary_reconciles) == Math.round(rs.row.summary_items))">
+              {{$app.number_format(rs.row.summary_reconciles/rs.row.summary_items*100, 0)}} %
+            </span>
+          </q-chip>
+        </q-td>
+
         <q-td slot="body-cell-transaction" slot-scope="rs" :props="rs" style="width:35px">
-          <q-chip dense square
-            color="blue-grey" text-color="white"
-            :label="rs.row.transaction"
-            :outline="rs.row.transaction === 'RETURN'" />
+          <q-chip dense square text-color="white" class="text-weight-medium"
+            :color="rs.row.transaction === 'RETURN' ? 'dark' : 'blue-grey-5'"
+            :label="rs.row.transaction" />
         </q-td>
 
         <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
@@ -167,8 +177,9 @@ export default {
           { name: 'prefix', label: '', align: 'left'},
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true,
             format:(v)=> v ? this.$app.moment(v).format('DD/MM/YYYY') : '-', classes: 'text-uppercase'},
-          { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'status', label: '', field: 'status', align: 'left', sortable: true },
+          { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left' },
+          { name: 'status', label: '', field: 'status', align: 'center', },
+          { name: 'persentase', label: '', align: 'center', },
           { name: 'transaction', label: this.$tc('label.transaction'), field: 'transaction', align: 'center', sortable: true },
           { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
           { name: 'created_at', label: this.$tc('form.create',2), field:'created_at', align: 'center' },
