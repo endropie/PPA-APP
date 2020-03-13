@@ -94,6 +94,18 @@
                   </tbody>
                 </q-markup-table>
               </div>
+              <div class="row">
+                <q-space/>
+                <div v-if="rsView.is_internal">
+                  <q-checkbox left-label color="blue-grey" label="REMAINIG"
+                    v-model="remain_only"
+                    :true-value="true" :false-value="false"
+                    class="print-hide align-end"
+                    >
+                  </q-checkbox>
+                  <span class="text-weight-medium print-only" v-if="remain_only">(REMAINIG)</span>
+                </div>
+              </div>
             </div>
           </div>
           <div>
@@ -106,12 +118,13 @@
                 <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
                 <q-th>{{ $tc('label.unit') }}</q-th>
                 <q-th>{{ $tc('label.quantity') }}</q-th>
-                <q-th v-if="rsView.is_internal" class="print-hide">Reconcile</q-th>
+                <q-th v-if="rsView.is_internal && !remain_only" class="print-hide">Reconcile</q-th>
                 <q-th>{{ $tc('label.encasement') }}</q-th>
               </q-tr>
               </thead>
               <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
-                <q-tr :delivery-order-item-id="row.id">
+                <q-tr :delivery-order-item-id="row.id"
+                  v-show="isRowMain(row)" >
                   <q-td>
                     <span class="text-weight-medium" v-if="Boolean(mode)">{{mode}}:&nbsp;</span>
                     <span class="text-weight-medium" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">Material:&nbsp;</span>
@@ -119,9 +132,14 @@
                   </q-td>
                   <q-td>{{row.item.part_number}}</q-td>
                   <q-td class="text-center">{{row.unit.name}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
-                  <q-td class="print-hide text-right" v-if="rsView.is_internal">
-                    {{$app.number_format(row.amount_reconcile)}}
+                  <q-td class="text-right">
+                    <span v-if="rsView.is_internal && remain_only">
+                      {{$app.number_format(Number(row.quantity) - (row.amount_reconcile / (row.unit_rate||1)),0)}}
+                    </span>
+                    <span v-else>{{$app.number_format(row.quantity,0)}}</span>
+                  </q-td>
+                  <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only">
+                    {{$app.number_format(row.amount_reconcile,0)}}
                   </q-td>
                   <q-td>
                     <div class="row cursor-pointer">
@@ -147,7 +165,9 @@
                     </div>
                   </q-td>
                 </q-tr>
-                <q-tr :delivery-order-item-id="row.id" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
+                <q-tr :delivery-order-item-id="row.id"
+                  v-show="isRowMain(row)"
+                  v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
                   <q-td>
                     <span class="text-weight-medium">Jasa:&nbsp;</span>
                     {{row.item.part_name}}
@@ -157,6 +177,13 @@
                   <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
                   <q-td></q-td>
                 </q-tr>
+              </tbody>
+              <tbody >
+                <tr v-if="rsView.is_internal && remain_only && !rsView.delivery_order_items.filter(x => isRowMain(x)).length">
+                  <td colspan="100%" class="text-italic text-grey text-center" style="height: 42px !important">
+                    <span>NO REMAIN RECORD.</span>
+                  </td>
+                </tr>
               </tbody>
             </q-markup-table>
           </div>
@@ -213,12 +240,16 @@ export default {
         }
       },
       rsView: {},
+      remain_only: true
     }
   },
   created() {
     this.init()
   },
   computed: {
+    IS_MAINROW() {
+      return Boolean(!this.rsView.is_internal || !this.remain_only)
+    },
     IS_CONFIRM() {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
@@ -253,6 +284,9 @@ export default {
     },
     print() {
       window.print()
+    },
+    isRowMain(row) {
+      return this.IS_MAINROW || Math.round(row.unit_amount) !== Math.round(row.amount_reconcile)
     },
     getBaseUnit(detail) {
       if(detail.unit_rate == 1) return ''
