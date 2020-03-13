@@ -109,7 +109,7 @@
             :label="Math.round(rs.row.summary_reconciles) == Math.round(rs.row.summary_items) ? 'RECONCILED' : 'RECON'"
             v-if="rs.row.is_internal">
             <span class="text-weight-normal q-ml-sm" v-if="rs.row.summary_items > 0 && !(Math.round(rs.row.summary_reconciles) == Math.round(rs.row.summary_items))">
-              {{$app.number_format(rs.row.summary_reconciles/rs.row.summary_items*100, 0)}} %
+              {{$app.number_format(Math.floor(rs.row.summary_reconciles/rs.row.summary_items*100), 0)}} %
             </span>
           </q-chip>
         </q-td>
