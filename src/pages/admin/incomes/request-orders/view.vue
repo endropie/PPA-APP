@@ -60,7 +60,7 @@
             <q-tr v-for="(row, index) in rsView.request_order_items" :key="index" :request-order-item-id="row.id">
               <q-td>{{row.item.part_name}}</q-td>
               <q-td>{{row.item.part_number}}</q-td>
-              <q-td class="text-center">{{row.unit.name}}</q-td>
+              <q-td class="text-center">{{row.unit.code}}</q-td>
               <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
               <q-td class="text-right">{{$app.number_format(row.amount_delivery)}}</q-td>
             </q-tr>
@@ -132,6 +132,13 @@
               actions: () => {
                 VIEW.void(()=> init() )
               }
+            },
+            { label: 'RE-CALCULATE', color:'warning', icon: 'refresh',
+              hidden: !$app.can('request-orders-create'),
+              // detail: $tc('messages.process_void'),
+              actions: () => {
+                setRecalculate()
+              }
             }
           ]">
         </ux-btn-dropdown>
@@ -150,25 +157,12 @@
               </q-item-section>
             </q-item>
           </q-list>
-          <!-- <div class="row q-pa-md">
-            <div class="column">
-              <div class="text-subtitle2 q-mb-md">SJ-DELIVERY ORDER</div>
-              <template v-for="(link, index) in rsView.delivery_orders">
-                <q-btn dense class="q-ma-xs" :key="index"
-                  color="secondary" icon="open_in_new"
-                  :label="`${link.fullnumber || link.number}`"
-                  @click="showDO(link.id)" />
-              </template>
-            </div>
-
-            <q-separator vertical inset class="q-mx-lg" v-show="false" />
-
-            <div class="column">
-            </div>
-          </div> -->
         </q-btn-dropdown>
       </div>
     </page-print>
+    <q-inner-loading :showing="VIEW.loading">
+      <q-spinner size="50px" color="primary" />
+    </q-inner-loading>
     <ux-modal-view ref="modal" fit icon="local_shipping" :title="$tc('general.sj_delivery')" :dark="LAYOUT.isDark" />
   </q-page>
 </template>
@@ -230,12 +224,6 @@ export default {
         this.setView(data || {})
       })
     },
-    btnIcon (str) {
-      return !this.$q.screen.lt.sm ? str : ''
-    },
-    print() {
-      window.print()
-    },
     showDO(id) {
       let params = {
         path: '/admin/deliveries/delivery-orders/view',
@@ -280,6 +268,30 @@ export default {
       }).onOk(() => {
         submit()
       })
+    },
+    setRecalculate() {
+      const submit = () => {
+        // this.VIEW.show = false
+        this.VIEW.loading = true
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=calculate&nodata=true`
+        this.$axios.put(url)
+          .then((response) => {
+            const data = response.data
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'FORM CLOSED')
+          })
+          .finally(()=>{
+            this.VIEW.show = true
+            setTimeout(() => {
+              this.VIEW.loading = false
+            }, 1000);
+          })
+
+      }
+
+      submit()
     }
   }
 }

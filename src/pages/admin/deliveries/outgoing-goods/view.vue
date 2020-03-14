@@ -57,7 +57,7 @@
               </q-td>
               <!-- <q-td>{{row.item.part_number}}</q-td> -->
               <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
-              <q-td>{{row.unit.name}}</q-td>
+              <q-td>{{row.unit.code}}</q-td>
               <q-td>{{row.encasement}}</q-td>
             </q-tr>
             </tbody>
@@ -120,6 +120,9 @@
         </div>
       </div>
     </page-print>
+    <q-inner-loading :showing="VIEW.loading">
+      <q-spinner size="50px" color="primary" />
+    </q-inner-loading>
     <ux-modal-view ref="modal"  fit icon="local_shipping" :title="$tc('general.sj_delivery')" />
   </q-page>
 </template>
