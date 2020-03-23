@@ -49,12 +49,12 @@
           <q-markup-table dense bordered separator="cell" class="no-shadow no-highlight"  :dark="LAYOUT.isDark">
             <thead>
             <q-tr style="line-height:25px">
-              <q-th width="25%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th width="25%">{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th width="30%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th width="30%">{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th width="10%">{{ $tc('label.unit') }}</q-th>
-              <q-th width="15%">{{ $tc('label.quantity') }}</q-th>
-              <q-th width="15%">{{ $tc('label.send') }}</q-th>
-              <q-th width="15%">{{ $tc('label.balance') }}</q-th>
+              <q-th width="10%">{{ $tc('label.quantity') }}</q-th>
+              <q-th width="10%">{{ $tc('label.send') }}</q-th>
+              <q-th width="10%">{{ $tc('label.balance') }}</q-th>
             </q-tr>
             </thead>
             <tbody>
