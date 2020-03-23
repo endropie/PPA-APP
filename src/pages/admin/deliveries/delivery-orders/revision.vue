@@ -63,7 +63,6 @@
     <q-separator inset />
     <!-- SINGLE-REVISION -->
     <q-card-section v-if="!isPartition">
-      <code v-if="rsForm.request_order">[{{rsForm.request_order.order_mode}}]</code>
       <div class="row items-center q-pb-sm">
         <div class="col ">
           <span class="text-h6 text-grey" >REVISE</span>
@@ -78,6 +77,7 @@
           filter clearable
           :source="`/api/v1/incomes/request-orders?mode=all&customer_id=${rsForm.customer_id}`"
           :option-label="(item) => item.number"
+          :option-sublabel="(item) => 'REF: ' + (item.reference_number || '-')"
           :option-value="(item) => item"
           :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
           v-validate="'required'"
@@ -85,7 +85,9 @@
           :error-message="errors.first(`request_order`)"
           @input="setRequestOrder"
         >
-          <q-btn slot="after" dense flat icon="open_in_new" color="blue-grey"  v-if="Boolean(rsForm.request_order)"
+          <q-btn slot="after" dense flat icon="open_in_new" color="blue-grey"
+            v-if="Boolean(rsForm.request_order)"
+            v-show="!Boolean(rsForm.request_order && rsForm.request_order.order_mode == 'ACCUMULATE')"
             @click="setDialogRequestOrder(rsForm.request_order)"
           />
         </ux-select>
@@ -237,7 +239,9 @@
           :error-message="errors.first(`partitions.${partitionIndex}.request_order_id`)"
           @input="(v) => setRequestOrder(v, partitionIndex)"
         >
-          <q-btn slot="after" dense flat icon="open_in_new" color="blue-grey"  v-if="Boolean(partition.request_order)"
+          <q-btn slot="after" dense flat icon="open_in_new" color="blue-grey"
+            v-if="Boolean(partition.request_order)"
+            v-show="!Boolean(partition.request_order && partition.request_order.order_mode == 'ACCUMULATE')"
             @click="setDialogRequestOrder(partition.request_order, partitionIndex)"
           />
         </ux-select>
