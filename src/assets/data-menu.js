@@ -223,6 +223,7 @@ const deliveries = [
       // {page: 'form', path: 'create', meta: {mode: 'create', permission: 'delivery-orders-create'}},
       // {page: 'form', path: ':id/edit', meta: {mode: 'edit', permission: 'delivery-orders-update'}},
       { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
+      { page: 'revision-internal', path: ':id/revision-internal', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
       { page: 'reconcile', path: ':id/reconcile', meta: { mode: 'edit', permission: 'sj-delivery-orders-create' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'sj-delivery-orders-read' } }
     ]

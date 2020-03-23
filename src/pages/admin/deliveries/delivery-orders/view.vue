@@ -264,6 +264,7 @@ export default {
     },
     IS_REVISE() {
       if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'OPEN') return false
       return true
     },
     IS_VOID() {
@@ -301,7 +302,8 @@ export default {
       this.rsView =  data
     },
     setRevision() {
-      this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/revision`)
+      const page = this.rsView.is_internal ? 'revision-internal' : 'revision'
+      this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/${page}`)
     },
     setReconciliation() {
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/reconcile`)
