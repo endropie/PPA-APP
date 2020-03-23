@@ -20,7 +20,7 @@
 
             <div class="column" >
               <div class="row q-col-gutter-xs q-pb-xs">
-                <ux-select-filter class="col" style="min-width:150px"
+                <ux-select class="col-auto"
                   name="line_id"
                   v-model="FILTERABLE.fill.line_id.value" clearable
                   :label="$tc('items.preline')" stack-label
@@ -29,10 +29,21 @@
                   standout="bg-blue-grey-5 text-white"
                   :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
                   :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                  filter emit-value map-options
                   :options="LineOptions"
-                  @input="FILTERABLE.submit" />
+                  @input="FILTERABLE.submit" >
+                <q-checkbox slot="before"
+                  class="text-caption"
+                  left-label label="MAIN"
+                  v-model="FILTERABLE.fill.ismain.value"
+                  :true-value="1"
+                  :false-value="0"
+                  @input="FILTERABLE.submit"
+                />
 
-                <q-select class="col" style="min-width:120px"
+                </ux-select>
+
+                <q-select class="col" style="min-width:150px"
                   label="Stockist"
                   v-model="FILTERABLE.fill.stockist_from.value" clearable
                   :options="stockist_options" map-options emit-value
@@ -149,6 +160,12 @@
           </span>
         </q-td>
 
+        <q-td slot="body-cell-line_id" slot-scope="rs" :props="rs" style="width:35px">
+          <span v-if="rs">
+            {{rs.value}} <q-badge v-if="!rs.row.ismain" color="blue-grey" label="Subline" />
+          </span>
+        </q-td>
+
         <template v-slot:bottom-row>
           <q-tr class="bg-blue-grey-2 text-weight-medium">
             <q-td key="prefix" colspan="3"></q-td>
@@ -190,6 +207,11 @@ export default {
         fill: {
           line_id: {
             value: null,
+            type: 'integer',
+            transform: (value) => { return null }
+          },
+          ismain: {
+            value: 1,
             type: 'integer',
             transform: (value) => { return null }
           },
@@ -238,7 +260,7 @@ export default {
           { name: 'item', label: this.$tc('items.part_name'), field: 'part_name', align: 'left'},
           { name: 'quantity', label: this.$tc('label.quantity'), field: (rs)=> rs.work_order_item.quantity, align: 'right', sortable: true },
           { name: 'unit', label: this.$tc('label.unit'), field: (rs)=> rs.work_order_item.unit.code , align: 'left'},
-          { name: 'line_id', label: 'Main Line', field: (rs)=> rs.line.name , align: 'left', sortable: true },
+          { name: 'line_id', label: 'Line Production', field: (rs)=> rs.line.name , align: 'left', sortable: true },
           { name: 'shift_id', label: 'Shift', field: (rs)=> rs.work_order_item.work_order.shift.name , align: 'center', sortable: true },
           { name: 'stockist', label:(rs)=> rs.work_order_item.work_order.stockist_from, align: 'left'},
         ]
