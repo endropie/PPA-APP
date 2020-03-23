@@ -296,7 +296,9 @@ export default {
         if (olditems.some(x => x === item.id)) return true
         if (item.customer_id !== this.rsForm.customer_id) return false
         if (this.rsForm.order_mode == 'PO') return true
-        return ((Number(item.totals['*']) - (Number(item.totals['PDO.REG']) + Number(item.totals['PDO.RET']))) > 0)
+        const PDO = Number(item.totals['PDO.REG']) > 0 ? Number(item.totals['PDO.REG']) : 0
+                  + Number(item.totals['PDO.RET']) > 0 ? Number(item.totals['PDO.RET']) : 0
+        return ((Number(item.totals['*']) - PDO) > 0)
       })
 
       return (data.map(item => ({
@@ -332,49 +334,26 @@ export default {
         }
       }
 
-      this.FORM.data.pre_delivery_items.forEach(item => {
-        if (stockItem.hasOwnProperty(item.item_id)) {
-          stockItem[item.item_id][STOCKIST] -= Number(item.unit_amount)
+      let oldItem = {}
+
+      this.FORM.data.pre_delivery_items.forEach(detail => {
+        if (stockItem.hasOwnProperty(detail.item_id)) {
+          if (!stockItem[detail.item_id]['OLD']) stockItem[detail.item_id]['OLD'] = 0
+          stockItem[detail.item_id]['OLD'] += Number(detail.unit_amount)
         }
       })
 
       let data = {}
       this.rsForm.pre_delivery_items.map((detail, index) => {
         if (stockItem[detail.item_id] && detail.item_id) {
-          const stockin = Number(stockItem[detail.item_id]['*'])
-                        - Number(stockItem[detail.item_id]['PDO.REG'])
-                        - Number(stockItem[detail.item_id]['PDO.RET'])
+          const stockin =
+            Number(stockItem[detail.item_id]['*']) > 0 ? Number(stockItem[detail.item_id]['*']) : 0
+            + Number(stockItem[detail.item_id]['OLD'] || 0)
+            - Number(stockItem[detail.item_id]['PDO.REG']) > 0 ? Number(stockItem[detail.item_id]['PDO.REG']) : 0
+            - Number(stockItem[detail.item_id]['PDO.RET']) > 0 ? Number(stockItem[detail.item_id]['PDO.RET']) : 0
           data[index] = stockin - Number(moveItem.get(detail.item_id) || 0)
           moveItem.set(detail.item_id, detail.quantity)
         }
-      })
-
-      return data
-    },
-    MaxStock() {
-      let stockItem =  JSON.parse(JSON.stringify(this.MAPINGKEY['itemstocks']))
-      let moveItem = {
-        set: function (id, val) {
-          if (!this.hasOwnProperty(id)) this[id] = 0
-            this[id] += Number(val)
-        },
-        get: function (id) {
-          return this.hasOwnProperty(id) ? this[id] : 0
-        }
-      }
-      this.FORM.data.pre_delivery_items.forEach(item => {
-        if (stockItem.hasOwnProperty(item.item_id)) {
-          stockItem[item.item_id]['PRE'] += Number(item.quantity)
-        }
-      })
-
-      let data = {}
-      this.rsForm.pre_delivery_items.map((detail, index) => {
-        if (stockItem[detail.item_id] && detail.item_id) {
-          data[index] = Number(stockItem[detail.item_id]['PRE'] || 0) - Number(moveItem.get(detail.item_id) || 0)
-          moveItem.set(detail.item_id, detail.quantity)
-        }
-
       })
 
       return data
