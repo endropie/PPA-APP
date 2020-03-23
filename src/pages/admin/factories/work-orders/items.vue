@@ -32,7 +32,7 @@
                   filter emit-value map-options
                   :options="LineOptions"
                   @input="FILTERABLE.submit" >
-                <q-checkbox slot="before"
+                <q-checkbox slot="prepend"
                   class="text-caption"
                   left-label label="MAIN"
                   v-model="FILTERABLE.fill.ismain.value"
