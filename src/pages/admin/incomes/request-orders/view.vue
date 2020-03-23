@@ -49,11 +49,12 @@
           <q-markup-table dense bordered separator="cell" class="no-shadow no-highlight"  :dark="LAYOUT.isDark">
             <thead>
             <q-tr style="line-height:25px">
-              <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th>{{ $tc('label.unit') }}</q-th>
-              <q-th>{{ $tc('label.quantity') }}</q-th>
-              <q-th>{{ $tc('general.delivery') }}</q-th>
+              <q-th width="25%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th width="25%">{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th width="10%">{{ $tc('label.unit') }}</q-th>
+              <q-th width="15%">{{ $tc('label.quantity') }}</q-th>
+              <q-th width="15%">{{ $tc('label.send') }}</q-th>
+              <q-th width="15%">{{ $tc('label.balance') }}</q-th>
             </q-tr>
             </thead>
             <tbody>
@@ -61,8 +62,16 @@
               <q-td>{{row.item.part_name}}</q-td>
               <q-td>{{row.item.part_number}}</q-td>
               <q-td class="text-center">{{row.unit.code}}</q-td>
-              <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
-              <q-td class="text-right">{{$app.number_format(row.amount_delivery)}}</q-td>
+              <q-td class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
+              <q-td class="text-right">{{$app.number_format(row.amount_delivery/(row.unit_rate||1),0)}}</q-td>
+              <q-td class="text-right">
+                <div v-if="Math.round(row.quantity - row.amount_delivery/(row.unit_rate||1)) > 0">
+                  {{$app.number_format((row.quantity - row.amount_delivery/(row.unit_rate||1)),0)}}
+                </div>
+                <div v-else class="text-center">
+                  -
+                </div>
+              </q-td>
             </q-tr>
             </tbody>
           </q-markup-table>
