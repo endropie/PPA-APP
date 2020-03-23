@@ -13,6 +13,10 @@
               label="SEMI-DELIVERY"
               color="orange"
               v-else>
+              <q-tooltip>
+                TOTAL:{{Math.round(rsView.total_unit_amount) }}
+                DELIVERED:{{ Math.round(rsView.total_unit_delivery)}}
+              </q-tooltip>
             </q-chip>
         </span>
       </div>
@@ -46,7 +50,7 @@
           </div>
         </div>
         <div class="col-12">
-          <q-markup-table dense bordered separator="cell" class="no-shadow no-highlight"  :dark="LAYOUT.isDark">
+          <q-markup-table dense bordered square separator="cell" class="table-print no-shadow no-highlight"  :dark="LAYOUT.isDark">
             <thead>
             <q-tr style="line-height:25px">
               <q-th width="30%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
