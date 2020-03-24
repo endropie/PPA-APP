@@ -114,6 +114,7 @@
                   :loading="SHEET['items'].loading" >
                   <small v-if="row.item.part_number" class="absolute-bottom">[{{row.item.customer_code}}] {{row.item.part_number}}</small>
                 </ux-select>
+                ({{row.request_order_item_id}})
 
               </q-td>
               <q-td key="quantity" width="25%">
@@ -328,9 +329,8 @@ export default {
   },
   computed: {
     IS_EDITABLE() {
-      if (!this.rsForm.hasOwnProperty('revise_id')) return false
-
-      return !this.rsForm.revise_id
+      if (this.rsForm.deleted_at) return false
+      return true
     },
     ISTO_RECONCILED() {
       if (this.reconcile || !this.reconcile.delivery_order_items.length) return false
