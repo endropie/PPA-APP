@@ -101,9 +101,15 @@
                     v-model="remain_only"
                     :true-value="true" :false-value="false"
                     class="print-hide align-end"
-                    >
-                  </q-checkbox>
+                  />
                   <span class="text-weight-medium print-only" v-if="remain_only">(REMAINIG)</span>
+                </div>
+                <div>
+                  <q-checkbox left-label color="blue-grey" label="UNIT [PCS-KG]"
+                    v-model="isDoubleUnit"
+                    :true-value="true" :false-value="false"
+                    class="print-hide align-end"
+                  />
                 </div>
               </div>
             </div>
@@ -114,10 +120,11 @@
               class="table-print no-shadow no-highlight th-uppercase">
               <thead>
               <q-tr>
-                <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-                <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
-                <q-th>{{ $tc('label.unit') }}</q-th>
-                <q-th>{{ $tc('label.quantity') }}</q-th>
+                <q-th class="text-left">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+                <q-th key="PCS" class="text-right" v-if="isDoubleUnit">Unit (PCS)</q-th>
+                <q-th key="KG" class="text-right" v-if="isDoubleUnit">Unit (KG)</q-th>
+                <q-th class="text-right" v-if="!isDoubleUnit">{{ $tc('label.quantity') }}</q-th>
+                <q-th class="text-left" width="10%" v-if="!isDoubleUnit">{{ $tc('label.unit') }}</q-th>
                 <q-th v-if="rsView.is_internal && !remain_only" class="print-hide">Reconcile</q-th>
                 <q-th>{{ $tc('label.encasement') }}</q-th>
               </q-tr>
@@ -129,15 +136,21 @@
                     <span class="text-weight-medium" v-if="Boolean(mode)">{{mode}}:&nbsp;</span>
                     <span class="text-weight-medium" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">Material:&nbsp;</span>
                     {{row.item.part_name}}
+                    <span v-if="row.item.part_name != row.item.part_number"> [No. {{row.item.part_number}}] </span>
                   </q-td>
-                  <q-td>{{row.item.part_number}}</q-td>
-                  <q-td class="text-center">{{row.unit.code}}</q-td>
-                  <q-td class="text-right">
+                  <q-td key="PCS" v-if="isDoubleUnit" class="text-right">
+                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
+                  </q-td>
+                  <q-td key="KG" v-if="isDoubleUnit" class="text-right">
+                    {{!valKG(row) ? '' : $app.number_format(valKG(row),0) + ' KG'}}
+                  </q-td>
+                  <q-td key="quantity" v-if="!isDoubleUnit" class="text-right">
                     <span v-if="rsView.is_internal && remain_only">
                       {{$app.number_format(Number(row.quantity) - (row.amount_reconcile / (row.unit_rate||1)),0)}}
                     </span>
                     <span v-else>{{$app.number_format(row.quantity,0)}}</span>
                   </q-td>
+                  <q-td key="unit" v-if="!isDoubleUnit" class="text-left">{{row.unit.code}}</q-td>
                   <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only">
                     {{$app.number_format(row.amount_reconcile,0)}}
                   </q-td>
@@ -170,11 +183,16 @@
                   v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
                   <q-td>
                     <span class="text-weight-medium">Jasa:&nbsp;</span>
-                    {{row.item.part_name}}
+                    {{row.item.part_name}} [No. {{row.item.part_number}}]
                   </q-td>
-                  <q-td>{{row.item.part_number}}</q-td>
-                  <q-td class="text-center">{{row.unit.code}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
+                  <q-td key="PCS" v-if="isDoubleUnit" class="text-right">
+                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
+                  </q-td>
+                  <q-td key="KG" v-if="isDoubleUnit" class="text-right">
+                    {{!valKG(row) ? '' : $app.number_format(valKG(row),0) + ' KG'}}
+                  </q-td>
+                  <q-td class="text-right" v-if="!isDoubleUnit">{{$app.number_format(row.quantity,0)}}</q-td>
+                  <q-td class="text-left" v-if="!isDoubleUnit">{{row.unit.code}}</q-td>
                   <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only"></q-td>
                   <q-td></q-td>
                 </q-tr>
@@ -241,7 +259,8 @@ export default {
         }
       },
       rsView: {},
-      remain_only: true
+      remain_only: true,
+      isDoubleUnit: false,
     }
   },
   created() {
@@ -290,6 +309,30 @@ export default {
     },
     isRowMain(row) {
       return this.IS_MAINROW || Math.round(row.unit_amount) !== Math.round(row.amount_reconcile)
+    },
+    valPCS(row) {
+      if (row.unit_id === 1) {
+        return Number(row.unit_amount)
+      }
+      else if (row.item && row.item.item_units) {
+        const find = row.item.item_units.find(u => u.unit_id === 1)
+        if (find) {
+          return (Number(row.unit_amount) / Number(find.rate||1))
+        }
+      }
+      return null
+    },
+    valKG(row) {
+      if (row.unit_id === 2) {
+        return Number(row.unit_amount)
+      }
+      else if (row.item && row.item.item_units) {
+        const find = row.item.item_units.find(u => u.unit_id === 2)
+        if (find) {
+          return (Number(row.unit_amount) / Number(find.rate||1))
+        }
+      }
+      return null
     },
     getBaseUnit(detail) {
       if(detail.unit_rate == 1) return ''
