@@ -46,7 +46,7 @@
                   <tr><td>{{$tc('label.no', 1, {v:'PO'})}}</td><td>{{rsView.reference_number}}</td></tr>
                 </tbody>
               </q-markup-table>
-              <q-checkbox  dense left-label v-model="show_summary" label="SUMMARY ACCUMULATE" v-if="rsView.order_mode == 'ACCUMULATE'" />
+              <q-checkbox  dense left-label v-model="show_summary" label="SUMMARY ACCUMULATE" class="print-hide" v-if="rsView.order_mode == 'ACCUMULATE'" />
             </div>
           </div>
         </div>
