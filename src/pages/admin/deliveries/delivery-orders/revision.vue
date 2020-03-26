@@ -367,7 +367,7 @@
       <q-space/>
       <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()"></q-btn>
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
-      <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()" v-if="IS_EDITABLE"></q-btn>
+      <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()" v-if="IS_REVISE"></q-btn>
     </q-card-actions>
   </q-card>
   <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark">
@@ -493,9 +493,10 @@ export default {
 
   },
   computed: {
-    IS_EDITABLE() {
+    IS_REVISE() {
       if (this.rsForm.deleted_at) return false
-      if (this.rsForm.status != 'OPEN') return false
+      if (this.rsForm.is_internal) return false
+      if (this.rsForm.reconcile_id && this.rsForm.status !== 'OPEN') return false
       return true
     },
     UnitOptions() {

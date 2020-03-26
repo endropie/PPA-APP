@@ -264,7 +264,8 @@ export default {
     },
     IS_REVISE() {
       if (this.rsView.deleted_at) return false
-      if (this.rsView.status !== 'OPEN') return false
+      if (this.rsView.status !== 'OPEN' && this.rsView.is_internal) return false
+      if (this.rsView.status !== 'OPEN' && this.rsView.reconcile_id) return false
       return true
     },
     IS_VOID() {
