@@ -38,14 +38,15 @@
                 </tbody>
               </q-markup-table>
             </div>
-            <div class="row items-start q-gutter-sm">
-              <q-markup-table dense square bordered class="super-dense no-shadow text-subtitle2" separator="cell" :dark="LAYOUT.isDark">
+            <div class="column items-start q-gutter-sm">
+              <q-markup-table dense square bordered class="super-dense no-shadow " separator="cell" :dark="LAYOUT.isDark">
                 <tbody>
                   <tr><td>{{$tc('label.number')}}</td><td>{{rsView.fullnumber || rsView.number}}</td></tr>
                   <tr><td>{{$tc('label.date')}}</td><td>{{ $app.date_format(rsView.date) }}</td></tr>
                   <tr><td>{{$tc('label.no', 1, {v:'PO'})}}</td><td>{{rsView.reference_number}}</td></tr>
                 </tbody>
               </q-markup-table>
+              <q-checkbox  dense left-label v-model="show_summary" label="SUMMARY ACCUMULATE" v-if="rsView.order_mode == 'ACCUMULATE'" />
             </div>
           </div>
         </div>
@@ -62,21 +63,40 @@
             </q-tr>
             </thead>
             <tbody>
-            <q-tr v-for="(row, index) in rsView.request_order_items" :key="index" :request-order-item-id="row.id">
-              <q-td>{{row.item.part_name}}</q-td>
-              <q-td>{{row.item.part_number}}</q-td>
-              <q-td class="text-center">{{row.unit.code}}</q-td>
-              <q-td class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
-              <q-td class="text-right">{{$app.number_format(row.amount_delivery/(row.unit_rate||1),0)}}</q-td>
-              <q-td class="text-right">
-                <div v-if="Math.round(row.quantity - row.amount_delivery/(row.unit_rate||1)) > 0">
-                  {{$app.number_format((row.quantity - row.amount_delivery/(row.unit_rate||1)),0)}}
-                </div>
-                <div v-else class="text-center">
-                  -
-                </div>
-              </q-td>
-            </q-tr>
+              <template v-if="IS_ITEM_SUMMARY">
+                <q-tr v-for="(row, index) in SUM_ITEMS" :key="index">
+                  <q-td>{{row.item.part_name}}</q-td>
+                  <q-td>{{row.item.part_number}}</q-td>
+                  <q-td class="text-center">{{row.item.unit.code}}</q-td>
+                  <q-td class="text-right">{{$app.number_format(row.unit_amount,0)}}</q-td>
+                  <q-td class="text-right">{{$app.number_format(row.amount_delivery,0)}}</q-td>
+                  <q-td class="text-right">
+                    <div v-if="Math.round(row.unit_amount - row.amount_delivery) > 0">
+                      {{$app.number_format((row.unit_amount - row.amount_delivery),0)}}
+                    </div>
+                    <div v-else class="text-center">
+                      -
+                    </div>
+                  </q-td>
+                </q-tr>
+              </template>
+              <template v-else>
+                <q-tr v-for="(row, index) in rsView.request_order_items" :key="index" :request-order-item-id="row.id">
+                  <q-td>{{row.item.part_name}}</q-td>
+                  <q-td>{{row.item.part_number}}</q-td>
+                  <q-td class="text-center">{{row.unit.code}}</q-td>
+                  <q-td class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
+                  <q-td class="text-right">{{$app.number_format(row.amount_delivery/(row.unit_rate||1),0)}}</q-td>
+                  <q-td class="text-right">
+                    <div v-if="Math.round(row.quantity - row.amount_delivery/(row.unit_rate||1)) > 0">
+                      {{$app.number_format((row.quantity - row.amount_delivery/(row.unit_rate||1)),0)}}
+                    </div>
+                    <div v-else class="text-center">
+                      -
+                    </div>
+                  </q-td>
+                </q-tr>
+              </template>
             </tbody>
           </q-markup-table>
         </div>
@@ -200,6 +220,7 @@ export default {
       },
       rsView: {},
       show_delivery: false,
+      show_summary: true
     }
   },
   created() {
@@ -210,7 +231,6 @@ export default {
   },
   computed: {
     IS_CLOSE() {
-      // if (this.rsView.order_mode === 'NONE') return false
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
       return true
@@ -230,6 +250,27 @@ export default {
 
       return true
     },
+    IS_ITEM_SUMMARY() {
+      if (this.rsView.order_mode !== 'ACCUMULATE') return false
+      return this.show_summary
+    },
+    SUM_ITEMS() {
+      let data = []
+      this.rsView.request_order_items.map((detail) => {
+        const index = data.findIndex(x => {
+          return x.item_id == detail.item_id
+        })
+        if (index > -1) {
+          data[index].unit_amount += detail.unit_amount
+          data[index].amount_delivery += detail.amount_delivery
+          data[index].quantity += detail.quantity
+        }
+        else {
+          data.push(JSON.parse(JSON.stringify(detail)))
+        }
+      })
+      return data
+    }
   },
   methods: {
     init() {
