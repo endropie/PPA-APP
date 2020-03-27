@@ -87,7 +87,7 @@
               <q-th key="KG" class="text-right" v-if="isDoubleUnit">Unit (KG)</q-th>
               <q-th class="text-right" v-if="!isDoubleUnit">{{ $tc('label.quantity') }}</q-th>
               <q-th class="text-left" width="10%" v-if="!isDoubleUnit">{{ $tc('label.unit') }}</q-th>
-              <q-th v-if="rsView.is_internal && !remain_only" class="print-hide">Reconcile</q-th>
+              <q-th v-if="rsView.is_internal && !remain_only && !isDoubleUnit" class="print-hide">Reconcile</q-th>
               <q-th>{{ $tc('label.encasement') }}</q-th>
             </q-tr>
             </thead>
@@ -115,7 +115,7 @@
                   <span v-else>{{$app.number_format(row.quantity,0)}}</span>
                 </q-td>
                 <q-td key="unit" v-if="!isDoubleUnit" class="text-left">{{row.unit.code}}</q-td>
-                <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only">
+                <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only && !isDoubleUnit">
                   {{$app.number_format(row.amount_reconcile,0)}}
                 </q-td>
                 <q-td>
@@ -160,7 +160,7 @@
                 </q-td>
                 <q-td class="text-right" v-if="!isDoubleUnit">{{$app.number_format(row.quantity,0)}}</q-td>
                 <q-td class="text-left" v-if="!isDoubleUnit">{{row.unit.code}}</q-td>
-                <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only"></q-td>
+                <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only && !isDoubleUnit"></q-td>
                 <q-td></q-td>
               </q-tr>
             </tbody>

@@ -114,8 +114,6 @@
                   :loading="SHEET['items'].loading" >
                   <small v-if="row.item.part_number" class="absolute-bottom">[{{row.item.customer_code}}] {{row.item.part_number}}</small>
                 </ux-select>
-                ({{row.request_order_item_id}})
-
               </q-td>
               <q-td key="quantity" width="25%">
                 <q-input type="number" style="min-width:120px"

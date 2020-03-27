@@ -86,14 +86,32 @@
         </q-td>
 
         <q-td slot="body-cell-customer_id" slot-scope="rs" :props="rs">
-          <span v-if="rs.row.customer"> {{ rs.row.customer.name }}</span>
-          <span v-else>- undifined -</span>
+          <div class="column">
+            <span v-if="rs.row.customer"> {{ rs.row.customer.name }}</span>
+            <span v-else>- undifined -</span>
+            <small class="text-blue-grey" v-if="rs.row.fullnumber_index">INDEX: {{rs.row.fullnumber_index}}</small>
+          </div>
         </q-td>
 
         <q-td slot="body-cell-number" slot-scope="rs" :props="rs">
           <span v-if="rs.row.number" class="column text-weight-medium" :class="{'text-strike text-faded': rs.row.status == 'REVISED'}">
             <span>{{ rs.row.fullnumber || rs.row.number }}</span>
-            <small class="text-grey" v-if="rs.row.reconcile_number">REC.{{rs.row.reconcile_number}}</small>
+            <!-- <small  class="text-blue-grey" v-if="rs.row.reconcile_number"> -->
+              <!-- REC.{{rs.row.reconcile_number}} -->
+            <!-- </small> -->
+            <div>
+              <q-btn flat dense color="blue-grey" size="sm" class="text-caption" style="line-height:normal"
+                :label="`REC.${rs.row.reconcile_number}`"
+                :to="`${TABLE.resource.uri}/${rs.row.reconcile_id}`"
+                v-if="rs.row.reconcile_id"
+              />
+              <q-btn flat dense color="blue-grey" size="sm" class="text-caption" style="line-height:normal"
+                :label="`REV.${rs.row.fullnumber_revise}`"
+                :to="`${TABLE.resource.uri}/${rs.row.revise_id}`"
+                v-if="rs.row.revise_id"
+              />
+            </div>
+
           </span>
           <span v-else>- undifined -</span>
         </q-td>
@@ -151,6 +169,8 @@ export default {
       },
       FILTERABLE: {
         fill: {
+          // reconcile_id: { value: null, type: 'integer' },
+          // revise_id: { value: null, type: 'integer' },
           customer_id: {
             value: null,
             type: 'integer',
@@ -178,10 +198,10 @@ export default {
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true,
             format:(v)=> v ? this.$app.moment(v).format('DD/MM/YYYY') : '-', classes: 'text-uppercase'},
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left' },
+          { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
           { name: 'status', label: '', field: 'status', align: 'center', },
           { name: 'persentase', label: '', align: 'center', },
           { name: 'transaction', label: this.$tc('label.transaction'), field: 'transaction', align: 'center', sortable: true },
-          { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
           { name: 'created_at', label: this.$tc('form.create',2), field:'created_at', align: 'center' },
         ],
         rowData:[],
