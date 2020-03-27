@@ -53,7 +53,7 @@
                   {{$tc(`general.schedule_board`, 2)}}
                 </div>
                 <div class="schedule-time">
-                  {{$app.moment().format('dddd, DD MMMM YYYY hh:mm')}}
+                  {{$app.moment().format('dddd, DD MMMM YYYY ')}}
                 </div>
               </div>
             </template>

@@ -154,7 +154,7 @@
             </span>
             <small v-if="rs.row.created_at" class="text-grey">
               <q-icon name="mdi-calendar-clock"></q-icon>
-              {{ $app.moment(rs.row.created_at).format('DD/MM/YYYY hh:mm') }}
+              {{ $app.moment(rs.row.created_at).format('DD/MM/YYYY HH:mm') }}
               <q-tooltip>{{ $app.moment(rs.row.created_at).fromNow() }}</q-tooltip>
             </small>
           </div>
