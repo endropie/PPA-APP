@@ -82,6 +82,7 @@
             <thead>
             <q-tr>
               <q-th class="text-left">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th class="text-left">{{ $tc('label.no', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th key="PCS" class="text-right" v-if="isDoubleUnit">Unit (PCS)</q-th>
               <q-th key="KG" class="text-right" v-if="isDoubleUnit">Unit (KG)</q-th>
               <q-th class="text-right" v-if="!isDoubleUnit">{{ $tc('label.quantity') }}</q-th>
@@ -96,8 +97,10 @@
                 <q-td>
                   <span class="text-weight-medium" v-if="Boolean(mode)">{{mode}}:&nbsp;</span>
                   <span class="text-weight-medium" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">Material:&nbsp;</span>
-                  {{row.item.part_name}}
-                  <span v-if="row.item.part_name != row.item.part_number"> [No. {{row.item.part_number}}] </span>
+                  <span v-if="row.item"> {{row.item.part_name}} </span>
+                </q-td>
+                <q-td>
+                  <span v-if="row.item"> {{row.item.part_number}} </span>
                 </q-td>
                 <q-td key="PCS" v-if="isDoubleUnit" class="text-right">
                   {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
@@ -144,7 +147,10 @@
                 v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
                 <q-td>
                   <span class="text-weight-medium">Jasa:&nbsp;</span>
-                  {{row.item.part_name}} [No. {{row.item.part_number}}]
+                  <span v-if="row.item"> {{row.item.part_name}} </span>
+                </q-td>
+                <q-td>
+                  <span v-if="row.item"> {{row.item.part_number}} </span>
                 </q-td>
                 <q-td key="PCS" v-if="isDoubleUnit" class="text-right">
                   {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
