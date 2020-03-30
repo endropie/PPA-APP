@@ -1,249 +1,457 @@
 <template>
-  <q-page padding class="column justify-start items-center q-gutter-sm"  v-if="VIEW.show">
-    <page-print :dark="LAYOUT.isDark" style="min-width:75%" :class="{'multi-page':getArrayPage(rsView.customer).length > 1}"
-      v-for="(mode, pi) in getArrayPage(rsView.customer)" :key="pi">
-      <div slot="header-tags" class="column no-wrap items-end">
-        <div class="print-hide no-padding">
-          <ux-chip-status :row="rsView" tag outline dense square icon='bookmark' class="no-margin" />
-          <!-- <q-chip tag outline small square color="orange-10" class="text-uppercase" :label="$tc('form.temporary')" v-if="rsView.is_internal" /> -->
-        </div>
-        <div class="text-subtitle2 text-weight-bold text-uppercase text-center on-right">
-          <span v-if="rsView.is_internal">{{$tc('general.sj_internal',2)}}</span>
-          <span v-else>{{$tc('general.sj_delivery',2)}} {{rsView.transaction}}</span>
-        </div>
-      </div>
-      <div class="column" style="min-height:11cm;height:auto">
-        <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
-          <div class="on-left" style="max-width:50%">
-            <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
-            <address class="text-weight-light">{{rsView.customer_address}}</address>
-            <div class="text-weight-medium" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
-            <div class="text-weight-medium" v-if="rsView.vehicle">{{$tc('label.transport')}}: {{rsView.vehicle.number}}</div>
+  <q-page padding class="column justify-start items-center"  v-if="VIEW.show">
+    <div class="column q-gutter-y-sm" style="min-width:75%" v-if="VIEW.show">
+
+      <q-card :dark="LAYOUT.isDark"
+        class="no-shadow no-margin print-hide modal-hide q-pt-sm"
+        style="position:sticky;top:50px">
+        <q-card-actions class="q-gutter-xs no-padding" align="right">
+          <q-btn :label="$tc('form.list')" icon="list"  color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
+          <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
+          <q-space />
+          <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" class="self-end"
+            :options="[
+              { label: $tc('form.confirm').toUpperCase(), color:'green', icon: 'done_all',
+                detail: $tc('messages.process_confirm'),
+                hidden: !IS_CONFIRM || !$app.can('sj-delivery-orders-confirm'),
+                actions: () => {
+                  setConfirmation()
+                }
+              },
+              { label: $tc('form.revision').toUpperCase(), color:'orange', icon: 'save',
+                detail: $tc('messages.process_revise'),
+                hidden: !IS_REVISE || !$app.can('sj-delivery-orders-revision'),
+                actions: () => {
+                  setRevision()
+                }
+              },
+              { label: $tc('form.reconciliation').toUpperCase(), color:'indigo-10', icon: 'swap_horiz',
+                detail: $tc('messages.process_reconcile'),
+                hidden: !IS_RECON || !$app.can('sj-delivery-orders-create'),
+                actions: () => {
+                  setReconciliation()
+                }
+              },
+              { label: 'VOID', color:'red', icon: 'block',
+                detail: $tc('messages.process_void'),
+                hidden: !IS_VOID || !$app.can('sj-delivery-orders-void'),
+                actions: () => {
+                  VIEW.void(()=> init() )
+                }
+              }
+            ]"
+          />
+        </q-card-actions>
+      </q-card>
+
+      <page-print :dark="LAYOUT.isDark" :class="{'multi-page':getArrayPage(rsView.customer).length > 1}"
+        v-for="(mode, pi) in getArrayPage(rsView.customer)" :key="pi">
+        <div slot="header-tags" class="column no-wrap items-end">
+          <div class="print-hide no-padding">
+            <ux-chip-status :row="rsView" tag outline dense square icon='bookmark' class="no-margin" />
+            <!-- <q-chip tag outline small square color="orange-10" class="text-uppercase" :label="$tc('form.temporary')" v-if="rsView.is_internal" /> -->
           </div>
-          <q-space/>
-          <div class="">
-            <div class="row no-wrap  q-gutter-x-xs items-start">
-              <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
-                class="table-print super-dense no-shadow no-highlight th-uppercase">
-                <tbody>
-                  <tr>
-                    <td>{{$tc('label.number')}}</td>
-                    <td>{{ rsView.fullnumber || rsView.number }}{{(String(mode).toUpperCase() === 'JASA' ? 'A' : '')}}</td>
-                  </tr>
-                  <tr>
-                    <td>{{$tc('label.date')}}</td>
-                    <td>{{$app.date_format(rsView.date)}}</td>
-                  </tr>
-                  <tr v-if="rsView.reconcile_number">
-                    <td>{{$tc('form.reconciliation')}}</td>
-                    <td>{{rsView.reconcile_number}}</td>
-                  </tr>
-                </tbody>
-              </q-markup-table>
-              <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
-                class="table-print super-dense no-shadow no-highlight th-uppercase"
-                v-if="!rsView.is_internal">
-                <tbody>
-                  <tr>
-                    <td>No. SO</td>
-                    <td>{{ rsView.request_order ? (rsView.request_order.fullnumber || rsView.request_order.number) : '-' }}</td>
-                  </tr>
-                  <tr>
-                    <td>REF. PO/SJ</td>
-                    <td>{{ rsView.request_order ? rsView.request_order.reference_number : '-' }}</td>
-                  </tr>
-                </tbody>
-              </q-markup-table>
-            </div>
-            <div class="row">
-              <q-space/>
-              <div v-if="rsView.is_internal">
-                <q-checkbox left-label color="blue-grey" label="REMAINIG"
-                  v-model="remain_only"
-                  :true-value="true" :false-value="false"
-                  class="print-hide align-end"
-                />
-                <span class="text-weight-medium print-only" v-if="remain_only">(REMAINIG)</span>
-              </div>
-              <div>
-                <q-checkbox left-label color="blue-grey" label="UNIT [PCS-KG]"
-                  v-model="isDoubleUnit"
-                  :true-value="true" :false-value="false"
-                  class="print-hide align-end"
-                />
-              </div>
-            </div>
+          <div class="text-subtitle2 text-weight-bold text-uppercase text-center on-right">
+            <span v-if="rsView.is_internal">{{$tc('general.sj_internal',2)}}</span>
+            <span v-else>{{$tc('general.sj_delivery',2)}} {{rsView.transaction}}</span>
           </div>
         </div>
-        <div>
-          <q-markup-table dense bordered square separator="cell"
-            :dark="LAYOUT.isDark"
-            class="table-print no-shadow no-highlight th-uppercase">
-            <thead>
-            <q-tr>
-              <q-th class="text-left">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th class="text-left">{{ $tc('label.no', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th key="PCS" class="text-right" v-if="isDoubleUnit">Unit (PCS)</q-th>
-              <q-th key="KG" class="text-right" v-if="isDoubleUnit">Unit (KG)</q-th>
-              <q-th class="text-right" v-if="!isDoubleUnit">{{ $tc('label.quantity') }}</q-th>
-              <q-th class="text-left" width="10%" v-if="!isDoubleUnit">{{ $tc('label.unit') }}</q-th>
-              <q-th v-if="rsView.is_internal && !remain_only && !isDoubleUnit" class="print-hide">Reconcile</q-th>
-              <q-th>{{ $tc('label.encasement') }}</q-th>
-            </q-tr>
-            </thead>
-            <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
-              <q-tr :delivery-order-item-id="row.id"
-                v-show="isRowMain(row)" >
-                <q-td>
-                  <span class="text-weight-medium" v-if="Boolean(mode)">{{mode}}:&nbsp;</span>
-                  <span class="text-weight-medium" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">Material:&nbsp;</span>
-                  <span v-if="row.item"> {{row.item.part_name}} </span>
-                </q-td>
-                <q-td>
-                  <span v-if="row.item"> {{row.item.part_number}} </span>
-                </q-td>
-                <q-td key="PCS" v-if="isDoubleUnit" class="text-right">
-                  {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
-                </q-td>
-                <q-td key="KG" v-if="isDoubleUnit" class="text-right">
-                  {{!valKG(row) ? '' : $app.number_format(valKG(row),0) + ' KG'}}
-                </q-td>
-                <q-td key="quantity" v-if="!isDoubleUnit" class="text-right">
-                  <span v-if="rsView.is_internal && remain_only">
-                    {{$app.number_format(Number(row.quantity) - (row.amount_reconcile / (row.unit_rate||1)),0)}}
-                  </span>
-                  <span v-else>{{$app.number_format(row.quantity,0)}}</span>
-                </q-td>
-                <q-td key="unit" v-if="!isDoubleUnit" class="text-left">{{row.unit.code}}</q-td>
-                <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only && !isDoubleUnit">
-                  {{$app.number_format(row.amount_reconcile,0)}}
-                </q-td>
-                <q-td>
-                  <div class="row cursor-pointer">
-                    <span>{{row.encasement}}</span>
-                    <template v-if="String(mode).toUpperCase() !== 'JASA' && rsView.status === 'OPEN'">
-                      <q-popup-edit v-model="row.encasement" content-class="" :cover="false" :offset="[0, 10]"
-                        @save="(val,init) => setEncasement(index, val, init)"
-                        >
-                        <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
-                          <q-input autofocus dense :value="value" :label="$tc('label.encasement')" stack-label
-                            @input="emitValue"
+        <div class="column" style="min-height:11cm;height:auto">
+          <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
+            <div class="on-left" style="max-width:50%">
+              <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
+              <address class="text-weight-light">{{rsView.customer_address}}</address>
+              <div class="text-weight-medium" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
+              <div class="text-weight-medium" v-if="rsView.vehicle">{{$tc('label.transport')}}: {{rsView.vehicle.number}}</div>
+            </div>
+            <q-space/>
+            <div class="">
+              <div class="row no-wrap  q-gutter-x-xs items-start">
+                <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
+                  class="table-print super-dense no-shadow no-highlight th-uppercase">
+                  <tbody>
+                    <tr>
+                      <td>{{$tc('label.number')}}</td>
+                      <td>{{ rsView.fullnumber || rsView.number }}{{(String(mode).toUpperCase() === 'JASA' ? 'A' : '')}}</td>
+                    </tr>
+                    <tr>
+                      <td>{{$tc('label.date')}}</td>
+                      <td>{{$app.date_format(rsView.date)}}</td>
+                    </tr>
+                    <tr v-if="rsView.reconcile_number">
+                      <td>{{$tc('form.reconciliation')}}</td>
+                      <td>{{rsView.reconcile_number}}</td>
+                    </tr>
+                  </tbody>
+                </q-markup-table>
+                <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
+                  class="table-print super-dense no-shadow no-highlight th-uppercase"
+                  v-if="!rsView.is_internal">
+                  <tbody>
+                    <tr>
+                      <td>No. SO</td>
+                      <td>{{ rsView.request_order ? (rsView.request_order.fullnumber || rsView.request_order.number) : '-' }}</td>
+                    </tr>
+                    <tr>
+                      <td>REF. PO/SJ</td>
+                      <td>{{ rsView.request_order ? rsView.request_order.reference_number : '-' }}</td>
+                    </tr>
+                  </tbody>
+                </q-markup-table>
+              </div>
+              <div class="row">
+                <q-space/>
+                <div v-if="rsView.is_internal">
+                  <q-checkbox left-label color="blue-grey" label="REMAINIG"
+                    v-model="remain_only"
+                    :true-value="true" :false-value="false"
+                    class="print-hide align-end"
+                  />
+                  <span class="text-weight-medium print-only" v-if="remain_only">(REMAINIG)</span>
+                </div>
+                <div>
+                  <q-checkbox left-label color="blue-grey" label="UNIT [PCS-KG]"
+                    v-model="isDoubleUnit"
+                    :true-value="true" :false-value="false"
+                    class="print-hide align-end"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <q-markup-table dense bordered square separator="cell"
+              :dark="LAYOUT.isDark"
+              class="table-print no-shadow no-highlight th-uppercase">
+              <thead>
+              <q-tr>
+                <q-th class="text-left">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+                <q-th class="text-left">{{ $tc('label.no', 1, {v: $tc('label.part')}) }}</q-th>
+                <q-th key="PCS" class="text-right" v-if="isDoubleUnit">Unit (PCS)</q-th>
+                <q-th key="KG" class="text-right" v-if="isDoubleUnit">Unit (KG)</q-th>
+                <q-th class="text-right" v-if="!isDoubleUnit">{{ $tc('label.quantity') }}</q-th>
+                <q-th class="text-left" width="10%" v-if="!isDoubleUnit">{{ $tc('label.unit') }}</q-th>
+                <q-th v-if="rsView.is_internal && !remain_only && !isDoubleUnit" class="print-hide">Reconcile</q-th>
+                <q-th>{{ $tc('label.encasement') }}</q-th>
+              </q-tr>
+              </thead>
+              <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
+                <q-tr :delivery-order-item-id="row.id"
+                  v-show="isRowMain(row)" >
+                  <q-td>
+                    <span class="text-weight-medium" v-if="Boolean(mode)">{{mode}}:&nbsp;</span>
+                    <span class="text-weight-medium" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">Material:&nbsp;</span>
+                    <span v-if="row.item"> {{row.item.part_name}} </span>
+                  </q-td>
+                  <q-td>
+                    <span v-if="row.item"> {{row.item.part_number}} </span>
+                  </q-td>
+                  <q-td key="PCS" v-if="isDoubleUnit" class="text-right">
+                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
+                  </q-td>
+                  <q-td key="KG" v-if="isDoubleUnit" class="text-right">
+                    {{!valKG(row) ? '' : $app.number_format(valKG(row),0) + ' KG'}}
+                  </q-td>
+                  <q-td key="quantity" v-if="!isDoubleUnit" class="text-right">
+                    <span v-if="rsView.is_internal && remain_only">
+                      {{$app.number_format(Number(row.quantity) - (row.amount_reconcile / (row.unit_rate||1)),0)}}
+                    </span>
+                    <span v-else>{{$app.number_format(row.quantity,0)}}</span>
+                  </q-td>
+                  <q-td key="unit" v-if="!isDoubleUnit" class="text-left">{{row.unit.code}}</q-td>
+                  <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only && !isDoubleUnit">
+                    {{$app.number_format(row.amount_reconcile,0)}}
+                  </q-td>
+                  <q-td>
+                    <div class="row cursor-pointer">
+                      <span>{{row.encasement}}</span>
+                      <template v-if="String(mode).toUpperCase() !== 'JASA' && rsView.status === 'OPEN'">
+                        <q-popup-edit v-model="row.encasement" content-class="" :cover="false" :offset="[0, 10]"
+                          @save="(val,init) => setEncasement(index, val, init)"
                           >
-                            <template v-slot:after>
-                              <q-btn flat dense color="negative" icon="cancel" @click.stop="cancel" />
-                              <q-btn flat dense color="positive" icon="check_circle" @click.stop="set" />
-                            </template>
-                          </q-input>
-                        </template>
-                      </q-popup-edit>
-                      <q-space/>
-                      <q-icon name="edit" class="print-hide cursor-pointer self-end text-grey"/>
-                    </template>
-                  </div>
-                </q-td>
-              </q-tr>
-              <q-tr :delivery-order-item-id="row.id"
-                v-show="isRowMain(row)"
-                v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
-                <q-td>
-                  <span class="text-weight-medium">Jasa:&nbsp;</span>
-                  <span v-if="row.item"> {{row.item.part_name}} </span>
-                </q-td>
-                <q-td>
-                  <span v-if="row.item"> {{row.item.part_number}} </span>
-                </q-td>
-                <q-td key="PCS" v-if="isDoubleUnit" class="text-right">
-                  {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
-                </q-td>
-                <q-td key="KG" v-if="isDoubleUnit" class="text-right">
-                  {{!valKG(row) ? '' : $app.number_format(valKG(row),0) + ' KG'}}
-                </q-td>
-                <q-td class="text-right" v-if="!isDoubleUnit">{{$app.number_format(row.quantity,0)}}</q-td>
-                <q-td class="text-left" v-if="!isDoubleUnit">{{row.unit.code}}</q-td>
-                <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only && !isDoubleUnit"></q-td>
-                <q-td></q-td>
-              </q-tr>
-            </tbody>
-            <tbody >
-              <tr v-if="rsView.is_internal && remain_only && !rsView.delivery_order_items.filter(x => isRowMain(x)).length">
-                <td colspan="100%" class="text-italic text-grey text-center" style="height: 42px !important">
-                  <span>NO REMAIN RECORD.</span>
+                          <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
+                            <q-input autofocus dense :value="value" :label="$tc('label.encasement')" stack-label
+                              @input="emitValue"
+                            >
+                              <template v-slot:after>
+                                <q-btn flat dense color="negative" icon="cancel" @click.stop="cancel" />
+                                <q-btn flat dense color="positive" icon="check_circle" @click.stop="set" />
+                              </template>
+                            </q-input>
+                          </template>
+                        </q-popup-edit>
+                        <q-space/>
+                        <q-icon name="edit" class="print-hide cursor-pointer self-end text-grey"/>
+                      </template>
+                    </div>
+                  </q-td>
+                </q-tr>
+                <q-tr :delivery-order-item-id="row.id"
+                  v-show="isRowMain(row)"
+                  v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
+                  <q-td>
+                    <span class="text-weight-medium">Jasa:&nbsp;</span>
+                    <span v-if="row.item"> {{row.item.part_name}} </span>
+                  </q-td>
+                  <q-td>
+                    <span v-if="row.item"> {{row.item.part_number}} </span>
+                  </q-td>
+                  <q-td key="PCS" v-if="isDoubleUnit" class="text-right">
+                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
+                  </q-td>
+                  <q-td key="KG" v-if="isDoubleUnit" class="text-right">
+                    {{!valKG(row) ? '' : $app.number_format(valKG(row),0) + ' KG'}}
+                  </q-td>
+                  <q-td class="text-right" v-if="!isDoubleUnit">{{$app.number_format(row.quantity,0)}}</q-td>
+                  <q-td class="text-left" v-if="!isDoubleUnit">{{row.unit.code}}</q-td>
+                  <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only && !isDoubleUnit"></q-td>
+                  <q-td></q-td>
+                </q-tr>
+              </tbody>
+              <tbody >
+                <tr v-if="rsView.is_internal && remain_only && !rsView.delivery_order_items.filter(x => isRowMain(x)).length">
+                  <td colspan="100%" class="text-italic text-grey text-center" style="height: 42px !important">
+                    <span>NO REMAIN RECORD.</span>
+                  </td>
+                </tr>
+              </tbody>
+            </q-markup-table>
+          </div>
+          <div v-show="Boolean(rsView.description)">
+              <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
+              <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
+          </div>
+          <q-space />
+          <div class="page-break-inside">
+            <q-markup-table dense :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
+              <tr class="text-center">
+                <td width="21%">
+                  <div class="sign-name">Diterima Oleh</div>
+                  <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+                </td>
+                <td width="21%">
+                  <div class="sign-name">Outgoing Oleh</div>
+                  <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+                </td>
+                <td width="21%">
+                  <div class="sign-name">Security</div>
+                  <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+                </td>
+                <td width="21%" class="text-capitalize">
+                  <div class="sign-name">Hormat Kami</div>
+                  <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.user_by">(<q-space/>{{rsView.user_by.name}}<q-space/>)</div>
+                  <div class="sign-tag row no-wrap q-mx-lg" v-else>( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
                 </td>
               </tr>
-            </tbody>
-          </q-markup-table>
+            </q-markup-table>
+          </div>
         </div>
-        <div v-show="Boolean(rsView.description)">
-            <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
-            <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
+      </page-print>
+
+      <page-print :dark="LAYOUT.isDark" :class="{'multi-page':getArrayPage(rsView.customer).length > 1}"
+        v-for="(mode, pi) in getArrayPage(rsView.customer)" :key="pi">
+        <div slot="header-tags" class="column no-wrap items-end">
+          <div class="print-hide no-padding">
+            <ux-chip-status :row="rsView" tag outline dense square icon='bookmark' class="no-margin" />
+            <!-- <q-chip tag outline small square color="orange-10" class="text-uppercase" :label="$tc('form.temporary')" v-if="rsView.is_internal" /> -->
+          </div>
+          <div class="text-subtitle2 text-weight-bold text-uppercase text-center on-right">
+            <span v-if="rsView.is_internal">{{$tc('general.sj_internal',2)}}</span>
+            <span v-else>{{$tc('general.sj_delivery',2)}} {{rsView.transaction}}</span>
+          </div>
         </div>
-        <q-space />
-        <div class="page-break-inside">
-          <q-markup-table dense :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
-            <tr class="text-center">
-              <td width="21%">
-                <div class="sign-name">Diterima Oleh</div>
-                <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
-              </td>
-              <td width="21%">
-                <div class="sign-name">Outgoing Oleh</div>
-                <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
-              </td>
-              <td width="21%">
-                <div class="sign-name">Security</div>
-                <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
-              </td>
-              <td width="21%" class="text-capitalize">
-                <div class="sign-name">Hormat Kami</div>
-                <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.user_by">(<q-space/>{{rsView.user_by.name}}<q-space/>)</div>
-                <div class="sign-tag row no-wrap q-mx-lg" v-else>( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
-              </td>
-            </tr>
-          </q-markup-table>
+        <div class="column" style="min-height:11cm;height:auto">
+          <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
+            <div class="on-left" style="max-width:50%">
+              <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
+              <address class="text-weight-light">{{rsView.customer_address}}</address>
+              <div class="text-weight-medium" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
+              <div class="text-weight-medium" v-if="rsView.vehicle">{{$tc('label.transport')}}: {{rsView.vehicle.number}}</div>
+            </div>
+            <q-space/>
+            <div class="">
+              <div class="row no-wrap  q-gutter-x-xs items-start">
+                <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
+                  class="table-print super-dense no-shadow no-highlight th-uppercase">
+                  <tbody>
+                    <tr>
+                      <td>{{$tc('label.number')}}</td>
+                      <td>{{ rsView.fullnumber || rsView.number }}{{(String(mode).toUpperCase() === 'JASA' ? 'A' : '')}}</td>
+                    </tr>
+                    <tr>
+                      <td>{{$tc('label.date')}}</td>
+                      <td>{{$app.date_format(rsView.date)}}</td>
+                    </tr>
+                    <tr v-if="rsView.reconcile_number">
+                      <td>{{$tc('form.reconciliation')}}</td>
+                      <td>{{rsView.reconcile_number}}</td>
+                    </tr>
+                  </tbody>
+                </q-markup-table>
+                <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
+                  class="table-print super-dense no-shadow no-highlight th-uppercase"
+                  v-if="!rsView.is_internal">
+                  <tbody>
+                    <tr>
+                      <td>No. SO</td>
+                      <td>{{ rsView.request_order ? (rsView.request_order.fullnumber || rsView.request_order.number) : '-' }}</td>
+                    </tr>
+                    <tr>
+                      <td>REF. PO/SJ</td>
+                      <td>{{ rsView.request_order ? rsView.request_order.reference_number : '-' }}</td>
+                    </tr>
+                  </tbody>
+                </q-markup-table>
+              </div>
+              <div class="row">
+                <q-space/>
+                <div v-if="rsView.is_internal">
+                  <q-checkbox left-label color="blue-grey" label="REMAINIG"
+                    v-model="remain_only"
+                    :true-value="true" :false-value="false"
+                    class="print-hide align-end"
+                  />
+                  <span class="text-weight-medium print-only" v-if="remain_only">(REMAINIG)</span>
+                </div>
+                <div>
+                  <q-checkbox left-label color="blue-grey" label="UNIT [PCS-KG]"
+                    v-model="isDoubleUnit"
+                    :true-value="true" :false-value="false"
+                    class="print-hide align-end"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <q-markup-table dense bordered square separator="cell"
+              :dark="LAYOUT.isDark"
+              class="table-print no-shadow no-highlight th-uppercase">
+              <thead>
+              <q-tr>
+                <q-th class="text-left">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+                <q-th class="text-left">{{ $tc('label.no', 1, {v: $tc('label.part')}) }}</q-th>
+                <q-th key="PCS" class="text-right" v-if="isDoubleUnit">Unit (PCS)</q-th>
+                <q-th key="KG" class="text-right" v-if="isDoubleUnit">Unit (KG)</q-th>
+                <q-th class="text-right" v-if="!isDoubleUnit">{{ $tc('label.quantity') }}</q-th>
+                <q-th class="text-left" width="10%" v-if="!isDoubleUnit">{{ $tc('label.unit') }}</q-th>
+                <q-th v-if="rsView.is_internal && !remain_only && !isDoubleUnit" class="print-hide">Reconcile</q-th>
+                <q-th>{{ $tc('label.encasement') }}</q-th>
+              </q-tr>
+              </thead>
+              <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
+                <q-tr :delivery-order-item-id="row.id"
+                  v-show="isRowMain(row)" >
+                  <q-td>
+                    <span class="text-weight-medium" v-if="Boolean(mode)">{{mode}}:&nbsp;</span>
+                    <span class="text-weight-medium" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">Material:&nbsp;</span>
+                    <span v-if="row.item"> {{row.item.part_name}} </span>
+                  </q-td>
+                  <q-td>
+                    <span v-if="row.item"> {{row.item.part_number}} </span>
+                  </q-td>
+                  <q-td key="PCS" v-if="isDoubleUnit" class="text-right">
+                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
+                  </q-td>
+                  <q-td key="KG" v-if="isDoubleUnit" class="text-right">
+                    {{!valKG(row) ? '' : $app.number_format(valKG(row),0) + ' KG'}}
+                  </q-td>
+                  <q-td key="quantity" v-if="!isDoubleUnit" class="text-right">
+                    <span v-if="rsView.is_internal && remain_only">
+                      {{$app.number_format(Number(row.quantity) - (row.amount_reconcile / (row.unit_rate||1)),0)}}
+                    </span>
+                    <span v-else>{{$app.number_format(row.quantity,0)}}</span>
+                  </q-td>
+                  <q-td key="unit" v-if="!isDoubleUnit" class="text-left">{{row.unit.code}}</q-td>
+                  <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only && !isDoubleUnit">
+                    {{$app.number_format(row.amount_reconcile,0)}}
+                  </q-td>
+                  <q-td>
+                    <div class="row cursor-pointer">
+                      <span>{{row.encasement}}</span>
+                      <template v-if="String(mode).toUpperCase() !== 'JASA' && rsView.status === 'OPEN'">
+                        <q-popup-edit v-model="row.encasement" content-class="" :cover="false" :offset="[0, 10]"
+                          @save="(val,init) => setEncasement(index, val, init)"
+                          >
+                          <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
+                            <q-input autofocus dense :value="value" :label="$tc('label.encasement')" stack-label
+                              @input="emitValue"
+                            >
+                              <template v-slot:after>
+                                <q-btn flat dense color="negative" icon="cancel" @click.stop="cancel" />
+                                <q-btn flat dense color="positive" icon="check_circle" @click.stop="set" />
+                              </template>
+                            </q-input>
+                          </template>
+                        </q-popup-edit>
+                        <q-space/>
+                        <q-icon name="edit" class="print-hide cursor-pointer self-end text-grey"/>
+                      </template>
+                    </div>
+                  </q-td>
+                </q-tr>
+                <q-tr :delivery-order-item-id="row.id"
+                  v-show="isRowMain(row)"
+                  v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
+                  <q-td>
+                    <span class="text-weight-medium">Jasa:&nbsp;</span>
+                    <span v-if="row.item"> {{row.item.part_name}} </span>
+                  </q-td>
+                  <q-td>
+                    <span v-if="row.item"> {{row.item.part_number}} </span>
+                  </q-td>
+                  <q-td key="PCS" v-if="isDoubleUnit" class="text-right">
+                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
+                  </q-td>
+                  <q-td key="KG" v-if="isDoubleUnit" class="text-right">
+                    {{!valKG(row) ? '' : $app.number_format(valKG(row),0) + ' KG'}}
+                  </q-td>
+                  <q-td class="text-right" v-if="!isDoubleUnit">{{$app.number_format(row.quantity,0)}}</q-td>
+                  <q-td class="text-left" v-if="!isDoubleUnit">{{row.unit.code}}</q-td>
+                  <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only && !isDoubleUnit"></q-td>
+                  <q-td></q-td>
+                </q-tr>
+              </tbody>
+              <tbody >
+                <tr v-if="rsView.is_internal && remain_only && !rsView.delivery_order_items.filter(x => isRowMain(x)).length">
+                  <td colspan="100%" class="text-italic text-grey text-center" style="height: 42px !important">
+                    <span>NO REMAIN RECORD.</span>
+                  </td>
+                </tr>
+              </tbody>
+            </q-markup-table>
+          </div>
+          <div v-show="Boolean(rsView.description)">
+              <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
+              <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
+          </div>
+          <q-space />
+          <div class="page-break-inside">
+            <q-markup-table dense :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
+              <tr class="text-center">
+                <td width="21%">
+                  <div class="sign-name">Diterima Oleh</div>
+                  <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+                </td>
+                <td width="21%">
+                  <div class="sign-name">Outgoing Oleh</div>
+                  <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+                </td>
+                <td width="21%">
+                  <div class="sign-name">Security</div>
+                  <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+                </td>
+                <td width="21%" class="text-capitalize">
+                  <div class="sign-name">Hormat Kami</div>
+                  <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.user_by">(<q-space/>{{rsView.user_by.name}}<q-space/>)</div>
+                  <div class="sign-tag row no-wrap q-mx-lg" v-else>( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+                </td>
+              </tr>
+            </q-markup-table>
+          </div>
         </div>
-      </div>
-    </page-print>
-    <q-card :dark="LAYOUT.isDark" v-if="VIEW.show"
-      class="no-shadow print-hide modal-hide full-width q-px-md"
-      style="position:sticky;bottom:0">
-      <q-card-actions class="q-gutter-xs" align="right">
-        <q-btn :label="$tc('form.list')" icon="list"  color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
-        <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="print()" ></q-btn>
-        <q-space />
-        <ux-btn-dropdown :label="$tc('label.others')" color="blue-grey" class="self-end"
-          :options="[
-            { label: $tc('form.confirm').toUpperCase(), color:'green', icon: 'done_all',
-              detail: $tc('messages.process_confirm'),
-              hidden: !IS_CONFIRM || !$app.can('sj-delivery-orders-confirm'),
-              actions: () => {
-                setConfirmation()
-              }
-            },
-            { label: $tc('form.revision').toUpperCase(), color:'orange', icon: 'save',
-              detail: $tc('messages.process_revise'),
-              hidden: !IS_REVISE || !$app.can('sj-delivery-orders-revision'),
-              actions: () => {
-                setRevision()
-              }
-            },
-            { label: $tc('form.reconciliation').toUpperCase(), color:'indigo-10', icon: 'swap_horiz',
-              detail: $tc('messages.process_reconcile'),
-              hidden: !IS_RECON || !$app.can('sj-delivery-orders-create'),
-              actions: () => {
-                setReconciliation()
-              }
-            },
-            { label: 'VOID', color:'red', icon: 'block',
-              detail: $tc('messages.process_void'),
-              hidden: !IS_VOID || !$app.can('sj-delivery-orders-void'),
-              actions: () => {
-                VIEW.void(()=> init() )
-              }
-            }
-          ]"
-        />
-      </q-card-actions>
-    </q-card>
+      </page-print>
+    </div>
 
     <q-inner-loading :showing="VIEW.loading">
         <q-spinner-dots size="50px" color="primary" />
