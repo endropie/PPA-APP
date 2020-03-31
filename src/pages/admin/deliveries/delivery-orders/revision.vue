@@ -64,11 +64,21 @@
     <!-- SINGLE-REVISION -->
     <q-card-section v-if="!isPartition">
       <div class="row items-center q-pb-sm">
-        <div class="col ">
+        <div class="">
           <span class="text-h6 text-grey" >REVISE</span>
         </div>
+        <q-space/>
+        <q-select dense filled hide-bottom-space
+          name="transaction"
+          class="q-mr-sm"
+          v-model="rsForm.transaction"
+          :options="['RETURN', 'REGULER']"
+          v-validate="`required|is:${rsForm.request_order ? rsForm.request_order.transaction : ''}`"
+          :error="errors.has(`transaction`)"
+          :error-message="errors.first(`transaction`)"
+        />
         <ux-select filled dense hide-bottom-space
-          class="col-auto" style="min-width:200px"
+          class="" style="min-width:200px"
           name="request_order"
           stack-label :label="$tc('general.request_order')"
           :data-vv-as="$tc('general.request_order')"
@@ -208,22 +218,23 @@
     </q-card-section>
     <!-- MULTI-REVISION -->
     <q-card-section v-else v-for="(partition, partitionIndex) in rsPartitions" :key="partitionIndex">
-      <div class="row items-center q-pb-sm">
-        <div class="col ">
-          <span class="text-h6 text-grey" >
-            <q-btn flat dense color="blue-grey" icon="delete" @click="removePartition(partitionIndex)" />
-            MULTI-REVISION
-            <font v-show="Boolean(rsPartitions.length > 1)">{{partitionIndex+1}}</font>
-          </span>
-        </div>
+      <div class="row  items-center q-pb-sm">
+        <span class="text-h6 text-grey text-no-wrap" >
+          <q-btn flat dense color="blue-grey" icon="delete" @click="removePartition(partitionIndex)" />
+          MULTI-REVISION
+          <font v-show="Boolean(rsPartitions.length > 1)">{{partitionIndex+1}}</font>
+        </span>
+        <q-space/>
 
-        <q-input
-          class="hidden"
-          label="request_order_id"
-          :name="`partitions.${partitionIndex}.request_order_id`"
-          :data-vv-as="$tc('general.request_order')"
-          v-model="partition.request_order_id"
-          v-validate="`required|excluded:${rsPartitions.filter((x,i) => (i!==partitionIndex)).map(x => x.request_order_id)}`"
+        <q-select dense filled hide-bottom-space no-error-icon
+          :name="`partitions.${partitionIndex}.transaction`"
+          data-vv-as="Transaction"
+          class="q-mr-sm"
+          v-model="partition.transaction"
+          :options="['RETURN', 'REGULER']"
+          v-validate="`required|is:${partition.request_order ? partition.request_order.transaction : ''}`"
+          :error="errors.has(`partitions.${partitionIndex}.transaction`)"
+          :error-message="errors.first(`partitions.${partitionIndex}.transaction`)"
         />
         <ux-select filled dense hide-bottom-space
           class="col-auto" style="min-width:200px"
@@ -245,6 +256,14 @@
             @click="setDialogRequestOrder(partition.request_order, partitionIndex)"
           />
         </ux-select>
+        <q-input
+          class="hidden"
+          label="request_order_id"
+          :name="`partitions.${partitionIndex}.request_order_id`"
+          :data-vv-as="$tc('general.request_order')"
+          v-model="partition.request_order_id"
+          v-validate="`required|excluded:${rsPartitions.filter((x,i) => (i!==partitionIndex)).map(x => x.request_order_id)}`"
+        />
       </div>
       <!-- COLUMN:: Part items lists -->
       <q-markup-table bordered class="main-box no-shadow no-highlight"
@@ -686,8 +705,9 @@ export default {
       if (v) {
         if (!this.rsPartitions.length) {
           this.addPartition({
-            request_order_id: this.FORM.data.request_order_id,
+            transaction: this.FORM.data.transaction,
             request_order: this.FORM.data.request_order,
+            request_order_id: this.FORM.data.request_order_id,
             delivery_order_items: [], //this.FORM.data.delivery_order_items,
           })
         }
@@ -695,7 +715,7 @@ export default {
     },
 
     addPartition (val) {
-      const entri = { request_order_id:null, request_order: null, delivery_order_items: [], description: null, ...val}
+      const entri = { transaction:null, request_order_id:null, request_order: null, delivery_order_items: [], description: null, ...val}
       this.rsPartitions.push(entri)
     },
     removePartition(partitionIndex) {
