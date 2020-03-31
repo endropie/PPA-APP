@@ -55,7 +55,7 @@
       <!-- COLUMN::3th Part items lists -->
       <div class="col-12 q-my-sm">
         <div class="row items-center">
-          <q-field :label="$tc('general.sj_internal', 2)" stack-label v-if="reconcile">
+          <q-field :label="$tc('general.sj_internal', 2)" stack-label v-if="reconcile" style="min-width:200px">
             <div slot="control" class="column">
               <span>{{reconcile.fullnumber || reconcile.number}}</span>
             </div>
@@ -63,6 +63,15 @@
               <q-btn slot="after" dense flat icon="open_in_new" color="blue-grey" @click="showReconcile = true"/>
           </q-field>
           <q-space />
+          <q-select dense filled hide-bottom-space
+            name="transaction"
+            class="q-mr-sm"
+            v-model="rsForm.transaction"
+            :options="['RETURN', 'REGULER']"
+            v-validate="`required|is:${rsForm.request_order ? rsForm.request_order.transaction : ''}`"
+            :error="errors.has(`transaction`)"
+            :error-message="errors.first(`transaction`)"
+          />
           <ux-select class="native-top"
             name="request_order"
             stack-label :label="$tc('general.request_order')"
@@ -227,9 +236,13 @@
     <q-card  style="min-width:80vw" v-if="reconcile">
       <q-card-section>
         <div class="row no-wrap items-center">
-          <div class="col ellipsis">
+          <div class="col column ellipsis">
             <span class="text-h6">{{$tc('general.sj_internal', 2)}}</span>
-            <br/><span># {{reconcile.fullnumber || reconcile.number }}</span>
+            <span class="text-caption">{{reconcile.fullnumber || reconcile.number }}
+              <q-badge color="blue-grey" :label="reconcile.transaction" class="on-right" />
+            </span>
+
+            <small class="text-grey">REF: {{reconcile.reference_number || '-' }}</small>
           </div>
           <div class="col-auto row no-wrap items-center">
             <ux-chip-status :row="reconcile" />
