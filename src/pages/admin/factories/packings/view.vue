@@ -74,11 +74,8 @@
             </thead>
             <tbody >
               <q-tr v-if="rsView.packing_items">
-                <!-- <q-td key="work_order_item" width="30%">
-                  {{rsView.packing_items.work_order_item.work_order.number}}
-                </q-td> -->
                 <q-td key="part" width="30%">
-                  <div>{{rsView.packing_items.item.part_number}}</div>
+                  <div>{{rsView.packing_items.item.part_name}}</div>
                   <small>{{rsView.packing_items.item.part_number}}</small>
                 </q-td>
                 <q-td key="unit_id" class="text-left">
