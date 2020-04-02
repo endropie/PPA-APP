@@ -446,6 +446,7 @@ export default {
     SpecificationOptions() {
       return (this.SHEET.specifications.data.map(item => ({
         label: [item.code, item.name].join(' - '),
+        sublabel: item.hasOwnProperty('color') ? `Color: ${item.color.name}` : undefined ,
         value: item.id
       })) || [])
     },
