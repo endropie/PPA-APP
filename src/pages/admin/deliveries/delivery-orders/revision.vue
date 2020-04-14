@@ -243,7 +243,8 @@
           :disable="partition.delivery_order_items && Boolean(partition.delivery_order_items.length)"
           filter clearable
           :source="`/api/v1/incomes/request-orders?mode=all&status=OPEN&customer_id=${rsForm.customer_id}`"
-          :option-label="(item) => item.number"
+          :option-label="(item) => item.fullnumber || item.number"
+          :option-sublabel="(item) => item.reference_number ? `REF: ${item.reference_number}` : undefined"
           :option-value="(item) => item"
           :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
           :error="errors.has(`partitions.${partitionIndex}.request_order_id`)"
