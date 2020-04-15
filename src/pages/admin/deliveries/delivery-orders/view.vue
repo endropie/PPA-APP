@@ -240,7 +240,7 @@
                 </td>
                 <td width="21%" class="text-capitalize">
                   <div class="sign-name">Hormat Kami</div>
-                  <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.user_by">(<q-space/>{{rsView.user_by.name}}<q-space/>)</div>
+                  <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.created_user">(<q-space/>{{rsView.created_user.name}}<q-space/>)</div>
                   <div class="sign-tag row no-wrap q-mx-lg" v-else>( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
                 </td>
               </tr>

@@ -141,7 +141,7 @@
         <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
           <div class="column text-body">
             <span class="text-uppercase text-grey-8">
-              {{rs.row.user_by ? rs.row.user_by.name : 'undefined'}}
+              {{rs.row.created_user ? rs.row.created_user.name : 'undefined'}}
             </span>
             <small v-if="rs.row.created_at" class="text-grey">
               <q-icon name="mdi-earth"></q-icon>

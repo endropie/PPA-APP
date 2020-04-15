@@ -27,7 +27,7 @@
           </q-td>
           <q-td class="text-right">
             <q-icon name="mdi-account-circle" class="q-mr-xs"/>
-            <span v-if="rs.row.user_by">{{ rs.row.user_by.name }}</span>
+            <span v-if="rs.row.created_user">{{ rs.row.created_user.name }}</span>
             <span v-else class="text-italic">undefined</span>
             <br/>
             <span class="text-caption text-faded">
@@ -102,7 +102,7 @@ export default {
     },
     init() {
       this.loading = true
-      let params = ['mode=all', '--with=customer;user_by', 'status=OPEN']
+      let params = ['mode=all', '--with=customer;created_user', 'status=OPEN']
       this.$axios.get(`${this.resource.api}?${params.join('&')}`)
       .then((response) => {
         this.data = JSON.parse(JSON.stringify(response.data))
