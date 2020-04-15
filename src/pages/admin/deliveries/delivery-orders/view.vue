@@ -326,6 +326,9 @@ export default {
     },
     valPCS(row) {
       if (row.unit_id === 1) {
+        return Number(row.quantity)
+      }
+      else if (row.item.unit_id === 1) {
         return Number(row.unit_amount)
       }
       else if (row.item && row.item.item_units) {
@@ -338,6 +341,9 @@ export default {
     },
     valKG(row) {
       if (row.unit_id === 2) {
+        return Number(row.quantity)
+      }
+      else if (row.item.unit_id === 2) {
         return Number(row.unit_amount)
       }
       else if (row.item && row.item.item_units) {
