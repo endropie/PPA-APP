@@ -100,6 +100,9 @@ export default {
   watch:{
     '$attrs.value': 'setValue',
     '$attrs.options': 'setOptions',
+    '$props.source': function () {
+      this.options = []
+    },
   },
   computed: {
     PROP () {
