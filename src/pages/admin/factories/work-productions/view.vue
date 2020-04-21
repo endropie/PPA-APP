@@ -18,7 +18,7 @@
                     <td class="text-left">{{$tc('general.line')}}</td><td>{{ rsView.line.name }}</td>
                   </tr>
                   <tr>
-                    <td class="text-left">Material</td><td>{{ getStockistFrom(rsView.stockist_from) }}</td>
+                    <td class="text-left">Worktime</td><td>{{ rsView.worktime }}</td>
                   </tr>
                 </tbody>
               </q-markup-table>
