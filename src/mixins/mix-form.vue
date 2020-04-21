@@ -94,8 +94,8 @@ export default {
               if(callback) callback(response.data)
             })
             .catch(error => {
+              console.error(error.response || error)
               if(!error.response) {
-                console.error(error)
                 error.response = {}
               }
               this.$router.replace({
