@@ -20,6 +20,13 @@
             :title="TABLE.getTitle()"
             :TABLE.sync="TABLE"
             :menus="[
+              { label: $tc('form.add'),
+                detail: $tc('messages.form_new'),
+                icon: 'add',
+                shortcut: true,
+                hidden:!$app.can('sj-delivery-orders-create'),
+                to: `${TABLE.resource.uri}/create-sample`
+              },
               { label: $tc('label.trash'),
                 detail:  $tc('messages.show_deleted'),
                 shortcut: true,

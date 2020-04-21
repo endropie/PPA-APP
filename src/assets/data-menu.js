@@ -220,8 +220,8 @@ const deliveries = [
     lang: 'general.sj_delivery',
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'sj-delivery-orders-read' } },
-      // {page: 'form', path: 'create', meta: {mode: 'create', permission: 'delivery-orders-create'}},
-      // {page: 'form', path: ':id/edit', meta: {mode: 'edit', permission: 'delivery-orders-update'}},
+      { page: 'form-sample', path: 'create-sample', meta: {mode: 'create', permission: 'sj-delivery-orders-create'}},
+      { page: 'form-sample', path: ':id/edit-sample', meta: {mode: 'edit', permission: 'sj-delivery-orders-update'}},
       { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
       { page: 'revision-internal', path: ':id/revision-internal', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
       { page: 'reconcile', path: ':id/reconcile', meta: { mode: 'edit', permission: 'sj-delivery-orders-create' } },

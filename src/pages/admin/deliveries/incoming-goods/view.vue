@@ -4,9 +4,12 @@
       <span slot="header-title">Priuk Perkasa Abadi, PT</span>
       <span slot="header-subtitle">Warehouses - Incoming Good</span>
       <div slot="header-tags" class="print-hide">
-        <q-chip class="shadow-1" square outline
+        <q-chip square outline icon='bookmark'
           color="blue-grey" text-color="white"
           label="NCR" v-if="rsView.transaction === 'RETURN'" />
+        <q-chip square outline icon='bookmark'
+          color="blue-grey" text-color="white"
+          label="SAMPLE" v-if="rsView.transaction === 'SAMPLE'" />
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
       <div class="row q-col-gutter-md" >

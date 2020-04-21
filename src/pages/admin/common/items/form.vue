@@ -29,7 +29,7 @@
             name="brand_id"
             :label="$tc('general.brand')"
             v-model="rsForm.brand_id"
-            v-validate="'required'"
+            v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
             :options="BrandOptions"
             input-debounce="0"
@@ -40,7 +40,7 @@
             name="specification_id"
             v-model="rsForm.specification_id"
             :label="$tc('items.specification')"
-            v-validate="'required'"
+            v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
             :options="SpecificationOptions"
             :error="errors.has('specification_id')"
@@ -64,12 +64,20 @@
               :color="rsForm.enable ? 'primary':'red'"
               :true-value="1"
               :false-value="0" />
+            <q-toggle slot="after" class="text-body2 bordered rounded-borders q-pa-xs no-margin"
+              :label="rsForm.sample ? 'Sample':'Reguler'" left-label
+              v-model="rsForm.sample"
+              :color="rsForm.sample ? 'primary':'red'"
+              :true-value="1"
+              :false-value="0"
+              v-if="!Boolean(FORM.data.id && FORM.data.sample == 0)"
+            />
           </q-input>
           <ux-select-filter
             name="category_item_id"
             v-model="rsForm.category_item_id"
             label="Category of Items"
-            v-validate="'required'"
+            v-validate="isNotSample(`required`)"
             class="col-12"
             icon="table_chart"
             :dark="LAYOUT.isDark"
@@ -82,7 +90,7 @@
             class="col-6"
             icon="dehaze"
             v-model="rsForm.type_item_id"
-            v-validate="'required'"
+            v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
             :options="TypeOptions"
             :error="errors.has('type_item_id')"
@@ -92,7 +100,7 @@
             name="size_id"
             v-model="rsForm.size_id"
             label="Size"
-            v-validate="'required'"
+            v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
             :options="SizeOptions"
             class="col-6"
@@ -149,7 +157,7 @@
             class="col-12"
             icon="timer"
             v-model="rsForm.packing_duration"
-            v-validate="'required'"
+            v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
             :error="errors.has('packing_duration')"
             :error-message="errors.first('packing_duration')"
@@ -160,7 +168,7 @@
             label="SA area"
             v-model="rsForm.sa_dm"
             type="number"
-            v-validate="'required'"
+            v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
             class="col-12"
             :error="errors.has('sa_dm')"
@@ -172,7 +180,7 @@
             label="Weight"
             v-model="rsForm.weight"
             type="number"
-            v-validate="'required'"
+            v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
             class="col-12"
             :error="errors.has('weight')"
@@ -199,7 +207,7 @@
             :label="$tc('label.mode', 1, {v:'Load'})" stack-label
             v-model="rsForm.load_type"
             :options="['HANGER', 'BAREL']"
-            v-validate="'required'"
+            v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
             :error="errors.has('load_type')" />
 
@@ -208,7 +216,7 @@
             :label="$tc('label.capacity', 1, {v:'Load'})" stack-label
             type="number"
             v-model="rsForm.load_capacity"
-            v-validate="'required'"
+            v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
             :error="errors.has('load_capacity')" />
 
@@ -219,7 +227,7 @@
         label="Normal Price"
         type="number"
         v-model="rsForm.price"
-        v-validate="'required'"
+        v-validate="isNotSample(`required`)"
         standout filled dark
         color="white"
         bg-color="primary"
@@ -270,7 +278,7 @@
                 :prefix="`${index+1}. `"
                 :options="LineOptions"
                 :inject-filter="(line) => { if(index === 0 && !line.ismain) return false}"
-                v-validate="`required` + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
+                v-validate="isNotSample(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
                 :error="errors.has(`pre-line-${index}`)"
                 :error-message="errors.first(`pre-line-${index}`)"
               >
@@ -302,7 +310,7 @@
                 :name="`unit-${index}`"
                 type="number"
                 v-model="rsForm.item_units[index].rate"
-                v-validate="'required'"
+                v-validate="isNotSample(`required`)"
                 dense
                 :dark="LAYOUT.isDark"
                 :error="errors.has(`unit-${index}`)"
@@ -313,7 +321,7 @@
                     :placeholder="$tc('form.select')"
                     prefix="1 -"
                     v-model="rsForm.item_units[index].unit_id"
-                    v-validate="'required'"
+                    v-validate="isNotSample(`required`)"
                     dense borderless style="width:110px"
                     map-options emit-value
                     :options="UnitOptions.filter(x => x.value !== rsForm.unit_id)"
@@ -410,7 +418,8 @@ export default {
           item_prelines:[ {id:null, line_id: null, note: null} ],
           item_units:[ {id:null, unit_id:null, rate:null} ],
           item_contacts:[ {id:null} ],
-          enable: true,
+          enable: 1,
+          sample: 0,
           description:null,
         }
       }
@@ -511,6 +520,10 @@ export default {
 
       // Set unique code
       this.rsForm['code'] = [CUST.code, BRAND.code, SPEC.code].join('-')
+    },
+
+    isNotSample(v) {
+        return this.rsForm.sample ? '' : v
     },
 
     addNewProduction (autofocus = true) {

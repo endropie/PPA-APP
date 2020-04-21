@@ -6,7 +6,6 @@
         <q-chip slot="optional" v-if="rsForm.status === 'VOID'"
           icon="bookmark"  class="text-weight-medium"
           label="void" color="negative" outline/>
-
       </form-header>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark"></q-separator>
@@ -16,6 +15,7 @@
         borderless stack-label hide-bottom-space
         :label="$tc('label.mode',1, {v:$tc('label.transaction')})"
         :dark="LAYOUT.isDark"
+        :disable="Boolean(rsForm.id) || IssetItemDetails"
         :error="errors.has('transaction')">
 
         <q-option-group slot="control"
@@ -23,8 +23,8 @@
           v-model="rsForm.transaction"
           v-validate="'required'"
           :dark="LAYOUT.isDark"
-          :disable="Boolean(rsForm.id)"
-          :options="CONFIG.options['transaction_mode']"
+          :disable="Boolean(rsForm.id) || IssetItemDetails"
+          :options="CONFIG.options['transaction_mode'].concat({ 'label': 'SAMPLE', 'value': 'SAMPLE' })"
           @input="(val) => setTransactionReference(val)"/>
 
       </q-field>
@@ -42,7 +42,7 @@
             @input="(val) => setCustomerReference(val)">
             <q-badge slot="counter"
               :label="String($tc(`customers.order_${rsForm.order_mode}`).toUpperCase())"
-              v-if="Boolean(rsForm.customer_id)" />
+              v-if="Boolean(rsForm.customer_id) && rsForm.transaction == 'REGULER'" />
           </ux-select-filter>
 
           <ux-date name="date" type="date" class="col-8"
@@ -118,13 +118,11 @@
       </div>
     </q-card-section>
     <!-- COLUMN::2nd Request orders -->
-    <q-separator inset spaced :dark="LAYOUT.isDark"></q-separator>
-    <q-card-section class="row q-col-gutter-sm">
-
-      <div class="col-12">
-        <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
-          dense separator="horizontal"
-          :dark="LAYOUT.isDark">
+    <q-card-section class="q-gutter-sm q-pt-none">
+      <q-markup-table flat bordered square class="main-box no-highlight th-uppercase"
+        dense separator="horizontal"
+        :dark="LAYOUT.isDark">
+        <thead>
           <q-tr>
             <q-th key="prefix"></q-th>
             <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
@@ -132,30 +130,37 @@
             <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
             <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
           </q-tr>
+        </thead>
+        <tbody>
           <q-tr v-for="(row, index) in rsForm.incoming_good_items" :key="index">
             <q-td  style="width:50px">
               <q-btn dense flat="" @click="removeItem(index)" icon="clear" tabindex="100" color="negative"/>
             </q-td>
             <q-td width="45%">
-              <ux-select-filter autofocus
+              <ux-select autofocus
                 :name="`items.${index}.item_id`"
                 :data-vv-as="$tc('items.part_name')"
                 dense outlined hide-bottom-space color="blue-grey-5"
                 v-model="row.item_id"
                 v-validate="'required'"
-                map-options emit-value
+                filter map-options emit-value
                 :options="ItemOptions" clearable
                 popup-content-class="options-striped"
                 :options-dark="LAYOUT.isDark"
                 :dark="LAYOUT.isDark"
-                :readonly="!Boolean(rsForm.customer_id)"
+                :readonly="Boolean(!rsForm.customer_id || !rsForm.transaction)"
                 @input="(val)=>{ setItemReference(index, val) }"
                 :loading="SHEET['items'].loading"
                 :error="errors.has(`items.${index}.item_id`)"
-                :error-message="errors.first(`items.${index}.item_id`)"
-              />
-              <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
-
+                :error-message="errors.first(`items.${index}.item_id`)">
+                <q-btn slot="after" dense color="primary" icon="add"
+                  :disable="Boolean(!rsForm.customer_id  || !rsForm.transaction)"
+                  v-if="rsForm.transaction === 'SAMPLE'"
+                  @click="$refs['addsample'].show()"
+                />
+              </ux-select>
+              <q-tooltip v-if="!Boolean(rsForm.customer_id)" :offset="[0, 10]">Select a customer, First! </q-tooltip>
+              <q-tooltip v-if="!Boolean(rsForm.transaction)" :offset="[0, 10]">Select a transaction, First! </q-tooltip>
             </q-td>
             <q-td key="part_number" width="35%" style="min-width:150px">
               <q-input readonly
@@ -198,10 +203,10 @@
             </q-td>
             <q-td colspan="100%"> </q-td>
           </q-tr>
-        </q-markup-table>
-      </div>
+        </tbody>
+      </q-markup-table>
       <!-- COLUMN::4th Description -->
-      <q-input class="col-12"
+      <q-input
         name="description" type="textarea" rows="3"
         stack-label :label="$tc('label.description')"
         filled
@@ -217,14 +222,24 @@
     </q-card-actions>
   </q-card>
   <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
+  <q-dialog ref="addsample" persistent>
+    <add-sample :data-default="{ customer_id: rsForm.customer_id }"
+      @done="(v) => {
+        setCustomerReference(rsForm.customer_id)
+        $refs['addsample'].hide()
+      }"
+    />
+  </q-dialog>
 </q-page>
 </template>
 
 <script>
 import MixForm from '@/mixins/mix-form.vue'
+import AddSample from '@/pages/admin/common/items/add-sample'
 
 export default {
   mixins: [MixForm],
+  components: { AddSample },
   data () {
     return {
       SHEET:{
@@ -380,7 +395,10 @@ export default {
     setForm(data) {
       this.rsForm = JSON.parse(JSON.stringify(data))
 
-      if(data.customer_id) this.SHEET.load('items', 'customer_id='+ data.customer_id)
+      if (this.rsForm.customer_id) {
+        const additonal = this.rsForm.transaction == 'SAMPLE' ? `&sampled=true` : ''
+        this.SHEET.load('items', `customer_id=${this.rsForm.customer_id}${additonal}`)
+      }
 
       if(data.hasOwnProperty('has_relationship') && Object.keys(data['has_relationship']).length > 0) {
 
@@ -401,30 +419,27 @@ export default {
       }
     },
     setTransactionReference(val) {
-      if (val == 'RETURN') {
+      if (val == 'RETURN')
         this.rsForm.order_mode = 'NONE'
-        return false
-      }
-      else if (val == 'REGULER' && this.rsForm.customer_id) {
-        this.setCustomerReference(this.rsForm.customer_id)
-      }
+      else
+        this.rsForm.order_mode = null
+
+      this.setCustomerReference(this.rsForm.customer_id)
     },
     setCustomerReference(val) {
-      if(!val){
-        this.rsForm.order_mode = null
-        return
+      if (!val) return
+
+      if (this.rsForm.customer_id) {
+        const additonal = this.rsForm.transaction == 'SAMPLE' ? `&sampled=true` : ''
+        this.SHEET.load('items', `customer_id=${this.rsForm.customer_id}${additonal}`)
       }
 
-      if(this.rsForm.customer_id) this.SHEET.load('items', 'customer_id='+ this.rsForm.customer_id)
-
-      if (this.rsForm.transaction !== 'RETURN') {
+      if (this.rsForm.transaction == 'REGULER') {
         const customer = this.MAPINGKEY['customers'][val]
         if (customer) {
           this.rsForm.order_mode = this.MAPINGKEY['customers'][val].order_mode
         }
       }
-      else this.rsForm.order_mode = 'NONE'
-
     },
     setItemReference(index, val) {
 

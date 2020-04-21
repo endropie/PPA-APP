@@ -18,6 +18,13 @@
                   setConfirmation()
                 }
               },
+              { label: $tc('form.edit').toUpperCase(), color:'orange', icon: 'save',
+                detail: $tc('messages.process_update'),
+                hidden: !IS_EDITABLE || !$app.can('sj-delivery-orders-update'),
+                actions: () => {
+                  $router.push(`${VIEW.resource.uri}/${ROUTE.params.id}/edit-sample`)
+                }
+              },
               { label: $tc('form.revision').toUpperCase(), color:'orange', icon: 'save',
                 detail: $tc('messages.process_revise'),
                 hidden: !IS_REVISE || !$app.can('sj-delivery-orders-revision'),
@@ -66,7 +73,7 @@
               <div class="text-weight-medium" v-if="rsView.indexed_number">{{$tc('label.no',1, {v:'Index'})}}: {{rsView.indexed_number}}</div>
             </div>
             <q-space/>
-            <div class="">
+            <div>
               <div class="row no-wrap  q-gutter-x-xs items-start">
                 <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
                   class="table-print super-dense no-shadow no-highlight th-uppercase">
@@ -87,7 +94,7 @@
                 </q-markup-table>
                 <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
                   class="table-print super-dense no-shadow no-highlight th-uppercase"
-                  v-if="!rsView.is_internal">
+                  v-if="!Boolean(rsView.is_internal || rsView.transaction == 'SAMPLE')">
                   <tbody>
                     <tr>
                       <td>No. SO</td>
@@ -297,6 +304,7 @@ export default {
     },
     IS_REVISE() {
       if (this.rsView.deleted_at) return false
+      if (this.rsView.transaction == 'SAMPLE') return false
       if (this.rsView.status !== 'OPEN' && this.rsView.is_internal) return false
       if (this.rsView.status !== 'OPEN' && this.rsView.reconcile_id) return false
       return true
@@ -308,6 +316,7 @@ export default {
     IS_EDITABLE() {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
+      if (this.rsView.transaction !== 'SAMPLE') return false
       if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
       return true
     },

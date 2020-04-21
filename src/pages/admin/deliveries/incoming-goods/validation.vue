@@ -24,7 +24,7 @@
           v-model="rsForm.transaction"
           v-validate="'required'"
           :dark="LAYOUT.isDark"
-          :options="CONFIG.options['transaction_mode']"
+          :options="CONFIG.options['transaction_mode'].concat({ 'label': 'SAMPLE', 'value': 'SAMPLE' })"
           @input="(val) => setTransactionReference(val)"/>
 
       </q-field>
@@ -42,7 +42,7 @@
             @input="(val) => setCustomerReference(val)">
             <q-badge slot="counter"
               :label="String($tc(`customers.order_${rsForm.order_mode}`).toUpperCase())"
-              v-show="Boolean(rsForm.customer_id)"/>
+              v-if="Boolean(rsForm.customer_id && rsForm.transaction == 'REGULER')"/>
           </ux-select-filter>
           <ux-date class="col-8"
             name="date" type="date"

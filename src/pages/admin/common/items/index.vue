@@ -33,7 +33,7 @@
             ]">
 
             <div class="row q-col-gutter-xs" >
-              <ux-select-filter class="col-12 col-sm-6"
+              <ux-select-filter class="col-12 col-sm-4"
                 v-model="FILTERABLE.fill.customer_id.value" clearable
                 :label="$tc('general.customer')"
                 dense hide-bottom-space hide-dropdown-icon
@@ -43,7 +43,7 @@
                 :options="CustomerOptions"
                 @input="FILTERABLE.submit" />
 
-              <q-select class="col-12 col-sm-6"
+              <q-select class="col-12 col-sm-4"
                 dense use-chips hide-dropdown-icon
                 placeholder="Stock"
                 :options="['FM','WIP','FG','NC','NCR']"
@@ -61,6 +61,25 @@
                   <q-tooltip>{{$tc('label.all')}}</q-tooltip>
                 </q-btn>
               </q-select>
+
+              <div class="col-12 col-sm-4">
+                <div class="row  justify-end">
+                  <q-checkbox
+                    left-label label="Sample"
+                    v-model="FILTERABLE.fill.sampled.value"
+                    true-value="true"
+                    false-value=""
+                    @input="FILTERABLE.submit"
+                  />
+                  <q-checkbox
+                    left-label label="Disable"
+                    v-model="FILTERABLE.fill.enable.value"
+                    true-value="0"
+                    false-value=""
+                    @input="FILTERABLE.submit"
+                  />
+                </div>
+              </div>
 
               <q-select class="col-12" autocomplete="off"
                 multiple use-chips use-input new-value-mode="add"
@@ -152,6 +171,16 @@ export default {
       },
       FILTERABLE: {
         fill: {
+          sampled: {
+            value: '',
+            type: 'string',
+            transform: (value) => { return null }
+          },
+          enable: {
+            value: '',
+            type: 'string',
+            transform: (value) => { return '' }
+          },
           customer_id: {
             value: null,
             type: 'integer',
