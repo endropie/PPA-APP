@@ -66,7 +66,7 @@
           <q-input name="registration" class="col-12"
             :label="$tc('warehouses.registration')"
             v-model="rsForm.registration"
-            v-validate="'required'"
+            v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
             :error="errors.has('registration')"
             :error-message="errors.first('registration')"/>
@@ -79,7 +79,7 @@
             name="reference_number"
             stack-label :label="$tc('warehouses.reference_number')"
             v-model="rsForm.reference_number"
-            v-validate="'required'"
+            v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
             :error="errors.has('reference_number')"
             :error-message="errors.first('reference_number')"/>
@@ -88,7 +88,7 @@
             name="reference_date" type="date"
             stack-label :label="$tc('warehouses.reference_date')"
             v-model="rsForm.reference_date"
-            v-validate="`required|date_format:yyyy-MM-dd|before:${$app.moment().add(1,'days').format('YYYY-MM-DD')}`"
+            v-validate="isNotSample(`required|date_format:yyyy-MM-dd|before:${$app.moment().add(1,'days').format('YYYY-MM-DD')}`)"
             :date-options="(date) => date <= $app.moment().format('YYYY/MM/DD')"
             :dark="LAYOUT.isDark"
             :error="errors.has('reference_date')"
@@ -173,7 +173,7 @@
                 :name="`items.${index}.quantity`"
                 :data-vv-as="$tc('label.quantity')"
                 v-model="row.quantity"
-                v-validate="row.item_id ? 'required' : ''"
+                v-validate="row.item_id ? 'required|gt_value:0' : ''"
                 dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
                 :dark="LAYOUT.isDark"
                 :error="errors.has(`items.${index}.quantity`)"/>
@@ -417,6 +417,9 @@ export default {
         }
 
       }
+    },
+    isNotSample (v) {
+      return this.rsForm.transaction !== 'SAMPLE' ? v : ''
     },
     setTransactionReference(val) {
       if (val == 'RETURN')

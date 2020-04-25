@@ -141,7 +141,6 @@
                   [{{row.item.customer_code}}] {{row.item.part_number}}
                 </small>
               </ux-select>
-              <q-tooltip>ID: {{row.item_id}} ITEM:{{row.item}} </q-tooltip>
             </q-td>
             <q-td key="quantity" width="25%">
               <q-input
