@@ -1,7 +1,7 @@
 <template>
 <q-page padding class="form-page row justify-center">
   <q-card inline class="main-box self-start" v-if="FORM.show" :dark="LAYOUT.isDark" :class="{ 'bg-grey-9': LAYOUT.isDark}">
-    <q-card-section>
+    <q-card-section class="q-pa-sm">
       <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" >
         <template slot="menu-item">
           <list-item :label="$tc('form.remove')" icon="delete" clickable @click="FORM.delete" v-close-popup v-if="ROUTE.params.id"/>
@@ -9,14 +9,14 @@
       </form-header>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark"/>
+    <!-- ROW::1st Part Identity -->
     <q-card-section class="row q-col-gutter-sm">
-
-      <!-- ROW::1st -->
       <div class="col-12 col-sm-6" >
-        <div class="column">
+        <div class="row q-col-gutter-x-sm">
           <ux-select-filter
             name="customer_id"
             :label="$tc('general.customer')"
+            class="col-12"
             :data-vv-as="$tc('general.customer')"
             v-model="rsForm.customer_id" options-cover clearable
             :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
@@ -28,6 +28,7 @@
           <ux-select-filter
             name="brand_id"
             :label="$tc('general.brand')"
+            class="col-12 col-sm-6"
             v-model="rsForm.brand_id"
             v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
@@ -40,11 +41,57 @@
             name="specification_id"
             v-model="rsForm.specification_id"
             :label="$tc('items.specification')"
+            class="col-12 col-sm-6"
             v-validate="isNotSample(`required`)"
             :dark="LAYOUT.isDark"
             :options="SpecificationOptions"
             :error="errors.has('specification_id')"
             :error-message="errors.first('specification_id')" />
+
+          <ux-select-filter
+            name="category_item_id"
+            v-model="rsForm.category_item_id"
+            label="Category"
+            v-validate="isNotSample(`required`)"
+            class="col-6"
+            icon="table_chart"
+            :dark="LAYOUT.isDark"
+            :options="CategoryOptions"
+            :error="errors.has('category_item_id')"
+            :error-message="errors.first('category_item_id')" />
+          <ux-select-filter
+            name="type_item_id"
+            label="Type"
+            class="col-6"
+            icon="dehaze"
+            v-model="rsForm.type_item_id"
+            v-validate="isNotSample(`required`)"
+            :dark="LAYOUT.isDark"
+            :options="TypeOptions"
+            :error="errors.has('type_item_id')"
+            :error-message="errors.first('type_item_id')" />
+          <ux-select-filter
+            name="unit_id"
+            v-model="rsForm.unit_id"
+            :label="$tc('label.unit')"
+            class="col-6"
+            icon="web_asset"
+            v-validate="'required'"
+            :dark="LAYOUT.isDark"
+            :options="UnitOptions"
+            :error="errors.has('unit_id')"
+            :error-message="errors.first('unit_id')" />
+          <ux-select-filter
+            name="size_id"
+            v-model="rsForm.size_id"
+            label="Size"
+            v-validate="isNotSample(`required`)"
+            :dark="LAYOUT.isDark"
+            :options="SizeOptions"
+            class="col-6"
+            icon="format_size"
+            :error="errors.has('size_id')"
+            :error-message="errors.first('size_id')" />
         </div>
       </div>
       <div class="col-12 col-sm-6" >
@@ -70,51 +117,10 @@
               :color="rsForm.sample ? 'primary':'red'"
               :true-value="1"
               :false-value="0"
+              :disable="!$app.can('items-sample')"
               v-if="!Boolean(FORM.data.id && FORM.data.sample == 0)"
             />
           </q-input>
-          <ux-select-filter
-            name="category_item_id"
-            v-model="rsForm.category_item_id"
-            label="Category of Items"
-            v-validate="isNotSample(`required`)"
-            class="col-12"
-            icon="table_chart"
-            :dark="LAYOUT.isDark"
-            :options="CategoryOptions"
-            :error="errors.has('category_item_id')"
-            :error-message="errors.first('category_item_id')" />
-          <ux-select-filter
-            name="type_item_id"
-            label="Type of Items"
-            class="col-6"
-            icon="dehaze"
-            v-model="rsForm.type_item_id"
-            v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
-            :options="TypeOptions"
-            :error="errors.has('type_item_id')"
-            :error-message="errors.first('type_item_id')" />
-
-          <ux-select-filter
-            name="size_id"
-            v-model="rsForm.size_id"
-            label="Size"
-            v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
-            :options="SizeOptions"
-            class="col-6"
-            icon="format_size"
-            :error="errors.has('size_id')"
-            :error-message="errors.first('size_id')" />
-        </div>
-      </div>
-    </q-card-section>
-    <q-separator spaced :dark="LAYOUT.isDark" class="inset-md"/>
-    <!-- ROW::2nd -->
-    <q-card-section class="row q-col-gutter-sm">
-      <div class="col-12 col-sm-6">
-        <div class="column q-col-gutter-sm">
           <q-input
             name="part_number"
             label="Part Number"
@@ -126,7 +132,6 @@
             :error-message="errors.first('part_number')"
             :dark="LAYOUT.isDark"
           />
-
           <q-input
               name="part_name"
               label="Part name"
@@ -148,210 +153,254 @@
           />
         </div>
       </div>
-      <div class="col-6 col-sm-3">
-        <div class="row q-col-gutter-sm">
-          <q-input
-            name="packing_duration"
-            label="Packing duration"
-            type="number"
-            class="col-12"
-            icon="timer"
-            v-model="rsForm.packing_duration"
-            v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
-            :error="errors.has('packing_duration')"
-            :error-message="errors.first('packing_duration')"
-          />
-
-          <q-input
-            name="sa_dm"
-            label="SA area"
-            v-model="rsForm.sa_dm"
-            type="number"
-            v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
-            class="col-12"
-            :error="errors.has('sa_dm')"
-            :error-message="errors.first('sa_dm')"
-          />
-
-          <q-input
-            name="weight"
-            label="Weight"
-            v-model="rsForm.weight"
-            type="number"
-            v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
-            class="col-12"
-            :error="errors.has('weight')"
-            :error-message="errors.first('weight')"
-          />
-
-        </div>
-      </div>
-      <div class="col-6 col-sm-3">
-        <div class="row q-col-gutter-sm ">
-          <ux-select-filter
-            name="unit_id"
-            v-model="rsForm.unit_id"
-            :label="$tc('label.unit')" stack-label
-            v-validate="'required'"
-            :dark="LAYOUT.isDark"
-            :options="UnitOptions"
-            class="col-12" icon="web_asset"
-            :error="errors.has('unit_id')"
-            :error-message="errors.first('unit_id')" />
-
-          <q-select class="col-12"
-            name="load_type"
-            :label="$tc('label.mode', 1, {v:'Load'})" stack-label
-            v-model="rsForm.load_type"
-            :options="['HANGER', 'BAREL']"
-            v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
-            :error="errors.has('load_type')" />
-
-          <q-input class="col-12"
-            name="load_capacity"
-            :label="$tc('label.capacity', 1, {v:'Load'})" stack-label
-            type="number"
-            v-model="rsForm.load_capacity"
-            v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
-            :error="errors.has('load_capacity')" />
-
-        </div>
-      </div>
-      <ux-numeric class="col-12 col-sm-4"
-        name="price"
-        label="Normal Price"
-        type="number"
-        v-model="rsForm.price"
-        v-validate="isNotSample(`required`)"
-        standout filled dark
-        color="white"
-        bg-color="primary"
-        align="center"
-        :error="errors.has('price')"
-        :error-message="errors.first('price')"
-      />
-      <ux-numeric class="col-12 col-sm-4"
-        name="price_area" type="number" readonly
-        label="Price in DM"
-        :value="price_area"
-        standout filled dark
-        color="white"
-        bg-color="primary"
-        align="center"
-        :error="errors.has('price_area')"
-        :error-message="errors.first('price_area')"
-      />
-      <ux-numeric class="col-12 col-sm-4"
-        name="price_packaged"
-        label="Price in BRL"
-        type="number" readonly
-        :value="price_packaged"
-        standout filled dark
-        color="white"
-        bg-color="primary"
-        align="center"
-        :error="errors.has('price_packaged')"
-        :error-message="errors.first('price_packaged')"
-      />
     </q-card-section>
-    <q-separator spaced :dark="LAYOUT.isDark" class="inset-md"/>
-    <!-- ROW::4th Pre Production -->
-    <q-card-section class="row q-col-gutter-md">
-      <!-- ITEM - PRELINE -->
-      <div class="col-12 col-md-6">
-        <q-list class="q-pa-xs " bordered dense>
-          <q-item-label header>Pre Line Production</q-item-label>
-          <q-item v-for="(item, index) in rsForm.item_prelines" :key="index">
-            <q-item-section>
-              <ux-select-filter
-                :ref="`pre-line`"
-                :name="`pre-line-${index}`"
-                v-model="rsForm.item_prelines[index].line_id"
-                :dark="LAYOUT.isDark"
-                inverted dense
-                color="primary"
-                :prefix="`${index+1}. `"
-                :options="LineOptions"
-                :inject-filter="(line) => { if(index === 0 && !line.ismain) return false}"
-                v-validate="isNotSample(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
-                :error="errors.has(`pre-line-${index}`)"
-                :error-message="errors.first(`pre-line-${index}`)"
-              >
-              <template v-slot:option-append="{option}">
-                <q-item-section side>
-                 <q-badge color="teal" label="main" v-if="option.ismain"/>
-                </q-item-section>
-              </template>
-              </ux-select-filter>
-            </q-item-section>
-            <q-item-section side>
-              <q-btn :class="{'invisible':!index}" dense flat round icon="clear" color="red-5" @click="removeProduction(index)"/>
-            </q-item-section>
-          </q-item>
-          <q-item>
-            <q-item-section>
-              <q-btn dense outline color="primary" :label="$tc('form.add',2)" @click="addNewProduction()" />
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </div>
-      <!-- ITEM - CONVERTION -->
-      <div class="col-12 col-md-6">
-        <q-list class="q-pa-xs" bordered dense>
-          <q-item-label header>Unit Convertion</q-item-label>
-          <q-item v-for="(item, index) in rsForm.item_units" :key="index">
-            <q-item-section>
-              <q-input
-                :name="`unit-${index}`"
-                type="number"
-                v-model="rsForm.item_units[index].rate"
-                v-validate="isNotSample(`required`)"
-                dense
-                :dark="LAYOUT.isDark"
-                :error="errors.has(`unit-${index}`)"
-                :error-message="errors.first(`unit-${index}`)">
-                <template slot="prepend">
-                  <q-select class="no-padding text-white"
-                    :name="`unit-${index}`"
-                    :placeholder="$tc('form.select')"
-                    prefix="1 -"
-                    v-model="rsForm.item_units[index].unit_id"
-                    v-validate="isNotSample(`required`)"
-                    dense borderless style="width:110px"
-                    map-options emit-value
-                    :options="UnitOptions.filter(x => x.value !== rsForm.unit_id)"
-                    :dark="LAYOUT.isDark"
-                    :error="errors.has(`unit-${index}`)"
-                    :error-message="errors.first(`unit-${index}`)"
+    <!-- ROW::2th Estimate, unit corvertion & Enginering  -->
+    <q-card-section>
+      <div class="row q-col-gutter-md">
+        <!-- ITEM - ESTIMATE -->
+        <div class="col-12 col-sm-6 col-md-3"  v-if="$app.can('items-sample')">
+          <q-card class="fit">
+            <q-card-section class="bg-secondary text-white q-pa-sm">
+              <div class="text-subtitle2">Estimation</div>
+            </q-card-section>
+            <q-separator />
+            <q-card-section class="q-pa-sm">
+                <ux-numeric input-style="text-align:left"
+                  type="number" color="secondary"
+                  name="estimate_price"
+                  label="Estimate Price"
+                  v-model="rsForm.estimate_price"
+                  v-validate="isNotSample(`required`)"
+                  :error="errors.has('estimate_price')"
+                  :error-message="errors.first('estimate_price')"
                 />
-                <span class="text-caption">{{$tc('label.rate')}}</span>
-                <q-icon size="24px" name="arrow_right_alt"></q-icon>
-                </template>
-              </q-input>
-            </q-item-section>
-            <q-item-section side>
-              <q-btn dense round flat icon="clear" color="red-4" @click="removeUnit(index)"/>
-            </q-item-section>
-          </q-item>
-          <q-item  class="">
-            <q-item-section>
-              <q-btn dense outline color="primary" :label="$tc('form.add', 2)" @click="addNewUnit()" />
-            </q-item-section>
-          </q-item>
-        </q-list>
+                <q-input input-style=""
+                  type="number" color="secondary"
+                  name="estimate_sadm"
+                  label="Estimate S.A (dm)"
+                  v-model="rsForm.estimate_sadm"
+                  v-validate="isNotSample(`required`)"
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has('estimate_sadm')"
+                  :error-message="errors.first('estimate_sadm')"
+                />
+                <q-space />
+
+                <q-input input-style=""
+                  type="number"  color="secondary" suffix=" / Montly"
+                  name="estimate_monthly_amount"
+                  :label="$tc('label.total', 1, {v: 'Estimasi'})"
+                  v-model="rsForm.estimate_monthly_amount"
+                  v-validate="isNotSample(`required`)"
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has('estimate_monthly_amount')"
+                  :error-message="errors.first('estimate_monthly_amount')"
+                />
+            </q-card-section>
+          </q-card>
+        </div>
+        <!-- ITEM - CONVERTION -->
+        <div class="col-12 col-sm-grow" :class="{'col-sm-6 col-md-3': $app.can('items-sample')}">
+          <q-card class="fit">
+            <q-card-section class="bg-secondary text-white q-pa-sm">
+              <div class="text-subtitle2">Unit Convertion</div>
+            </q-card-section>
+            <q-separator />
+            <q-card-section class="q-pa-sm">
+              <q-list dense>
+                <!-- <q-item-label header class="text-caption no-padding">Unit Convertion</q-item-label> -->
+                <q-item v-for="(item, index) in rsForm.item_units" :key="index" class="no-padding">
+                  <q-item-section>
+                    <q-input
+                      :name="`unit-${index}`"
+                      type="number"
+                      v-model="rsForm.item_units[index].rate"
+                      v-validate="isNotSample(`required|gt_value:0`)"
+                      dense no-error-icon
+                      :dark="LAYOUT.isDark"
+                      :error="errors.has(`unit-${index}`)"
+                      :error-message="errors.first(`unit-${index}`)">
+                      <template slot="prepend">
+                        <q-select class="no-padding text-white"
+                          :name="`unit-${index}`"
+                          :placeholder="$tc('form.select')"
+                          prefix="1 -"
+                          v-model="rsForm.item_units[index].unit_id"
+                          v-validate="isNotSample(`required`)"
+                          dense borderless style="width:110px"
+                          map-options emit-value
+                          :options="UnitOptions.filter(x => x.value !== rsForm.unit_id)"
+                          :dark="LAYOUT.isDark"
+                          :error="errors.has(`unit-${index}`)"
+                          :error-message="errors.first(`unit-${index}`)"
+                      />
+                      <span class="text-caption">rate</span>
+                      <q-icon size="24px" name="arrow_right_alt"></q-icon>
+                      </template>
+                    </q-input>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-btn dense round flat icon="clear" color="red-4" @click="removeUnit(index)"/>
+                  </q-item-section>
+                </q-item>
+                <q-item  class="">
+                  <q-item-section>
+                    <q-btn dense outline color="primary" :label="$tc('form.add', 2)" @click="addNewUnit()" />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-card-section>
+          </q-card>
+        </div>
+        <!-- ITEM - PRELINE -->
+        <div class="col-12 col-md-6">
+          <q-card class="fit">
+            <q-card-section class="bg-secondary text-white q-pa-sm">
+              <div class="text-subtitle2">Enginering information</div>
+            </q-card-section>
+            <q-separator />
+            <q-card-section class="q-pa-sm">
+              <div class="row q-col-gutter-x-sm ">
+                <q-input class="col-12 col-sm-6" input-style="text-align:left"
+                  name="sa_dm"
+                  label="S.A (dm)"
+                  v-model="rsForm.sa_dm"
+                  type="number"
+                  v-validate="isNotSample(`required`)"
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has('sa_dm')"
+                  :error-message="errors.first('sa_dm')"
+                />
+                <q-input class="col-12 col-sm-6" input-style="text-align:left"
+                  name="weight"
+                  label="Weight"
+                  v-model="rsForm.weight"
+                  type="number"
+                  v-validate="isNotSample(`required`)"
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has('weight')"
+                  :error-message="errors.first('weight')"
+                />
+                <q-input class="col-12 col-sm-6"
+                  name="packing_duration"
+                  label="Packing duration"
+                  type="number"
+                  icon="timer"
+                  v-model="rsForm.packing_duration"
+                  v-validate="isNotSample(`required`)"
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has('packing_duration')"
+                  :error-message="errors.first('packing_duration')"
+                />
+
+                <q-select class="col-12 col-sm-6"
+                  name="load_type"
+                  :label="$tc('label.mode', 1, {v:'Hanger/Barrel'})"
+                  v-model="rsForm.load_type"
+                  :options="['HANGER', 'BAREL']"
+                  v-validate="isNotSample(`required`)"
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has('load_type')" >
+                  <q-input slot="after" class="no-padding" input-style="width:75px"
+                    name="load_capacity"
+                    :label="$tc('label.capacity', 1)"
+                    type="number"
+                    v-model="rsForm.load_capacity"
+                    v-validate="isNotSample(`required`)"
+                    :dark="LAYOUT.isDark"
+                    :error="errors.has('load_capacity')"
+                  />
+                </q-select>
+              </div>
+              <q-list dense class="no-padding">
+                <q-item-label header class="text-caption no-padding" >Preline Production</q-item-label>
+                <q-item v-for="(item, index) in rsForm.item_prelines" :key="index" class="no-padding">
+                  <q-item-section>
+                    <ux-select-filter
+                      :ref="`pre-line`"
+                      :name="`pre-line-${index}`"
+                      v-model="rsForm.item_prelines[index].line_id"
+                      :dark="LAYOUT.isDark"
+                      inverted dense
+                      color="primary"
+                      :prefix="`${index+1}. `"
+                      :options="LineOptions"
+                      :inject-filter="(line) => { if(index === 0 && !line.ismain) return false}"
+                      v-validate="isNotSample(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
+                      :error="errors.has(`pre-line-${index}`)"
+                      :error-message="errors.first(`pre-line-${index}`)"
+                    >
+                    <template v-slot:option-append="{option}">
+                      <q-item-section side>
+                      <q-badge color="teal" label="main" v-if="option.ismain"/>
+                      </q-item-section>
+                    </template>
+                    </ux-select-filter>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-btn :class="{'invisible':!index}" dense flat round icon="clear" color="red-5" @click="removeProduction(index)"/>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-btn dense outline color="primary" :label="$tc('form.add',2)" @click="addNewProduction()" />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-card-section>
+          </q-card>
+        </div>
       </div>
 
-      <q-input class="col-12" type="textarea" rows="3"
-        :label="$tc('label.description')" stack-label
-        v-model="rsForm.description"
-        filled
-        :dark="LAYOUT.isDark"
-      />
+    </q-card-section>
+    <!-- ROW::3th Price & Description -->
+    <q-card-section>
+      <div class="row q-col-gutter-sm" v-if="$app.can('items-price')">
+        <ux-numeric class="col-12 col-sm-4"
+          name="price"
+          label="Normal Price"
+          type="number"
+          v-model="rsForm.price"
+          v-validate="isNotSample(`required`)"
+          standout filled dark
+          color="white"
+          bg-color="primary"
+          align="center"
+          :error="errors.has('price')"
+          :error-message="errors.first('price')"
+        />
+        <ux-numeric class="col-12 col-sm-4"
+          name="price_area" type="number" readonly
+          label="Price in DM"
+          :value="price_area"
+          standout filled dark
+          color="white"
+          bg-color="primary"
+          align="center"
+          :error="errors.has('price_area')"
+          :error-message="errors.first('price_area')"
+        />
+        <ux-numeric class="col-12 col-sm-4"
+          name="price_packaged"
+          label="Price in BRL"
+          type="number" readonly
+          :value="price_packaged"
+          standout filled dark
+          color="white"
+          bg-color="primary"
+          align="center"
+          :error="errors.has('price_packaged')"
+          :error-message="errors.first('price_packaged')"
+        />
+      </div>
+      <div class="row q-col-gutter-sm">
+        <q-input class="col-12" type="textarea" autogrow rows="3"
+          :label="$tc('label.description')" stack-label
+          v-model="rsForm.description"
+          filled
+          :dark="LAYOUT.isDark"
+        />
+      </div>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" spaced />
     <q-card-actions class="group float-right">
@@ -415,9 +464,11 @@ export default {
           unit_id: null,
 
           price: null,
-          item_prelines:[ {id:null, line_id: null, note: null} ],
-          item_units:[ {id:null, unit_id:null, rate:null} ],
-          item_contacts:[ {id:null} ],
+          item_prelines: [{ id:null, line_id: null, note: null }],
+          item_units: [],
+          estimate_price: null,
+          estimate_sadm: null,
+          estimate_monthly_amount: null,
           enable: 1,
           sample: 0,
           description:null,
@@ -538,8 +589,7 @@ export default {
     },
 
     addNewUnit (autofocus = true) {
-      var newEntri =this.setDefault().item_units[0];
-
+      const newEntri = Object.assign({ id:null, unit_id:null, rate:null })
       this.rsForm.item_units.push(newEntri)
     },
 
