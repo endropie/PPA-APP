@@ -15,9 +15,9 @@
         <slot name="menu-append"></slot>
       </div>
       <div class="row justify-between">
-        <div class="header-title">
-          <div class="text-h6 no-wrap">{{ title }}</div>
-          <div class="text-subtitle-2 text-faded text-weight-light">{{ subtitle }}</div>
+        <div class="column header-title">
+          <div class="text-subtitle2 no-wrap">{{ title }}</div>
+          <div class="text-caption text-faded">{{ subtitle }}</div>
         </div>
         <div class="header-optional">
           <slot name="optional"></slot>

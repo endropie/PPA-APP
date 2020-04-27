@@ -231,7 +231,20 @@
           </div>
           <q-space />
           <div class="page-break-inside">
-            <q-markup-table dense :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
+            <q-card bordered flat class="bg-red-10 text-white print-hide"
+              v-if="rsView.deleted_at">
+              <q-card-section>
+                <div  class="text-subtitle2">
+                  {{rsView.status }}
+                  <span v-if="rsView.reason" v-html="rsView.reason.name" />
+                </div>
+                <div class="text-caption">
+                  Desription <br>
+                  {{rsView.reason_description || '-'}}
+                </div>
+              </q-card-section>
+            </q-card>
+            <q-markup-table v-else dense :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
               <tr class="text-center">
                 <td width="21%">
                   <div class="sign-name">Diterima Oleh</div>
