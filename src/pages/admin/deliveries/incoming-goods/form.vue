@@ -153,11 +153,6 @@
                 :loading="SHEET['items'].loading"
                 :error="errors.has(`items.${index}.item_id`)"
                 :error-message="errors.first(`items.${index}.item_id`)">
-                <q-btn slot="after" dense color="primary" icon="add"
-                  :disable="Boolean(!rsForm.customer_id  || !rsForm.transaction)"
-                  v-if="rsForm.transaction === 'SAMPLE'"
-                  @click="$refs['addsample'].show()"
-                />
               </ux-select>
               <q-tooltip v-if="!Boolean(rsForm.customer_id)" :offset="[0, 10]">Select a customer, First! </q-tooltip>
               <q-tooltip v-if="!Boolean(rsForm.transaction)" :offset="[0, 10]">Select a transaction, First! </q-tooltip>
@@ -222,14 +217,6 @@
     </q-card-actions>
   </q-card>
   <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
-  <q-dialog ref="addsample" persistent>
-    <add-sample :data-default="{ customer_id: rsForm.customer_id }"
-      @done="(v) => {
-        setCustomerReference(rsForm.customer_id)
-        $refs['addsample'].hide()
-      }"
-    />
-  </q-dialog>
 </q-page>
 </template>
 
