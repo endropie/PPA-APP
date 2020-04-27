@@ -156,12 +156,44 @@
   <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark">
     <q-spinner-dots size="70px" color="primary" />
   </q-inner-loading>
+  <q-dialog ref="dialog-submit" persistent>
+    <q-card style="min-width:200px; width:50vw">
+      <q-bar class="text-grey-14">
+        <q-icon name="insert_comment" class="on-left"/>
+        <div class="text-ellipsis">
+          ALASAN REVISI
+        </div>
+        <q-space />
+        <q-btn dense flat icon="close" v-close-popup>
+          <q-tooltip>Close</q-tooltip>
+        </q-btn>
+      </q-bar>
+      <q-card-section class="q-gutter-sm">
+        <q-select
+          label="Standard"
+          v-model="dialog_reason.reason_id"
+          :options="ReasonOptions" clearable
+          emit-value map-options
+        />
+        <q-input type="textarea" filled autogrow
+          input-style="min-height:50px"
+          label="Description" stack-label
+          v-model="dialog_reason.reason_description"
+        />
+      </q-card-section>
+      <q-card-actions class="q-pt-none" align="right">
+        <q-btn color="grey" label="Cancel" v-close-popup />
+        <q-btn color="primary" label="OK" @click="onSubmit(dialog_reason)"
+          :disable="(dialog_reason.reason_id == null && !dialog_reason.reason_description)"
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </q-page>
 </template>
 
 <script>
 import MixForm from '@/mixins/mix-form.vue'
-import { error } from 'util';
 
 export default {
   mixins: [MixForm],
@@ -171,6 +203,7 @@ export default {
         items: {autoload:false, api:'/api/v1/common/items?mode=all'},
         customers: {api:'/api/v1/incomes/customers?mode=all'},
         units: {api:'/api/v1/references/units?mode=all'},
+        reasons: {api:'/api/v1/references/reasons?mode=all'},
       },
       FORM:{
         resource:{
@@ -202,7 +235,8 @@ export default {
             unit_rate: 1
           }],
         }
-      }
+      },
+      dialog_reason: { reason: null, reason_description: null }
     }
   },
   created() {
@@ -215,6 +249,9 @@ export default {
       if (this.rsForm.delated_at) return false
       if (!this.rsForm.is_internal) return false
       return true
+    },
+    ReasonOptions() {
+      return (this.SHEET.reasons.data.map(item => ({label: item.name, value: item.id})) || []).concat([{ label: 'Others', value: null}])
     },
     UnitOptions() {
       return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
@@ -338,27 +375,27 @@ export default {
         this.addNewItem
       }
     },
+    onSubmit () {
+      this.FORM.loading = true
+      // const {method, mode, apiUrl} = this.FORM.meta();
+      const method = 'PUT'
+      const apiUrl = `${this.FORM.resource.api}/${this.ROUTE.params.id}?mode=revision`
+      const data = { ...this.rsForm, ...this.dialog_reason }
+      this.$axios.set(method, apiUrl, data)
+      .then((response) => {
+        let message = response.data.number + ' - #' + response.data.id
+        this.FORM.response.success({ message: message})
+        this.FORM.toView(response.data.id)
+      })
+      .catch((error) => {
+        this.FORM.response.fields(error.response)
+        this.FORM.response.error(error.response || error, 'REVISION FAILED')
+      })
+      .finally(()=>{
+        this.FORM.loading = false
+      });
+    },
     onSave() {
-      const submit = () => {
-        this.FORM.loading = true
-        // const {method, mode, apiUrl} = this.FORM.meta();
-        const method = 'PUT'
-        const apiUrl = `${this.FORM.resource.api}/${this.ROUTE.params.id}?mode=revision`
-
-        this.$axios.set(method, apiUrl, this.rsForm)
-        .then((response) => {
-          let message = response.data.number + ' - #' + response.data.id
-          this.FORM.response.success({ message: message})
-          this.FORM.toView(response.data.id)
-        })
-        .catch((error) => {
-          this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error, 'REVISION FAILED')
-        })
-        .finally(()=>{
-          this.FORM.loading = false
-        });
-      }
       this.$validator.validate().then(result => {
         if (!result) {
           return this.$q.notify({
@@ -367,14 +404,16 @@ export default {
           })
         }
 
-        this.$q.dialog({
-          title: this.$tc('form.confirm'),
-          message: this.$tc('messages.to_sure', 1, {v: this.$tc('form.revision')}),
-          cancel: true,
-          persistent: true
-        }).onOk(() => {
-          submit()
-        })
+
+        this.$refs['dialog-submit'].show()
+        // this.$q.dialog({
+        //   title: this.$tc('form.confirm'),
+        //   message: this.$tc('messages.to_sure', 1, {v: this.$tc('form.revision')}),
+        //   cancel: true,
+        //   persistent: true
+        // }).onOk(() => {
+        //   submit()
+        // })
       })
     },
   },

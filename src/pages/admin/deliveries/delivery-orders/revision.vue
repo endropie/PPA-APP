@@ -477,7 +477,7 @@
       <q-card-actions class="q-pt-none" align="right">
         <q-btn color="grey" label="Cancel" v-close-popup />
         <q-btn color="primary" label="OK" @click="onSubmit(dialog_reason)"
-          :disable="(dialog_reason.reason_id == null && !String(dialog_reason.reason_description).length)"
+          :disable="(dialog_reason.reason_id == null && !dialog_reason.reason_description)"
         />
       </q-card-actions>
     </q-card>
@@ -801,8 +801,6 @@ export default {
       }
     },
     onSubmit () {
-      // return console.warn('SUBMITED!!')
-
       this.FORM.loading = true
       const method = 'PUT'
       const mode = this.isPartition ? 'multi-revision' : 'revision'
@@ -834,15 +832,6 @@ export default {
         }
 
         this.$refs['dialog-submit'].show()
-
-        // this.$q.dialog({
-        //   title: this.$tc('form.confirm'),
-        //   message: this.$tc('messages.to_sure', 1, {v: this.$tc('form.revision')}),
-        //   cancel: true,
-        //   persistent: true
-        // }).onOk(() => {
-        //   submit()
-        // })
       })
     },
   },
