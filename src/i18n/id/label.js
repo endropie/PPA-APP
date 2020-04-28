@@ -46,6 +46,7 @@ export default {
   qty: 'JML {v}',
   quantity: 'Jumlah {v}',
   rate: 'rating',
+  reason: 'Alasan',
   reference: 'Referensi',
   second: 'Detik',
   send: 'Kirim',

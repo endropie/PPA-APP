@@ -454,7 +454,7 @@
       <q-bar class="text-grey-14">
         <q-icon name="insert_comment" class="on-left"/>
         <div class="text-ellipsis">
-          ALASAN REVISI
+          REVISE REASON
         </div>
         <q-space />
         <q-btn dense flat icon="close" v-close-popup>
@@ -463,14 +463,14 @@
       </q-bar>
       <q-card-section class="q-gutter-sm">
         <q-select
-          label="Standard"
+          :label="$tc('label.reason')" stack-label
           v-model="dialog_reason.reason_id"
           :options="ReasonOptions" clearable
           emit-value map-options
         />
         <q-input type="textarea" filled autogrow
           input-style="min-height:50px"
-          label="Description" stack-label
+          :label="$tc('label.description')" stack-label
           v-model="dialog_reason.reason_description"
         />
       </q-card-section>
