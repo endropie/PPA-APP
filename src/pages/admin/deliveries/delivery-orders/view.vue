@@ -65,44 +65,51 @@
         </div>
         <div class="column" style="min-height:11cm;height:auto">
           <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
-            <div class="on-left" style="max-width:50%">
+            <div class="" style="max-width:50%">
               <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
               <address class="text-weight-light">{{rsView.customer_address}}</address>
               <div class="text-weight-medium" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
               <div class="text-weight-medium" v-if="rsView.vehicle">{{$tc('label.transport')}}: {{rsView.vehicle.number}}</div>
-              <div class="text-weight-medium" v-if="rsView.indexed_number">{{$tc('label.no',1, {v:'Index'})}}: {{rsView.indexed_number}}</div>
+              <!-- <div class="text-weight-medium" v-if="rsView.indexed_number">{{$tc('label.no',1, {v:'Index'})}}: {{rsView.indexed_number}}</div> -->
             </div>
             <q-space/>
-            <div>
-              <div class="row no-wrap  q-gutter-x-xs items-start">
+            <div class="on-right" style="max-width:50%">
+              <div class="column items-start">
                 <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
-                  class="table-print super-dense no-shadow no-highlight th-uppercase">
+                  class="table-print super-dense no-shadow no-highlight th-uppercase"
+                >
                   <tbody>
                     <tr>
                       <td>{{$tc('label.number')}}</td>
-                      <td>{{ rsView.fullnumber || rsView.number }}{{(String(mode).toUpperCase() === 'JASA' ? 'A' : '')}}</td>
-                    </tr>
-                    <tr>
+                      <td>
+                        {{ rsView.fullnumber || rsView.number }}{{(String(mode).toUpperCase() === 'JASA' ? 'A' : '')}}
+                        </td>
                       <td>{{$tc('label.date')}}</td>
                       <td>{{$app.date_format(rsView.date)}}</td>
                     </tr>
+                    <tr v-if="!Boolean(rsView.is_internal || rsView.transaction == 'SAMPLE')">
+                      <td>{{$tc('label.no',1, {v:'Index'})}}</td>
+                      <td>
+                        {{rsView.indexed_number}}
+                      </td>
+                      <td>No. SO</td>
+                      <td>
+                        {{ rsView.request_order ? (rsView.request_order.fullnumber || rsView.request_order.number) : '-' }}
+                      </td>
+                    </tr>
                     <tr v-if="rsView.reconcile_number">
                       <td>{{$tc('form.reconciliation')}}</td>
-                      <td>{{rsView.reconcile_number}}</td>
+                      <td  colspan="100%">
+                        {{rsView.reconcile_number}}
+                      </td>
                     </tr>
-                  </tbody>
-                </q-markup-table>
-                <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
-                  class="table-print super-dense no-shadow no-highlight th-uppercase"
-                  v-if="!Boolean(rsView.is_internal || rsView.transaction == 'SAMPLE')">
-                  <tbody>
-                    <tr>
-                      <td>No. SO</td>
-                      <td>{{ rsView.request_order ? (rsView.request_order.fullnumber || rsView.request_order.number) : '-' }}</td>
-                    </tr>
-                    <tr>
-                      <td>REF. PO/SJ</td>
-                      <td>{{ rsView.request_order ? rsView.request_order.reference_number : '-' }}</td>
+                    <tr v-if="!Boolean(rsView.is_internal || rsView.transaction == 'SAMPLE')">
+                      <td>PO/SJ</td>
+                      <td colspan="100%">
+                        <div class="ellipsis-3-lines" style="white-space:normal;">
+                          {{ rsView.request_orders ? rsView.request_order.reference_number : '-' }}
+                        </div>
+                      </td>
                     </tr>
                   </tbody>
                 </q-markup-table>
