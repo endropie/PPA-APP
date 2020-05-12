@@ -259,7 +259,7 @@ export default {
 
       let data = this.SHEET.customers.data
       if(this.ROUTE.meta.mode !== 'edit'){
-        data = data.filter(item => item.order_mode === 'PO')
+        data = data.filter(item => item.order_mode === 'PO' || item.order_manual_allowed)
       }
 
       return (data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])

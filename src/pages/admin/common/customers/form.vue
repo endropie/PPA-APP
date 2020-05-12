@@ -233,7 +233,6 @@
       <!-- COLUMN::4th Reference Mode Picker -->
       <div class="col-12">
         <div class="row items-start q-col-gutter-md q-mb-md" :class="{'text-white': LAYOUT.isDark}">
-
           <q-field class="col-12 col-sm-4"
             :error="errors.has('invoice_mode')"
             :error-message="errors.first('invoice_mode')"
@@ -263,7 +262,6 @@
               :dark="LAYOUT.isDark" dense
               :options="CONFIG.options.delivery_mode.map(x => ({...x, label: x.detail}))" />
           </q-field>
-
           <q-field class="col-12 col-sm-4"
             hint="Pick the mode PO Type"
             :dark="LAYOUT.isDark"
@@ -276,6 +274,24 @@
               v-validate="'required'"
               :dark="LAYOUT.isDark" dense
               :options="CONFIG.options.order_mode" />
+          </q-field>
+        </div>
+        <div class="column">
+          <q-field borderless hide-bottom-space >
+            <div class="column">
+              <q-checkbox name="order_manual_allowed" class="text-faded"
+                label="Tambah atau edit PO customer"
+                v-model="rsForm.order_manual_allowed"
+                :false-value="0"
+                :true-value="1"
+                :dark="LAYOUT.isDark"/>
+              <q-checkbox name="order_monthly_actived" class="text-faded"
+                label="Tanggal active PO (generate) setiap akhir bulan"
+                v-model="rsForm.order_monthly_actived"
+                :false-value="0"
+                :true-value="1"
+                :dark="LAYOUT.isDark"/>
+            </div>
           </q-field>
         </div>
       </div>
