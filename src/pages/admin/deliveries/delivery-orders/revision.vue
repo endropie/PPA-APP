@@ -552,7 +552,10 @@ export default {
       return true
     },
     ReasonOptions() {
-      return (this.SHEET.reasons.data.map(item => ({label: item.name, value: item.id})) || []).concat([{ label: 'Others', value: null}])
+      return (this.SHEET.reasons.data
+        .filter(item => item.enable)
+        .map(item => ({label: item.name, value: item.id})) || [])
+        .concat([{ label: 'Others', value: null}])
     },
     UnitOptions() {
       return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
