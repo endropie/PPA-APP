@@ -107,7 +107,7 @@
                       <td>PO/SJ</td>
                       <td colspan="100%">
                         <div class="ellipsis-3-lines" style="white-space:normal;">
-                          {{ rsView.request_orders ? rsView.request_order.reference_number : '-' }}
+                          {{ rsView.request_order ? rsView.request_order.reference_number : '-' }}
                         </div>
                       </td>
                     </tr>
