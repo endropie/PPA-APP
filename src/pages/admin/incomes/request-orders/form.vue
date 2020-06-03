@@ -47,7 +47,6 @@
             v-validate="rsForm.order_mode == 'PO' ? 'required' : ''"
             :error="errors.has('actived_date')"
             :error-message="errors.first('actived_date')"
-             v-if="rsForm.order_mode === 'PO'"
           />
         </div>
       </div>
@@ -237,8 +236,6 @@ export default {
   computed: {
     IS_EDITABLE() {
       if (this.rsForm.deleted_at) return false
-      if (this.rsForm.order_mode === 'NONE') return false
-      if (this.rsForm.order_mode === 'ACCUMULATE') return false
       if (this.rsForm.is_relationship) return false
       return true
     },
