@@ -170,7 +170,7 @@
                   name="estimate_price"
                   label="Estimate Price"
                   v-model="rsForm.estimate_price"
-                  v-validate="isNotSample(`required`)"
+                  v-validate="isFromSample(`required`)"
                   :error="errors.has('estimate_price')"
                   :error-message="errors.first('estimate_price')"
                 />
@@ -179,19 +179,17 @@
                   name="estimate_sadm"
                   label="Estimate S.A (dm)"
                   v-model="rsForm.estimate_sadm"
-                  v-validate="isNotSample(`required`)"
+                  v-validate="isFromSample(`required`)"
                   :dark="LAYOUT.isDark"
                   :error="errors.has('estimate_sadm')"
                   :error-message="errors.first('estimate_sadm')"
                 />
-                <q-space />
-
                 <q-input input-style=""
                   type="number"  color="secondary" suffix=" / Montly"
                   name="estimate_monthly_amount"
                   :label="$tc('label.total', 1, {v: 'Estimasi'})"
                   v-model="rsForm.estimate_monthly_amount"
-                  v-validate="isNotSample(`required`)"
+                  v-validate="isFromSample(`required`)"
                   :dark="LAYOUT.isDark"
                   :error="errors.has('estimate_monthly_amount')"
                   :error-message="errors.first('estimate_monthly_amount')"
@@ -574,7 +572,10 @@ export default {
     },
 
     isNotSample(v) {
-        return this.rsForm.sample ? '' : v
+      return this.rsForm.sample ? '' : v
+    },
+    isFromSample(v) {
+      return !(!this.rsForm.sample && this.FORM.data.sample) ? '' : v
     },
 
     addNewProduction (autofocus = true) {
