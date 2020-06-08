@@ -30,7 +30,7 @@
               :label="$tc('label.date')" stack-label
               v-model="rsForm.date"
               v-validate="`required|date_format:yyyy-MM-dd` + FORM.ifCreate(`|after:${$app.moment().add(-1,'days').format('YYYY-MM-DD')}`,'')"
-              :date-options="(date) => FORM.ifCreate(date >= $app.moment().format('YYYY/MM/DD'), true)"
+              :date-options="(date) => FORM.ifCreate(date <= $app.moment().format('YYYY/MM/DD'), true)"
               :dark="LAYOUT.isDark"
               :error="errors.has('date')"
               :error-message="errors.first('date')"
