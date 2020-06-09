@@ -301,7 +301,8 @@ export default {
       return data.map(item => {
         item.amount_packing -= hasold(item.id)
         let total = (Number(item.amount_process) - Number(item.amount_packing))
-        if (item.id === this.rsForm.packing_items.item_id) total = total / UnitRate
+        // console.warn('TEST', UnitRate)
+        // if (item.id === this.rsForm.packing_items.item_id) total = total / UnitRate
         return ({
           label: item.work_order.fullnumber || item.work_order.number,
           value: item.id,
