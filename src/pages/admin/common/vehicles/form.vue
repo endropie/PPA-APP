@@ -99,7 +99,7 @@ export default {
           type:null,
           owner:null,
           department_id:null,
-          is_scheduled:null,
+          is_scheduled:0,
           description:null,
         }
       }
