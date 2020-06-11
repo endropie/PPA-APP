@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="column justify-start">
     <page-print v-if="VIEW.show">
-      <div slot="header-title">PPA - Pre Delivery </div>
+      <div slot="header-title">Pre Delivery </div>
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>

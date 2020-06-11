@@ -1,19 +1,22 @@
 <template>
   <div class="index-page bg-grey-2 window-height window-width column items-center no-wrap">
     <div class="banner bg-primary flex flex-center">
-      PPA
+      {{ $store.state.admin.SETTING.general.app_brand || 'MANUFACTURE PLAY' }}
     </div>
     <div class="text-center">
       <div class="card bg-white shadow-4 column no-wrap flex-center group q-gutter-xs">
         <!-- <img src="~assets/quasar-play-logo-full.svg"> -->
         <q-icon name="widgets" class="text-h2" color="blue-7" />
-          <p class="text-h4 text-orange-14 text-weight-bolder" style="font: courier">
-            PPA PLAY
-          </p>
+        <div class="text-h4 text-orange-14 text-weight-bolder" style="font: courier">
+          {{ $store.state.admin.SETTING.general.app_brand || 'MANUFACTURE PLAY' }}
+        </div>
+        <div class="text-orange-8 text-weight-light">
+          {{ $store.state.admin.SETTING.general.app_description || 'Administration Manufacture' }}
+        </div>
         <br>
 
         <q-btn no-wrap
-          label="PPA SYSTEM"
+          label="ADMINSTRATION SYSTEM"
           to="/admin"
           color="primary"
           class="full-width"
@@ -30,24 +33,22 @@
 
         <div class="fit row justify-center q-mt-lg" :class="{'justify-between': $q.screen.gt.xs}">
 
-          <q-btn flat no-caps color="grey-7"
-            label="Privacy Policy"
-            @click.native="$refs.privacy.show()"
-            class="q-mt-sm"
-          />
-          <!-- <q-space /> -->
           <q-btn no-ripple
             color="green-8"
             icon="android"
             type="a" href="/statics/apps/ppa-system.apk"
-            aria-multiline
-          >
-          <span class="q-ml-sm column" style="line-height:normal">
-            <span>PPA SYSTEM V.1</span>
-            <span style="font-size:70%">Build.7</span>
-          </span>
-            <q-tooltip>Download PPA System Mobile App</q-tooltip>
+            aria-multiline >
+            <span class="q-ml-sm column" style="line-height:normal">
+              <span>ANDROID APP V.1</span>
+              <span style="font-size:70%">Build.7</span>
+            </span>
+            <q-tooltip>Download Mobile App</q-tooltip>
           </q-btn>
+
+          <q-btn flat no-caps color="grey-7"
+            label="Privacy Policy"
+            @click.native="$refs.privacy.show()"
+            class="q-mt-sm" />
         </div>
 
 
@@ -83,7 +84,7 @@
         </modal>
       </div>
     </div>
-    <a class="ribbon" :title="`PPA SYSTEM V1.0`" />
+    <!-- <a class="ribbon" :title="`MANUFACTURE SYSTEM V1.0`" /> -->
   </div>
 </template>
 
@@ -95,18 +96,18 @@ export default {
   components: {
     PrivacyPolicy,
   },
-  data(){
+  data () {
     return {
       servers:['http://localhost:8000', 'http://ppa.virmata.com'],
       baseURL: null,
       loadingSeturl: false
     }
   },
-  mounted() {
-    // console.warn('Modal -> ')
+  created () {
+    // component created!
   },
   computed: {
-    BASEURL() {
+    BASEURL () {
       return this.$store.state.admin.CONFIG.general.baseURL
     }
   },
@@ -114,11 +115,11 @@ export default {
     launch () {
       openURL('http://quasar-framework.org')
     },
-    openSetURL(){
+    openSetURL (){
       this.baseURL = this.$store.state.admin.CONFIG.general.baseURL
       this.$refs.modal.show()
     },
-    saveBaseURL(){
+    saveBaseURL (){
       this.loadingSeturl = true
 
       setTimeout(() => {
@@ -138,7 +139,7 @@ export default {
   .banner
     height 50vh
     width 100%
-    font-size 30vmax
+    font-size 12vmax
     color rgba(255, 255, 255, .2)
     overflow hidden
   .card

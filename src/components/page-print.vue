@@ -21,12 +21,12 @@
                     <div class="head-brand col-grow text-no-wrap ">
                       <div  class="title text-weight-bolder uppercase ellipsis text-truncate" style="opacity:0.8">
                         <slot name="header-title">
-                          <span>Priuk Perkasa Abadi, PT</span>
+                          <span>{{ $store.state.admin.SETTING.general.app_corporate || 'MY-CORPORATION' }}</span>
                         </slot>
                       </div>
                       <div class="subtitle text-weight-light ellipsis text-truncate">
                         <slot name="header-subtitle">
-                          <span>Jati Raya Blok J3 No. 7 Kawasan Industri Newton Techno Park Lippo Cikarang</span>
+                          <span>{{ $store.state.admin.SETTING.general.app_corporate_address || '' }}</span>
                         </slot>
                       </div>
                     </div>

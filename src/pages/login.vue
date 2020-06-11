@@ -2,15 +2,18 @@
   <div padding  >
     <div class="index-page bg-grey-2 window-height window-width column items-center no-wrap">
       <div class="banner bg-primary flex flex-center">
-        PPA
+        {{ $store.state.admin.SETTING.general.app_brand || 'MANUFACTURE PLAY' }}
       </div>
       <div class="text-center" >
         <div class="card bg-white shadow-4 column no-wrap flex-center group">
           <!-- <img src="~assets/quasar-play-logo-full.svg"> -->
           <q-icon name="widgets" class="text-h2" color="blue-7" />
-          <p class="text-h4 text-orange-14 text-weight-bolder" style="font: courier">
-            PPA PLAY
-          </p>
+          <div class="text-h4 text-orange-14 text-weight-bolder" style="font: courier">
+            {{ $store.state.admin.SETTING.general.app_brand || 'MANUFACTURE PLAY' }}
+          </div>
+          <div class="text-orange-8 text-weight-light">
+            {{ $store.state.admin.SETTING.general.app_description || 'Administration Manufacture' }}
+          </div>
           <div class="q-body ">
             <div class="row q-col-gutter-x-md">
               <q-input
@@ -46,7 +49,10 @@
                 }"
               />
               <div class="col-12 q-py-xs">
-                <q-btn class="float-right" flat label="Forgot" color="blue-grey-5" size="sm" :tabindex="5000"/>
+                <q-btn flat color="blue-grey-5" size="sm" class="float-right"
+                  label="Forgot" :tabindex="5000"
+                  @click="$q.notify('Forgot is not allowed!')"
+                />
               </div>
               <div class="col-12 col-sm-6 q-py-xs">
                 <q-btn class="full-width" label="Login" color="primary" @click="onLoginSubmit()" :loading="FORM.btnLoadingSubmit">
@@ -55,14 +61,13 @@
               </div>
               <div class="col-12 col-sm-6 q-py-xs">
                 <q-btn class="full-width" label="Register" color="secondary"
-                  @click="setAuth()"
+                  @click="$q.notify('Register is not allowed!')"
                 />
               </div>
             </div>
           </div>
         </div>
       </div>
-      <a class="ribbon" :title="`PPA Administration Built on v${$q.version}`" />
     </div>
     <div class="fixed-top-left q-ma-md">
       <q-btn-dropdown color="lime-8" label="EXAMPLE USER" v-show="false">
@@ -216,7 +221,7 @@ export default {
   .banner
     height 50vh
     width 100%
-    font-size 30vmax
+    font-size 12vmax
     color rgba(255, 255, 255, .2)
     overflow hidden
   .card

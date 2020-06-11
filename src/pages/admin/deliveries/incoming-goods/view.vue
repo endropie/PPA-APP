@@ -1,7 +1,6 @@
 <template>
   <q-page padding class="column justify-start items-center" :dark="LAYOUT.isDark">
     <page-print v-if="VIEW.show">
-      <span slot="header-title">Priuk Perkasa Abadi, PT</span>
       <span slot="header-subtitle">Warehouses - Incoming Good</span>
       <div slot="header-tags" class="print-hide">
         <q-chip square outline icon='bookmark'

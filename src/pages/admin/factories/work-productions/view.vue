@@ -4,8 +4,7 @@
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
-      <span slot="header-title" style="font-size:26px">Priuk Perkasa Abadi, PT</span>
-      <span slot="header-subtitle" style="font-size:16px">Planing & Production Control Division</span>
+      <span slot="header-subtitle" style="font-size:12px">Planing & Production Control Division</span>
 
       <div class="row q-col-gutter-xs" >
         <div class="col-12">

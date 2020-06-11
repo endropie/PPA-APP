@@ -7,8 +7,8 @@
           <q-avatar>
             <q-icon name="widgets" size="lg" />
           </q-avatar>
-          
-          <q-toolbar-title><span class="text-weight-bold">APP PLAY</span> Privacy Policy</q-toolbar-title>
+
+          <q-toolbar-title><span class="text-weight-bold">MANUFACTURE PLAY</span> Privacy Policy</q-toolbar-title>
 
           <q-btn flat round dense icon="close" v-close-popup />
 
@@ -28,24 +28,24 @@
             style="height: calc(80vh - 20px) "
           >
             <div>
-              
+
                 <p>
                   We value your privacy, and our Privacy Policy aims to explain how your privacy is
-                  protected while using the PPA Play app.
+                  protected while using the MANUFACTURE PLAY app.
                 </p>
 
-                <p class="caption">What personal information is collected from people using PPA Play?</p>
+                <p class="caption">What personal information is collected from people using MANUFACTURE PLAY?</p>
                 <p>
                   None, period. We don't collect, transmit or store any personal information or any other
-                  data. PPA Play is fully functional without requiring any information about the user.
+                  data. MANUFACTURE PLAY is fully functional without requiring any information about the user.
                 </p>
 
-                <p class="caption">What information about my device is collected when I use PPA Play?</p>
+                <p class="caption">What information about my device is collected when I use MANUFACTURE PLAY?</p>
                 <p>
-                  It is not required to grant the app any device permissions in order to use PPA Play,
+                  It is not required to grant the app any device permissions in order to use MANUFACTURE PLAY,
                   however use of the QR code-scanning option requires allowing the app access your device's
                   camera. This is the only device permission the app will ever request, and it is the only
-                  purpose for which the device's camera will ever be used by PPA Play.
+                  purpose for which the device's camera will ever be used by MANUFACTURE PLAY.
                 </p>
 
                 <p class="caption">Third-party disclosure</p>
@@ -65,7 +65,7 @@
                   If you have any questions about this Privacy Policy, please contact us at
                   <a href="mailto:razvan.stoenescu@gmail.com">razvan.stoenescu@gmail.com</a>.
                 </p>
-            
+
             </div>
           </q-scroll-area>
         </q-page>

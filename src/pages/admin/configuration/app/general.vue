@@ -5,22 +5,40 @@
       </q-card-section>
       <q-card-section class="row q-gutter-xs" v-if="FORM.show">
         <q-input class="col-12"
-          name="app_name"
-          label="App Name"
-          v-model="rsForm.app_name"
+          name="app_brand"
+          label="Application Brand"
+          v-model="rsForm.app_brand"
           v-validate="'required|min:4|max:25'"
           :dark="LAYOUT.isDark"
-          :error="errors.has('app_name')"
-          :error-message="errors.first('app_name')"
+          :error="errors.has('app_brand')"
+          :error-message="errors.first('app_brand')"
         />
         <q-input class="col-12"
-          name="app_subname"
-          label="Sub name"
-          v-model="rsForm.app_subname"
+          name="app_description"
+          label="Description"
+          v-model="rsForm.app_description"
           v-validate="'max:191'"
           :dark="LAYOUT.isDark"
-          :error="errors.has('app_subname')"
-          :error-message="errors.first('app_subname')"
+          :error="errors.has('app_description')"
+          :error-message="errors.first('app_description')"
+        />
+        <q-input class="col-12"
+          name="app_corporate"
+          label="Corporate Name"
+          v-model="rsForm.app_corporate"
+          v-validate="'max:191'"
+          :dark="LAYOUT.isDark"
+          :error="errors.has('app_corporate')"
+          :error-message="errors.first('app_corporate')"
+        />
+        <q-input type="textarea" autogrow filled class="col-12"
+          name="app_corporate_address"
+          label="Address"
+          v-model="rsForm.app_corporate_address"
+          v-validate="'max:191'"
+          :dark="LAYOUT.isDark"
+          :error="errors.has('app_corporate_address')"
+          :error-message="errors.first('app_corporate_address')"
         />
       </q-card-section>
       <q-card-actions class="q-gutter-sm" align="right">
@@ -62,7 +80,7 @@ export default {
     init() {
       this.FORM.loading = true
       this.FORM.show = false
-      this.rsForm = this.$store.state.admin.SETTING[this.FORM.resource.name]
+      this.rsForm = JSON.parse(JSON.stringify(this.$store.state.admin.SETTING[this.FORM.resource.name]))
 
       setTimeout(() => {
         this.FORM.loading = false

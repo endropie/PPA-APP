@@ -1,7 +1,6 @@
 <template>
   <q-page padding class="column justify-start items-center" :dark="LAYOUT.isDark">
     <page-print v-if="VIEW.show">
-      <span slot="header-title">Priuk Perkasa Abadi, PT</span>
       <span slot="header-subtitle">Warehouses - Stock Opname</span>
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="{...rsView, status: rsView.opname.status}" tag outline small square icon='bookmark' />
