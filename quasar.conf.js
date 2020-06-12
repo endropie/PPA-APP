@@ -1,5 +1,6 @@
 // Configuration for your app
 let path = require('path')
+let pkg = require('./package.json')
 
 module.exports = function (ctx) {
   return {
@@ -8,7 +9,6 @@ module.exports = function (ctx) {
     // --> boot files are part of "main.js"
     boot: [
       'app',
-      // 'apollo',
       'axios',
       'components',
       'i18n',
@@ -62,6 +62,10 @@ module.exports = function (ctx) {
     supportIE: true,
 
     build: {
+      env: {
+        APP_NAME: JSON.stringify(pkg.productName),
+        APP_DESCRIPTION: JSON.stringify(pkg.description)
+      },
       scopeHoisting: true,
       // vueRouterMode: 'history',
       // vueCompiler: true,
@@ -75,12 +79,6 @@ module.exports = function (ctx) {
         //   loader: 'eslint-loader',
         //   exclude: /node_modules/
         // })
-
-        cfg.module.rules.push({
-          test: /\.(graphql|gql)$/,
-          exclude: /node_modules/,
-          loader: 'graphql-tag/loader'
-        })
 
         cfg.module.rules.push({
           test: /\.md$/,
@@ -97,7 +95,7 @@ module.exports = function (ctx) {
     devServer: {
       // https: true,
       // port: 8080,
-      open: false 
+      open: false
     },
 
     animations: 'all', // --- includes all animations
