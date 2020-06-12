@@ -1,90 +1,93 @@
 <template>
-  <div class="index-page bg-grey-2 window-height window-width column items-center no-wrap">
-    <div class="banner bg-primary flex flex-center">
-      {{ $store.state.admin.SETTING.general.app_brand || 'MANUFACTURE PLAY' }}
-    </div>
-    <div class="text-center">
-      <div class="card bg-white shadow-4 column no-wrap flex-center group q-gutter-xs">
-        <!-- <img src="~assets/quasar-play-logo-full.svg"> -->
-        <q-icon name="widgets" class="text-h2" color="blue-7" />
-        <div class="text-h4 text-orange-14 text-weight-bolder" style="font: courier">
-          {{ $store.state.admin.SETTING.general.app_brand || 'MANUFACTURE PLAY' }}
-        </div>
-        <div class="text-orange-8 text-weight-light">
-          {{ $store.state.admin.SETTING.general.app_description || 'Administration Manufacture' }}
-        </div>
-        <br>
-
-        <q-btn no-wrap
-          label="ADMINSTRATION SYSTEM"
-          to="/admin"
-          color="primary"
-          class="full-width"
-          no-ripple
-        />
-
-        <q-btn no-wrap outline
-          label="Schedule Board"
-          to="/schedule-boards"
-          color="primary"
-          class="full-width"
-          no-ripple
-        />
-
-        <div class="fit row justify-center q-mt-lg" :class="{'justify-between': $q.screen.gt.xs}">
-
-          <q-btn no-ripple
-            color="green-8"
-            icon="android"
-            type="a" href="/statics/apps/ppa-system.apk"
-            aria-multiline >
-            <span class="q-ml-sm column" style="line-height:normal">
-              <span>ANDROID APP V.1</span>
-              <span style="font-size:70%">Build.7</span>
-            </span>
-            <q-tooltip>Download Mobile App</q-tooltip>
-          </q-btn>
-
-          <q-btn flat no-caps color="grey-7"
-            label="Privacy Policy"
-            @click.native="$refs.privacy.show()"
-            class="q-mt-sm" />
-        </div>
-
-
-        <privacy-policy ref="privacy" />
-        <modal ref="modal" >
-          <template slot="footer" >
-            <div class="row justify-around text-light full-width">
-              <span>
-                store:{{$store.getters['admin/CONFIG'].general.baseURL}} <br/>
-              </span>
-              <span>
-                axios:{{$axios.defaults.baseURL}}
-              </span>
-            </div>
-          </template>
-          <div class="column" style="min-width:300px">
-            <q-select
-              label="Host API"
-              v-model="baseURL"
-              :options="servers"
-              :loading="loadingSeturl">
-              <template slot="after">
-                <q-btn dense
-                  :disable="baseURL === BASEURL"
-                  :flat="baseURL === BASEURL"
-                  :icon="baseURL !== BASEURL ? 'refresh' : 'done'"
-                  :color="baseURL !== BASEURL ? 'warning' : 'primary'"
-                 @click="saveBaseURL()" />
-
-              </template>
-            </q-select>
+  <div>
+    <div class="index-page bg-grey-2 window-height window-width column items-center no-wrap">
+      <div class="banner bg-primary flex flex-center">
+        <span v-if="$q.screen.gt.xs" >
+          <q-icon name="widgets" class="text-h1" color="blue-7" /> {{$app.name}}
+        </span>
+      </div>
+      <div class="text-center">
+        <div class="card bg-white shadow-4 column no-wrap flex-center group q-gutter-xs">
+          <!-- <img src="~assets/quasar-play-logo-full.svg"> -->
+          <q-icon name="widgets" class="text-h2" color="blue-7" />
+          <div class="text-h4 text-orange-14 text-weight-bolder" style="font: courier">
+            {{ $app.name || 'MANUFACTURE PLAY' }}
           </div>
-        </modal>
+          <div class="text-orange-8 text-weight-light">
+            {{ $app.description || 'Administration Manufacture' }}
+          </div>
+          <br>
+
+          <q-btn no-wrap
+            label="ADMINSTRATION SYSTEM"
+            to="/admin"
+            color="primary"
+            class="full-width"
+            no-ripple
+          />
+
+          <q-btn no-wrap outline
+            label="Schedule Board"
+            to="/schedule-boards"
+            color="primary"
+            class="full-width"
+            no-ripple
+          />
+
+          <div class="fit row justify-center q-mt-lg" :class="{'justify-between': $q.screen.gt.xs}">
+
+            <q-btn no-ripple
+              color="green-8"
+              icon="android"
+              type="a" href="/statics/apps/ppa-system.apk"
+              aria-multiline >
+              <span class="q-ml-sm column" style="line-height:normal">
+                <span>ANDROID APP V.1</span>
+                <span style="font-size:70%">Build.7</span>
+              </span>
+              <q-tooltip>Download Mobile App</q-tooltip>
+            </q-btn>
+
+            <q-btn flat no-caps color="grey-7"
+              label="Privacy Policy"
+              @click.native="$refs.privacy.show()"
+              class="q-mt-sm" />
+          </div>
+
+
+          <privacy-policy ref="privacy" />
+          <modal ref="modal" >
+            <template slot="footer" >
+              <div class="row justify-around text-light full-width">
+                <span>
+                  store:{{$store.getters['admin/CONFIG'].general.baseURL}} <br/>
+                </span>
+                <span>
+                  axios:{{$axios.defaults.baseURL}}
+                </span>
+              </div>
+            </template>
+            <div class="column" style="min-width:300px">
+              <q-select
+                label="Host API"
+                v-model="baseURL"
+                :options="servers"
+                :loading="loadingSeturl">
+                <template slot="after">
+                  <q-btn dense
+                    :disable="baseURL === BASEURL"
+                    :flat="baseURL === BASEURL"
+                    :icon="baseURL !== BASEURL ? 'refresh' : 'done'"
+                    :color="baseURL !== BASEURL ? 'warning' : 'primary'"
+                  @click="saveBaseURL()" />
+
+                </template>
+              </q-select>
+            </div>
+          </modal>
+        </div>
       </div>
     </div>
-    <!-- <a class="ribbon" :title="`MANUFACTURE SYSTEM V1.0`" /> -->
   </div>
 </template>
 

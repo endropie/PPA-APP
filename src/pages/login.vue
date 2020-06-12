@@ -1,18 +1,20 @@
 <template>
-  <div padding  >
+  <div>
     <div class="index-page bg-grey-2 window-height window-width column items-center no-wrap">
       <div class="banner bg-primary flex flex-center">
-        {{ $store.state.admin.SETTING.general.app_brand || 'MANUFACTURE PLAY' }}
+        <span v-if="$q.screen.gt.xs" >
+          <q-icon name="widgets" class="text-h1" color="blue-7" /> {{$app.name}}
+        </span>
       </div>
       <div class="text-center" >
         <div class="card bg-white shadow-4 column no-wrap flex-center group">
           <!-- <img src="~assets/quasar-play-logo-full.svg"> -->
           <q-icon name="widgets" class="text-h2" color="blue-7" />
-          <div class="text-h4 text-orange-14 text-weight-bolder" style="font: courier">
-            {{ $store.state.admin.SETTING.general.app_brand || 'MANUFACTURE PLAY' }}
+          <div class="text-h6 text-orange-14 text-weight-bolder" style="font: courier">
+            {{ $app.name || 'MANUFACTURE PLAY' }}
           </div>
           <div class="text-orange-8 text-weight-light">
-            {{ $store.state.admin.SETTING.general.app_description || 'Administration Manufacture' }}
+            {{ $app.description || 'Administration Manufacture' }}
           </div>
           <div class="q-body ">
             <div class="row q-col-gutter-x-md">
@@ -221,7 +223,7 @@ export default {
   .banner
     height 50vh
     width 100%
-    font-size 12vmax
+    font-size 10vmax
     color rgba(255, 255, 255, .2)
     overflow hidden
   .card

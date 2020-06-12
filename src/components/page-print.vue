@@ -21,12 +21,12 @@
                     <div class="head-brand col-grow text-no-wrap ">
                       <div  class="title text-weight-bolder uppercase ellipsis text-truncate" style="opacity:0.8">
                         <slot name="header-title">
-                          <span>{{ $store.state.admin.SETTING.general.app_corporate || 'MY-CORPORATION' }}</span>
+                          <span>{{ CorporateName || 'MY-CORPORATION' }}</span>
                         </slot>
                       </div>
                       <div class="subtitle text-weight-light ellipsis text-truncate">
                         <slot name="header-subtitle">
-                          <span>{{ $store.state.admin.SETTING.general.app_corporate_address || '' }}</span>
+                          <span>{{ CorporateAddress || '' }}</span>
                         </slot>
                       </div>
                     </div>
@@ -63,6 +63,16 @@
 <script>
 export default {
   name :'page-print',
+  computed: {
+    CorporateName () {
+      if (!this.$store.state.admin.SETTING.general) return ''
+      return this.$store.state.admin.SETTING.general.app_corporate
+    },
+    CorporateAddress () {
+      if (!this.$store.state.admin.SETTING.general) return ''
+      return this.$store.state.admin.SETTING.general.app_corporate_address
+    }
+  }
 }
 </script>
 <style lang="stylus">
