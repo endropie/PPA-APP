@@ -6,6 +6,8 @@ export const CONFIG = (state, getters) => state.CONFIG
 
 export const SETTING = (state, getters) => state.SETTING
 
+export const ACCURATE = (state, getters) => state.ACCURATE
+
 export const AUTH = (state, getters) => {
   if (!state.AUTH) return null
 

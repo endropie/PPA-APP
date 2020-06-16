@@ -8,6 +8,8 @@ moment.locale('id')
 export default async ({ app, store, router, Vue }) => {
   Vue.prototype.$_ = _lodash
   Vue.prototype.$app = {
+    name: process.env.APP_NAME,
+    description: process.env.APP_DESCRIPTION,
     can: (v = null) => {
       // console.warn('CAN', v, (v === null || (typeof v === 'string' && v === '') || (typeof v === 'object' && v.length === 0)) ? 'SKIP' : 'NEXT')
       if (v === null || (typeof v === 'string' && v === '') || (typeof v === 'object' && v.length === 0)) return true

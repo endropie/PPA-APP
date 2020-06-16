@@ -1,6 +1,5 @@
 
-export const TIMESTART = ({ commit }) => {
-  setInterval(() => {
-    commit('setNow')
-  }, 1000 * 5)
+export const assignAccurate = ({ commit }, data) => {
+  console.warn('action', data)
+  commit('setAccurate', data)
 }

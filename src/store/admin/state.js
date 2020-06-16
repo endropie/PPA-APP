@@ -21,6 +21,7 @@ export default {
   USER: Object.assign({}, JSON.parse(LocalStorage.getItem('USER'))),
   CONFIG: Object.assign({}, config, JSON.parse(LocalStorage.getItem('CONFIG'))),
   SETTING: Object.assign({}, JSON.parse(LocalStorage.getItem('SETTING'))),
+  ACCURATE: Object.assign({}, JSON.parse(LocalStorage.getItem('ACCURATE'))),
   PAGEMETA: {},
   PAGE: {
     show: true,

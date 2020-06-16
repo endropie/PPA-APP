@@ -1,12 +1,15 @@
 import axios from 'axios'
+import { LocalStorage } from 'quasar'
 
 export default async ({ app, Vue }) => {
   Vue.prototype.$axios = axios
 
   // axios.defaults.baseURL = 'http://laravel.ppa'
   // axios.defaults.baseURL = 'localhost:8000'
+  const BASE_URL = LocalStorage.getItem('BASE_URL')
   const CONFIG = app.store.getters['admin/CONFIG']
   const AUTH = app.store.getters['admin/AUTH']
+  const ACCURATE = app.store.getters['admin/ACCURATE']
 
   if (CONFIG) {
     axios.defaults.baseURL = CONFIG.general.baseURL
@@ -15,11 +18,17 @@ export default async ({ app, Vue }) => {
     }
   }
 
-  // console.warn('[AXIOS] AUTH->', AUTH)
+  if (BASE_URL) axios.defaults.baseURL = BASE_URL
 
   if (AUTH.hasOwnProperty('token')) {
     axios.defaults.headers.common['Accept'] = 'application/json'
     axios.defaults.headers.common['Authorization'] = `Bearer ${AUTH.token}`
+  }
+
+  if (ACCURATE.hasOwnProperty('accurate[auth][access_token]')) {
+    axios.defaults.headers.common['X-Accurate-DB-host'] = ACCURATE['accurate[db][host]']
+    axios.defaults.headers.common['X-Accurate-DB-session'] = ACCURATE['accurate[db][session]']
+    axios.defaults.headers.common['X-Accurate-Auth-access_token'] = ACCURATE['accurate[auth][access_token]']
   }
 
   axios.set = (method, url, data) => {
@@ -30,7 +39,7 @@ export default async ({ app, Vue }) => {
     if (method.toUpperCase() === 'PATCH') return axios({ method: method, url: url, data: data })
   }
   axios.setHeader = (values = []) => {
-    values.forEach(function (data) {
+    values.map((data) => {
       axios.defaults.headers.common[data.key] = data.value
     }
     )

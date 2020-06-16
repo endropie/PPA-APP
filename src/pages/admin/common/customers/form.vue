@@ -413,7 +413,7 @@ export default {
         .then((response) => {
           let message = response.data.name + ' - #' + response.data.id
           this.FORM.response.success({message:message})
-          this.FORM.toIndex()
+          this.onSaved()
         })
         .catch((error) => {
           this.FORM.response.fields(error.response)
@@ -428,6 +428,38 @@ export default {
 
       });
     },
+
+
+    onSaved () {
+      if (!this.$app.can('customers-push')) return this.FORM.toIndex()
+      this.$q.dialog({ title: 'ACCURATE', message: 'are push to accurate?', cancel: true })
+      .onOk(() => {
+        this.onPush()
+      })
+      .onCancel(() => {
+        this.FORM.toIndex()
+      })
+
+    },
+
+    onPush () {
+      let { method, mode, apiUrl } = this.FORM.meta();
+      let url = `${apiUrl}/accurate/push`
+      this.$q.loading.show()
+      this.$axios.post(url)
+        .then((response) => {
+          let msg = response.data.d[0] || ''
+          if (response.data.s)
+            this.$app.notify.success('ACCURATE', msg)
+          else
+            this.$app.notify.warning('ACCURATE', msg)
+          this.FORM.toIndex()
+        }).catch((error) => {
+          this.$app.response.error(error.response || error)
+        }).finally(() => {
+          this.$q.loading.hide()
+        })
+    }
   },
 }
 </script>

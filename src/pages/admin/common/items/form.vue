@@ -598,34 +598,82 @@ export default {
         this.rsForm.item_units.splice(index, 1)
     },
 
-    onSave() {
-      this.$validator.validate().then(result => {
-        if (!result) {
-          this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
-          });
-
-          return;
-        }
+    onSave () {
+      const submit = () => {
         this.FORM.loading = true
         let {method, mode, apiUrl} = this.FORM.meta();
         this.$axios.set(method, apiUrl, this.rsForm)
         .then((response) => {
           let message = response.data.code + ' - #' + response.data.id
           this.FORM.response.success({message:message})
-          this.FORM.toIndex()
+          this.onSaved()
         })
         .catch((error) => {
           console.warn(error)
           this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error, 'Submit')
+          this.FORM.response.error(error.response || error, 'ITEM UPDATE')
         })
         .finally(()=>{
           this.FORM.loading = false
         });
+      }
 
+      this.$validator.validate().then(result => {
+        if (!result) {
+          return this.$q.notify({
+            color:'negative', icon:'error', position:'top-right', timeout: 3000,
+            message:this.$tc('messages.to_complete_form')
+          });
+        }
+
+        if (this.rsForm.price == this.FORM.data.price) submit()
+        else {
+          this.$q.dialog({
+            title: 'PASSWORD CONFIRM',
+            message: 'Price has changed. Enter password is required!',
+            prompt: { type: 'password', model: ''}
+          }).onOk(model => {
+            this.$axios.post('/api/v1/auth/confirm-password', { password: model })
+            .then((response) => {
+              if (response.data.status) submit()
+            })
+            .catch((error) => {
+              this.$app.response.error(error.response || error)
+            });
+          })
+        }
       });
+    },
+
+    onSaved () {
+      if (!this.$app.can('items-push')) return this.FORM.toIndex()
+      this.$q.dialog({ title: 'ACCURATE', message: 'are push to accurate?', cancel: true })
+      .onOk(() => {
+        this.onPush()
+      })
+      .onCancel(() => {
+        this.FORM.toIndex()
+      })
+
+    },
+
+    onPush () {
+      let { method, mode, apiUrl } = this.FORM.meta();
+      let url = `${apiUrl}/accurate/push`
+      this.$q.loading.show()
+      this.$axios.post(url)
+        .then((response) => {
+          let msg = response.data.d[0] || ''
+          if (response.data.s)
+            this.$app.notify.success('ACCURATE', msg)
+          else
+            this.$app.notify.warning('ACCURATE', msg)
+          this.FORM.toIndex()
+        }).catch((error) => {
+          this.$app.response.error(error.response || error)
+        }).finally(() => {
+          this.$q.loading.hide()
+        })
     },
   },
 }

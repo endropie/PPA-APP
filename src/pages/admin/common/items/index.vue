@@ -29,7 +29,14 @@
                 icon: 'add',
                 hidden: !$app.can('items-create'),
                 to: `${TABLE.resource.uri}/create`
-              }
+              },
+              { shortcut: true,
+                label: 'All sync',
+                detail: $tc('messages.form_new'),
+                icon: 'mdi-database-refresh',
+                hidden:!$app.can('items-push'),
+                actions: () => pushAll()
+              },
             ]">
 
             <div class="row q-col-gutter-xs" >
@@ -104,6 +111,9 @@
           <div v-if="rs.col.name === 'prefix'">
             <q-btn v-if="isCanUpdate" dense flat color="grey" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`"/>
             <q-btn v-if="isCanDelete" dense flat color="grey" icon="delete" @click.native="TABLE.delete(rs.row)" />
+            <q-btn v-if="isCanPush" dense flat color="light" icon="mdi-database-export" title="upload"
+              @click.native="push(rs.row)"
+            />
           </div>
 
           <div v-else-if="rs.col.name === 'customer'">
@@ -248,6 +258,9 @@ export default {
     this.INDEX.load()
   },
   computed: {
+    isCanPush () {
+      return this.$app.can('items-push')
+    },
     isCanUpdate(){
       return this.$app.can('items-update')
     },
@@ -270,6 +283,42 @@ export default {
     totalStock(id, label) {
       if(!this.MAPINGKEY['itemstocks'][id]) return 0
       return Number(this.MAPINGKEY['itemstocks'][id][label])
+    },
+    push (row) {
+      let url = `${this.TABLE.resource.api}/${row.id}/accurate/push`
+      console.warn('pusher', url);
+      this.$q.loading.show()
+      this.$axios.post(url)
+        .then((response) => {
+          let msg = response.data.d[0] || ''
+          return (response.data.s)
+            ? this.$app.notify.success('ACCURATE PUSH', msg)
+            : this.$app.notify.warning('ACCURATE PUSH', msg)
+        }).catch((error) => {
+          this.$app.response.error(error.response || error)
+        }).finally(() => {
+          this.$q.loading.hide()
+        })
+    },
+    pushAll () {
+      let url = `${this.TABLE.resource.api}/all/accurate/push`
+      this.$q.loading.show()
+      this.$axios.post(url)
+        .then((response) => {
+          console.warn('OK', response.data.filter(x => x.s === true).length);
+          let arrMsg = []
+          if (response.data.filter(x => x.s === true).length) {
+            arrMsg.push(response.data.filter(x => x.s === true).length + ' success')
+          }
+          if (response.data.filter(x => x.s === false).length) {
+            arrMsg.push(response.data.filter(x => x.s === false).length + ' failed')
+          }
+          this.$app.notify.info('ACCURATE SYNC', String(arrMsg.join(',') + ' to customer sync.'))
+        }).catch((error) => {
+          this.$app.response.error(error.response || error)
+        }).finally(() => {
+          this.$q.loading.hide()
+        });
     }
   },
 }
