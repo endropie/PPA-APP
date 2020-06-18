@@ -61,13 +61,13 @@ export const setAccurate = (state, values) => {
 
 export const setConfig = (state, values) => {
   state.CONFIG = Object.assign(state.CONFIG, values)
-  LocalStorage.set('SETTING', JSON.stringify(state.CONFIG))
+  LocalStorage.set('CONFIG', JSON.stringify(state.CONFIG))
 }
 
 export const setBaseURL = (state, value) => {
   state.CONFIG.general.baseURL = value
   axios.defaults.baseURL = value
-  LocalStorage.set('SETTING', JSON.stringify(state.CONFIG))
+  LocalStorage.set('CONFIG', JSON.stringify(state.CONFIG))
 
   return value
 }

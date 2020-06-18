@@ -10,6 +10,11 @@ export default async ({ app, store, router, Vue }) => {
   Vue.prototype.$app = {
     name: process.env.APP_NAME,
     description: process.env.APP_DESCRIPTION,
+    config: (attr, val = undefined) => {
+      if (val === undefined) return store.getters['admin/CONFIG'][attr]
+      const newData = Object.assign({}, { [attr]: val })
+      store.dispatch('admin/setItemConfig', newData)
+    },
     can: (v = null) => {
       // console.warn('CAN', v, (v === null || (typeof v === 'string' && v === '') || (typeof v === 'object' && v.length === 0)) ? 'SKIP' : 'NEXT')
       if (v === null || (typeof v === 'string' && v === '') || (typeof v === 'object' && v.length === 0)) return true

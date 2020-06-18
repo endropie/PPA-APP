@@ -1,7 +1,7 @@
 <template>
     <q-card highlight class="main-box no-margin no-shadow" :dark="LAYOUT.isDark">
       <q-card-section>
-        <span class="text-h4 text-uppercase text-blue-grey" header>{{$tc('general.incoming_good')}}</span>
+        <span class="text-h4 text-uppercase text-blue-grey" header>{{$tc('general.sj_delivery')}}</span>
       </q-card-section>
       <q-separator inset/>
       <q-card-section class="row q-col-gutter-xs" v-if="FORM.show">
@@ -103,7 +103,7 @@ export default {
       FORM: {
         show: false,
         resource:{
-          name: 'incoming_good',
+          name: 'sj_delivery',
           api: '/api/v1/setting',
         },
       },

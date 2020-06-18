@@ -61,8 +61,11 @@ const config = {
       { value: 'VDO', code:'VERIFICATION', label: 'VERIFICATION'},
     ]
   },
-  incomes: {
-    // code
+  incoming_good: {
+    hide_view_columns: ['part_specification']
+  },
+  sj_delivery: {
+    hide_view_columns: ['part_specification']
   },
   references: {
     vehicle_type: ['DELIVERY', 'OFFICE', 'OTHERS'],

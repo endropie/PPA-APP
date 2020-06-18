@@ -1,89 +1,14 @@
 <template>
     <q-card highlight class="main-box no-margin no-shadow" :dark="LAYOUT.isDark">
       <q-card-section>
-        <span class="text-h4 text-uppercase text-blue-grey" header>{{$tc('general.incoming_good')}}</span>
+        <span class="text-h4" header>{{$tc('general.item')}}</span>
       </q-card-section>
-      <q-separator inset/>
       <q-card-section class="row q-col-gutter-xs" v-if="FORM.show">
-        <div class="col-12 self-center">
-          <q-chip outline square color="primary" >
-            <q-badge :label="'NUMBER'" class="on-left"></q-badge>
-            {{EXAMP}}
-          </q-chip>
-        </div>
 
-        <q-input class="col-12 col-sm-4"
-          name="number_prefix"
-          :label="$tc('label.code', 1, {v:'prefix'})"
-          v-model="rsForm.number_prefix"
-          v-validate="'required|max:10'"
-          :dark="LAYOUT.isDark"
-          :error="errors.has('number_prefix')"
-          :error-message="errors.first('number_prefix')" />
-
-
-        <q-select class="col-12 col-sm-4"
-          name="number_interval"
-          label="Interval Prefix"
-          v-model="rsForm.number_interval"
-          :options="CONFIG.options['prefix_intervals']"
-          emit-value map-options
-          v-validate="''"
-          :dark="LAYOUT.isDark"
-          :error="errors.has('number_interval')"
-          :error-message="errors.first('number_interval')" />
-
-        <q-input class="col-12 col-sm-4"
-          name="number_digit"
-          :label="$tc('label.quantity', 1, {v: 'Digit'})"
-          v-model="rsForm.number_digit"
-          v-validate="'max:191'"
-          :dark="LAYOUT.isDark"
-          :error="errors.has('number_digit')"
-          :error-message="errors.first('number_digit')" />
-
-        <div class="col-12 self-center">
-          <q-chip outline square color="primary" >
-            <q-badge :label="'CUST INDEXED'" class="on-left"></q-badge>
-            {{INDEXED_EXAMP}}
-          </q-chip>
-        </div>
-
-        <q-select class="col-12 col-sm-6"
-          name="indexed_number_interval"
-          label="Cust. indexed Prefix"
-          v-model="rsForm.indexed_number_interval"
-          :options="CONFIG.options['prefix_intervals']"
-          emit-value map-options
-          v-validate="''"
-          :dark="LAYOUT.isDark"
-          :error="errors.has('indexed_number_interval')"
-          :error-message="errors.first('indexed_number_interval')" />
-
-        <q-input class="col-12 col-sm-6"
-          name="indexed_number_digit"
-          :label="$tc('label.quantity', 1, {v: 'Digit'})"
-          v-model="rsForm.indexed_number_digit"
-          v-validate="'max:191'"
-          :dark="LAYOUT.isDark"
-          :error="errors.has('indexed_number_digit')"
-          :error-message="errors.first('indexed_number_digit')" />
-
-      </q-card-section>
-      <q-separator inset />
-      <q-card-section class="row">
-        <q-select class="col-12"
-          name="show"
-          label="Hide View Columns"
-          v-model="rsForm.hide_view_columns"
-          :options="['part_name', 'part_number', 'part_specification', 'quantity', 'unit', 'note']"
-          multiple use-chips
-          :dark="LAYOUT.isDark"
-          :error="errors.has('hide_view_columns')"
-          :error-message="errors.first('hide_view_columns')" />
 
       </q-card-section>
       <q-card-actions class="q-gutter-sm" align="right">
+          <!-- <q-btn color="light" size="sm" @click="setForm(FORM.data)">Reset</q-btn> -->
           <q-btn dense color="positive"  @click="onSave()">Save</q-btn>
       </q-card-actions>
 
@@ -154,8 +79,7 @@ export default {
     init() {
       this.FORM.loading = true
       this.FORM.show = false
-      const resource = JSON.parse(JSON.stringify(this.$store.state.admin.SETTING[this.FORM.resource.name]))
-      this.rsForm = { ...this.rsForm, ...resource }
+      this.rsForm = JSON.parse(JSON.stringify(this.$store.state.admin.SETTING[this.FORM.resource.name]))
 
       setTimeout(() => {
         this.FORM.loading = false
