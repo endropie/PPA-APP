@@ -29,7 +29,7 @@
             <ux-date name="date" type="date" class="col-12" style="min-width:200px"
               :label="$tc('label.date')" stack-label
               v-model="rsForm.date"
-              v-validate="`required|date_format:yyyy-MM-dd` + FORM.ifCreate(`|after:${$app.moment().add(-1,'days').format('YYYY-MM-DD')}`,'')"
+              v-validate="`required|date_format:yyyy-MM-dd` + FORM.ifCreate(`|before:${$app.moment().add(1,'days').format('YYYY-MM-DD')}`,'')"
               :date-options="(date) => FORM.ifCreate(date <= $app.moment().format('YYYY/MM/DD'), true)"
               :dark="LAYOUT.isDark"
               :error="errors.has('date')"
