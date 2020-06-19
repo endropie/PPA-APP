@@ -167,6 +167,7 @@ const deliveries = [
     param: `?status=OPEN`,
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'incoming-goods-read' } },
+      { page: 'index-items', path: 'items', icon: 'list', meta: { permission: 'incoming-goods-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'incoming-goods-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'incoming-goods-update' } },
       { page: 'restoration', path: ':id/restoration', meta: { mode: 'edit', permission: 'incoming-goods-create' } },
@@ -221,6 +222,7 @@ const deliveries = [
     lang: 'general.sj_delivery',
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'sj-delivery-orders-read' } },
+      { page: 'index-items', path: 'items', icon: 'list', meta: { permission: 'sj-delivery-orders-read' } },
       { page: 'form-sample', path: 'create-sample', meta: {mode: 'create', permission: 'sj-delivery-orders-create'}},
       { page: 'form-sample', path: ':id/edit-sample', meta: {mode: 'edit', permission: 'sj-delivery-orders-update'}},
       { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
@@ -240,6 +242,18 @@ const deliveries = [
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'schedule-boards-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'schedule-boards-read' } }
     ]
+  },
+  {
+    path: 'incoming-goods/items',
+    icon: 'list',
+    lang: 'general.incoming_good_items',
+    meta: { permission: 'incoming-goods-read' }
+  },
+  {
+    path: 'delivery-orders/items',
+    icon: 'list',
+    lang: 'general.sj_delivery_items',
+    meta: { permission: 'sj-delivery-orders-read' }
   }
 ]
 

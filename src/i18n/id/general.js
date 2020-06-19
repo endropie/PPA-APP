@@ -27,11 +27,13 @@ export default {
   transfer_stock: 'Migrasi Stok | Pemindahan stock',
 
   receipt_delivery: 'Penerimaan & Pengiriman',
-  incoming_good: 'Incoming Good | Kedatangan - Material',
+  incoming_good: 'Incoming Good | Kedatangan Part',
+  incoming_good_items: 'Incoming Part Details | Detail Kedatangan Part',
   outgoing_good: 'Package Loading | Keberangkatan Part',
   outgoing_verification: 'Outgoing Verification | Verifikasi Part Keluar',
   pre_delivery: 'Pre Delivery | Permintaan Pengiriman',
   sj_delivery: 'Delivery (SJDO) | Surat Jalan',
+  sj_delivery_items: 'Delivery (SJDO) Details | Detail Surat Jalan',
   sj_internal: 'Delivery (Intern) | Surat Jalan Sementara',
   schedule_board: 'Penjadwalan |Jadwal Pengiriman & Penjemputan',
 
