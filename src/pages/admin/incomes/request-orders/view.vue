@@ -68,11 +68,11 @@
                   <q-td>{{row.item.part_name}}</q-td>
                   <q-td>{{row.item.part_number}}</q-td>
                   <q-td class="text-center">{{row.item.unit.code}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.unit_amount,0)}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.amount_delivery,0)}}</q-td>
+                  <q-td class="text-right">{{$app.number_format(row.unit_amount, row.item.unit.decimal_in)}}</q-td>
+                  <q-td class="text-right">{{$app.number_format(row.amount_delivery, row.item.unit.decimal_in)}}</q-td>
                   <q-td class="text-right">
                     <div v-if="Math.round(row.unit_amount - row.amount_delivery) > 0">
-                      {{$app.number_format((row.unit_amount - row.amount_delivery),0)}}
+                      {{$app.number_format((row.unit_amount - row.amount_delivery), row.item.unit.decimal_in)}}
                     </div>
                     <div v-else class="text-center">
                       -
@@ -84,12 +84,12 @@
                 <q-tr v-for="(row, index) in rsView.request_order_items" :key="index" :request-order-item-id="row.id">
                   <q-td>{{row.item.part_name}}</q-td>
                   <q-td>{{row.item.part_number}}</q-td>
-                  <q-td class="text-center">{{row.unit.code}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.amount_delivery/(row.unit_rate||1),0)}}</q-td>
+                  <q-td class="text-center">{{row.unit.code}} </q-td>
+                  <q-td class="text-right">{{$app.number_format(row.quantity, row.unit.decimal_in)}}</q-td>
+                  <q-td class="text-right">{{$app.number_format(row.amount_delivery/(row.unit_rate||1), row.unit.decimal_in)}}</q-td>
                   <q-td class="text-right">
                     <div v-if="Math.round(row.quantity - row.amount_delivery/(row.unit_rate||1)) > 0">
-                      {{$app.number_format((row.quantity - row.amount_delivery/(row.unit_rate||1)),0)}}
+                      {{$app.number_format((row.quantity - row.amount_delivery/(row.unit_rate||1)), row.unit.decimal_in)}}
                     </div>
                     <div v-else class="text-center">
                       -
