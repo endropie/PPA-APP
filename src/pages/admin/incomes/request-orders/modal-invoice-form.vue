@@ -17,6 +17,15 @@
 
       <q-page-container>
         <q-page padding>
+          <div class="column q-mb-sm">
+            <ux-date
+              :label="$tc('label.date')" stack-label
+              v-model="rsForm.date"
+
+              :error="errors.has('date')"
+              :error-message="errors.first('date')"
+            />
+          </div>
           <q-list bordered separator>
             <q-item-label v-if="!Deliveries.length" header class="text-center">
               Delivery not result!
@@ -53,6 +62,10 @@ export default {
   },
   data () {
     return {
+      rsForm: {
+        number: null,
+        date: null
+      },
       delivery_orders: []
     }
   },
@@ -94,8 +107,7 @@ export default {
       }
 
       const data = {
-        number: null,
-        data: null,
+        ...this.rsForm,
         delivery_orders: this.delivery_orders.filter(x => x.selected).map(item => ({id: item.id}))
       }
 
