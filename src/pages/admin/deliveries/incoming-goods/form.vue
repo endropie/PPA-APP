@@ -129,6 +129,7 @@
             <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
             <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
             <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+            <q-th key="note">{{$tc('label.note')}}</q-th>
           </q-tr>
         </thead>
         <tbody>
@@ -136,7 +137,7 @@
             <q-td  style="width:50px">
               <q-btn dense flat="" @click="removeItem(index)" icon="clear" tabindex="100" color="negative"/>
             </q-td>
-            <q-td width="45%">
+            <q-td width="30%">
               <ux-select autofocus
                 :name="`items.${index}.item_id`"
                 :data-vv-as="$tc('items.part_name')"
@@ -157,23 +158,23 @@
               <q-tooltip v-if="!Boolean(rsForm.customer_id)" :offset="[0, 10]">Select a customer, First! </q-tooltip>
               <q-tooltip v-if="!Boolean(rsForm.transaction)" :offset="[0, 10]">Select a transaction, First! </q-tooltip>
             </q-td>
-            <q-td key="part_number" width="35%" style="min-width:150px">
+            <q-td key="part_number" width="25%" style="min-width:150px">
               <q-input readonly
                 :value="row.item ? row.item.part_number : null"
                 outlined dense hide-bottom-space color="blue-grey-5"
                 :dark="LAYOUT.isDark" />
             </q-td>
-            <q-td width="25%">
+            <q-td width="15%">
               <q-input type="number" min="0" style="min-width:120px"
-                :name="`items.${index}.quantity`"
                 :data-vv-as="$tc('label.quantity')"
+                :name="`items.${index}.quantity`"
                 v-model="row.quantity"
                 v-validate="row.item_id ? 'required|gt_value:0' : ''"
                 dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
                 :dark="LAYOUT.isDark"
                 :error="errors.has(`items.${index}.quantity`)"/>
             </q-td>
-            <q-td width="25%">
+            <q-td width="15%">
               <q-select style="min-width:100px"
                 :name="`items.${index}.unit_id`"
                 :data-vv-as="$tc('label.unit')"
@@ -186,6 +187,12 @@
                 v-validate="row.item_id ? 'required' : ''"
                 :error="errors.has(`items.${index}.unit_id`)"/>
               <q-input class="hidden" v-model="row.unit_rate" />
+            </q-td>
+            <q-td width="20%">
+              <q-input
+                v-model="row.note"
+                outlined dense hide-bottom-space color="blue-grey-5"
+                :dark="LAYOUT.isDark" />
             </q-td>
 
           </q-tr>
@@ -267,6 +274,7 @@ export default {
 
               unit_id: null,
               unit_rate: 1,
+              note: null
             }
           ]
 
