@@ -19,9 +19,10 @@
         <q-page padding>
           <div class="column q-mb-sm">
             <ux-date
+              name="date"
               :label="$tc('label.date')" stack-label
               v-model="rsForm.date"
-
+              v-validate="'required'"
               :error="errors.has('date')"
               :error-message="errors.first('date')"
             />
@@ -64,7 +65,7 @@ export default {
     return {
       rsForm: {
         number: null,
-        date: null
+        date: this.$app.moment().format('YYYY-MM-DD')
       },
       delivery_orders: []
     }
@@ -111,13 +112,24 @@ export default {
         delivery_orders: this.delivery_orders.filter(x => x.selected).map(item => ({id: item.id}))
       }
 
-      if (!data.delivery_orders.length) {
-        return this.$q.dialog({
-          html: true,
-          message:'Delivery unset!. <br>Please choice some delivery, first.'
-        });
-      }
-      submit(data)
+
+      this.$validator.validate().then(result => {
+        if (!result) {
+          return this.$q.notify({
+            color:'negative', icon:'error', position:'top-right', timeout: 3000,
+            message:this.$tc('messages.to_complete_form')
+          })
+        }
+
+        if (!data.delivery_orders.length) {
+          return this.$q.dialog({
+            html: true,
+            message:'Delivery unset!. <br>Please choice some delivery, first.'
+          });
+        }
+        submit(data)
+      })
+
     }
   }
 }
