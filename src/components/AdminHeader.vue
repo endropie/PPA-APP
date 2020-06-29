@@ -90,6 +90,7 @@ export default {
       },
       set (val) {
         this.$store.commit('admin/setMode', val)
+        this.$q.dark.set(val)
       }
     },
     ...mapState('admin', [
