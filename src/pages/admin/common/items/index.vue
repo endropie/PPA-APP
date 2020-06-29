@@ -24,13 +24,23 @@
             :TABLE.sync="TABLE"
             :menus="[
               { shortcut: true,
-                label: $tc('form.add'),
+                tooltip: true,
+                label: $tc('form.add_new'),
                 detail: $tc('messages.form_new'),
                 icon: 'add',
                 hidden: !$app.can('items-create'),
                 to: `${TABLE.resource.uri}/create`
               },
               { shortcut: true,
+                tooltip: true,
+                label: $tc('items.sample.add'),
+                detail: $tc('messages.form_new'),
+                icon: 'mdi-tag-plus',
+                hidden: !$app.can('items-sample'),
+                to: `${TABLE.resource.uri}/create-sample`
+              },
+              { shortcut: true,
+                tooltip: true,
                 label: 'All sync',
                 detail: $tc('messages.form_new'),
                 icon: 'mdi-database-refresh',
@@ -70,14 +80,19 @@
               </q-select>
 
               <div class="col-12 col-sm-4">
-                <div class="row  justify-end">
-                  <q-checkbox
+                <div class="row justify-end no-wrap">
+                  <!-- <q-checkbox
                     left-label label="Sample"
                     v-model="FILTERABLE.fill.sampled.value"
                     true-value="true"
                     false-value=""
                     @input="FILTERABLE.submit"
-                  />
+                  /> -->
+                  <q-select input-class="no-wrap"
+                    dense borderless outlined
+                    :options="['REGULER','SAMPLE','VALIDATE']"
+                    v-model="FILTERABLE.fill.sampling.value"
+                    @input="FILTERABLE.submit" />
                   <q-checkbox
                     left-label label="Disable"
                     v-model="FILTERABLE.fill.enable.value"
@@ -109,11 +124,12 @@
 
         <q-td slot="body-cell" slot-scope="rs" :props="rs">
           <div v-if="rs.col.name === 'prefix'">
-            <q-btn v-if="isCanUpdate" dense flat color="grey" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`"/>
+            <q-btn v-if="$app.can('items-read')" dense flat color="grey" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`"/>
+            <!-- <q-btn v-if="isCanUpdate" dense flat color="grey" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`"/>
             <q-btn v-if="isCanDelete" dense flat color="grey" icon="delete" @click.native="TABLE.delete(rs.row)" />
             <q-btn v-if="isCanPush" dense flat color="light" icon="mdi-database-export" title="upload"
               @click.native="push(rs.row)"
-            />
+            /> -->
           </div>
 
           <div v-else-if="rs.col.name === 'customer'">
@@ -183,6 +199,11 @@ export default {
         fill: {
           sampled: {
             value: '',
+            type: 'string',
+            transform: (value) => { return null }
+          },
+          sampling: {
+            value: 'REGULER',
             type: 'string',
             transform: (value) => { return null }
           },

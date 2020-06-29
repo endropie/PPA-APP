@@ -41,7 +41,7 @@ export default {
   period: 'Periode',
   phone: 'No. HP',
   plan: 'Plan',
-  price: 'Harga',
+  price: 'Harga {v}',
   preference: 'Preference',
   qty: 'JML {v}',
   quantity: 'Jumlah {v}',

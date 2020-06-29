@@ -1,0 +1,500 @@
+<template>
+<q-page padding class="form-page row justify-center">
+  <q-card inline class="main-box self-start" v-if="FORM.show" :dark="LAYOUT.isDark" :class="{ 'bg-grey-9': LAYOUT.isDark}">
+    <q-card-section class="q-pa-sm">
+      <form-header :title="(`SAMPLE ${$tc('general.item')}`).toUpperCase()" :subtitle="FORM.subtitle()" >
+        <template slot="menu-item">
+          <list-item :label="$tc('form.remove')" icon="delete" clickable @click="FORM.delete" v-close-popup v-if="ROUTE.params.id"/>
+        </template>
+      </form-header>
+    </q-card-section>
+    <q-separator :dark="LAYOUT.isDark"/>
+    <!-- ROW::1st Part Identity -->
+    <q-card-section class="row q-col-gutter-sm">
+      <div class="col-12 col-sm-6" >
+        <div class="row q-col-gutter-x-sm">
+          <ux-select-filter
+            name="customer_id"
+            :label="$tc('general.customer')"
+            class="col-12"
+            :data-vv-as="$tc('general.customer')"
+            v-model="rsForm.customer_id" options-cover clearable
+            :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+            :options="CustomerOptions"
+            v-validate="'required'"
+            :error="errors.has('customer_id')"
+            :error-message="errors.first('customer_id')"/>
+
+          <q-input
+            name="part_number"
+            label="Part Number"
+            class="col-12"
+            icon="layers"
+            v-model="rsForm.part_number"
+            v-validate="'required'"
+            :error="errors.has('part_number')"
+            :error-message="errors.first('part_number')"
+            :dark="LAYOUT.isDark"
+          />
+          <q-input
+              name="part_name"
+              label="Part name"
+              v-model="rsForm.part_name"
+              v-validate="'required'"
+              :dark="LAYOUT.isDark"
+              class="col-12"
+              icon="label"
+              :error="errors.has('part_name')"
+              :error-message="errors.first('part_name')"
+          />
+          <q-input
+            name="part_alias"
+            label="Part alias Finished"
+            v-model="rsForm.part_alias"
+            v-validate="''"
+            :dark="LAYOUT.isDark"
+              class="col-12" icon="beenhere" :error="errors.has('part_alias')" :error-message="errors.first('part_alias')"
+          />
+        </div>
+      </div>
+      <div class="col-12 col-sm-6" >
+        <div class="row q-col-gutter-x-sm">
+          <q-input class="col-12"
+            name="code"
+            :placeholder="FORM.ifCreate('[Auto Generate]','')"
+            :label="$tc('label.code_intern')"
+            :dark="LAYOUT.isDark"
+            v-model="rsForm.code"
+            v-validate="FORM.ifCreate('','required')"
+            :error="errors.has('code')"
+            :error-message="errors.first('code')" >
+            <q-toggle slot="after" class="text-body2 bordered rounded-borders q-pa-xs no-margin"
+              :label="rsForm.enable ? 'Enable':'Disable'" left-label
+              v-model="rsForm.enable"
+              :color="rsForm.enable ? 'primary':'red'"
+              :true-value="1"
+              :false-value="0" />
+          </q-input>
+          <ux-select-filter
+            name="brand_id"
+            :label="$tc('general.brand')"
+            class="col-12 col-sm-6"
+            v-model="rsForm.brand_id"
+            v-validate="isNotSample(`required`)"
+            :dark="LAYOUT.isDark"
+            :options="BrandOptions"
+            input-debounce="0"
+            :error="errors.has('brand_id')"
+            :error-message="errors.first('brand_id')" />
+
+          <ux-select-filter
+            name="specification_id"
+            v-model="rsForm.specification_id"
+            :label="$tc('items.specification')"
+            class="col-12 col-sm-6"
+            v-validate="isNotSample(`required`)"
+            :dark="LAYOUT.isDark"
+            :options="SpecificationOptions"
+            :error="errors.has('specification_id')"
+            :error-message="errors.first('specification_id')" />
+
+          <ux-select-filter
+            name="category_item_id"
+            v-model="rsForm.category_item_id"
+            label="Category"
+            v-validate="isNotSample(`required`)"
+            class="col-6"
+            icon="table_chart"
+            :dark="LAYOUT.isDark"
+            :options="CategoryOptions"
+            :error="errors.has('category_item_id')"
+            :error-message="errors.first('category_item_id')" />
+          <ux-select-filter
+            name="type_item_id"
+            label="Type"
+            class="col-6"
+            icon="dehaze"
+            v-model="rsForm.type_item_id"
+            v-validate="isNotSample(`required`)"
+            :dark="LAYOUT.isDark"
+            :options="TypeOptions"
+            :error="errors.has('type_item_id')"
+            :error-message="errors.first('type_item_id')" />
+          <ux-select-filter
+            name="unit_id"
+            v-model="rsForm.unit_id"
+            :label="$tc('label.unit')"
+            class="col-6"
+            icon="web_asset"
+            v-validate="'required'"
+            :dark="LAYOUT.isDark"
+            :options="UnitOptions"
+            :error="errors.has('unit_id')"
+            :error-message="errors.first('unit_id')" />
+          <ux-select-filter
+            name="size_id"
+            v-model="rsForm.size_id"
+            label="Size"
+            v-validate="isNotSample(`required`)"
+            :dark="LAYOUT.isDark"
+            :options="SizeOptions"
+            class="col-6"
+            icon="format_size"
+            :error="errors.has('size_id')"
+            :error-message="errors.first('size_id')" />
+
+        </div>
+      </div>
+    </q-card-section>
+    <!-- ROW::2th Estimate, unit corvertion & Enginering  -->
+    <q-card-section>
+      <div class="row q-col-gutter-md">
+        <!-- ITEM - ESTIMATE -->
+        <div class="col-12 col-sm-6"  v-if="$app.can('items-sample')">
+          <q-card class="fit">
+            <q-card-section class="bg-secondary text-white q-pa-sm">
+              <div class="text-subtitle2 text-uppercase">Estimation</div>
+            </q-card-section>
+            <q-separator />
+            <q-card-section class="q-pa-sm">
+                <ux-numeric input-style="text-align:left"
+                  type="number" color="secondary"
+                  name="estimate_price"
+                  label="Estimate Price"
+                  v-model="rsForm.estimate_price"
+                  v-validate="isFromSample(`required`)"
+                  :error="errors.has('estimate_price')"
+                  :error-message="errors.first('estimate_price')"
+                />
+                <ux-numeric input-style=""
+                  type="number" color="secondary"
+                  name="estimate_sadm"
+                  label="Estimate S.A (dm)"
+                  v-model="rsForm.estimate_sadm"
+                  v-validate="isFromSample(`required`)"
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has('estimate_sadm')"
+                  :error-message="errors.first('estimate_sadm')"
+                />
+                <ux-numeric input-style=""
+                  type="number"  color="secondary"
+                  name="estimate_monthly_amount"
+                  :label="`${$tc('label.total', 1, {v: 'Estimasi'})} / Montly`"
+                  v-model="rsForm.estimate_monthly_amount"
+                  v-validate="isFromSample(`required`)"
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has('estimate_monthly_amount')"
+                  :error-message="errors.first('estimate_monthly_amount')"
+                />
+            </q-card-section>
+          </q-card>
+        </div>
+
+        <div class="column col-12 col-sm-6" v-if="$app.can('items-price')">
+          <q-card class="fit">
+            <q-card-section class="bg-secondary text-white q-pa-sm">
+              <div class="text-subtitle2 text-uppercase">{{$tc('items.price')}}</div>
+            </q-card-section>
+            <q-separator />
+            <q-card-section class="q-pa-sm">
+              <ux-numeric
+                name="price"
+                :label="$tc('label.price', 1, { v: 'Normal' })"
+                type="number"
+                v-model="rsForm.price"
+                v-validate="isFromSample(`required`)"
+                outlined align="center"
+                :error="errors.has('price')"
+                :error-message="errors.first('price')"
+              />
+              <ux-numeric
+                name="price_area" type="number" readonly
+                label="Price in DM"
+                :value="price_area"
+                outlined align="center"
+                :error="errors.has('price_area')"
+                :error-message="errors.first('price_area')"
+              />
+              <ux-numeric
+                name="price_packaged"
+                label="Price in BRL"
+                type="number" readonly
+                :value="price_packaged"
+                outlined align="center"
+                :error="errors.has('price_packaged')"
+                :error-message="errors.first('price_packaged')"
+              />
+            </q-card-section>
+          </q-card>
+        </div>
+      </div>
+
+    </q-card-section>
+    <!-- ROW::3th Price & Description -->
+    <q-card-section>
+      <div class="row q-col-gutter-sm">
+        <q-input class="col-12" type="textarea" autogrow rows="3"
+          :label="$tc('label.description')" stack-label
+          v-model="rsForm.description"
+          filled
+          :dark="LAYOUT.isDark"
+        />
+      </div>
+    </q-card-section>
+    <q-separator :dark="LAYOUT.isDark" spaced />
+    <q-card-actions class="group float-right">
+      <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()" />
+      <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)" />
+      <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()" />
+      <q-btn :label="$tc('items.reguler_request')" color="secondary" @click="onSave(true)" />
+    </q-card-actions>
+  </q-card>
+  <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
+</q-page>
+</template>
+
+<script>
+import MixForm from '@/mixins/mix-form.vue'
+
+export default {
+  mixins: [MixForm],
+  data () {
+    return {
+      SHEET: {
+        colors: {data:[], api:'/api/v1/references/colors?mode=all'},
+        type_items: {data:[], api:'/api/v1/references/type-items?mode=all'},
+        category_items: {data:[], api:'/api/v1/references/category-items?mode=all'},
+        sizes: {data:[], api:'/api/v1/references/sizes?mode=all'},
+        units: {data:[], api:'/api/v1/references/units?mode=all'},
+        brands: {data:[], api:'/api/v1/references/brands?mode=all'},
+        specifications: {data:[], api:'/api/v1/references/specifications?mode=all'},
+        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
+        lines: {data:[], api:'/api/v1/references/lines?mode=all'},
+
+      },
+      FORM: {
+        resource:{
+          uri: '/admin/common/items',
+          api: '/api/v1/common/items',
+        },
+      },
+      rsForm:{},
+      setDefault:()=>{
+        return {
+          code:null,
+          customer_id:null,
+          brand_id:null,
+          specification_id:null,
+
+          part_name:null,
+          part_alias:null,
+          part_number:null,
+
+          load_type: null,
+          load_capacity: null,
+          packing_duration: null,
+          sa_dm: null,
+          weight: null,
+
+          category_item_id: null,
+          type_item_id: null,
+          size_id: null,
+          unit_id: null,
+
+          price: null,
+          item_prelines: [{ id:null, line_id: null, note: null }],
+          item_units: [],
+          estimate_price: null,
+          estimate_sadm: null,
+          estimate_monthly_amount: null,
+          enable: 1,
+          sample: 1,
+          description:null,
+        }
+      }
+    }
+  },
+  created() {
+    // Component Page Mounted!
+    this.init()
+
+  },
+  computed: {
+    LineOptions() {
+      return (this.SHEET.lines.data.map(item => ({...item, label: item.name, value: item.id})) || [])
+    },
+    CategoryOptions() {
+      return (this.SHEET.category_items.data.map(item => ({label: item.name, value: item.id})) || [])
+    },
+    TypeOptions() {
+      return (this.SHEET.type_items.data.map(item => ({label: item.name, value: item.id})) || [])
+    },
+    CustomerOptions() {
+      return (this.SHEET.customers.data.map(item => ({
+        label: [item.code, item.name].join(' - '),
+        value: item.id
+      })) || [])
+    },
+    BrandOptions() {
+      return (this.SHEET.brands.data.map(item => ({
+        label: [item.code, item.name].join(' - '),
+        value: item.id
+      })) || [])
+    },
+    SpecificationOptions() {
+      return (this.SHEET.specifications.data.map(item => ({
+        label: [item.code, item.name].join(' - '),
+        sublabel: item.hasOwnProperty('color') ? `Color: ${item.color.name}` : undefined ,
+        value: item.id
+      })) || [])
+    },
+    SizeOptions() {
+      return (this.SHEET.sizes.data.map(item => ({
+        label: item.name,
+        value: item.id
+      })) || [])
+    },
+    UnitOptions() {
+      return (this.SHEET.units.data.map(item => ({
+        label: String(item.code).toUpperCase(),
+        value: item.id
+      })) || [])
+    },
+    price_area() {
+      if(!Number(this.rsForm.price) || !Number(this.rsForm.sa_dm)) return 0
+      return Number(this.rsForm.price) / Number(this.rsForm.sa_dm)
+    },
+    price_packaged() {
+      return Number(this.rsForm.load_capacity|| 0) * Number(this.rsForm.price || 0)
+    },
+    MAPINGKEY(){
+      let variables = {
+        'brands' : {},
+        'customers': {},
+        'specifications': {}
+      }
+      this.SHEET['brands'].data.map(item => { variables['brands'][item.id] = item })
+      this.SHEET['customers'].data.map(item => { variables['customers'][item.id] = item })
+      this.SHEET['specifications'].data.map(item => { variables['specifications'][item.id] = item })
+
+      return variables;
+    }
+  },
+  watch:{
+      '$route' : 'init'
+  },
+  methods: {
+    init() {
+      this.FORM.load((data) => {
+        this.setForm(data || this.setDefault())
+      })
+    },
+    setForm(data) {
+      this.rsForm = JSON.parse(JSON.stringify(data))
+    },
+
+    setCode() {
+      let brand_id = this.rsForm.brand_id,
+        customer_id = this.rsForm.customer_id,
+        specification_id = this.rsForm.specification_id;
+
+      if (!brand_id || !customer_id || !specification_id) {
+        this.rsForm['code'] = this.rsForm['id'] || null
+        return
+      }
+
+      let BRAND = this.MAPINGKEY['brands'][this.rsForm.brand_id] || {}
+      let CUST = this.MAPINGKEY['customers'][this.rsForm.customer_id] || {}
+      let SPEC = this.MAPINGKEY['specifications'][this.rsForm.specification_id] || {}
+
+      // Set unique code
+      this.rsForm['code'] = [CUST.code, BRAND.code, SPEC.code].join('-')
+    },
+
+    isNotSample(v) {
+      return this.rsForm.sample ? '' : v
+    },
+    isFromSample(v) {
+      return !(this.rsForm.isRegulerRequest && this.FORM.data.sample) ? '' : v
+    },
+
+    addNewProduction (autofocus = true) {
+      var newEntri =this.setDefault().item_prelines[0];
+
+      this.rsForm.item_prelines.push(newEntri)
+    },
+
+    removeProduction (index) {
+        this.rsForm.item_prelines.splice(index, 1)
+        if(this.rsForm.item_prelines.length < 1) this.addNewProduction()
+    },
+
+    addNewUnit (autofocus = true) {
+      const newEntri = Object.assign({ id:null, unit_id:null, rate:null })
+      this.rsForm.item_units.push(newEntri)
+    },
+
+    removeUnit (index) {
+        this.rsForm.item_units.splice(index, 1)
+    },
+
+    onSave (isRegulerRequest = false) {
+
+      const submit = () => {
+        let {method, mode, apiUrl} = this.FORM.meta()
+        const data =  { ...this.rsForm, isRegulerRequest }
+
+        this.$q.loading.show()
+        this.$axios.set(method, apiUrl, data)
+        .then((response) => {
+          let message = response.data.code + ' - #' + response.data.id
+          this.FORM.response.success({message:message})
+          this.$router.go(-1)
+        })
+        .catch((error) => {
+          console.warn(error)
+          this.FORM.response.fields(error.response)
+          this.FORM.response.error(error.response || error, 'FORM ITEM PART')
+        })
+        .finally(()=>{
+          this.$q.loading.hide()
+        });
+      }
+
+      this.rsForm.isRegulerRequest = isRegulerRequest
+      this.$validator.validate()
+      setTimeout(() => {
+        this.$validator.validate().then(result => {
+          if (!result) {
+            return this.$q.notify({
+              color:'negative', icon:'error', position:'top-right', timeout: 3000,
+              message:this.$tc('messages.to_complete_form')
+            })
+          }
+
+          this.$q.dialog({ message: 'Are sure to submit?', title: 'CONFIRM'})
+            .onOk(() => {
+              submit()
+            })
+        }, 1000)
+      })
+    },
+
+    confirmByPass(callback = false) {
+          this.$q.dialog({
+            title: 'PASSWORD CONFIRM',
+            message: 'Price has changed. Enter password is required!',
+            prompt: { type: 'password', model: ''}
+          }).onOk(model => {
+            this.$axios.post('/api/v1/auth/confirm-password', { password: model })
+            .then((response) => {
+              if (response.data.status && callback !== false) callback()
+            })
+            .catch((error) => {
+              this.$app.response.error(error.response || error)
+            });
+          })
+    }
+  },
+}
+</script>

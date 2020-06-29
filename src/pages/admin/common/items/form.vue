@@ -3,6 +3,7 @@
   <q-card inline class="main-box self-start" v-if="FORM.show" :dark="LAYOUT.isDark" :class="{ 'bg-grey-9': LAYOUT.isDark}">
     <q-card-section class="q-pa-sm">
       <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" >
+        <q-chip slot="optional" square outline icon="bookmark" color="warning" label="SAMPLE" v-if="rsForm.sample" />
         <template slot="menu-item">
           <list-item :label="$tc('form.remove')" icon="delete" clickable @click="FORM.delete" v-close-popup v-if="ROUTE.params.id"/>
         </template>
@@ -13,7 +14,7 @@
     <q-card-section class="row q-col-gutter-sm">
       <div class="col-12 col-sm-6" >
         <div class="row q-col-gutter-x-sm">
-          <ux-select-filter
+          <ux-select-filter readonly
             name="customer_id"
             :label="$tc('general.customer')"
             class="col-12"
@@ -110,15 +111,7 @@
               v-model="rsForm.enable"
               :color="rsForm.enable ? 'primary':'red'"
               :true-value="1"
-              :false-value="0" />
-            <q-toggle slot="after" class="text-body2 bordered rounded-borders q-pa-xs no-margin"
-              :label="rsForm.sample ? 'Sample':'Reguler'" left-label
-              v-model="rsForm.sample"
-              :color="rsForm.sample ? 'primary':'red'"
-              :true-value="1"
               :false-value="0"
-              :disable="!$app.can('items-sample')"
-              v-if="!Boolean(FORM.data.id && FORM.data.sample == 0)"
             />
           </q-input>
           <q-input
@@ -157,43 +150,100 @@
     <!-- ROW::2th Estimate, unit corvertion & Enginering  -->
     <q-card-section>
       <div class="row q-col-gutter-md">
-        <!-- ITEM - ESTIMATE -->
-        <div class="col-12 col-sm-6 col-md-3"  v-if="$app.can('items-sample')">
+        <!-- ITEM - PRELINE -->
+        <div class="col-12 col-md-6">
           <q-card class="fit">
             <q-card-section class="bg-secondary text-white q-pa-sm">
-              <div class="text-subtitle2">Estimation</div>
+              <div class="text-subtitle2">Enginering information</div>
             </q-card-section>
             <q-separator />
             <q-card-section class="q-pa-sm">
-                <ux-numeric input-style="text-align:left"
-                  type="number" color="secondary"
-                  name="estimate_price"
-                  label="Estimate Price"
-                  v-model="rsForm.estimate_price"
-                  v-validate="isFromSample(`required`)"
-                  :error="errors.has('estimate_price')"
-                  :error-message="errors.first('estimate_price')"
-                />
-                <q-input input-style=""
-                  type="number" color="secondary"
-                  name="estimate_sadm"
-                  label="Estimate S.A (dm)"
-                  v-model="rsForm.estimate_sadm"
-                  v-validate="isFromSample(`required`)"
+              <div class="row q-col-gutter-x-sm ">
+                <q-input class="col-12 col-sm-6" input-style="text-align:left"
+                  name="sa_dm"
+                  label="S.A (dm)"
+                  v-model="rsForm.sa_dm"
+                  type="number"
+                  v-validate="isNotSample(`required`)"
                   :dark="LAYOUT.isDark"
-                  :error="errors.has('estimate_sadm')"
-                  :error-message="errors.first('estimate_sadm')"
+                  :error="errors.has('sa_dm')"
+                  :error-message="errors.first('sa_dm')"
                 />
-                <q-input input-style=""
-                  type="number"  color="secondary" suffix=" / Montly"
-                  name="estimate_monthly_amount"
-                  :label="$tc('label.total', 1, {v: 'Estimasi'})"
-                  v-model="rsForm.estimate_monthly_amount"
-                  v-validate="isFromSample(`required`)"
+                <q-input class="col-12 col-sm-6" input-style="text-align:left"
+                  name="weight"
+                  label="Weight"
+                  v-model="rsForm.weight"
+                  type="number"
+                  v-validate="isNotSample(`required`)"
                   :dark="LAYOUT.isDark"
-                  :error="errors.has('estimate_monthly_amount')"
-                  :error-message="errors.first('estimate_monthly_amount')"
+                  :error="errors.has('weight')"
+                  :error-message="errors.first('weight')"
                 />
+
+                <q-select class="col-12 col-sm-6"
+                  name="load_type"
+                  :label="$tc('label.mode', 1, {v:'Hanger/Barrel'})"
+                  v-model="rsForm.load_type"
+                  :options="['HANGER', 'BAREL']"
+                  v-validate="isNotSample(`required`)"
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has('load_type')"
+                  :error-message="errors.first('load_type')"/>
+
+                <div class="row col-12 col-sm-6 q-col-gutter-sm">
+                  <q-input class="col-12 col-sm-6"
+                    name="load_capacity"
+                    :label="$tc('label.capacity', 1)"
+                    type="number"
+                    v-model="rsForm.load_capacity"
+                    v-validate="isNotSample(`required`)"
+                    no-error-icon
+                    :error="errors.has('load_capacity')"
+                  />
+
+                  <q-input class="col-12 col-sm-6"
+                    name="packing_duration"
+                    label="Packing duration"
+                    type="number"
+                    icon="timer"
+                    v-model="rsForm.packing_duration"
+                    v-validate="isNotSample(`required`)"
+                    no-error-icon
+                    :error="errors.has('packing_duration')"
+                  />
+                </div>
+              </div>
+              <q-list dense class="no-padding">
+                <q-item-label header class="text-caption no-padding" >Preline Production</q-item-label>
+                <q-item v-for="(item, index) in rsForm.item_prelines" :key="index" class="no-padding">
+                  <q-item-section>
+                    <ux-select-filter
+                      :ref="`pre-line`"
+                      :name="`pre-line-${index}`"
+                      v-model="rsForm.item_prelines[index].line_id"
+                      :dark="LAYOUT.isDark"
+                      inverted dense
+                      color="primary"
+                      :prefix="`${index+1}. `"
+                      :options="LineOptions"
+                      :inject-filter="(line) => { if(index === 0 && !line.ismain) return false}"
+                      v-validate="isNotSample(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
+                      :error="errors.has(`pre-line-${index}`)"
+                      :error-message="errors.first(`pre-line-${index}`)"
+                    >
+                      <q-badge slot="append" color="teal" label="main" v-if="index === 0"/>
+                    </ux-select-filter>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-btn :class="{'invisible':!index}" dense flat round icon="clear" color="red-5" @click="removeProduction(index)"/>
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    <q-btn dense outline color="primary" :label="$tc('form.add',2)" @click="addNewProduction()" />
+                  </q-item-section>
+                </q-item>
+              </q-list>
             </q-card-section>
           </q-card>
         </div>
@@ -250,101 +300,43 @@
             </q-card-section>
           </q-card>
         </div>
-        <!-- ITEM - PRELINE -->
-        <div class="col-12 col-md-6">
+        <!-- ITEM - ESTIMATE -->
+        <div class="col-12 col-sm-6 col-md-3"  v-if="$app.can('items-sample')">
           <q-card class="fit">
             <q-card-section class="bg-secondary text-white q-pa-sm">
-              <div class="text-subtitle2">Enginering information</div>
+              <div class="text-subtitle2">Estimation</div>
             </q-card-section>
             <q-separator />
             <q-card-section class="q-pa-sm">
-              <div class="row q-col-gutter-x-sm ">
-                <q-input class="col-12 col-sm-6" input-style="text-align:left"
-                  name="sa_dm"
-                  label="S.A (dm)"
-                  v-model="rsForm.sa_dm"
-                  type="number"
-                  v-validate="isNotSample(`required`)"
-                  :dark="LAYOUT.isDark"
-                  :error="errors.has('sa_dm')"
-                  :error-message="errors.first('sa_dm')"
+                <ux-numeric readonly input-style="text-align:left"
+                  type="number" color="secondary"
+                  name="estimate_price"
+                  label="Estimate Price"
+                  v-model="rsForm.estimate_price"
+                  v-validate="isFromSample(`required`)"
+                  :error="errors.has('estimate_price')"
+                  :error-message="errors.first('estimate_price')"
                 />
-                <q-input class="col-12 col-sm-6" input-style="text-align:left"
-                  name="weight"
-                  label="Weight"
-                  v-model="rsForm.weight"
-                  type="number"
-                  v-validate="isNotSample(`required`)"
+                <q-input readonly input-style=""
+                  type="number" color="secondary"
+                  name="estimate_sadm"
+                  label="Estimate S.A (dm)"
+                  v-model="rsForm.estimate_sadm"
+                  v-validate="isFromSample(`required`)"
                   :dark="LAYOUT.isDark"
-                  :error="errors.has('weight')"
-                  :error-message="errors.first('weight')"
+                  :error="errors.has('estimate_sadm')"
+                  :error-message="errors.first('estimate_sadm')"
                 />
-                <q-input class="col-12 col-sm-6"
-                  name="packing_duration"
-                  label="Packing duration"
-                  type="number"
-                  icon="timer"
-                  v-model="rsForm.packing_duration"
-                  v-validate="isNotSample(`required`)"
+                <q-input readonly input-style=""
+                  type="number"  color="secondary" suffix=" / Montly"
+                  name="estimate_monthly_amount"
+                  :label="$tc('label.total', 1, {v: 'Estimasi'})"
+                  v-model="rsForm.estimate_monthly_amount"
+                  v-validate="isFromSample(`required`)"
                   :dark="LAYOUT.isDark"
-                  :error="errors.has('packing_duration')"
-                  :error-message="errors.first('packing_duration')"
+                  :error="errors.has('estimate_monthly_amount')"
+                  :error-message="errors.first('estimate_monthly_amount')"
                 />
-
-                <q-select class="col-12 col-sm-6"
-                  name="load_type"
-                  :label="$tc('label.mode', 1, {v:'Hanger/Barrel'})"
-                  v-model="rsForm.load_type"
-                  :options="['HANGER', 'BAREL']"
-                  v-validate="isNotSample(`required`)"
-                  :dark="LAYOUT.isDark"
-                  :error="errors.has('load_type')" >
-                  <q-input slot="after" class="no-padding" input-style="width:75px"
-                    name="load_capacity"
-                    :label="$tc('label.capacity', 1)"
-                    type="number"
-                    v-model="rsForm.load_capacity"
-                    v-validate="isNotSample(`required`)"
-                    :dark="LAYOUT.isDark"
-                    :error="errors.has('load_capacity')"
-                  />
-                </q-select>
-              </div>
-              <q-list dense class="no-padding">
-                <q-item-label header class="text-caption no-padding" >Preline Production</q-item-label>
-                <q-item v-for="(item, index) in rsForm.item_prelines" :key="index" class="no-padding">
-                  <q-item-section>
-                    <ux-select-filter
-                      :ref="`pre-line`"
-                      :name="`pre-line-${index}`"
-                      v-model="rsForm.item_prelines[index].line_id"
-                      :dark="LAYOUT.isDark"
-                      inverted dense
-                      color="primary"
-                      :prefix="`${index+1}. `"
-                      :options="LineOptions"
-                      :inject-filter="(line) => { if(index === 0 && !line.ismain) return false}"
-                      v-validate="isNotSample(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
-                      :error="errors.has(`pre-line-${index}`)"
-                      :error-message="errors.first(`pre-line-${index}`)"
-                    >
-                    <template v-slot:option-append="{option}">
-                      <q-item-section side>
-                      <q-badge color="teal" label="main" v-if="option.ismain"/>
-                      </q-item-section>
-                    </template>
-                    </ux-select-filter>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-btn :class="{'invisible':!index}" dense flat round icon="clear" color="red-5" @click="removeProduction(index)"/>
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    <q-btn dense outline color="primary" :label="$tc('form.add',2)" @click="addNewProduction()" />
-                  </q-item-section>
-                </q-item>
-              </q-list>
             </q-card-section>
           </q-card>
         </div>
@@ -379,16 +371,16 @@
           :error-message="errors.first('price_area')"
         />
         <ux-numeric class="col-12 col-sm-4"
-          name="price_packaged"
+          name="price_loaded"
           label="Price in BRL"
           type="number" readonly
-          :value="price_packaged"
+          :value="price_loaded"
           standout filled dark
           color="white"
           bg-color="primary"
           align="center"
-          :error="errors.has('price_packaged')"
-          :error-message="errors.first('price_packaged')"
+          :error="errors.has('price_loaded')"
+          :error-message="errors.first('price_loaded')"
         />
       </div>
       <div class="row q-col-gutter-sm">
@@ -404,9 +396,7 @@
     <q-card-actions class="group float-right">
       <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()" />
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)" />
-      <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()" :loading="FORM.loading">
-        <q-spinner-facebook slot="loading" />
-      </q-btn>
+      <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()" />
     </q-card-actions>
   </q-card>
   <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
@@ -461,7 +451,7 @@ export default {
           size_id: null,
           unit_id: null,
 
-          price: null,
+          price: 0,
           item_prelines: [{ id:null, line_id: null, note: null }],
           item_units: [],
           estimate_price: null,
@@ -524,7 +514,7 @@ export default {
       if(!Number(this.rsForm.price) || !Number(this.rsForm.sa_dm)) return 0
       return Number(this.rsForm.price) / Number(this.rsForm.sa_dm)
     },
-    price_packaged() {
+    price_loaded() {
       return Number(this.rsForm.load_capacity|| 0) * Number(this.rsForm.price || 0)
     },
     MAPINGKEY(){
@@ -600,7 +590,7 @@ export default {
 
     onSave () {
       const submit = () => {
-        this.FORM.loading = true
+        this.$q.loading.show()
         let {method, mode, apiUrl} = this.FORM.meta();
         this.$axios.set(method, apiUrl, this.rsForm)
         .then((response) => {
@@ -614,9 +604,10 @@ export default {
           this.FORM.response.error(error.response || error, 'ITEM UPDATE')
         })
         .finally(()=>{
-          this.FORM.loading = false
+          this.$q.loading.hide()
         });
       }
+
 
       this.$validator.validate().then(result => {
         if (!result) {
@@ -626,33 +617,34 @@ export default {
           });
         }
 
-        if (this.rsForm.price == this.FORM.data.price) submit()
-        else {
-          this.$q.dialog({
-            title: 'PASSWORD CONFIRM',
-            message: 'Price has changed. Enter password is required!',
-            prompt: { type: 'password', model: ''}
-          }).onOk(model => {
-            this.$axios.post('/api/v1/auth/confirm-password', { password: model })
-            .then((response) => {
-              if (response.data.status) submit()
+        this.$q.dialog({ message: 'Are sure to submit?', title: 'CONFIRM'})
+          .onOk(() => {
+            if (this.rsForm.price == this.FORM.data.price) return submit()
+            this.$q.dialog({
+                title: 'PASSWORD CONFIRM',
+                message: 'Price has changed. Enter password is required!',
+                prompt: { type: 'password', model: ''}
+              })
+              .onOk(model => {
+                this.$axios.post('/api/v1/auth/confirm-password', { password: model }).then((response) => {
+                  if (response.data.status) submit()
+                })
+              .catch((error) => {
+                this.$app.response.error(error.response || error)
+              })
             })
-            .catch((error) => {
-              this.$app.response.error(error.response || error)
-            });
           })
-        }
-      });
+      })
     },
 
     onSaved () {
-      if (!this.$app.can('items-push')) return this.FORM.toIndex()
+      if (this.rsForm.sample || !this.$app.can('items-push')) return this.$router.go(-1)
       this.$q.dialog({ title: 'ACCURATE', message: 'are push to accurate?', cancel: true })
       .onOk(() => {
         this.onPush()
       })
       .onCancel(() => {
-        this.FORM.toIndex()
+          this.$router.go(-1)
       })
 
     },
@@ -668,7 +660,8 @@ export default {
             this.$app.notify.success('ACCURATE', msg)
           else
             this.$app.notify.warning('ACCURATE', msg)
-          this.FORM.toIndex()
+
+          this.$router.go(-1)
         }).catch((error) => {
           this.$app.response.error(error.response || error)
         }).finally(() => {

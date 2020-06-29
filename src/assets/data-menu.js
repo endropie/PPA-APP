@@ -21,6 +21,8 @@ const common = [
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'items-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'items-create' } },
+      { page: 'form-sample', path: 'create-sample', meta: { mode: 'create', permission: 'items-create' } },
+      { page: 'form-sample', path: ':id/edit-sample', meta: { mode: 'edit', permission: 'items-update' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'items-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'items-read' } }
     ]
