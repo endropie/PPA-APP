@@ -229,11 +229,9 @@
 
 <script>
 import MixForm from '@/mixins/mix-form.vue'
-import AddSample from '@/pages/admin/common/items/add-sample'
 
 export default {
   mixins: [MixForm],
-  components: { AddSample },
   data () {
     return {
       SHEET:{
