@@ -1,4 +1,4 @@
-import { Dialog, Notify, date } from 'quasar'
+import { Dialog, Notify, date, Dark } from 'quasar'
 import _lodash from 'lodash'
 import moment from 'moment'
 
@@ -188,4 +188,8 @@ export default async ({ app, store, router, Vue }) => {
     moment: moment,
     date: date
   }
+
+  setTimeout(() => {
+    Dark.set(store.getters['admin/LAYOUT'].isDark)
+  }, 100)
 }
