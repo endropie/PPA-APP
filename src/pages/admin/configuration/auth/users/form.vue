@@ -1,6 +1,6 @@
 <template>
-<q-page padding class="form-page row justify-center" >
-  <q-card inline class="main-box self-start" :dark="LAYOUT.isDark" v-if="FORM.show">
+<q-page padding>
+  <q-card inline class="main-box full-width" :dark="LAYOUT.isDark" v-if="FORM.show">
     <q-card-section>
      <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" >
         <template slot="menu-item">
@@ -55,6 +55,12 @@
         <div  class="col-12">
           <q-list>
             <q-expansion-item label="RULES" expand-separator >
+              <q-input dense type="search" class="q-mb-md q-mx-sm"
+                v-model="find.role"
+                placeholder="Find a role..." >
+                <q-icon slot="before" name="search" />
+              </q-input>
+
               <div class="row q-col-gutter-sm ">
                 <q-checkbox v-for="(role, index) in RoleOptions" :key="index"
                   class="col-12 col-sm-6 col-md-3" :dark="LAYOUT.isDark"
@@ -65,6 +71,11 @@
             </q-expansion-item>
 
             <q-expansion-item label="PERMISSION" expand-separator>
+              <q-input dense type="search" class="q-mb-md q-mx-sm" input-style="min-width:200px"
+                v-model="find.permission"
+                placeholder="Find a permission..." >
+                <q-icon slot="before" name="search" />
+              </q-input>
               <div class="row q-col-gutter-sm ">
                 <q-checkbox v-for="(permission, index) in PermissionOptions"
                   class="col-12 col-sm-6 col-md-3" :dark="LAYOUT.isDark"
@@ -81,7 +92,7 @@
       </div>
     </q-card-section>
     <q-separator/>
-    <q-card-actions class="q-mx-lg">
+    <q-card-actions class="items-end self-end">
         <q-btn color="grey-8" @click="FORM.toBack()">Cancel</q-btn>
         <q-btn color="grey-5" @click="setForm(FORM.data)">Reset</q-btn>
         <q-btn color="positive" @click="onSave()">Save</q-btn>
@@ -108,7 +119,11 @@ export default {
           uri: '/admin/configuration/auth/users',
         },
       },
-      rsForm:{},
+      find: {
+        role: '',
+        permission: ''
+      },
+      rsForm: {},
       setDefault:()=>{
         return {
           name:null,
@@ -130,11 +145,15 @@ export default {
       return this.rsForm.id === 1
     },
     RoleOptions() {
-      return (this.SHEET.roles.data.map(item => ({label: item.name, value: item.name})))
+      return this.SHEET.roles.data
+        .map(item => ({label: item.name, value: item.name}))
+        .filter(x => !this.find.role.length || String(x.label).search(this.find.role) > -1)
     },
     PermissionOptions() {
-      return (this.SHEET.permissions.data.map(item => ({label: item.name, value: item.name})))
-    },
+      return this.SHEET.permissions.data
+        .map(item => ({label: item.name, value: item.name}))
+        .filter(x => !this.find.permission.length || String(x.label).search(this.find.permission) > -1)
+    }
   },
   watch:{
       '$route' : 'init',
