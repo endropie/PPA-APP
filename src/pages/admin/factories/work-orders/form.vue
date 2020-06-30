@@ -48,7 +48,7 @@
 
         </div>
       </div>
-      <div class="col-12 row">
+      <div class="col-12 row q-col-gutter-x-sm">
         <div class="col-12 col-sm-auto  column q-pb-sm">
           <span class="text-small text-grey">Stockist Material</span>
           <q-btn-toggle spread class="no-shadow text-no-wrap" style="border:1px solid #027be3"
@@ -59,7 +59,6 @@
             :options="CONFIG.items['stockists'].map(x => ({...x, color:null})).filter(stockist => ['FM','NC','NCR'].indexOf(stockist.value) > -1 )"
           />
         </div>
-        <q-space />
         <div class="col-12 col-sm-auto column q-pb-sm">
           <span class="text-small text-grey">Line Filter</span>
           <q-btn-toggle spread class="no-shadow" style="border:1px solid #027be3"
@@ -73,6 +72,14 @@
               {label: 'All', value: 'ALL'}
             ]"
           />
+        </div>
+        <q-space />
+        <div class="col-12 col-sm-auto q-pb-sm column items-center">
+          <q-checkbox class="self-center"
+            label="FG Direct"
+            v-model="rsForm.stockist_direct"
+            true-value="FG" :false-value="null"
+            :disable="Boolean(rsForm.id)" />
         </div>
       </div>
       <div class="col-12">
@@ -228,7 +235,8 @@ export default {
           shift_id: null,
           stockist_from: 'FM',
           description: null,
-          mode_line: 'SINGLE',
+          mode_line: 'ALL',
+          stockist_direct: null,
           work_order_items: [
             {
               id:null,
