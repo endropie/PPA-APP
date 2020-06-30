@@ -169,7 +169,15 @@
                   v-validate="`required|gt_value:0|max_value:${Math.ceil(MaxStock[index] / (row.unit_rate || 1))}`"
                   :error="errors.has(`work_order_items.${index}.quantity`)"
                   :suffix="' / '+ Math.ceil((MaxStock[index] || 0) / (row.unit_rate || 1))"
-                />
+                >
+                  <q-btn slot="after" dense flat icon="done_all"
+                    v-if="Math.ceil((MaxStock[index] || 0) / (row.unit_rate || 1)) > 0"
+                    v-show="Math.ceil((MaxStock[index] || 0) / (row.unit_rate || 1)) !== row.target"
+                    @click="() => {
+                      row.target = Math.ceil((MaxStock[index] || 0) / (row.unit_rate || 1))
+                      row.quantity = calcQuantity(row)
+                    }" />
+                </q-input>
               </q-td>
             </q-tr>
             <q-tr>
