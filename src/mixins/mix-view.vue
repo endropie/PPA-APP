@@ -70,7 +70,8 @@ export default {
             }
           })
           .catch(error => {
-            if(!error.response) error.response = {}
+            console.error(error.response || error)
+            if (!error.response) error.response = {}
             this.$router.replace({
               path: '/admin/error',
               query: {
