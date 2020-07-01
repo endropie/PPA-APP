@@ -145,26 +145,19 @@
                       :true-value="1"
                       :dark="LAYOUT.isDark"/>
                   </q-field>
-                  <q-input name="tax" class="col-4"
-                    label="Tax [PPN]" type="number"
-                    filled
+                  <q-input type="number" class="col-6"
+                    filled label="Tax [PPN]"
+                    name="tax" data-vv-name="Ppn"
                     v-model="rsForm.tax"
-                    :dark="LAYOUT.isDark"
+                    v-validate="`max_value:100`"
                     :error="errors.has('tax')"
                     :error-message="errors.first('tax')" />
-                  <q-input name="pph_material" class="col-4"
-                    label="Material" type="number"
-                    filled
-                    v-model="rsForm.pph_material"
-                    :dark="LAYOUT.isDark"
-                    :error="errors.has('pph_material')"
-                    :error-message="errors.first('pph_material')" />
 
-                  <q-input name="pph_service" class="col-4"
-                    label="Service" type="number"
-                    filled
+                  <q-input type="number" class="col-6"
+                    filled label="Service"
+                    name="pph_service" data-vv-name="Pph"
                     v-model="rsForm.pph_service"
-                    :dark="LAYOUT.isDark"
+                    v-validate="`max_value:100`"
                     :error="errors.has('pph_service')"
                     :error-message="errors.first('pph_service')" />
 
@@ -291,6 +284,13 @@
                 :false-value="0"
                 :true-value="1"
                 :dark="LAYOUT.isDark"/>
+              <q-checkbox name="order_lots" class="text-faded"
+                label="Lots Order"
+                v-model="rsForm.order_lots"
+                :false-value="0"
+                :true-value="1"
+                v-show="rsForm.order_mode == 'NONE'"
+              />
             </div>
           </q-field>
         </div>
@@ -349,15 +349,16 @@ export default {
           with_tax: 1,
           with_pph: 1,
           tax: 0,
-          pph_material: 0,
           pph_service: 0,
-
 
           invoice_mode: null,
           delivery_mode: null,
           order_mode: null,
-          customer_contacts:[ {id:null} ]
+          customer_contacts:[ {id:null} ],
 
+          order_manual_allowed: 0,
+          order_monthly_actived: 0,
+          order_lots: 0,
         }
       }
     }
@@ -365,7 +366,6 @@ export default {
   created(){
     // Component Page Mounted!
     this.init()
-
   },
   computed:{
     ProvinceOptions() {

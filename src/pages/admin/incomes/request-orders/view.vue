@@ -54,6 +54,7 @@
           <q-markup-table dense bordered square separator="cell" class="table-print no-shadow no-highlight"  :dark="LAYOUT.isDark">
             <thead>
             <q-tr style="line-height:25px">
+              <q-th width="30%" v-if="IS_LOTS && !IS_ITEM_SUMMARY">LOTS</q-th>
               <q-th width="30%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th width="30%">{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th width="10%">{{ $tc('label.unit') }}</q-th>
@@ -62,26 +63,32 @@
               <q-th width="10%">{{ $tc('label.balance') }}</q-th>
             </q-tr>
             </thead>
-            <tbody>
-              <template v-if="IS_ITEM_SUMMARY">
-                <q-tr v-for="(row, index) in SUM_ITEMS" :key="index">
-                  <q-td>{{row.item.part_name}}</q-td>
-                  <q-td>{{row.item.part_number}}</q-td>
-                  <q-td class="text-center">{{row.item.unit.code}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.unit_amount, row.item.unit.decimal_in)}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.amount_delivery, row.item.unit.decimal_in)}}</q-td>
-                  <q-td class="text-right">
-                    <div v-if="Math.round(row.unit_amount - row.amount_delivery) > 0">
-                      {{$app.number_format((row.unit_amount - row.amount_delivery), row.item.unit.decimal_in)}}
-                    </div>
-                    <div v-else class="text-center">
-                      -
-                    </div>
-                  </q-td>
-                </q-tr>
-              </template>
-              <template v-else>
-                <q-tr v-for="(row, index) in rsView.request_order_items" :key="index" :request-order-item-id="row.id">
+            <tbody v-if="IS_ITEM_SUMMARY">
+              <q-tr v-for="(row, index) in SUM_ITEMS" :key="index">
+                <q-td>{{row.item.part_name}}</q-td>
+                <q-td>{{row.item.part_number}}</q-td>
+                <q-td class="text-center">{{row.item.unit.code}}</q-td>
+                <q-td class="text-right">{{$app.number_format(row.unit_amount, row.item.unit.decimal_in)}}</q-td>
+                <q-td class="text-right">{{$app.number_format(row.amount_delivery, row.item.unit.decimal_in)}}</q-td>
+                <q-td class="text-right">
+                  <div v-if="Math.round(row.unit_amount - row.amount_delivery) > 0">
+                    {{$app.number_format((row.unit_amount - row.amount_delivery), row.item.unit.decimal_in)}}
+                  </div>
+                  <div v-else class="text-center">
+                    -
+                  </div>
+                </q-td>
+              </q-tr>
+            </tbody>
+            <template>
+              <tbody v-for="(row, index) in rsView.request_order_items" :key="index">
+                <q-tr :request-order-item-id="row.id">
+                  <td v-if="IS_LOTS">
+                    <span v-if="row.incoming_good_item && row.incoming_good_item.lots">
+                      {{ row.incoming_good_item.lots }}
+                    </span>
+                    <span v-else>-</span>
+                  </td>
                   <q-td>{{row.item.part_name}}</q-td>
                   <q-td>{{row.item.part_number}}</q-td>
                   <q-td class="text-center">{{row.unit.code}} </q-td>
@@ -96,8 +103,17 @@
                     </div>
                   </q-td>
                 </q-tr>
-              </template>
-            </tbody>
+                <!-- <template v-if="IS_LOTS && false">
+                  <q-tr v-for="(rsDelivery, iDelivery) in row.delivery_order_items" :key="iDelivery">
+                    <td :colspan="5" >
+
+                    </td>
+                    <td align="right">{{rsDelivery.quantity}}</td>
+                    <td></td>
+                  </q-tr>
+                </template> -->
+              </tbody>
+            </template>
           </q-markup-table>
         </div>
         <div class="col-12 text-weight-light text-italic" v-if="rsView.begin_date || rsView.until_date">
@@ -266,6 +282,10 @@ export default {
       '$route' : 'init',
   },
   computed: {
+    IS_LOTS () {
+      if (!this.rsView.customer) return false
+      return this.rsView.customer.order_lots
+    },
     IS_CLOSE() {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false

@@ -28,6 +28,7 @@ export default {
   item: 'Item',
   keyword: 'Kata Kunci',
   list: 'Daftar {v}',
+  lots: 'Lots',
   minute: 'Menit',
   mode: 'Jenis {v}',
   name: 'Nama {v}',

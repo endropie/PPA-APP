@@ -131,6 +131,7 @@
           :dark="LAYOUT.isDark">
             <q-tr>
               <q-th key="prefix"></q-th>
+              <q-th key="lots" v-if="IS_LOTS">{{$tc('label.lots')}}</q-th>
               <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
               <q-th key="part_name">{{$tc('items.part_number')}}</q-th>
               <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
@@ -147,6 +148,13 @@
                   <q-icon v-if="row.valid == row.quantity" name="done_all"/>
                   <q-icon v-else name="done_all" color="light"/>
                 </q-btn>
+              </q-td>
+              <q-td key="lots" width="20%" v-if="IS_LOTS">
+                <q-input readonly
+                  :value="row.lots"
+                  outlined dense hide-bottom-space
+                  color="blue-grey-5"
+                />
               </q-td>
               <q-td key="item_id" width="35%">
                 <q-input readonly
@@ -304,6 +312,13 @@ export default {
 
   },
   computed: {
+    IS_LOTS() {
+      if (this.FORM.data.deleted_at) return false
+      if (this.FORM.data.transaction !== 'REGULER') return false
+      if (this.FORM.data.order_mode !== 'NONE') return false
+      if (!this.FORM.data.customer) return false
+      return this.FORM.data.customer.order_lots
+    },
     IS_EDITABLE() {
       if (Object.keys(this.FORM.data.has_relationship || {}).length > 0) return false
 

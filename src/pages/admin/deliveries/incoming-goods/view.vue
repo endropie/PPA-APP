@@ -76,9 +76,10 @@
           <q-markup-table dense bordered square separator="cell" class="table-print no-shadow no-highlight"  :dark="LAYOUT.isDark">
             <thead>
             <q-tr style="line-height:25px">
-              <q-th width="30%" v-if="!isHideColumn('part_name')">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th width="15%" v-if="IS_LOTS">{{ $tc('label.lots') }}</q-th>
+              <q-th width="25%" v-if="!isHideColumn('part_name')">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th width="20%" v-if="!isHideColumn('part_number')">{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th width="20%" v-if="!isHideColumn('part_specification')">{{ $tc('items.specification') }}</q-th>
+              <q-th width="15%" v-if="!isHideColumn('part_specification')">{{ $tc('items.specification') }}</q-th>
               <q-th width="10%" v-if="!isHideColumn('unit')">{{ $tc('label.unit') }}</q-th>
               <q-th width="10%" v-if="!isHideColumn('quantity')">{{ $tc('label.quantity') }}</q-th>
               <q-th width="20%" v-if="!isHideColumn('note')">{{ $tc('label.note') }}</q-th>
@@ -86,6 +87,7 @@
             </thead>
             <tbody>
               <q-tr v-for="(row, index) in rsView.incoming_good_items" :key="index" :request-order-item-id="row.id">
+                <q-td v-if="IS_LOTS">{{row.lots || '-'}}</q-td>
                 <q-td v-if="!isHideColumn('part_name')">{{row.item.part_name}}</q-td>
                 <q-td v-if="!isHideColumn('part_number')">{{row.item.part_number}}</q-td>
                 <q-td v-if="!isHideColumn('part_specification')">{{row.item.part_specification}}</q-td>
@@ -201,6 +203,12 @@ export default {
     },
     isCanDelete() {
       return this.$app.can('incoming-goods-delete')
+    },
+    IS_LOTS() {
+      if (this.rsView.transaction !== 'REGULER') return false
+      if (this.rsView.order_mode !== 'NONE') return false
+      if (!this.rsView.customer) return false
+      return this.rsView.customer.order_lots
     },
     IS_REVISE() {
       if (this.IS_EDITABLE) return false

@@ -166,7 +166,7 @@ const deliveries = [
     icon: 'move_to_inbox',
     path: 'incoming-goods',
     lang: 'general.incoming_good',
-    param: `?status=OPEN`,
+    param: `?`,
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'incoming-goods-read' } },
       { page: 'index-items', path: 'items', icon: 'list', meta: { permission: 'incoming-goods-read' } },

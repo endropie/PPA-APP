@@ -131,6 +131,7 @@
           <thead>
             <q-tr class="text-uppercase">
               <q-th key="prefix"></q-th>
+              <q-th key="lots" v-if="IS_LOTS">{{$tc('label.lots')}}</q-th>
               <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
               <q-th key="part_name">{{$tc('items.part_number')}}</q-th>
               <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
@@ -139,12 +140,24 @@
           </thead>
           <tbody>
             <q-tr v-for="(row, index) in rsForm.incoming_good_items" :key="index">
-              <q-td  style="width:50px">
+              <q-td key="prefix" style="width:50px">
                 <q-btn dense flat round icon="clear" color="red" @click="removeItem(index)"/>
               </q-td>
-              <q-td width="45%">
+
+              <q-td v-if="IS_LOTS" key="lots" width="20%" style="min-width:100px">
+                <q-input
+                  color="blue-grey-5"
+                  :name="`incoming_good_items.${index}.lots`"
+                  v-model="row.lots"
+                  outlined dense hide-bottom-space  no-error-icon
+                  v-validate="'required'"
+                  :error="errors.has(`incoming_good_items.${index}.lots`)"
+                />
+              </q-td>
+
+              <q-td key="part" width="35%">
                 <ux-select
-                  :name="`items.${index}.item_id`"
+                  :name="`incoming_good_items.${index}.item_id`"
                   :data-vv-as="$tc('items.part_name')"
                   dense outlined hide-bottom-space color="blue-grey-5"
                   v-model="row.item_id"
@@ -156,8 +169,8 @@
                   :readonly="Boolean(row.request_order_item_id)"
                   @input="(val)=>{ setItemReference(index, val) }"
                   :loading="SHEET['items'].loading"
-                  :error="errors.has(`items.${index}.item_id`)"
-                  :error-message="errors.first(`items.${index}.item_id`)"
+                  :error="errors.has(`incoming_good_items.${index}.item_id`)"
+                  :error-message="errors.first(`incoming_good_items.${index}.item_id`)"
                 />
                 <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
 
@@ -170,17 +183,17 @@
               </q-td>
               <q-td width="25%">
                 <q-input type="number" min="0" style="min-width:120px"
-                  :name="`items.${index}.quantity`"
+                  :name="`incoming_good_items.${index}.quantity`"
                   :data-vv-as="$tc('label.quantity')"
                   v-model="row.quantity"
                   v-validate="row.item_id ? 'required' : ''"
                   dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
                   :dark="LAYOUT.isDark"
-                  :error="errors.has(`items.${index}.quantity`)"/>
+                  :error="errors.has(`incoming_good_items.${index}.quantity`)"/>
               </q-td>
               <q-td width="25%">
                 <q-select style="min-width:100px"
-                  :name="`items.${index}.unit_id`"
+                  :name="`incoming_good_items.${index}.unit_id`"
                   :data-vv-as="$tc('label.unit')"
                   v-model="row.unit_id"
                   dense outlined hide-bottom-space color="blue-grey-5"
@@ -189,7 +202,7 @@
                   map-options emit-value
                   :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                   v-validate="row.item_id ? 'required' : ''"
-                  :error="errors.has(`items.${index}.unit_id`)"/>
+                  :error="errors.has(`incoming_good_items.${index}.unit_id`)"/>
                 <q-input class="hidden" v-model="row.unit_rate" />
               </q-td>
             </q-tr>
@@ -295,6 +308,13 @@ export default {
 
   },
   computed: {
+    IS_LOTS() {
+      if (this.FORM.data.deleted_at) return false
+      if (this.FORM.data.transaction !== 'REGULER') return false
+      if (this.FORM.data.order_mode !== 'NONE') return false
+      if (!this.FORM.data.customer) return false
+      return this.FORM.data.customer.order_lots
+    },
     IS_REVISION() {
       if (this.FORM.data.deleted_at) return false
       if (this.FORM.data.status === 'REVISED') return false
