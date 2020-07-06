@@ -149,104 +149,252 @@
     <!-- ROW::2th Estimate, unit corvertion & Enginering  -->
     <q-card-section>
       <div class="row q-col-gutter-md">
+        <!-- ITEM - DRAWING -->
+        <div class="col-12 col-md-4">
+          <q-uploader class="fit"
+            color="secondary"
+            ref="depictUploader"
+            label="Auto Uploader"
+            multiple auto-upload
+            :factory="factoryFn"
+            @factory-failed="fileFactoryFailed"
+          >
+            <template v-slot:header="scope">
+              <div class="row no-wrap items-center q-px-sm q-py-xs q-gutter-xs">
+                <!-- <q-btn v-if="scope.queuedFiles.length > 0" icon="clear_all" @click="scope.removeQueuedFiles" round dense flat >
+                  <q-tooltip>Clear All</q-tooltip>
+                </q-btn> -->
+                <!-- <q-btn v-if="scope.uploadedFiles.length > 0" icon="done_all" @click="scope.removeUploadedFiles" round dense flat >
+                  <q-tooltip>Remove Uploaded Files</q-tooltip>
+                </q-btn> -->
+                <q-spinner v-if="scope.isUploading" class="q-uploader__spinner" />
+                <div class="col">
+                  <div class="q-uploader__title">Drawing files</div>
+                  <!-- <div class="q-uploader__subtitle">{{ scope.uploadSizeLabel }} / {{ scope.uploadProgressLabel }}</div> -->
+                </div>
+                <q-btn v-if="scope.canAddFiles && rsForm.sample_depicted_at === true" type="a" icon="add_box" round dense flat>
+                  <q-uploader-add-trigger />
+                  <q-tooltip>Pick Files</q-tooltip>
+                </q-btn>
+                <q-btn v-if="scope.canUpload" icon="cloud_upload" @click="scope.upload" round dense flat >
+                  <!-- <q-tooltip>Upload Files</q-tooltip> -->
+                </q-btn>
+
+                <q-btn v-if="scope.isUploading" icon="clear" @click="scope.abort" round dense flat >
+                  <!-- <q-tooltip>Abort Upload</q-tooltip> -->
+                </q-btn>
+
+                <q-btn flat dense outline icon="edit"
+                  @click="rsForm.sample_depicted_at = true"
+                  v-if="FORM.data.sample"
+                  v-show="rsForm.sample_depicted_at !== true"
+                />
+                <q-btn flat dense outline icon="clear"
+                  @click="[rsForm.sample_depicted_at = null]"
+                  v-if="FORM.data.sample"
+                  v-show="rsForm.sample_depicted_at === true"
+                />
+              </div>
+            </template>
+            <template v-slot:list="scope">
+              <q-tooltip v-if="rsForm.sample_depicted_at !== true" >
+                For modify, click edit first!
+              </q-tooltip>
+              <q-list separator :class="{'light-dimmed': rsForm.sample_depicted_at !== true}">
+                <q-item v-for="(file, indexFile) in (rsForm.depicts || [])" :key="indexFile">
+                  <q-item-section thumbnail class="gt-xs">
+                    <q-avatar square v-if="file.__img" size="5rem" >
+                      <img :src="$axios.serverURL(file.url)" v-if="file.__img" style="max-width:5rem">
+                    </q-avatar>
+                    <q-avatar v-else size="5rem" icon="mdi-file" />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label class="full-width ellipsis">
+                      {{ file.name }}
+                    </q-item-label>
+
+                    <q-item-label caption>
+                      Status: {{ file.__status }}
+                    </q-item-label>
+
+                    <q-item-label caption>
+                      {{ file.__sizeLabel }} / {{ file.__progressLabel }}
+                    </q-item-label>
+                  </q-item-section>
+
+
+                  <q-item-section top side>
+                    <q-btn
+                      class="gt-xs"
+                      size="12px"
+                      flat
+                      dense
+                      round
+                      icon="clear"
+                      @click="removeDepict(indexFile)"
+                    />
+                  </q-item-section>
+                </q-item>
+                <q-item v-for="file in scope.files" :key="file.name">
+                  <q-item-section thumbnail class="gt-xs">
+                    <q-avatar square v-if="file.__img" size="5rem" >
+                      <img :src="file.__img.src" v-if="file.__img" style="max-width:5rem">
+                    </q-avatar>
+                    <q-avatar v-else size="5rem" icon="mdi-file" />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label class="full-width ellipsis">
+                      {{ file.name }}
+                    </q-item-label>
+
+                    <q-item-label caption>
+                      Status: {{ file.__status }}
+                    </q-item-label>
+
+                    <q-item-label caption>
+                      {{ file.__sizeLabel }} / {{ file.__progressLabel }}
+                    </q-item-label>
+                  </q-item-section>
+
+
+                  <q-item-section top side>
+                    <q-btn
+                      class="gt-xs"
+                      size="12px"
+                      flat
+                      dense
+                      round
+                      icon="clear"
+                      @click="scope.removeFile(file)"
+                    />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </template>
+          </q-uploader>
+        </div>
+
         <!-- ITEM - ESTIMATE -->
-        <div class="col-12 col-sm-6"  v-if="$app.can('items-sample')">
+        <div class="col-12 col-sm-6 col-md-4"  v-if="$app.can('items-sample')">
           <q-card class="fit">
             <q-card-section class="bg-secondary text-white q-pa-sm">
               <div class="text-subtitle2 text-uppercase">Estimation</div>
             </q-card-section>
             <q-separator />
             <q-card-section class="q-pa-sm">
-                <ux-numeric input-style="text-align:left"
-                  type="number" color="secondary"
-                  name="estimate_price"
-                  label="Estimate Price"
-                  v-model="rsForm.estimate_price"
-                  v-validate="isFromSample(`required`)"
-                  :error="errors.has('estimate_price')"
-                  :error-message="errors.first('estimate_price')"
-                />
-                <ux-numeric input-style=""
+              <ux-date
+                type="date" color="secondary"
+                name="estimate_begin_date"
+                label="Estimate starting project" stack-label
+                v-model="rsForm.estimate_begin_date"
+                v-validate="'required'" no-error-icon
+                :error="errors.has('estimate_begin_date')"
+                :error-message="errors.first('estimate_begin_date')"
+              />
+              <ux-numeric input-style="text-align:left"
+                type="number" color="secondary"
+                name="estimate_price"
+                label="Estimate Price"
+                v-model="rsForm.estimate_price"
+                v-validate="'required'" no-error-icon
+                :error="errors.has('estimate_price')"
+                :error-message="errors.first('estimate_price')"
+              />
+              <div class="row q-col-gutter-x-sm">
+                <ux-numeric class="col-12 col-sm-6"
                   type="number" color="secondary"
                   name="estimate_sadm"
                   label="Estimate S.A (dm)"
                   v-model="rsForm.estimate_sadm"
-                  v-validate="isFromSample(`required`)"
+                  v-validate="'required'" no-error-icon
                   :dark="LAYOUT.isDark"
                   :error="errors.has('estimate_sadm')"
                   :error-message="errors.first('estimate_sadm')"
                 />
-                <ux-numeric input-style=""
+                <ux-numeric class="col-12 col-sm-6"
                   type="number"  color="secondary"
                   name="estimate_monthly_amount"
                   :label="`${$tc('label.total', 1, {v: 'Estimasi'})} / Montly`"
                   v-model="rsForm.estimate_monthly_amount"
-                  v-validate="isFromSample(`required`)"
+                  v-validate="" no-error-icon
                   :dark="LAYOUT.isDark"
                   :error="errors.has('estimate_monthly_amount')"
                   :error-message="errors.first('estimate_monthly_amount')"
                 />
+              </div>
             </q-card-section>
           </q-card>
         </div>
-
-        <div class="column col-12 col-sm-6" v-if="$app.can('items-price')">
+        <!-- ITEM - PRICE -->
+        <div class="col-12 col-sm-6 col-md-4 column">
           <q-card class="fit">
-            <q-card-section class="bg-secondary text-white q-pa-sm">
-              <div class="text-subtitle2 text-uppercase">{{$tc('items.price')}}</div>
+            <q-card-section horizontal class="bg-secondary text-white q-px-sm q-py-xs items-center">
+              <div class="text-subtitle2 text-uppercase q-py-xs">{{$tc('items.price')}}</div>
+              <q-space />
+              <q-btn flat dense outline icon="edit"
+                @click="rsForm.sample_priced_at = true"
+                v-if="FORM.data.sample"
+                v-show="rsForm.sample_priced_at !== true"
+              />
+              <q-btn flat dense outline icon="clear"
+                @click="[rsForm.sample_priced_at = null, rsForm.price = FORM.data.price]"
+                v-if="FORM.data.sample"
+                v-show="rsForm.sample_priced_at === true"
+              />
             </q-card-section>
             <q-separator />
-            <q-card-section class="q-pa-sm">
-              <ux-numeric
-                name="price"
-                :label="$tc('label.price', 1, { v: 'Normal' })"
-                type="number"
-                v-model="rsForm.price"
-                v-validate="isFromSample(`required`)"
-                outlined align="center"
-                :error="errors.has('price')"
-                :error-message="errors.first('price')"
-              />
-              <ux-numeric
-                name="price_area" type="number" readonly
-                label="Price in DM"
-                :value="price_area"
-                outlined align="center"
-                :error="errors.has('price_area')"
-                :error-message="errors.first('price_area')"
-              />
-              <ux-numeric
-                name="price_packaged"
-                label="Price in BRL"
-                type="number" readonly
-                :value="price_packaged"
-                outlined align="center"
-                :error="errors.has('price_packaged')"
-                :error-message="errors.first('price_packaged')"
-              />
+            <q-card-section class="q-pa-sm" v-if="$app.can('items-price')">
+              <q-tooltip v-if="rsForm.sample_priced_at !== true" >
+                For modify, click edit first!
+              </q-tooltip>
+              <div class="column" :class="{'light-dimmed': rsForm.sample_priced_at !== true}">
+                <ux-numeric
+                  name="price"
+                  :label="$tc('label.price', 1, { v: 'Normal' })"
+                  type="number"
+                  v-model="rsForm.price"
+                  v-validate="isPriced(`required`)"
+                  outlined align="center"
+                  :error="errors.has('price')"
+                  :error-message="errors.first('price')"
+                />
+                <ux-numeric
+                  name="price_area" type="number" readonly
+                  label="Price in DM"
+                  :value="price_area"
+                  outlined align="center" hint=""
+                />
+                <ux-numeric
+                  name="price_packaged"
+                  label="Price in BRL"
+                  type="number" readonly
+                  :value="price_packaged"
+                  outlined align="center" hint=""
+                />
+
+              </div>
+            </q-card-section>
+            <q-card-section v-else class="text-grey">
+              <q-avatar icon="info" /> NOT PERMISSION
             </q-card-section>
           </q-card>
         </div>
       </div>
-
     </q-card-section>
     <!-- ROW::3th Price & Description -->
     <q-card-section>
-      <div class="row q-col-gutter-sm">
-        <q-input class="col-12" type="textarea" autogrow rows="3"
-          :label="$tc('label.description')" stack-label
-          v-model="rsForm.description"
-          filled
-          :dark="LAYOUT.isDark"
-        />
-      </div>
+      <q-input type="textarea" autogrow rows="3"
+        :label="$tc('label.description')" stack-label
+        v-model="rsForm.description"
+        filled
+        :dark="LAYOUT.isDark"
+      />
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" spaced />
     <q-card-actions class="group float-right">
       <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()" />
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)" />
       <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()" />
-      <q-btn :label="$tc('items.reguler_request')" color="secondary" @click="onSave(true)" />
     </q-card-actions>
   </q-card>
   <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
@@ -307,9 +455,15 @@ export default {
           estimate_price: null,
           estimate_sadm: null,
           estimate_monthly_amount: null,
+          estimate_begin_date: null,
           enable: 1,
           sample: 1,
           description:null,
+          depicts: [],
+          sample_depicted_at: null,
+          sample_enginered_at: null,
+          sample_priced_at: null,
+          sample_validated_at: null
         }
       }
     }
@@ -384,8 +538,97 @@ export default {
       '$route' : 'init'
   },
   methods: {
+    fileFailed (info) {
+      console.warn('fileFailed', info)
+    },
+    fileUploaded (info) {
+      console.warn('fileUploaded', info)
+    },
+    fileUploading (info) {
+      console.warn('fileUploading', info)
+    },
+    fileAdded (files) {
+      console.warn('fileAdded', files)
+    },
+    fileRemoved(files) {
+      console.warn('fileRemoved', files)
+    },
+    fileRejected (rejectedEntries) {
+      console.warn('rejectedEntries', rejectedEntries)
+    },
+    fileFactoryFailed (err, files) {
+      console.warn('fileFailed => removing', err, files)
+      files.map(e => this.$refs.depictUploader.removeFile(e))
+    },
+    urlDepict (file) {
+      return (file.url) ? (this.$axios.defaults.baseURL + file.url) : null
+    },
+    addNewDepicts (file) {
+      if (!this.rsForm.depicts) this.rsForm.depicts = []
+      this.$refs.depictUploader.removeUploadedFiles()
+      this.rsForm.depicts.push(file)
+    },
+    removeDepict(index) {
+      if (!this.rsForm.depicts[index]) return
+
+      const path =  this.rsForm.depicts[index].url || null
+      this.rsForm.depicts.splice(index, 1)
+
+      this.$axios
+        .delete(`/api/v1/uploads/file?path=${path}`)
+        .then(response => {
+          console.warn(response)
+        })
+        .catch(error => {
+          this.$app.response.error(error.response || error)
+          console.error(error.response || error)
+        })
+        .finally(() => {
+
+        })
+
+    },
+    factoryFn (files) {
+      // returning a Promise
+      var data = new FormData()
+      files.map(file => data.append('file', file))
+      return new Promise((resolve, reject) => {
+        const urlFile = `/api/v1/uploads/file`
+        const urlExist = `/api/v1/uploads/exist`
+        const token = this.$axios.defaults.headers.common.Authorization
+        const resolver = {
+          url: this.$axios.defaults.baseURL + urlExist,
+          headers: [
+            // {name: 'Content-Type', value: 'multipart/form-data'},
+            { name: 'Accept', value: 'application/json'},
+            { name: 'Content-Type', value: 'application/json-patch+json'},
+            { name: 'Authorization', value: token }
+          ]
+        }
+        this.$axios.post(urlFile, data, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          })
+          .then(response => {
+            console.warn('response', response)
+            reject()
+            files.map(e => this.addNewDepicts({...e, name: e.name, type: e.type, size: e.size, lastModified: e.lastModified, url: response.data, __status: 'uploaded', __img: Boolean(e.__img)}))
+
+            // resolve({
+            //   ...resolver,
+            //   sendRaw: (files) => {
+            //     return files.map(e => e.url = response.data)
+            //   }
+            // })
+          })
+          .catch(error => {
+            console.error('error', error.response || error)
+            reject(error)
+          })
+      })
+    },
     init() {
       this.FORM.load((data) => {
+        console.warn('DATA', data)
         this.setForm(data || this.setDefault())
       })
     },
@@ -414,8 +657,8 @@ export default {
     isNotSample(v) {
       return this.rsForm.sample ? '' : v
     },
-    isFromSample(v) {
-      return !(this.rsForm.isRegulerRequest && this.FORM.data.sample) ? '' : v
+    isPriced(v) {
+      return !(this.rsForm.sample_priced_at && this.FORM.data.sample) ? '' : v
     },
 
     addNewProduction (autofocus = true) {
@@ -438,12 +681,10 @@ export default {
         this.rsForm.item_units.splice(index, 1)
     },
 
-    onSave (isRegulerRequest = false) {
-
+    onSave () {
       const submit = () => {
         let {method, mode, apiUrl} = this.FORM.meta()
-        const data =  { ...this.rsForm, isRegulerRequest }
-
+        const data =  this.rsForm
         this.$q.loading.show()
         this.$axios.set(method, apiUrl, data)
         .then((response) => {
@@ -461,7 +702,6 @@ export default {
         });
       }
 
-      this.rsForm.isRegulerRequest = isRegulerRequest
       this.$validator.validate()
       setTimeout(() => {
         this.$validator.validate().then(result => {

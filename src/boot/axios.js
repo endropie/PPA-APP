@@ -50,4 +50,8 @@ export default async ({ app, Vue }) => {
       .then((response) => callback(response))
       .catch((error) => callback(error.response || error))
   }
+
+  axios.serverURL = (url = '') => {
+    return axios.defaults.baseURL + url
+  }
 }

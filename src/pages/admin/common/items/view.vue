@@ -317,9 +317,10 @@ export default {
       return true
     },
     IS_SAMPLE_VALIDATE() {
-      if (this.rsView.deleted_at) return false
       if (!this.rsView.sample) return false
-      return this.rsView.sample_moved_by && !this.rsView.sample_validated_by
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.sample_validated_at) return false
+      return this.rsView.sample_enginered_at && this.rsView.sample_priced_at
     },
     price_area() {
       if(!Number(this.rsView.price) || !Number(this.rsView.sa_dm)) return null

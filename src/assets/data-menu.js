@@ -7,7 +7,7 @@ const common = [
     path: 'customers',
     lang: 'general.customer',
     resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'items-read' } },
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'customers-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'customers-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'customers-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'customers-read' } }
@@ -19,12 +19,12 @@ const common = [
     icon: 'style',
     lang: 'general.item',
     resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'items-read' } },
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'items-read;items-validation;items-sample' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'items-create' } },
-      { page: 'form-sample', path: 'create-sample', meta: { mode: 'create', permission: 'items-create' } },
-      { page: 'form-sample', path: ':id/edit-sample', meta: { mode: 'edit', permission: 'items-update' } },
+      { page: 'form-sample', path: 'create-sample', meta: { mode: 'create', permission: 'items-sample' } },
+      { page: 'form-sample', path: ':id/edit-sample', meta: { mode: 'edit', permission: 'items-sample' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'items-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'items-read' } }
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'items-read;items-validation;items-sample' } }
     ]
   },
   {

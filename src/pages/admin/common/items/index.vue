@@ -50,7 +50,7 @@
             ]">
 
             <div class="row q-col-gutter-xs" >
-              <ux-select-filter class="col-12 col-sm-4"
+              <ux-select-filter class="col-12 col-sm-3"
                 v-model="FILTERABLE.fill.customer_id.value" clearable
                 :label="$tc('general.customer')"
                 dense hide-bottom-space hide-dropdown-icon
@@ -60,7 +60,7 @@
                 :options="CustomerOptions"
                 @input="FILTERABLE.submit" />
 
-              <q-select class="col-12 col-sm-4"
+              <q-select class="col-12 col-sm-3"
                 dense use-chips hide-dropdown-icon
                 placeholder="Stock"
                 :options="['FM','WIP','FG','NC','NCR']"
@@ -78,8 +78,17 @@
                   <q-tooltip>{{$tc('label.all')}}</q-tooltip>
                 </q-btn>
               </q-select>
+              <q-select class="col-12 col-sm-3" input-class="no-wrap"
+                dense standout="bg-blue-grey-5 text-white"
+                :options="['REGULER','SAMPLE','SAMPLE:DEPICT','SAMPLE:ENGINERY','SAMPLE:PRICE','SAMPLE:VALIDATE']"
+                v-model="FILTERABLE.fill.sampling.value"
+                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
+                :dark="LAYOUT.isDark"
+                @input="FILTERABLE.submit"
+              />
 
-              <div class="col-12 col-sm-4">
+
+              <div class="col-12 col-sm-3">
                 <div class="row justify-end no-wrap">
                   <!-- <q-checkbox
                     left-label label="Sample"
@@ -88,11 +97,6 @@
                     false-value=""
                     @input="FILTERABLE.submit"
                   /> -->
-                  <q-select input-class="no-wrap"
-                    dense borderless outlined
-                    :options="['REGULER','SAMPLE','VALIDATE']"
-                    v-model="FILTERABLE.fill.sampling.value"
-                    @input="FILTERABLE.submit" />
                   <q-checkbox
                     left-label label="Disable"
                     v-model="FILTERABLE.fill.enable.value"
@@ -124,7 +128,7 @@
 
         <q-td slot="body-cell" slot-scope="rs" :props="rs">
           <div v-if="rs.col.name === 'prefix'">
-            <q-btn v-if="$app.can('items-read')" dense flat color="grey" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`"/>
+            <q-btn dense flat color="grey" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`"/>
             <!-- <q-btn v-if="isCanUpdate" dense flat color="grey" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`"/>
             <q-btn v-if="isCanDelete" dense flat color="grey" icon="delete" @click.native="TABLE.delete(rs.row)" />
             <q-btn v-if="isCanPush" dense flat color="light" icon="mdi-database-export" title="upload"

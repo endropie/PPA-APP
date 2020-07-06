@@ -153,19 +153,33 @@
         <!-- ITEM - PRELINE -->
         <div class="col-12 col-md-6">
           <q-card class="fit">
-            <q-card-section class="bg-secondary text-white q-pa-sm">
-              <div class="text-subtitle2">Enginering information</div>
+            <q-card-section horizontal class="bg-secondary text-white q-px-sm q-py-xs">
+              <div class="text-subtitle2 q-py-xs">Enginering information</div>
+              <q-space />
+              <q-btn flat dense outline icon="edit"
+                @click="rsForm.sample_enginered_at = true"
+                v-if="FORM.data.sample"
+                v-show="rsForm.sample_enginered_at !== true"
+              />
+              <q-btn flat dense outline icon="clear"
+                @click="[rsForm.sample_enginered_at = null, rsForm.price = FORM.data.price]"
+                v-if="FORM.data.sample"
+                v-show="rsForm.sample_enginered_at === true"
+              />
             </q-card-section>
             <q-separator />
             <q-card-section class="q-pa-sm">
-              <div class="row q-col-gutter-x-sm ">
+              <q-tooltip v-if="FORM.data.sample && rsForm.sample_enginered_at !== true" >
+                For modify, click edit first!
+              </q-tooltip>
+              <div class="row q-col-gutter-x-sm" :class="{'light-dimmed': FORM.data.sample && rsForm.sample_enginered_at !== true} ">
                 <q-input class="col-12 col-sm-6" input-style="text-align:left"
                   name="sa_dm"
                   label="S.A (dm)"
                   v-model="rsForm.sa_dm"
                   type="number"
-                  v-validate="isNotSample(`required`)"
-                  :dark="LAYOUT.isDark"
+                  v-validate="isNotEnginered(`required`)"
+                  no-error-icon
                   :error="errors.has('sa_dm')"
                   :error-message="errors.first('sa_dm')"
                 />
@@ -174,29 +188,28 @@
                   label="Weight"
                   v-model="rsForm.weight"
                   type="number"
-                  v-validate="isNotSample(`required`)"
-                  :dark="LAYOUT.isDark"
+                  v-validate="isNotEnginered(`required`)"
+                  no-error-icon
                   :error="errors.has('weight')"
                   :error-message="errors.first('weight')"
                 />
-
                 <q-select class="col-12 col-sm-6"
                   name="load_type"
                   :label="$tc('label.mode', 1, {v:'Hanger/Barrel'})"
                   v-model="rsForm.load_type"
                   :options="['HANGER', 'BAREL']"
-                  v-validate="isNotSample(`required`)"
+                  v-validate="isNotEnginered(`required`)"
                   :dark="LAYOUT.isDark"
                   :error="errors.has('load_type')"
                   :error-message="errors.first('load_type')"/>
 
-                <div class="row col-12 col-sm-6 q-col-gutter-sm">
+                <div class="col-12 col-sm-6 row q-col-gutter-sm">
                   <q-input class="col-12 col-sm-6"
                     name="load_capacity"
                     :label="$tc('label.capacity', 1)"
                     type="number"
                     v-model="rsForm.load_capacity"
-                    v-validate="isNotSample(`required`)"
+                    v-validate="isNotEnginered(`required`)"
                     no-error-icon
                     :error="errors.has('load_capacity')"
                   />
@@ -207,43 +220,45 @@
                     type="number"
                     icon="timer"
                     v-model="rsForm.packing_duration"
-                    v-validate="isNotSample(`required`)"
+                    v-validate="isNotEnginered(`required`)"
                     no-error-icon
                     :error="errors.has('packing_duration')"
                   />
                 </div>
+
+                <q-list dense class="col-12 ">
+                  <q-item-label header class="text-subtitle2 no-padding" >Preline Production</q-item-label>
+                  <q-item v-for="(item, index) in rsForm.item_prelines" :key="index" class="no-padding">
+                    <q-item-section>
+                      <ux-select-filter
+                        :ref="`pre-line`"
+                        :name="`pre-line-${index}`"
+                        v-model="rsForm.item_prelines[index].line_id"
+                        :dark="LAYOUT.isDark"
+                        inverted dense
+                        color="primary"
+                        :prefix="`${index+1}. `"
+                        :options="LineOptions"
+                        :inject-filter="(line) => { if(index === 0 && !line.ismain) return false}"
+                        v-validate="isNotEnginered(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
+                        :error="errors.has(`pre-line-${index}`)"
+                        :error-message="errors.first(`pre-line-${index}`)"
+                      >
+                        <q-badge slot="append" color="teal" label="main" v-if="index === 0"/>
+                      </ux-select-filter>
+                    </q-item-section>
+                    <q-item-section side class="no-padding">
+                      <q-btn :class="{'invisible':!index}" dense flat round icon="clear" color="red-5" @click="removeProduction(index)"/>
+                    </q-item-section>
+                  </q-item>
+                  <q-item class="no-padding">
+                    <q-item-section>
+                      <q-btn dense outline color="primary" :label="$tc('form.add',2)" @click="addNewProduction()" />
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+
               </div>
-              <q-list dense class="no-padding">
-                <q-item-label header class="text-caption no-padding" >Preline Production</q-item-label>
-                <q-item v-for="(item, index) in rsForm.item_prelines" :key="index" class="no-padding">
-                  <q-item-section>
-                    <ux-select-filter
-                      :ref="`pre-line`"
-                      :name="`pre-line-${index}`"
-                      v-model="rsForm.item_prelines[index].line_id"
-                      :dark="LAYOUT.isDark"
-                      inverted dense
-                      color="primary"
-                      :prefix="`${index+1}. `"
-                      :options="LineOptions"
-                      :inject-filter="(line) => { if(index === 0 && !line.ismain) return false}"
-                      v-validate="isNotSample(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
-                      :error="errors.has(`pre-line-${index}`)"
-                      :error-message="errors.first(`pre-line-${index}`)"
-                    >
-                      <q-badge slot="append" color="teal" label="main" v-if="index === 0"/>
-                    </ux-select-filter>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-btn :class="{'invisible':!index}" dense flat round icon="clear" color="red-5" @click="removeProduction(index)"/>
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    <q-btn dense outline color="primary" :label="$tc('form.add',2)" @click="addNewProduction()" />
-                  </q-item-section>
-                </q-item>
-              </q-list>
             </q-card-section>
           </q-card>
         </div>
@@ -457,9 +472,15 @@ export default {
           estimate_price: null,
           estimate_sadm: null,
           estimate_monthly_amount: null,
+          estimate_begin_date: null,
           enable: 1,
           sample: 0,
           description:null,
+
+          sample_priced_at: null,
+          sample_enginered_at: null,
+          sample_priced_at: null,
+          sample_validated_at: null
         }
       }
     }
@@ -537,6 +558,9 @@ export default {
     init() {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
+        this.$nextTick(() => {
+          if (!data.item_prelines.length) this.addNewProduction()
+        })
       })
     },
     setForm(data) {
@@ -559,6 +583,11 @@ export default {
 
       // Set unique code
       this.rsForm['code'] = [CUST.code, BRAND.code, SPEC.code].join('-')
+    },
+
+    isNotEnginered(v) {
+      console.info('ENGINERED', this.rsForm.sample_enginered_at)
+      return !Boolean(this.rsForm.sample && this.rsForm.sample_enginered_at) ? '' : v
     },
 
     isNotSample(v) {
