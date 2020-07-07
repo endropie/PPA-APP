@@ -81,7 +81,7 @@
               <q-select class="col-12 col-sm-3" input-class="no-wrap"
                 dense standout="bg-blue-grey-5 text-white"
                 :options="['REGULER','SAMPLE','SAMPLE:DEPICT','SAMPLE:ENGINERY','SAMPLE:PRICE','SAMPLE:VALIDATE']"
-                v-model="FILTERABLE.fill.sampling.value"
+                v-model="FILTERABLE.fill.sampled.value"
                 :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
                 :dark="LAYOUT.isDark"
                 @input="FILTERABLE.submit"
@@ -202,11 +202,6 @@ export default {
       FILTERABLE: {
         fill: {
           sampled: {
-            value: '',
-            type: 'string',
-            transform: (value) => { return null }
-          },
-          sampling: {
             value: 'REGULER',
             type: 'string',
             transform: (value) => { return null }

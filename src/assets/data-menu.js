@@ -28,6 +28,11 @@ const common = [
     ]
   },
   {
+    name: 'New Part Sample',
+    path: 'items/create-sample',
+    icon: 'style'
+  },
+  {
     name: 'Employee',
     path: 'employees',
     icon: 'style',

@@ -56,161 +56,260 @@
         inline-label
         active-color="primary">
         <q-tab name="info" icon="info" label="Info" />
-        <q-tab name="detail" icon="money" label="Detail" />
+        <!-- <q-tab name="detail" icon="money" label="Detail" /> -->
         <q-tab name="timeline" icon="movie" label="Timeline" />
       </q-tabs>
       <q-tab-panels v-model="tab" animated class="">
         <q-tab-panel name="info">
-          <div class="q-px-md text-subtitle2">INFORMATION</div>
-          <div class="row">
-            <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
-              <q-item>
-                <q-item-section avatar>
-                  <q-icon name="code" color="primary"/>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('general.customer')}}</q-item-label>
-                  <q-item-label>{{rsView.customer.name}}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('general.brand')}}</q-item-label>
-                  <q-item-label>{{rsView.brand ? rsView.brand.name : '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('general.specification')}}</q-item-label>
-                  <q-item-label>{{rsView.specification ? rsView.specification.name : '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-
-            <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('items.part_name')}}</q-item-label>
-                  <q-item-label>{{rsView.part_name || '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('items.part_number')}}</q-item-label>
-                  <q-item-label>{{rsView.part_number || '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('items.part_alias')}}</q-item-label>
-                  <q-item-label>{{rsView.part_alias || '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-
-            <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('label.code')}}</q-item-label>
-                  <q-item-label>{{rsView.code || '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('label.unit')}}</q-item-label>
-                  <q-item-label>{{rsView.unit ? rsView.unit.name : '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-
-            <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('general.item_category')}}</q-item-label>
-                  <q-item-label>{{rsView.category_item? rsView.category_item.name : '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('general.item_type')}}</q-item-label>
-                  <q-item-label>{{rsView.type_item ? rsView.type_item.name : '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('general.size')}}</q-item-label>
-                  <q-item-label>{{rsView.size ? rsView.size.name : '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-
+          <q-card flat bordered class="q-mb-sm">
+            <q-card-section class="q-py-sm">
+              <div class="text-subtitle2">Information </div>
+            </q-card-section>
             <q-separator inset />
+            <q-card-section>
+              <div class="row">
+                <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
+                  <q-item>
+                    <q-item-section avatar>
+                      <q-icon name="code" color="primary"/>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('general.customer')}}</q-item-label>
+                      <q-item-label>{{rsView.customer.name}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('general.brand')}}</q-item-label>
+                      <q-item-label>{{rsView.brand ? rsView.brand.name : '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('general.specification')}}</q-item-label>
+                      <q-item-label>{{rsView.specification ? rsView.specification.name : '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
 
-            <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('items.packing_duration')}}</q-item-label>
-                  <q-item-label>{{rsView.packing_duration ? $app.number_format(rsView.packing_duration) : '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('items.sa_dm')}}</q-item-label>
-                  <q-item-label>{{rsView.sa_dm ? $app.number_format(rsView.sa_dm) : '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('items.weight')}}</q-item-label>
-                  <q-item-label>{{rsView.weight ? $app.number_format(rsView.weight) : '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
+                <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('items.part_name')}}</q-item-label>
+                      <q-item-label>{{rsView.part_name || '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('items.part_number')}}</q-item-label>
+                      <q-item-label>{{rsView.part_number || '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('items.part_alias')}}</q-item-label>
+                      <q-item-label>{{rsView.part_alias || '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
 
-            <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('items.load_type')}}</q-item-label>
-                  <q-item-label>{{rsView.load_type || '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
-                <q-item-section>
-                  <q-item-label caption>{{$tc('items.load_capacity')}}</q-item-label>
-                  <q-item-label>{{rsView.load_capacity ? $app.number_format(rsView.load_capacity) : '-'}}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
+                <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('label.code')}}</q-item-label>
+                      <q-item-label>{{rsView.code || '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('label.unit')}}</q-item-label>
+                      <q-item-label>{{rsView.unit ? rsView.unit.name : '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
 
-            <q-card flat class="col-12 col-md-6">
-              <q-card-section class="q-py-sm">
-                <div class="text-subtitle2">{{$tc('items.preline')}}</div>
-              </q-card-section>
-              <q-separator inset />
-              <q-card-section class="q-py-sm column-reverse">
-                <div v-for="(preline, i) in rsView.item_prelines" :key="i">
-                  <q-chip dense square :label="i+1" color="primary" text-color="white" />
-                  {{preline.line.name}}
-                  <q-chip dense square label="MAIN" color="primary" text-color="white" />
+                <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('general.item_category')}}</q-item-label>
+                      <q-item-label>{{rsView.category_item? rsView.category_item.name : '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('general.item_type')}}</q-item-label>
+                      <q-item-label>{{rsView.type_item ? rsView.type_item.name : '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('general.size')}}</q-item-label>
+                      <q-item-label>{{rsView.size ? rsView.size.name : '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </div>
+            </q-card-section>
+          </q-card>
+          <!-- ITEM ENGINERY -->
+          <q-card flat bordered class="q-mb-sm">
+            <q-card-section class="q-py-sm">
+              <div class="text-subtitle2">Enginering details</div>
+            </q-card-section>
+            <q-separator inset />
+            <q-card-section>
+              <div class="row">
+
+                <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('items.packing_duration')}}</q-item-label>
+                      <q-item-label>{{rsView.packing_duration ? $app.number_format(rsView.packing_duration) : '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('items.sa_dm')}}</q-item-label>
+                      <q-item-label>{{rsView.sa_dm ? $app.number_format(rsView.sa_dm) : '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('items.weight')}}</q-item-label>
+                      <q-item-label>{{rsView.weight ? $app.number_format(rsView.weight) : '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+
+                <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('items.load_type')}}</q-item-label>
+                      <q-item-label>{{rsView.load_type || '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>{{$tc('items.load_capacity')}}</q-item-label>
+                      <q-item-label>{{rsView.load_capacity ? $app.number_format(rsView.load_capacity) : '-'}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+
+                <q-card flat class="col-12 col-md-6">
+                  <q-card-section class="q-py-xs">
+                    <div class="text-weight-light text-grey">{{$tc('items.preline')}}</div>
+                  </q-card-section>
+                  <!-- <q-separator inset /> -->
+                  <q-card-section class="q-py-sm column-reverse">
+                    <div v-for="(preline, i) in rsView.item_prelines" :key="i">
+                      <q-chip dense square :label="i+1" color="primary" text-color="white" />
+                      {{preline.line.name}}
+                      <q-chip dense square label="MAIN" color="primary" text-color="white" />
+                    </div>
+                  </q-card-section>
+                </q-card>
+              </div>
+            </q-card-section>
+          </q-card>
+          <!-- ITEM DEPICTS -->
+          <q-card flat bordered class="q-mb-sm">
+            <q-card-section class="q-py-sm">
+              <div class="text-subtitle2">{{$tc('items.depicts')}}</div>
+            </q-card-section>
+            <q-separator inset />
+            <q-card-section class="q-py-sm">
+              <div v-if="!rsView.depicts || !rsView.depicts.length" class="text-grey text-center">
+                <q-avatar size="30px" font-size="24px" icon="info" class="no-margin"/>
+                No files
+              </div>
+              <div v-else class="row q-gutter-sm">
+                <q-card  v-for="(file, fileIndex) in rsView.depicts" :key="fileIndex">
+                  <img :src="$axios.serverURL(file.url)" v-if="file.__img" style="max-width:7rem">
+                  <q-avatar square v-else
+                    size="7rem" font-size="52px"
+                    color="blue-grey-1" text-color="blue-grey"
+                    icon="mdi-file" >
+                  </q-avatar>
+                <q-card-section horizontal style="max-width:7rem" class="q-px-sm items-center">
+                  <div class="text-caption text-truncate ellipsis">
+                    {{file.name}}
+                  </div>
+                  <q-space />
+                  <q-btn flat dense icon="mdi-download" @click="openFile(file.url)" />
+                </q-card-section>
+                </q-card>
+              </div>
+            </q-card-section>
+
+          </q-card>
+          <!-- ITEM ESTIMATE -->
+          <q-card flat bordered class="q-mb-sm">
+            <q-card-section class="q-py-sm">
+              <div class="text-subtitle2">{{$tc('label.estimate')}}</div>
+            </q-card-section>
+            <q-separator inset />
+            <q-card-section class="q-py-sm" >
+              <div v-if="!$app.can(['items-price','items-sample'])" class="text-grey">
+                <q-avatar icon="info" /> NOT ALLOWED
+              </div>
+              <div v-else class="row">
+                <div class="col-12 col-sm-4">
+                  <div class="text-caption text-grey">{{$tc('items.estimate_price')}}</div>
+                  <div>{{rsView.estimate_price ? $app.number_format(rsView.estimate_price) : '-'}}</div>
                 </div>
-              </q-card-section>
-            </q-card>
-          </div>
+                <div class="col-12 col-sm-4">
+                  <div class="text-caption text-grey">{{$tc('items.estimate_sadm')}}</div>
+                  <div>{{rsView.estimate_sadm ? $app.number_format(rsView.estimate_sadm) : '-'}}</div>
+                </div>
+                <div class="col-12 col-sm-4">
+                  <div class="text-caption text-grey">{{$tc('items.estimate_monthly_amount')}}</div>
+                  <div>{{rsView.estimate_monthly_amount ? $app.number_format(rsView.estimate_monthly_amount) : '-'}}</div>
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+          <!-- ITEM PRICE -->
+          <q-card flat bordered class="q-mb-sm">
+            <q-card-section class="q-py-sm">
+              <div class="text-subtitle2">{{$tc('label.price')}}</div>
+            </q-card-section>
+            <q-separator inset />
+            <q-card-section class="q-py-sm">
+              <div v-if="!$app.can('items-price')" class="text-grey">
+                <q-avatar icon="info" /> NOT ALLOWED
+              </div>
+              <div v-else class="row">
+                <div class="col-12 col-sm-4">
+                  <div class="text-caption text-grey">{{$tc('items.price')}}</div>
+                  <div>{{rsView.price ? $app.number_format(rsView.price) : '-'}}</div>
+                </div>
+                <div class="col-12 col-sm-4">
+                  <div class="text-caption text-grey">{{$tc('items.price_area')}}</div>
+                  <div>{{price_area ? $app.number_format(price_area) : '-'}}</div>
+                </div>
+                <div class="col-12 col-sm-4">
+                  <div class="text-caption text-grey">{{$tc('items.price_loaded')}}</div>
+                  <div>{{price_loaded ? $app.number_format(price_loaded) : '-'}}</div>
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
         </q-tab-panel>
 
         <q-tab-panel name="detail">
@@ -278,7 +377,7 @@
 </template>
 
 <script>
-
+import { openURL } from 'quasar'
 import MixView from '@/mixins/mix-view.vue'
 import StockTimeline from './stock-timeline.vue'
 
@@ -352,6 +451,10 @@ export default {
         }).finally(() => {
           this.$q.loading.hide()
         })
+    },
+    openFile(v) {
+      console.warn('OPEN', v)
+      openURL(this.$axios.serverURL(v))
     },
     push (row) {
       let url = `${this.VIEW.resource.api}/${this.rsView.id}/accurate/push`

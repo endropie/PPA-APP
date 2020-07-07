@@ -1,5 +1,6 @@
 
 export default {
+  depicts: 'Drawing files',
   estimate_monthly_amount: 'Perkiraan Jumlah per bulan',
   estimate_sadm: 'Perkiraan @:items.sa_dm',
   estimate_price: 'Perkiraan @:label.price',
@@ -10,6 +11,7 @@ export default {
   part_number: 'No. Part',
   part_name: 'Nama Part',
   part_alias: 'Part Alias',
+  part_sample: 'Part sample',
   plate: 'Plate',
   preline: 'Line Produksi',
   price: 'Part @:label.price',
