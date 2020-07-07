@@ -59,7 +59,7 @@
       </div>
       <div class="col-12 col-sm-6" >
         <div class="row q-col-gutter-x-sm">
-          <q-input class="col-12"
+          <q-input class="col-6"
             name="code"
             :placeholder="FORM.ifCreate('[Auto Generate]','')"
             :label="$tc('label.code_intern')"
@@ -68,13 +68,23 @@
             v-validate="FORM.ifCreate('','required')"
             :error="errors.has('code')"
             :error-message="errors.first('code')" >
-            <q-toggle slot="after" class="text-body2 bordered rounded-borders q-pa-xs no-margin"
+
+          </q-input>
+          <div class="col-6">
+            <q-select v-if="!rsForm.id"
+              label="Sample Project"
+              class="no-margin"
+              v-model="rsForm.project"
+              :options="['NEW','MIGRATE']"
+            />
+            <q-toggle v-if="rsForm.id"
+              class="float-right text-body2 bordered rounded-borders q-pa-xs no-margin"
               :label="rsForm.enable ? 'Enable':'Disable'" left-label
               v-model="rsForm.enable"
               :color="rsForm.enable ? 'primary':'red'"
               :true-value="1"
               :false-value="0" />
-          </q-input>
+          </div>
           <ux-select-filter
             name="brand_id"
             :label="$tc('general.brand')"
@@ -426,7 +436,7 @@ export default {
           api: '/api/v1/common/items',
         },
       },
-      rsForm:{},
+      rsForm: {},
       setDefault:()=>{
         return {
           code:null,
@@ -458,6 +468,7 @@ export default {
           estimate_begin_date: null,
           enable: 1,
           sample: 1,
+          project: 'NEW',
           description:null,
           depicts: [],
           sample_depicted_at: null,
@@ -538,26 +549,7 @@ export default {
       '$route' : 'init'
   },
   methods: {
-    fileFailed (info) {
-      console.warn('fileFailed', info)
-    },
-    fileUploaded (info) {
-      console.warn('fileUploaded', info)
-    },
-    fileUploading (info) {
-      console.warn('fileUploading', info)
-    },
-    fileAdded (files) {
-      console.warn('fileAdded', files)
-    },
-    fileRemoved(files) {
-      console.warn('fileRemoved', files)
-    },
-    fileRejected (rejectedEntries) {
-      console.warn('rejectedEntries', rejectedEntries)
-    },
     fileFactoryFailed (err, files) {
-      console.warn('fileFailed => removing', err, files)
       files.map(e => this.$refs.depictUploader.removeFile(e))
     },
     urlDepict (file) {
@@ -577,7 +569,7 @@ export default {
       this.$axios
         .delete(`/api/v1/uploads/file?path=${path}`)
         .then(response => {
-          console.warn(response)
+          // file deleted!
         })
         .catch(error => {
           this.$app.response.error(error.response || error)
@@ -609,16 +601,10 @@ export default {
           headers: { 'Content-Type': 'multipart/form-data' },
           })
           .then(response => {
-            console.warn('response', response)
             reject()
-            files.map(e => this.addNewDepicts({...e, name: e.name, type: e.type, size: e.size, lastModified: e.lastModified, url: response.data, __status: 'uploaded', __img: Boolean(e.__img)}))
-
-            // resolve({
-            //   ...resolver,
-            //   sendRaw: (files) => {
-            //     return files.map(e => e.url = response.data)
-            //   }
-            // })
+            files.map(e => this.addNewDepicts({
+              ...e, name: e.name, type: e.type, size: e.size, lastModified: e.lastModified, url: response.data, __status: 'uploaded', __img: Boolean(e.__img)
+            }))
           })
           .catch(error => {
             console.error('error', error.response || error)
@@ -628,7 +614,6 @@ export default {
     },
     init() {
       this.FORM.load((data) => {
-        console.warn('DATA', data)
         this.setForm(data || this.setDefault())
       })
     },

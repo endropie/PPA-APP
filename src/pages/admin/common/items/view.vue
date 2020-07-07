@@ -8,7 +8,7 @@
         </div>
         <q-space />
         <div>
-          <q-chip square outline color="warning" class="text-weight-bold" label="VALIDATION" icon="info" v-if="rsView.sample && rsView.sample_moved_by && !rsView.sample_validated_by" />
+          <q-chip square outline color="secondary" class="text-weight-bold" :label="rsView.project" icon="bookmark" v-if="rsView.sample && rsView.project !== 'NONE'" />
           <q-chip square outline color="warning" class="text-weight-bold" label="SAMPLE" icon="bookmark" v-if="rsView.sample" />
           <q-btn dense flat round icon="more_vert">
             <q-menu>
@@ -240,12 +240,20 @@
               </div>
               <div v-else class="row q-gutter-sm">
                 <q-card  v-for="(file, fileIndex) in rsView.depicts" :key="fileIndex">
-                  <img :src="$axios.serverURL(file.url)" v-if="file.__img" style="max-width:7rem">
-                  <q-avatar square v-else
+                  <q-img v-if="file.__img"
+                    placeholder-src="statics/images/stop_block.png"
+                    :src="$axios.serverURL(file.url)"
+                    spinner-color="white"
+                    style="height: 7rem; max-width: 7rem;"
+                    img-class=""
+                    class="rounded-borders"
+                  />
+                  <q-avatar v-if="!file.__img"
+                    square
                     size="7rem" font-size="52px"
                     color="blue-grey-1" text-color="blue-grey"
-                    icon="mdi-file" >
-                  </q-avatar>
+                    icon="mdi-file"
+                  />
                 <q-card-section horizontal style="max-width:7rem" class="q-px-sm items-center">
                   <div class="text-caption text-truncate ellipsis">
                     {{file.name}}
@@ -453,7 +461,6 @@ export default {
         })
     },
     openFile(v) {
-      console.warn('OPEN', v)
       openURL(this.$axios.serverURL(v))
     },
     push (row) {
