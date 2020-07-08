@@ -81,7 +81,7 @@
               <q-select class="col-12 col-sm-3" input-class="no-wrap"
                 dense standout="bg-blue-grey-5 text-white"
                 :options="['REGULER','SAMPLE','SAMPLE:DEPICT','SAMPLE:ENGINERY','SAMPLE:PRICE','SAMPLE:VALIDATE']"
-                v-model="FILTERABLE.fill.sampled.value"
+                v-model="FILTERABLE.fill.sample_in.value"
                 :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
                 :dark="LAYOUT.isDark"
                 @input="FILTERABLE.submit"
@@ -90,13 +90,6 @@
 
               <div class="col-12 col-sm-3">
                 <div class="row justify-end no-wrap">
-                  <!-- <q-checkbox
-                    left-label label="Sample"
-                    v-model="FILTERABLE.fill.sampled.value"
-                    true-value="true"
-                    false-value=""
-                    @input="FILTERABLE.submit"
-                  /> -->
                   <q-checkbox
                     left-label label="Disable"
                     v-model="FILTERABLE.fill.enable.value"
@@ -201,7 +194,7 @@ export default {
       },
       FILTERABLE: {
         fill: {
-          sampled: {
+          sample_in: {
             value: 'REGULER',
             type: 'string',
             transform: (value) => { return null }

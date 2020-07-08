@@ -219,7 +219,7 @@
                   <q-card-section class="q-py-sm column-reverse">
                     <div v-for="(preline, i) in rsView.item_prelines" :key="i">
                       <q-chip dense square :label="i+1" color="primary" text-color="white" />
-                      {{preline.line.name}}
+                      {{ preline.line ? preline.line.name : 'no - line' }}
                       <q-chip dense square label="MAIN" color="primary" text-color="white" />
                     </div>
                   </q-card-section>

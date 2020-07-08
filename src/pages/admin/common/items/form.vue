@@ -178,7 +178,7 @@
                   label="S.A (dm)"
                   v-model="rsForm.sa_dm"
                   type="number"
-                  v-validate="isNotEnginered(`required`)"
+                  v-validate="isEnginered(`required`)"
                   no-error-icon
                   :error="errors.has('sa_dm')"
                   :error-message="errors.first('sa_dm')"
@@ -188,7 +188,7 @@
                   label="Weight"
                   v-model="rsForm.weight"
                   type="number"
-                  v-validate="isNotEnginered(`required`)"
+                  v-validate="isEnginered(`required`)"
                   no-error-icon
                   :error="errors.has('weight')"
                   :error-message="errors.first('weight')"
@@ -198,7 +198,7 @@
                   :label="$tc('label.mode', 1, {v:'Hanger/Barrel'})"
                   v-model="rsForm.load_type"
                   :options="['HANGER', 'BAREL']"
-                  v-validate="isNotEnginered(`required`)"
+                  v-validate="isEnginered(`required`)"
                   :dark="LAYOUT.isDark"
                   :error="errors.has('load_type')"
                   :error-message="errors.first('load_type')"/>
@@ -209,7 +209,7 @@
                     :label="$tc('label.capacity', 1)"
                     type="number"
                     v-model="rsForm.load_capacity"
-                    v-validate="isNotEnginered(`required`)"
+                    v-validate="isEnginered(`required`)"
                     no-error-icon
                     :error="errors.has('load_capacity')"
                   />
@@ -220,7 +220,7 @@
                     type="number"
                     icon="timer"
                     v-model="rsForm.packing_duration"
-                    v-validate="isNotEnginered(`required`)"
+                    v-validate="isEnginered(`required`)"
                     no-error-icon
                     :error="errors.has('packing_duration')"
                   />
@@ -240,7 +240,7 @@
                         :prefix="`${index+1}. `"
                         :options="LineOptions"
                         :inject-filter="(line) => { if(index === 0 && !line.ismain) return false}"
-                        v-validate="isNotEnginered(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
+                        v-validate="isEnginered(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
                         :error="errors.has(`pre-line-${index}`)"
                         :error-message="errors.first(`pre-line-${index}`)"
                       >
@@ -585,8 +585,7 @@ export default {
       this.rsForm['code'] = [CUST.code, BRAND.code, SPEC.code].join('-')
     },
 
-    isNotEnginered(v) {
-      console.info('ENGINERED', this.rsForm.sample_enginered_at)
+    isEnginered(v) {
       return !Boolean(this.rsForm.sample && this.rsForm.sample_enginered_at) ? '' : v
     },
 

@@ -103,15 +103,6 @@
                     </div>
                   </q-td>
                 </q-tr>
-                <!-- <template v-if="IS_LOTS && false">
-                  <q-tr v-for="(rsDelivery, iDelivery) in row.delivery_order_items" :key="iDelivery">
-                    <td :colspan="5" >
-
-                    </td>
-                    <td align="right">{{rsDelivery.quantity}}</td>
-                    <td></td>
-                  </q-tr>
-                </template> -->
               </tbody>
             </template>
           </q-markup-table>
@@ -196,8 +187,8 @@
       <div class="print-hide q-my-md full-width">
         <q-separator class="q-my-md" />
         <div class="row justify-end q-col-gutter-sm">
-          <div  class="col-12 col-sm-6 col-md-4">
-            <q-card :dark="LAYOUT.isDark">
+          <div class="col-12 col-sm-6 col-md-4" v-if="rsView.delivery_orders">
+            <q-card>
               <q-expansion-item header-class="bg-cyan-8 text-white" icon="local_shipping" :label="`SJDO ${$tc('general.sj_delivery', 2)} (${rsView.delivery_orders.length})`">
                 <q-list bordered separator :dark="LAYOUT.isDark" class="main-box">
                   <q-item clickable v-ripple @click="showDO(link.id)" :dark="LAYOUT.isDark"
@@ -213,8 +204,8 @@
               </q-expansion-item>
             </q-card>
           </div>
-          <div  class="col-12 col-sm-6 col-md-4">
-            <q-card :dark="LAYOUT.isDark">
+          <div class="col-12 col-sm-6 col-md-4" v-if="rsView.acc_invoices">
+            <q-card>
               <q-expansion-item header-class="bg-teal-8 text-white" icon="mdi-shopping" :label="`${$tc('general.invoice', 2)} (${rsView.acc_invoices.length})`">
                 <q-list separator bordered :dark="LAYOUT.isDark" class="main-box">
                   <q-item :dark="LAYOUT.isDark"
