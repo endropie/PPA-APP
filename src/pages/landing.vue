@@ -3,7 +3,7 @@
     <div class="index-page bg-grey-2 window-height window-width column items-center no-wrap">
       <div class="banner bg-primary flex flex-center">
         <span v-if="$q.screen.gt.xs" >
-          <q-icon name="widgets" class="text-h1" color="blue-7" /> {{$app.name}}
+          {{APP_NAME}}
         </span>
       </div>
       <div class="text-center">
@@ -11,10 +11,10 @@
           <!-- <img src="~assets/quasar-play-logo-full.svg"> -->
           <q-icon name="widgets" class="text-h2" color="blue-7" />
           <div class="text-h4 text-orange-14 text-weight-bolder" style="font: courier">
-            {{ $app.name || 'MANUFACTURE PLAY' }}
+            {{ APP_NAME }}
           </div>
           <div class="text-orange-8 text-weight-light">
-            {{ $app.description || 'Administration Manufacture' }}
+            {{ APP_DESCRIPTION }}
           </div>
           <br>
 
@@ -127,6 +127,20 @@ export default {
   computed: {
     BASEURL () {
       return this.$q.localStorage.getItem('BASE_URL')
+    },
+    APP_NAME () {
+      let name = 'MANUFACTURE PLAY'
+      if (this.$store.state.admin.SETTING && this.$store.state.admin.SETTING.general.app_brand) {
+        name = this.$store.state.admin.SETTING.general.app_brand
+      }
+      return name
+    },
+    APP_DESCRIPTION () {
+      let name = 'Administration Manufacture'
+      if (this.$store.state.admin.SETTING && this.$store.state.admin.SETTING.general.app_description) {
+        name = this.$store.state.admin.SETTING.general.app_description
+      }
+      return name
     }
   },
   methods: {
