@@ -56,6 +56,7 @@ export default {
           { name: 'prefix', label: '', align: 'left'},
           { name: 'code', field: 'code', label: this.$tc('label.code'), align: 'left', sortable: true},
           { name: 'name', field: 'name', label: this.$tc('label.unit'), align: 'left', sortable: true},
+          { name: 'decimal_in', field: 'decimal_in', label: this.$tc('label.quantity', 1, {v:'Decimal'}), align: 'right', sortable: false},
         ]
       },
     }
