@@ -127,9 +127,9 @@
                 v-model="row.item"
                 :disable="!Boolean(rsForm.customer_id && rsForm.transaction)"
                 filter clearable
-                :source="`/api/v1/common/items?mode=all&customer_id=${rsForm.customer_id}` + (rsForm.transaction == 'SAMPLE' ? '&sampled=true' : '')"
+                :source="`/api/v1/common/items?mode=all&customer_id=${rsForm.customer_id}` + (rsForm.transaction == 'SAMPLE' ? '&sample_in=SAMPLE' : '')"
                 :option-label="(item) => item.part_name"
-                :option-sublabel="(item) => `[${item.customer_code}] ${item.part_number}`"
+                :option-sublabel="(item) => `[${item.customer_code}] ${item.part_subname || '-'}`"
                 option-value="id"
                 v-validate="`required`"
                 :error="errors.has(`delivery_order_items.${index}.item_id`)"
@@ -137,8 +137,8 @@
                   row.item_id = v ? v.id : null
                 }"
               >
-                <small v-if="row.item_id && row.item && row.item.part_number" class="absolute-bottom">
-                  [{{row.item.customer_code}}] {{row.item.part_number}}
+                <small v-if="row.item_id && row.item && row.item.part_subname" class="absolute-bottom">
+                  [{{row.item.customer_code}}] {{row.item.part_subname}}
                 </small>
               </ux-select>
             </q-td>

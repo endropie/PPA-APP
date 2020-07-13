@@ -56,7 +56,7 @@
             <q-tr style="line-height:25px">
               <q-th width="30%" v-if="IS_LOTS && !IS_ITEM_SUMMARY">LOTS</q-th>
               <q-th width="30%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th width="30%">{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th width="30%">{{ $tc('item.subname_label') }}</q-th>
               <q-th width="10%">{{ $tc('label.unit') }}</q-th>
               <q-th width="10%">{{ $tc('label.quantity') }}</q-th>
               <q-th width="10%">{{ $tc('label.send') }}</q-th>
@@ -66,7 +66,7 @@
             <tbody v-if="IS_ITEM_SUMMARY">
               <q-tr v-for="(row, index) in SUM_ITEMS" :key="index">
                 <q-td>{{row.item.part_name}}</q-td>
-                <q-td>{{row.item.part_number}}</q-td>
+                <q-td>{{row.item.part_subname}}</q-td>
                 <q-td class="text-center">{{row.item.unit.code}}</q-td>
                 <q-td class="text-right">{{$app.number_format(row.unit_amount, row.item.unit.decimal_in)}}</q-td>
                 <q-td class="text-right">{{$app.number_format(row.amount_delivery, row.item.unit.decimal_in)}}</q-td>
@@ -90,7 +90,7 @@
                     <span v-else>-</span>
                   </td>
                   <q-td>{{row.item.part_name}}</q-td>
-                  <q-td>{{row.item.part_number}}</q-td>
+                  <q-td>{{row.item.part_subname}}</q-td>
                   <q-td class="text-center">{{row.unit.code}} </q-td>
                   <q-td class="text-right">{{$app.number_format(row.quantity, row.unit.decimal_in)}}</q-td>
                   <q-td class="text-right">{{$app.number_format(row.amount_delivery/(row.unit_rate||1), row.unit.decimal_in)}}</q-td>

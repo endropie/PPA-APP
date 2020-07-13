@@ -41,7 +41,7 @@
           <div class="row  items-center q-gutter-sm">
             <div class="col column  text-no-wrap">
               <span class="text-weight-medium">{{rsView.item.part_name}}</span>
-              <span class="text-caption">[{{rsView.item.customer_code}}] {{rsView.item.part_number}}</span>
+              <span class="text-caption">[{{rsView.item.customer_code}}] {{rsView.item.part_subname || '--'}}</span>
             </div>
             <div class="col text-center">
               <q-chip dense square color="blue-grey" text-color="white" :label="rsView.stockist" />

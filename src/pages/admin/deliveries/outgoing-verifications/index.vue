@@ -61,9 +61,9 @@
 
 
         <q-td slot="body-cell-item" slot-scope="rs" style="width:35px">
-          <div style="line-height:normal">
+          <div style="line-height:normal" v-if="rs.row.item">
             <span>{{ rs.row.item.part_name }}</span><br/>
-            <small>No.{{ rs.row.item.part_number }}</small>
+            <small>[{{rs.row.item.customer_code}}] {{ rs.row.item.part_subname }}</small>
           </div>
         </q-td>
 
@@ -160,14 +160,7 @@ export default {
     },
     CustomerOptions() {
       return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
-    },
-    ItemOptions() {
-      return (this.SHEET.items.data.map(item => ({
-        label: item.code,
-        detail:`[${item.part_number}] ${item.part_name}`,
-        value: item.id
-      })) || [])
-    },
+    }
   },
   methods: {
     toggleShow() {

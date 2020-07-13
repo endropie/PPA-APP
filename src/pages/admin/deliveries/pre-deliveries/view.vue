@@ -41,7 +41,7 @@
             <thead>
             <q-tr>
               <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th>{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th>{{ $app.setting('item.subname_label') }}</q-th>
               <q-th>{{ $tc('label.unit') }}</q-th>
               <q-th>{{ $tc('label.quantity') }}</q-th>
               <q-th>Verify</q-th>
@@ -51,7 +51,7 @@
             <tbody>
             <q-tr v-for="(row, index) in rsView.pre_delivery_items" :key="index">
               <q-td>{{row.item.part_name}}</q-td>
-              <q-td>{{row.item.part_number}}</q-td>
+              <q-td>{{row.item.part_subname}}</q-td>
               <q-td class="text-center">{{row.unit.code}}</q-td>
               <q-td class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
               <q-td class="text-right">{{$app.number_format(row.amount_verification / (row.unit_rate || 1),0)}}</q-td>

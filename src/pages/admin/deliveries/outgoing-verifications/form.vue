@@ -13,8 +13,8 @@
           <td>
             <span v-if="rsForm.item" class="text-body2">
               {{rsForm.item.part_name}}
-              <div v-show="rsForm.item.part_number" class="text-small text-faded">
-                No. {{rsForm.item.part_number}}
+              <div class="text-small text-faded">
+                [{{rsForm.item.customer_code}}] {{rsForm.item.part_subname}}
               </div>
             </span>
           </td>

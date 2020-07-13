@@ -22,7 +22,7 @@
           <q-td >
             {{rs.row.part_name}}<br/>
             <span class="text-caption text-faded" v-if="rs.row.customer">
-              [{{ rs.row.customer_code }}] {{rs.row.part_number}}
+              [{{ rs.row.customer_code }}] {{rs.row.part_subname}}
             </span>
           </q-td>
           <q-td class="text-right">

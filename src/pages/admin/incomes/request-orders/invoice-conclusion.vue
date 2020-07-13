@@ -41,7 +41,7 @@
             <thead>
             <q-tr style="line-height:25px">
               <q-th width="30%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th width="30%">{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th width="30%">{{ $app.setting('item.subname_label') }}</q-th>
               <q-th width="10%">{{ $tc('label.unit') }}</q-th>
               <q-th width="10%">{{ $tc('label.quantity') }}</q-th>
               <q-th width="30%">{{ $tc('label.encasement') }}</q-th>
@@ -57,7 +57,7 @@
               </tr>
               <q-tr v-for="(row, index) in delivery.delivery_order_items" :key="index" :request-order-item-id="row.id">
                 <q-td>{{row.item.part_name}}</q-td>
-                <q-td>{{row.item.part_number}}</q-td>
+                <q-td>{{row.item.part_subname}}</q-td>
                 <q-td class="text-center">{{row.unit.code}}</q-td>
                 <q-td class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
                 <q-td class="text-right">{{row.encasement}}</q-td>

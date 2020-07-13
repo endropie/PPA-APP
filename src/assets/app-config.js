@@ -62,10 +62,10 @@ const config = {
     ]
   },
   incoming_good: {
-    hide_view_columns: ['part_specification']
+    hide_view_columns: ['part_subname']
   },
   sj_delivery: {
-    hide_view_columns: ['part_specification']
+    hide_view_columns: ['part_subname']
   },
   references: {
     vehicle_type: ['DELIVERY', 'OFFICE', 'OTHERS'],

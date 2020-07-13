@@ -109,7 +109,7 @@
               <q-td key="item" width="30%" style="min-width:150px">
                 <div class="column">
                   <span>{{row.item.part_name}}</span>
-                  <small class="text-light">{{row.item.part_number}}</small>
+                  <small class="text-light">[{{row.item.customer_code}}] {{row.item.part_subname}}</small>
                 </div>
               </q-td>
               <q-td key="quantity" width="10%" class="text-right">

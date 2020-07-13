@@ -10,7 +10,7 @@
           name="show"
           label="Hide View Columns"
           v-model="rsConfig.hide_view_columns"
-          :options="['part_name', 'part_number', 'part_specification', 'quantity', 'unit', 'encasement']"
+          :options="['part_name', 'part_subname', 'quantity', 'unit', 'encasement']"
           multiple use-chips
           dense
           :error="errors.has('hide_view_columns')"

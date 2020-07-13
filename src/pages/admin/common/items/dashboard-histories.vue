@@ -34,7 +34,7 @@
             <div v-if="rs.row.item">
               {{rs.row.item.part_name}}<br/>
               <span class="text-caption text-faded">
-                [{{rs.row.item.customer_code}}] {{ rs.row.item.part_number }}
+                [{{rs.row.item.customer_code}}] {{ rs.row.item.part_subname }}
               </span>
             </div>
             <div v-else v-text="$tc('messages.no_data')" />

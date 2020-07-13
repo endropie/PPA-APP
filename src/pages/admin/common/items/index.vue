@@ -226,8 +226,8 @@ export default {
           { name: 'prefix', label: '', align: 'left', required: true,},
 
           { name: 'customer', label: this.$tc('general.cust')+'.', field: 'customer_id', align: 'left', sortable: true},
-          { name: 'part_number', label: this.$tc('label.part')+' #', field: 'part_number', align: 'left', sortable: true },
           { name: 'part_name', label: this.$tc('items.part_name'), field: 'part_name', align: 'left', sortable: true },
+          { name: 'part_subname', label: this.$app.setting('item.subname_label'), field: 'part_subname', align: 'left', sortable: true },
           // { name: 'enable', label:this.$tc('label.active'), field: 'enable', align: 'center', sortable: true },
 
           // Item stocks

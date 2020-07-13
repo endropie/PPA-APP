@@ -87,7 +87,7 @@
           <!-- <code>({{Object.keys(rs.row)}})</code> -->
           <div class="column" v-if="rs.row.item">
             <span>{{rs.row.item.part_name}}</span>
-            <span class="text-weight-light">[{{rs.row.item.customer_code}}]<font>{{rs.row.item.part_number}}</font></span>
+            <span class="text-weight-light">[{{rs.row.item.customer_code}}] <font>{{rs.row.item.part_subname}}</font></span>
           </div>
         </q-td>
 
@@ -161,7 +161,6 @@ export default {
           { name: 'date', label: this.$tc('label.date'), field:(rs) => rs.delivery_order ? rs.delivery_order.date : '-', format:(v) => this.$app.moment(v).format('DD/MM/YYYY'), align: 'center', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field:(rs) => rs.delivery_order ? rs.delivery_order.fullnumber : '-', align: 'left', sortable: true },
           { name: 'item', label: this.$tc('items.part_name'), field: 'part_name', align: 'left'},
-          { name: 'specification', label: this.$tc('items.specification'), field: 'part_specification', align: 'left'},
           { name: 'quantity', label: this.$tc('label.quantity'), field: (rs)=> rs.quantity, align: 'right', sortable: true },
           { name: 'unit', label: this.$tc('label.unit'), field: (rs)=> rs.unit.code , align: 'left'}
         ]
@@ -177,8 +176,8 @@ export default {
     },
     ItemOptions() {
       return (this.SHEET.items.data.map(item => ({
-        label: `${item.part_name} - ${item.part_number}`,
-        sublabel:`[${item.customer_code}] ${item.part_number}`,
+        label: `${item.part_name}`,
+        sublabel:`[${item.customer_code}] ${item.part_subname}`,
         value: item.id
       })) || [])
     },

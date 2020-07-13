@@ -78,8 +78,7 @@
             <q-tr style="line-height:25px">
               <q-th width="15%" v-if="IS_LOTS">{{ $tc('label.lots') }}</q-th>
               <q-th width="25%" v-if="!isHideColumn('part_name')">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th width="20%" v-if="!isHideColumn('part_number')">{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th width="15%" v-if="!isHideColumn('part_specification')">{{ $tc('items.specification') }}</q-th>
+              <q-th width="20%" v-if="!isHideColumn('part_subname')">{{ $app.setting('item.subname_label') }}</q-th>
               <q-th width="10%" v-if="!isHideColumn('unit')">{{ $tc('label.unit') }}</q-th>
               <q-th width="10%" v-if="!isHideColumn('quantity')">{{ $tc('label.quantity') }}</q-th>
               <q-th width="20%" v-if="!isHideColumn('note')">{{ $tc('label.note') }}</q-th>
@@ -89,8 +88,7 @@
               <q-tr v-for="(row, index) in rsView.incoming_good_items" :key="index" :request-order-item-id="row.id">
                 <q-td v-if="IS_LOTS">{{row.lots || '-'}}</q-td>
                 <q-td v-if="!isHideColumn('part_name')">{{row.item.part_name}}</q-td>
-                <q-td v-if="!isHideColumn('part_number')">{{row.item.part_number}}</q-td>
-                <q-td v-if="!isHideColumn('part_specification')">{{row.item.part_specification}}</q-td>
+                <q-td v-if="!isHideColumn('part_subname')">{{row.item.part_subname}}</q-td>
                 <q-td v-if="!isHideColumn('unit')" class="text-center">{{row.unit.code}}</q-td>
                 <q-td v-if="!isHideColumn('quantity')" class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
                 <q-td v-if="!isHideColumn('note')" style="width:180px"> {{row.note}} </q-td>

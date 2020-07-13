@@ -19,7 +19,7 @@
         <q-td slot="body-cell-part" slot-scope="rs" :props="rs" class="no-padding">
           <div v-if="rs.row.item" class="column">
             <span>{{rs.row.item.part_name}}</span>
-            <small>{{rs.row.item.part_number}}</small>
+            <small>[{{rs.row.item.customer_code}}] {{rs.row.item.part_subname}}</small>
           </div>
           <span v-else class="text-grey">undifined!</span>
         </q-td>

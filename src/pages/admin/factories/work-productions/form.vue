@@ -109,8 +109,8 @@
                     </ux-select-filter>
 
                     <q-input dense readonly tabindex="100" class="col-12 col-md-6"
-                      :label="$tc('items.part_number')" stack-label
-                      :value="row.item ? row.item.part_number : null"
+                      :label="$app.setting('item.subname_label')" stack-label
+                      :value="row.item ? row.item.part_subname : null"
                       outlined hide-bottom-space color="blue-grey-5"
                       :dark="LAYOUT.isDark" />
 
@@ -310,7 +310,7 @@ export default {
       })
       return (ITEM.map(item => ({
         label: item.part_name,
-        sublabel: `[${item.customer_code}] ${item.part_number}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id,
         disable: !item.enable,
         row: item

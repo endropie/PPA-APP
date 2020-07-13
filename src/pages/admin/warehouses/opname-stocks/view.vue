@@ -16,7 +16,7 @@
                 <q-item>
                   <q-item-section>
                     <span>{{rsView.item.part_name}}</span>
-                    <small>[{{rsView.item.customer_code}}] {{rsView.item.part_number}}</small>
+                    <small>[{{rsView.item.customer_code}}] {{rsView.item.part_subname}}</small>
                   </q-item-section>
                   <q-item-section side>{{rsView.stockist}}</q-item-section>
                 </q-item>

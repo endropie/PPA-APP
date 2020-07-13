@@ -82,8 +82,8 @@
                   <q-td key="part_name" width="30%">
                     {{row.item.part_name}}
                   </q-td>
-                  <q-td key="part_number" width="30%">
-                    {{row.item.part_number}}
+                  <q-td key="part_subname" width="30%">
+                    {{row.item.part_subname}}
                   </q-td>
                   <q-td key="target" class="text-right">
                     {{row.target}}

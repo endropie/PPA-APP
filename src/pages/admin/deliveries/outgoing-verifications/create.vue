@@ -50,7 +50,6 @@
         <thead>
           <q-tr>
             <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
-            <!-- <q-th key="part_number">{{$tc('items.part_number')}}</q-th> -->
             <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
             <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
             <q-th key="AVA"># FG #</q-th>
@@ -62,7 +61,7 @@
             <q-td key="item_id" width="35%" >
               <div v-if="row.item" class="column text-body2">
                 <span class="text-subtitle2">{{row.item.part_name}}</span>
-                <span class="text-small" v-if="row.item.part_number">No. {{row.item.part_number}}</span>
+                <span class="text-small">[{{row.item.customer_code}}] {{row.item.part_subname}}</span>
               </div>
             </q-td>
             <q-td key="unit_id" width="10%" >

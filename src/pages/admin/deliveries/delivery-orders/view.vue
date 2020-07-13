@@ -144,8 +144,7 @@
               <thead>
               <q-tr>
                 <q-th v-if="!isHideColumn('part_name')" class="text-left">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-                <q-th v-if="!isHideColumn('part_number')" class="text-left">{{ $tc('label.no', 1, {v: $tc('label.part')}) }}</q-th>
-                <q-th v-if="!isHideColumn('part_specification')" class="text-left">{{ $tc('items.specification') }}</q-th>
+                <q-th v-if="!isHideColumn('part_subname')" class="text-left">{{ $app.setting('item.subname_label') }}</q-th>
                 <q-th v-if="isDoubleUnit & !isHideColumn('quantity')" key="PCS" class="text-right" >Unit (PCS)</q-th>
                 <q-th v-if="isDoubleUnit & !isHideColumn('quantity')" key="KG" class="text-right" >Unit (KG)</q-th>
                 <q-th v-if="!isDoubleUnit & !isHideColumn('quantity')" class="text-right" >{{ $tc('label.quantity') }}</q-th>
@@ -162,11 +161,8 @@
                     <span class="text-weight-medium" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">Material:&nbsp;</span>
                     <span v-if="row.item"> {{row.item.part_name}} </span>
                   </q-td>
-                  <q-td v-if="!isHideColumn('part_number')" key="part_number">
-                    <span v-if="row.item"> {{row.item.part_number}} </span>
-                  </q-td>
-                  <q-td v-if="!isHideColumn('part_specification')" key="part_specification">
-                    <span v-if="row.item"> {{row.item.part_specification}} </span>
+                  <q-td v-if="!isHideColumn('part_subname')" key="part_subname">
+                    <span v-if="row.item"> {{row.item.part_subname}} </span>
                   </q-td>
                   <q-td v-if="!isHideColumn('quantity') && isDoubleUnit" key="PCS" class="text-right">
                     {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
@@ -217,11 +213,8 @@
                     <span class="text-weight-medium">Jasa:&nbsp;</span>
                     <span v-if="row.item"> {{row.item.part_name}} </span>
                   </q-td>
-                  <q-td v-if="!isHideColumn('part_number')">
-                    <span v-if="row.item"> {{row.item.part_number}} </span>
-                  </q-td>
-                  <q-td v-if="!isHideColumn('part_specification')">
-                    <span v-if="row.item"> {{row.item.part_specification}} </span>
+                  <q-td v-if="!isHideColumn('part_subname')">
+                    <span v-if="row.item"> {{row.item.part_subname}} </span>
                   </q-td>
                   <q-td  v-if="!isHideColumn('quantity') && isDoubleUnit" key="PCS" class="text-right">
                     {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}

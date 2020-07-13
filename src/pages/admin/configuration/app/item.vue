@@ -4,6 +4,24 @@
         <span class="text-h4" header>{{$tc('general.item')}}</span>
       </q-card-section>
       <q-card-section class="row q-col-gutter-xs" v-if="FORM.show">
+          <q-select class="col-12 col-sm-6"
+            name="subname_mode"
+            label="Subname mode"
+            v-model="rsForm.subname_mode"
+            :options="['SPECIFICATION', 'PART_NUMBER']"
+            clearable
+            :error="errors.has('subname_mode')"
+            :error-message="errors.first('subname_mode')"
+          />
+          <q-input class="col-12 col-sm-6"
+            type="text"
+            name="subname_label"
+            label="Subname label"
+            v-model="rsForm.subname_label"
+            :disable="!rsForm.subname_mode"
+            :error="errors.has('subname_label')"
+            :error-message="errors.first('subname_label')"
+          />
 
 
       </q-card-section>
@@ -22,21 +40,21 @@
 import MixForm from '@/mixins/mix-form.vue'
 
 export default {
-  mixins: [MixForm],
+  mixins: [ MixForm ],
   data () {
     return {
       FORM: {
         show: false,
         resource:{
-          name: 'incoming_good',
+          name: 'item',
           api: '/api/v1/setting',
         },
       },
       rsForm: {
-        number_prefix: null,
-        number_interval: null,
-        number_digit: null,
+        subname_mode: null,
+        subname_label: ''
       },
+      subnames : ['PART_NUMBER', 'SPECIFICATION']
     }
   },
   created() {
@@ -47,48 +65,21 @@ export default {
       '$route' : 'init',
   },
   computed:{
-    EXAMP() {
-      const separator = this.SETTING.general.prefix_separator
-      let example = ''
-      if (this.rsForm.number_prefix) example += this.rsForm.number_prefix + separator
-      if (this.rsForm.number_interval) {
-        const find = this.CONFIG.options['prefix_intervals'].find(x => x.value === this.rsForm.number_interval)
-        if (find) {
-          example += find.digit + separator
-        }
-      }
 
-      return example + String(1).padStart(this.rsForm.number_digit || 5, '0')
-    },
-
-    INDEXED_EXAMP() {
-      const separator = this.SETTING.general.prefix_separator
-      let example = '[CODE CUST]' + separator
-
-      if (this.rsForm.indexed_number_interval) {
-        const find = this.CONFIG.options['prefix_intervals'].find(x => x.value === this.rsForm.indexed_number_interval)
-        if (find) {
-          example += find.digit + separator
-        }
-      }
-
-      return example + String(1).padStart(this.rsForm.indexed_number_digit || 5, '0')
-    }
   },
   methods: {
     init() {
       this.FORM.loading = true
       this.FORM.show = false
-      this.rsForm = JSON.parse(JSON.stringify(this.$store.state.admin.SETTING[this.FORM.resource.name]))
+      const data = this.$store.state.admin.SETTING[this.FORM.resource.name] || {}
+      this.rsForm = Object.assign(this.rsForm, JSON.parse(JSON.stringify(data)))
 
       setTimeout(() => {
         this.FORM.loading = false
         this.FORM.show = true
-
       }, 500)
     },
     onSave() {
-
       this.$validator.validateAll().then(result => {
         if (!result) {
           this.$q.notify({

@@ -76,7 +76,7 @@
           name="show"
           label="Hide View Columns"
           v-model="rsForm.hide_view_columns"
-          :options="['part_name', 'part_number', 'part_specification', 'quantity', 'unit', 'note']"
+          :options="['part_name', 'part_subname', 'quantity', 'unit', 'note']"
           multiple use-chips
           :dark="LAYOUT.isDark"
           :error="errors.has('hide_view_columns')"

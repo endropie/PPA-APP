@@ -7,15 +7,19 @@
           <q-tabs class="text-primary" v-model="tab" vertical >
             <q-tab name="general"
               icon="dashboard"
-              :label="$tc('label.general')"
+              :label="$q.screen.lt.sm ? undefined : $tc('label.general')"
+              v-if="$app.can()"/>
+            <q-tab name="item"
+              icon="style"
+              :label="$q.screen.lt.sm ? undefined : $tc('general.item')"
               v-if="$app.can()"/>
             <q-tab name="incoming_good"
               icon="move_to_inbox"
-              :label="$tc('general.incoming_good')"
+              :label="$q.screen.lt.sm ? undefined : $tc('general.incoming_good')"
               v-if="$app.can()"/>
             <q-tab name="delivery_order"
               icon="unarchive"
-              :label="$tc('general.sj_delivery')"
+              :label="$q.screen.lt.sm ? undefined : $tc('general.sj_delivery')"
               v-if="$app.can()"/>
           </q-tabs>
         </template>

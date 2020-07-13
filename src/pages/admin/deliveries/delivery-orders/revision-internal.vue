@@ -98,8 +98,8 @@
                   :error="errors.has(`delivery_order_items.${index}.item_id`)"
                   @input="(val)=>{ setItemReference(index, val) }"
                   :loading="SHEET['items'].loading" >
-                  <small v-if="row.item_id && row.item && row.item.part_number" class="absolute-bottom">
-                    [{{row.item.customer_code}}] {{row.item.part_number}}
+                  <small v-if="row.item" class="absolute-bottom">
+                    [{{row.item.customer_code}}] {{row.item.part_subname}}
                   </small>
                 </ux-select>
               </q-td>
@@ -258,7 +258,7 @@ export default {
     },
     ItemOptions() {
       let ITEM = this.SHEET.items.data.filter((item) => item.customer_id === this.rsForm.customer_id)
-      return (ITEM.map(item => ({label: `${item.part_name}`, sublabel:`${item.code} - ${item.part_number}`, value: item.id})) || [])
+      return (ITEM.map(item => ({label: `${item.part_name}`, sublabel:`${item.code} - ${item.part_subname}`, value: item.id})) || [])
     },
     ItemUnitOptions() {
       let vars = []

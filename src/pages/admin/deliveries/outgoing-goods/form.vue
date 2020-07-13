@@ -124,7 +124,7 @@
               <q-td key="item" width="40%">
                 <div v-if="Boolean(row.item)" style="line-height:normal">
                   <span>{{row.item.part_name}}</span><br/>
-                  <small>No. {{row.item.part_number}}</small>
+                  <small>[{{row.item.customer_code}}] {{row.item.part_subname}}</small>
                 </div>
               </q-td>
               <q-td key="quantity" width="20%" >
@@ -180,9 +180,9 @@
                   {{exItem.item.part_name}}
                 </span>
               </q-td>
-              <q-td key="part_number">
+              <q-td key="part_subname">
                 <span v-if="Boolean(exItem.item)" class="text-strike">
-                  {{exItem.item.part_number}}
+                  {{exItem.item.part_subname}}
                 </span>
               </q-td>
               <q-td key="unit_id" width="20%" >

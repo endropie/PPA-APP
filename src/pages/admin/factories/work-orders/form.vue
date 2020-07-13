@@ -117,7 +117,7 @@
                   @input="(val) => setItemReference(index, val)">
                   <q-tooltip v-if="!rsForm.line_id" :offset="[0, 10]">Select a Pre-Line , first! </q-tooltip>
                   <small class="absolute-bottom text-weight-light" v-if="row.item_id">
-                    [{{row.item.customer_code}}] No.{{row.item.part_number}}
+                    [{{row.item.customer_code}}] {{row.item.part_subname || '--'}}
                   </small>
                 </ux-select>
               </q-td>
@@ -307,7 +307,7 @@ export default {
       })
       .map(item => ({
         label: item.part_name,
-        sublabel: `[${item.customer_code}] ${item.part_number}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id,
         disable: !item.enable,
         row: item
