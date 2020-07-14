@@ -59,32 +59,45 @@
       </div>
       <div class="col-12 col-sm-6" >
         <div class="row q-col-gutter-x-sm">
-          <q-input class="col-6"
+          <q-select  class="col-auto"
+            :disable="Boolean(rsForm.id)"
+            data-vv-name="Jenis Project"
+            label="Jenis Project"
+            :options="ProjectSampleOptions" map-options emit-value
+            v-model="rsForm.project"
+            v-validate="FORM.ifCreate('required', '')"
+            name="project"
+            :error="errors.has('project')"
+            :error-message="errors.first('project')"
+          />
+          <q-input class="col" style="min-width:150px"
+            label="Project code"
+            v-model="rsForm.project_number"
+            v-validate="FORM.ifCreate('required', '')"
+            name="project_number"
+            :error="errors.has('project_number')"
+            :error-message="errors.first('project_number')"
+          />
+
+          <q-input class="col" style="min-width:150px"
             name="code"
             :placeholder="FORM.ifCreate('[Auto Generate]','')"
             :label="$tc('label.code_intern')"
-            :dark="LAYOUT.isDark"
             v-model="rsForm.code"
             v-validate="FORM.ifCreate('','required')"
             :error="errors.has('code')"
-            :error-message="errors.first('code')" >
-
-          </q-input>
-          <div class="col-6">
-            <q-select v-if="!rsForm.id"
-              label="Sample Project"
-              class="no-margin"
-              v-model="rsForm.project"
-              :options="['NEW','MIGRATE']"
-            />
-            <q-toggle v-if="rsForm.id"
-              class="float-right text-body2 bordered rounded-borders q-pa-xs no-margin"
-              :label="rsForm.enable ? 'Enable':'Disable'" left-label
-              v-model="rsForm.enable"
-              :color="rsForm.enable ? 'primary':'red'"
-              :true-value="1"
-              :false-value="0" />
-          </div>
+            :error-message="errors.first('code')"
+          />
+          <q-toggle
+            v-if="rsForm.id"
+            class="col-auto text-body2 bordered rounded-borders q-pa-xs no-margin"
+            :label="rsForm.enable ? 'Enable':'Disable'" left-label
+            v-model="rsForm.enable"
+            :color="rsForm.enable ? 'primary':'red'"
+            :true-value="1"
+            :false-value="0" />
+        </div>
+        <div class="row q-col-gutter-x-sm">
           <ux-select-filter
             name="brand_id"
             :label="$tc('general.brand')"
@@ -437,6 +450,7 @@ export default {
         },
       },
       rsForm: {},
+      ProjectSampleOptions: [{value: 'NEW', label: 'Project Baru'}, {value:'MIGRATE', label: 'Alih Loading'}],
       setDefault:()=>{
         return {
           code:null,
@@ -469,6 +483,7 @@ export default {
           enable: 1,
           sample: 1,
           project: 'NEW',
+          project_number: null,
           description:null,
           depicts: [],
           sample_depicted_at: null,
