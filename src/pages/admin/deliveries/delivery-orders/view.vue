@@ -165,22 +165,22 @@
                     <span v-if="row.item"> {{row.item.part_subname}} </span>
                   </q-td>
                   <q-td v-if="!isHideColumn('quantity') && isDoubleUnit" key="PCS" class="text-right">
-                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
+                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row), row.unit.decimal_in) + ' PCS'}}
                   </q-td>
                   <q-td v-if="!isHideColumn('quantity') && isDoubleUnit" key="KG" class="text-right">
-                    {{!valKG(row) ? '' : $app.number_format(valKG(row),0) + ' KG'}}
+                    {{!valKG(row) ? '' : $app.number_format(valKG(row), row.unit.decimal_in) + ' KG'}}
                   </q-td>
                   <q-td  v-if="!isHideColumn('quantity') && !isDoubleUnit" key="quantity" class="text-right">
                     <span v-if="rsView.is_internal && remain_only">
-                      {{$app.number_format(Number(row.quantity) - (row.amount_reconcile / (row.unit_rate||1)),0)}}
+                      {{$app.number_format(Number(row.quantity) - (row.amount_reconcile / (row.unit_rate||1)), row.unit.decimal_in)}}
                     </span>
-                    <span v-else>{{$app.number_format(row.quantity,0)}}</span>
+                    <span v-else>{{$app.number_format(row.quantity, row.unit.decimal_in)}}</span>
                   </q-td>
                   <q-td v-if="!isHideColumn('unit') && !isDoubleUnit" key="unit"  class="text-left">
                     {{row.unit.code}}
                   </q-td>
                   <q-td v-if="rsView.is_internal && !remain_only && !isDoubleUnit" class="print-hide text-right">
-                    {{$app.number_format(row.amount_reconcile,0)}}
+                    {{$app.number_format(row.amount_reconcile, row.unit.decimal_in)}}
                   </q-td>
                   <q-td v-if="!isHideColumn('encasement')">
                     <div class="row cursor-pointer">
@@ -217,12 +217,14 @@
                     <span v-if="row.item"> {{row.item.part_subname}} </span>
                   </q-td>
                   <q-td  v-if="!isHideColumn('quantity') && isDoubleUnit" key="PCS" class="text-right">
-                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
+                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row), row.unit.decimal_in) + ' PCS'}}
                   </q-td>
                   <q-td v-if="!isHideColumn('quantity') && isDoubleUnit" key="KG" class="text-right">
-                    {{!valKG(row) ? '' : $app.number_format(valKG(row),0) + ' KG'}}
+                    {{!valKG(row) ? '' : $app.number_format(valKG(row), row.unit.decimal_in) + ' KG'}}
                   </q-td>
-                  <q-td v-if="!isHideColumn('quantity') && !isDoubleUnit" class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
+                  <q-td v-if="!isHideColumn('quantity') && !isDoubleUnit" class="text-right">
+                    {{$app.number_format(row.quantity, row.unit.decimal_in)}}
+                  </q-td>
                   <q-td v-if="!isHideColumn('unit') && !isDoubleUnit" class="text-left">{{row.unit.code}}</q-td>
                   <q-td v-if="rsView.is_internal && !remain_only && !isDoubleUnit" class="print-hide text-right"></q-td>
                   <q-td v-if="!isHideColumn('encasement')"></q-td>

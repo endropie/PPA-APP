@@ -218,7 +218,7 @@
               </q-td>
 
               <q-td key="quantity" width="20%">
-                <span class="q-px-sm text-strike" v-text="$app.number_format(row.quantity)" />
+                <span class="q-px-sm text-strike" v-text="$app.number_format(row.quantity, row.unit.decimal_in)" />
               </q-td>
 
               <q-td key="note" width="35%">

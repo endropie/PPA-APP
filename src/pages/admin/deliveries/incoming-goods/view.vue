@@ -90,7 +90,7 @@
                 <q-td v-if="!isHideColumn('part_name')">{{row.item.part_name}}</q-td>
                 <q-td v-if="!isHideColumn('part_subname')">{{row.item.part_subname}}</q-td>
                 <q-td v-if="!isHideColumn('unit')" class="text-center">{{row.unit.code}}</q-td>
-                <q-td v-if="!isHideColumn('quantity')" class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
+                <q-td v-if="!isHideColumn('quantity')" class="text-right">{{$app.number_format(row.quantity, row.unit.decimal_in)}}</q-td>
                 <q-td v-if="!isHideColumn('note')" style="width:180px"> {{row.note}} </q-td>
               </q-tr>
             </tbody>

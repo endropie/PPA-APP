@@ -53,8 +53,8 @@
               <q-td>{{row.item.part_name}}</q-td>
               <q-td>{{row.item.part_subname}}</q-td>
               <q-td class="text-center">{{row.unit.code}}</q-td>
-              <q-td class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
-              <q-td class="text-right">{{$app.number_format(row.amount_verification / (row.unit_rate || 1),0)}}</q-td>
+              <q-td class="text-right">{{$app.number_format(row.quantity, $app.get(row, 'unit.decimal_in') || 0)}}</q-td>
+              <q-td class="text-right">{{$app.number_format(row.amount_verification / (row.unit_rate || 1), $app.get(row, 'unit.decimal_in') || 0)}}</q-td>
               <q-td>{{row.encasement || '-'}}</q-td>
             </q-tr>
             </tbody>

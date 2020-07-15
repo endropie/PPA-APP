@@ -343,7 +343,7 @@
                 v-validate="`required|gt_value:0|max_value:${Number(MaxMultiMount[partitionIndex][index]) / Number(row.unit_rate || 1)}`"
                 :error="errors.has(`partitions.${partitionIndex}.delivery_order_items.${index}.quantity`)">
                 <span slot="append" class="text-body2">
-                / <q-badge :label="$app.number_format(Number(MaxMultiMount[partitionIndex][index]) / Number(row.unit_rate || 1),0)" />
+                / <q-badge :label="$app.number_format(Number(MaxMultiMount[partitionIndex][index]) / Number(row.unit_rate || 1), row.unit.decimal_in)" />
                 </span>
               </q-input>
             </q-td>
@@ -425,8 +425,8 @@
                 <span class="text-small">No. {{row.item.part_subname}}</span>
               </td>
               <td class="text-center">{{row.item.unit.code}}</td>
-              <td class="text-right">{{$app.number_format(row.quantity)}}</td>
-              <td class="text-right">{{$app.number_format(row.amount_delivery)}}</td>
+              <td class="text-right">{{$app.number_format(row.quantity, row.unit.decimal_in)}}</td>
+              <td class="text-right">{{$app.number_format(row.amount_delivery, row.unit.decimal_in)}}</td>
               <td class="text-center">
                 <q-btn dense flat icon="add_circle" @click="addNewDetail(row, dialog_request_order.partitionIndex )"/>
               </td>

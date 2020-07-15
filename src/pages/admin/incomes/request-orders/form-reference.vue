@@ -113,7 +113,7 @@
                 </div>
               </q-td>
               <q-td key="quantity" width="10%" class="text-right">
-                {{$app.number_format(row.quantity)}}
+                {{$app.number_format(row.quantity, row.unit.decimal_in)}}
               </q-td>
               <q-td key="unit_id" width="10%">
                 {{row.unit.code}}

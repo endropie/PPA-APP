@@ -107,7 +107,7 @@
                           <span v-if="MAPINGKEY['lines']" >
                             {{MAPINGKEY['lines'][itemLine.line_id].name}}
                             <q-badge v-if="itemLine.work_production_items"
-                              :label="`${$app.number_format(itemLine.amount_line / (row.unit_rate||1),0)} / ${$app.number_format(itemLine.unit_amount / (row.unit_rate||1),0)}`"
+                              :label="`${$app.number_format(itemLine.amount_line / (row.unit_rate||1), row.unit.decimal_in)} / ${$app.number_format(itemLine.unit_amount / (row.unit_rate||1), row.unit.decimal_in)}`"
                               :color="rsView.has_producted ? 'red-10' : 'primary'"/>
                           </span>
                           <span v-else>

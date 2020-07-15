@@ -79,14 +79,14 @@
                 v-model="row.quantity" type="number" :min="0"
                 outlined dense hide-bottom-space no-error-icon align="center"
                 :dark="LAYOUT.isDark" color="blue-grey-5"
-                :suffix="row.item_id ? `/ ${$app.number_format(row.maximum / row.unit_rate)}` : ''"
+                :suffix="row.item_id ? `/ ${$app.number_format(row.maximum / row.unit_rate, $app.get(row, 'unit.decimal_in') || 0)}` : ''"
                 v-validate="`gt_value:0|max_value: ${maximality(row.maximum, FGSTOCK[index]) / row.unit_rate}`"
                 :error="errors.has(`outgoing_good_verifications.${index}.quantity`)"
               />
             </q-td>
             <q-td key="AVA" width="15%" align="center">
               <q-chip square class="text-weight-medium">
-                {{$app.number_format(FGSTOCK[index] / row.unit_rate)}}
+                {{$app.number_format(FGSTOCK[index] / row.unit_rate, $app.get(row, 'unit.decimal_in') || 0)}}
               </q-chip>
             </q-td>
             <q-td key="encasement" width="35%">
@@ -261,11 +261,16 @@ export default {
       if(!val) return;
       else if (this.rsForm.outgoing_good_verifications[index].item.unit_id === val) {
         this.rsForm.outgoing_good_verifications[index].unit_rate = 1
+        this.rsForm.outgoing_good_verifications[index].unit = null
       }
       else {
         if(this.rsForm.outgoing_good_verifications[index].item.item_units) {
           this.rsForm.outgoing_good_verifications[index].item.item_units.map((itemUnit)=> {
-            if (itemUnit.unit_id == val) this.rsForm.outgoing_good_verifications[index].unit_rate = itemUnit.rate
+            if (itemUnit.unit_id == val) {
+
+              this.rsForm.outgoing_good_verifications[index].unit = itemUnit.unit
+              this.rsForm.outgoing_good_verifications[index].unit_rate = itemUnit.rate
+            }
           })
         }
       }

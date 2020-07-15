@@ -55,7 +55,7 @@
                   <small>[{{row.item.customer_code}}] {{row.item.part_subname}}</small>
                 </div>
               </q-td>
-              <q-td class="text-right">{{$app.number_format(row.quantity)}}</q-td>
+              <q-td class="text-right">{{$app.number_format(row.quantity, $app.get(row, 'unit.decimal_in') || 0)}}</q-td>
               <q-td>{{row.unit.code}}</q-td>
               <q-td>{{row.encasement}}</q-td>
             </q-tr>

@@ -122,7 +122,7 @@
                       outlined hide-bottom-space no-error-icon align="right"
                       v-validate="`required|gt_value:0|max_value:${MaxStock[index] / (row.unit_rate||1)}`"
                       :error="errors.has(`work_production_items.${index}.quantity`)"
-                      :suffix="' / '+ $app.number_format(MaxStock[index] / (row.unit_rate||1))" />
+                      :suffix=" ` / ${$app.number_format(MaxStock[index] / (row.unit_rate||1), ($app.get(row, 'unit.decimal_in') || 0))}`" />
 
                     <q-select dense class="col-12 col-sm-4 col-md-2"
                       :name="`work_production_items.${index}.unit_id`"
@@ -477,11 +477,13 @@ export default {
       if(!val) return;
       else if (this.rsForm.work_production_items[index].item.unit_id === val) {
         this.rsForm.work_production_items[index].unit_rate = 1
+        this.rsForm.work_production_items[index].unit = null
       }
       else {
         if(this.rsForm.work_production_items[index].item.item_units) {
           this.rsForm.work_production_items[index].item.item_units.find((unitItem)=> {
             if (unitItem.unit_id == val) {
+              this.rsForm.work_production_items[index].unit = unitItem.unit
               this.rsForm.work_production_items[index].unit_rate = unitItem.rate
               return true
             }
