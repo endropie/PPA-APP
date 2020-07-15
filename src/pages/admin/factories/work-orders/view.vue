@@ -61,9 +61,9 @@
           <q-markup-table bordered dense square class="table-print no-highlight no-shadow transparent" separator="cell" :dark="LAYOUT.isDark" >
             <thead>
               <tr>
-                <th>{{this.$tc('general.cust')}}</th>
-                <th class="text-left">{{this.$tc('label.no', 1, {v:this.$tc('label.part')})}}</th>
-                <th class="text-left">{{this.$tc('label.name', 1, {v:this.$tc('label.part')})}}</th>
+                <th>{{$tc('general.cust')}}</th>
+                <th class="text-left">{{$tc('label.name', 1, {v:$tc('label.part')})}}</th>
+                <th class="text-left">{{$app.setting('item.subname_label')}}</th>
                 <th class="text-right">{{$tc('label.quantity')}}</th>
                 <th>{{$tc('label.unit')}}</th>
                 <th>%NG</th>
