@@ -239,6 +239,18 @@ const deliveries = [
     ]
   },
   {
+    name: 'DEPORTATIONS',
+    icon: 'local_offer',
+    path: 'deportation-goods',
+    lang: 'general.deportation_goods',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'deportation-goods-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'deportation-goods-update'}},
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'deportation-goods-update'}},
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'deportation-goods-read' } }
+    ]
+  },
+  {
     name: 'Schedule Board',
     icon: 'work',
     path: 'schedule-boards',
