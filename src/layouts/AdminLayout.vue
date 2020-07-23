@@ -43,10 +43,10 @@
             'bg-grey-2 text-primary': !LAYOUT.isDark,
           }" >
           <!-- <img alt="Quasar logo" src="~assets/quasar-logo.svg" style="height: 75px; width 75px;"> -->
-          <q-icon name="widgets" class="text-h3" />
-          <div class="caption q-ml-md" :class="{'hidden': miniState}">
-            <!-- Quasar v{{ $q.version }} -->
-            <!-- {{$store.state.keys()}} <BR/>PLAY V-{{'1.0'}} -->
+          <q-icon name="widgets" class="text-h2" />
+          <div class="column q-ml-md">
+            <span class="text-h6">{{$app.setting('general.app_brand') || $app.name}}</span>
+            <span class="caption text-small text-weight-light">MANUPLAY V.2</span>
           </div>
         </div>
         <q-list class="menu" :class="{'dimmed' : miniState}">
