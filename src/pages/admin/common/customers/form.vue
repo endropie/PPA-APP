@@ -129,38 +129,68 @@
             <q-item>
               <q-item-section >
                 <div class="row q-col-gutter-sm">
-                  <q-field class="col-4" borderless >
-                    <q-toggle name="with_tax"
-                      label="Tax"
-                      v-model="rsForm.with_tax"
+                  <q-field dense class="col-12" borderless >
+                    <q-toggle name="with_ppn"
+                      label="PPN" left-label
+                      v-model="rsForm.with_ppn"
                       :false-value="0"
                       :true-value="1"
-                      :dark="LAYOUT.isDark"/>
+                    />
+                    <q-input type="number"
+                      class="q-pl-md full-width"
+                      name="ppn" suffix="% PPN"
+                      v-model="rsForm.ppn"
+                      :disable="!Boolean(rsForm.with_ppn)"
+                      v-validate="`${(rsForm.with_ppn ? 'required|gt_value:0|max_value:100' :'')}`"
+                      :error="errors.has('ppn')"
+                      :error-message="errors.first('ppn')"
+                    />
                   </q-field>
-                  <q-field class="col-8" borderless>
+                  <q-field dense class="col-12" borderless>
                     <q-toggle name="with_pph"
-                      label="PPH"
+                      label="PPH" left-label
                       v-model="rsForm.with_pph"
                       :false-value="0"
                       :true-value="1"
-                      :dark="LAYOUT.isDark"/>
+                    />
+
+                    <q-input dense type="number"
+                      class="q-pl-md full-width"
+                      suffix="% PPH"
+                      value="2"
+                      :disable="!Boolean(rsForm.with_pph)" readonly
+                    />
                   </q-field>
-                  <q-input type="number" class="col-6"
-                    filled label="Tax [PPN]"
-                    name="tax" data-vv-name="Ppn"
-                    v-model="rsForm.tax"
-                    v-validate="`max_value:100`"
-                    :error="errors.has('tax')"
-                    :error-message="errors.first('tax')" />
 
                   <q-input type="number" class="col-6"
-                    filled label="Service"
-                    name="pph_service" data-vv-name="Pph"
-                    v-model="rsForm.pph_service"
-                    v-validate="`max_value:100`"
-                    :error="errors.has('pph_service')"
-                    :error-message="errors.first('pph_service')" />
+                    filled label="% Service"
+                    name="sen_service"
+                    v-model="rsForm.sen_service"
+                    :disable="!Boolean(rsForm.with_pph)"
+                    v-validate="(rsForm.with_pph ? 'required|gt_value:0|max_value:100' :'')"
+                    :error="errors.has('sen_service')"
+                    :error-message="errors.first('sen_service')"
+                  />
 
+                  <q-field dense borderless class="col-auto">
+                    <div slot="control">
+                      <q-checkbox class="col-12 col-sm-auto"
+                        :label="$tc('customers.service.exclude')"
+                        v-model="rsForm.exclude_service"
+                        :disable="!Boolean(rsForm.with_pph)"
+                        :true-value="1" :false-value="0"
+                      />
+
+                      <q-checkbox class="col-12 col-sm-auto"
+                        :label="$tc('customers.service.bounded')"
+                        v-model="rsForm.bounded_service"
+                        :disable="!Boolean(rsForm.with_pph && rsForm.with_ppn)"
+                        :true-value="1" :false-value="0"
+                      >
+                      <q-tooltip>{{$tc('customers.tooltip.service_bounded')}}</q-tooltip>
+                    </q-checkbox>
+                    </div>
+                  </q-field>
                 </div>
 
               </q-item-section>
@@ -346,10 +376,12 @@ export default {
           npwp: null,
           bank_account: null,
 
-          with_tax: 1,
+          with_ppn: 1,
           with_pph: 1,
-          tax: 0,
-          pph_service: 0,
+          ppn: 0,
+          sen_service: null,
+          exclude_service: 0,
+          bounded_service: 0,
 
           invoice_mode: null,
           delivery_mode: null,

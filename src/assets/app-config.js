@@ -38,8 +38,9 @@ const config = {
     ],
     invoice_mode: [
       { value: 'JOIN', label: 'JOIN', detail: 'Service & material are joined', color: 'positive' },
-      { value: 'SEPARATE', label: 'SEPARATE', detail: 'Service & material are separated', color: 'orange' },
-      { value: 'DETAIL', label: 'DETAIL', detail: 'Service & material Specified', color: 'blue' }
+      { value: 'SEPARATE', label: 'SEPARATE', detail: 'Service & material are specific-separated', color: 'orange' },
+      { value: 'DETAIL', label: 'DETAIL', detail: 'Service & material are specified', color: 'blue' },
+      { value: 'SUMMARY', label: 'SUMMARY', detail: 'Service summary & material specified', color: 'info' }
     ],
     delivery_mode: [
       { value: 'JOIN', label: 'JOIN', detail: 'Service & material are joined', color: 'positive' },
