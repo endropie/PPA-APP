@@ -36,15 +36,15 @@
       show-if-above
       v-if="!NODRAWER">
       <q-scroll-area :class="LAYOUT.isDark ? 'bg-black text-primary' : 'bg-white text-primary'" style="width: 100%; height: 100%;">
-        <div :style="{'height': miniState ? '72px': '115px'}"
+        <div :style="{'height': miniState ? '50px': '115px'}"
           class="row flex-center opacity-1"
           :class="{
             'bg-primary text-white' : LAYOUT.isDark,
             'bg-grey-2 text-primary': !LAYOUT.isDark,
           }" >
           <!-- <img alt="Quasar logo" src="~assets/quasar-logo.svg" style="height: 75px; width 75px;"> -->
-          <q-icon name="widgets" class="text-h2" />
-          <div class="column q-ml-md">
+          <q-icon name="widgets" :class="miniState ? 'text-h4' : 'text-h3'"  />
+          <div class="column q-ml-md"  :class="{'hidden' : miniState}">
             <span class="text-h6">{{$app.setting('general.app_brand') || $app.name}}</span>
             <span class="caption text-small text-weight-light">MANUPLAY V.2</span>
           </div>
