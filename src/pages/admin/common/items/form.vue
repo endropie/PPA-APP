@@ -21,7 +21,7 @@
             v-model="rsForm.customer_id" :readonly="Boolean(rsForm.id)"
             options-cover clearable
             :options="CustomerOptions"
-            map-options emit-value
+            filter map-options emit-value
             v-validate="'required'"
             :error="errors.has('customer_id')"
             :error-message="errors.first('customer_id')"/>
@@ -34,7 +34,7 @@
             v-validate="isNotSample(`required`)"
             :options="BrandOptions"
             :input-debounce="0"
-            map-options emit-value
+            filter map-options emit-value
             :error="errors.has('brand_id')"
             :error-message="errors.first('brand_id')"
           />
