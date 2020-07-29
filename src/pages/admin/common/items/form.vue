@@ -14,29 +14,30 @@
     <q-card-section class="row q-col-gutter-sm">
       <div class="col-12 col-sm-6" >
         <div class="row q-col-gutter-x-sm">
-          <ux-select-filter readonly
+          <ux-select class="col-12"
             name="customer_id"
             :label="$tc('general.customer')"
-            class="col-12"
             :data-vv-as="$tc('general.customer')"
-            v-model="rsForm.customer_id" options-cover clearable
-            :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+            v-model="rsForm.customer_id" :readonly="Boolean(rsForm.id)"
+            options-cover clearable
             :options="CustomerOptions"
+            map-options emit-value
             v-validate="'required'"
             :error="errors.has('customer_id')"
             :error-message="errors.first('customer_id')"/>
 
-          <ux-select-filter
+          <ux-select
             name="brand_id"
             :label="$tc('general.brand')"
             class="col-12 col-sm-6"
             v-model="rsForm.brand_id"
             v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
             :options="BrandOptions"
-            input-debounce="0"
+            :input-debounce="0"
+            map-options emit-value
             :error="errors.has('brand_id')"
-            :error-message="errors.first('brand_id')" />
+            :error-message="errors.first('brand_id')"
+          />
 
           <ux-select-filter
             name="specification_id"
