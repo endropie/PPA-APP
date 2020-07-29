@@ -130,15 +130,15 @@ export default {
     },
     APP_NAME () {
       let name = 'MANUFACTURE PLAY'
-      if (this.$store.state.admin.SETTING && this.$store.state.admin.SETTING.general.app_brand) {
-        name = this.$store.state.admin.SETTING.general.app_brand
+      if (this.$app.setting('general.app_brand')) {
+        name = this.$app.setting('general.app_brand')
       }
       return name
     },
     APP_DESCRIPTION () {
       let name = 'Administration Manufacture'
-      if (this.$store.state.admin.SETTING && this.$store.state.admin.SETTING.general.app_description) {
-        name = this.$store.state.admin.SETTING.general.app_description
+      if (this.$app.setting('general.app_description')) {
+        name = this.$app.setting('general.app_description')
       }
       return name
     }
