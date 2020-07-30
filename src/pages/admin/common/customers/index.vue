@@ -138,11 +138,13 @@ export default {
       this.$q.loading.show()
       this.$axios.post(url)
         .then((response) => {
+          console.warn('ACCURATE', response)
           let msg = response.data.d[0] || ''
           return (response.data.s)
             ? this.$app.notify.success('ACCURATE PUSH', msg)
             : this.$app.notify.warning('ACCURATE PUSH', msg)
         }).catch((error) => {
+          console.error('ACCURATE', error.response || error)
           this.$app.response.error(error.response || error)
         }).finally(() => {
           this.$q.loading.hide()
