@@ -43,7 +43,7 @@
               aria-multiline >
               <span class="q-ml-sm column" style="line-height:normal">
                 <span>ANDROID APP V.1</span>
-                <span style="font-size:70%">Build.7</span>
+                <span style="font-size:70%">Build.10</span>
               </span>
               <q-tooltip>Download Mobile App</q-tooltip>
             </q-btn>
