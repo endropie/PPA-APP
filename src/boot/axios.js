@@ -28,7 +28,7 @@ export default async ({ app, Vue }) => {
   if (ACCURATE.hasOwnProperty('accurate[auth][access_token]')) {
     axios.defaults.headers.common['X-Accurate-DB-host'] = ACCURATE['accurate[db][host]']
     axios.defaults.headers.common['X-Accurate-DB-session'] = ACCURATE['accurate[db][session]']
-    axios.defaults.headers.common['X-Accurate-Auth-access_token'] = ACCURATE['accurate[auth][access_token]']
+    axios.defaults.headers.common['X-Accurate-Auth-Access-Token'] = ACCURATE['accurate[auth][access_token]']
   }
 
   axios.set = (method, url, data) => {
