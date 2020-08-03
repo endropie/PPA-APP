@@ -161,7 +161,6 @@
                   />
               </q-td>
               <q-td key="quantity"  width="25%">
-                [rate:{{row.quantity +'<>'+ unitValueMax(index, row)}}]
                 <q-input style="min-width:150px"
                   :name="`work_order_items.${index}.quantity`" type="number"
                   :dark="LAYOUT.isDark" color="blue-grey-6"
@@ -172,7 +171,7 @@
                   :suffix="' / '+ unitValueMax(index, row)"
                 >
                   <q-btn slot="after" dense flat icon="done_all"
-                    v-if="unitValueMax(index, row) > 0"
+                    v-if="!rsForm.id && unitValueMax(index, row) > 0"
                     v-show="unitValueMax(index, row) !== row.target"
                     @click="() => {
                       row.target = unitValueMax(index, row)
@@ -424,9 +423,7 @@ export default {
       if (!row.unit_rate) return null
       const value = parseFloat((this.MaxStock[index] || 0) / (row.unit_rate || 1))
       if (row.unit && row.unit.decimal_in) {
-        console.warn('DEC', row.unit.decimal_in)
         return value.toFixed(row.unit.decimal_in)
-        // parseFloat(this.MaxStock[index] / (row.unit_rate || 1)).toFixed(2)
       }
       return value.toFixed(0)
     },
@@ -516,8 +513,6 @@ export default {
           return
         }
 
-        // console.warn(this.rsForm)
-        // return;
         this.FORM.loading = true
         let {method, mode, apiUrl} = this.FORM.meta();
         this.$axios.set(method, apiUrl, this.rsForm)
