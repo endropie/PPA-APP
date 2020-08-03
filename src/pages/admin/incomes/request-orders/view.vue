@@ -80,7 +80,7 @@
                 </q-td>
               </q-tr>
             </tbody>
-            <template>
+            <template  v-if="!IS_ITEM_SUMMARY">
               <tbody v-for="(row, index) in rsView.request_order_items" :key="index">
                 <q-tr :request-order-item-id="row.id">
                   <td v-if="IS_LOTS">
