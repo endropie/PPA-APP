@@ -144,7 +144,7 @@
                   outlined dense hide-bottom-space no-error-icon
                   v-validate="`required|gt_value:0`"
                   :error="errors.has(`work_order_items.${index}.target`)"
-                  @input="() => { row.quantity = calcQuantity(row)}"
+                  @input="() => { row.quantity = setQuantity(row)}"
                 />
               </q-td>
               <q-td key="ngratio"  width="15%">
@@ -157,25 +157,26 @@
                   :error="errors.has(`work_order_items.${index}.ngratio`)"
                   :error-message="errors.first(`work_order_items.${index}.ngratio`)"
                   :disable="!rsForm.line_id || !rsForm.work_order_items[index].item_id"
-                  @input="() => { row.quantity = calcQuantity(row) }"
+                  @input="() => { row.quantity = setQuantity(row) }"
                   />
               </q-td>
               <q-td key="quantity"  width="25%">
+                [rate:{{row.quantity +'<>'+ unitValueMax(index, row)}}]
                 <q-input style="min-width:150px"
                   :name="`work_order_items.${index}.quantity`" type="number"
                   :dark="LAYOUT.isDark" color="blue-grey-6"
                   v-model="row.quantity" disable
                   outlined dense hide-bottom-space no-error-icon align="right"
-                  v-validate="`required|gt_value:0|max_value:${Math.ceil(MaxStock[index] / (row.unit_rate || 1))}`"
+                  v-validate="`required|gt_value:0|max_value:${unitValueMax(index, row)}`"
                   :error="errors.has(`work_order_items.${index}.quantity`)"
-                  :suffix="' / '+ Math.ceil((MaxStock[index] || 0) / (row.unit_rate || 1))"
+                  :suffix="' / '+ unitValueMax(index, row)"
                 >
                   <q-btn slot="after" dense flat icon="done_all"
-                    v-if="Math.ceil((MaxStock[index] || 0) / (row.unit_rate || 1)) > 0"
-                    v-show="Math.ceil((MaxStock[index] || 0) / (row.unit_rate || 1)) !== row.target"
+                    v-if="unitValueMax(index, row) > 0"
+                    v-show="unitValueMax(index, row) !== row.target"
                     @click="() => {
-                      row.target = Math.ceil((MaxStock[index] || 0) / (row.unit_rate || 1))
-                      row.quantity = calcQuantity(row)
+                      row.target = unitValueMax(index, row)
+                      row.quantity = setQuantity(row)
                     }" />
                 </q-input>
               </q-td>
@@ -350,7 +351,7 @@ export default {
         }
       }
 
-      this.FORM.data.work_order_items.forEach(item => {
+      this.FORM.data.work_order_items.map(item => {
         if (stockItem.hasOwnProperty(item.item_id)) {
           stockItem[item.item_id].totals[this.FORM.data.stockist_from] += Number(item.unit_amount)
         }
@@ -415,9 +416,19 @@ export default {
       val = Math.ceil(val)
       return this.$app.number_format(Number(val || 0) / Number(row.unit_rate || 1))
     },
-    calcQuantity(row) {
-      // console.log(this.FORM)
-      return Math.ceil(Number(row.target) + (Number(row.target) * Number(row.ngratio) / 100))
+    setQuantity(row) {
+      const v = Number(row.target) + (Number(row.target) * Number(row.ngratio) / 100)
+      return Boolean(row.ngratio) ? Math.ceil(v) : v
+    },
+    unitValueMax (index, row) {
+      if (!row.unit_rate) return null
+      const value = parseFloat((this.MaxStock[index] || 0) / (row.unit_rate || 1))
+      if (row.unit && row.unit.decimal_in) {
+        console.warn('DEC', row.unit.decimal_in)
+        return value.toFixed(row.unit.decimal_in)
+        // parseFloat(this.MaxStock[index] / (row.unit_rate || 1)).toFixed(2)
+      }
+      return value.toFixed(0)
     },
     loadItemOptions(data = this.rsForm) {
       let params = ['has_stocks=FM,NC,NCR']
@@ -458,8 +469,10 @@ export default {
     },
     setUnitReference(index, val) {
 
-      if(!val) return;
-      else if (this.rsForm.work_order_items[index].item.unit_id === val) {
+      if(!val) return
+      this.rsForm.work_order_items[index].unit = this.MAPINGKEY['units'][val]
+
+      if (this.rsForm.work_order_items[index].item.unit_id === val) {
         this.rsForm.work_order_items[index].unit_rate = 1
       }
       else {
