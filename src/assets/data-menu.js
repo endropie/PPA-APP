@@ -83,6 +83,19 @@ const incomes = [
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'request-orders-read;pre-deliveries-create' } },
       { page: 'invoice-conclusion', path: 'invoice-conclusion/:id', meta: { mode: 'view', permission: 'request-orders-read' } }
     ]
+  },
+  {
+    name: 'Invoices',
+    icon: 'shop',
+    path: 'invoices',
+    lang: 'general.invoice',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'request-orders-read;pre-deliveries-create' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'request-orders-create' } },
+      // { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'request-orders-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'request-orders-read;pre-deliveries-create' } },
+
+    ]
   }
 ]
 

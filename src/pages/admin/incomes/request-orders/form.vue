@@ -1,6 +1,6 @@
 <template>
 <q-page padding class="main-page justify-center">
-  <q-card inline class="main-box" :dark="LAYOUT.isDark" v-if="FORM.show">
+  <q-card inline class="main-box" v-if="FORM.show">
     <q-card-section>
       <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" hide-menu>
         <q-chip square outline slot="optional" icon="assignment" color="blue-grey" class="text-weight-normal"
