@@ -42,8 +42,8 @@
            @request="deliveryTable.request"
         >
           <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
-            <!-- {{rs.row.id}} -->
             <q-checkbox left-label
+              :disable="rs.row.status !== 'CONFIRMED'"
               :value="Boolean(rsForm.delivery_orders.find(e => e.id === rs.row.id))"
               @input="!Boolean(rsForm.delivery_orders.find(e => e.id === rs.row.id))
                 ? rsForm.delivery_orders.push(rs.row)
@@ -72,8 +72,8 @@
            @request="orderTable.request"
         >
           <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
-            <!-- {{rs.row.id}} -->
             <q-checkbox left-label
+              :disable="rs.row.status !== 'CLOSED'"
               :value="Boolean(rsForm.request_orders.find(e => e.id === rs.row.id))"
               @input="!Boolean(rsForm.request_orders.find(e => e.id === rs.row.id))
                 ? rsForm.request_orders.push(rs.row)
@@ -137,7 +137,7 @@ export default {
         loding: false,
         columns: [
           { name: 'number', label: 'number', field: 'number', align: 'left'},
-          // { name: 'indexed_number', label: 'index', field: 'indexed_number', align: 'left'},
+          { name: 'reference_number', label: 'Reference', field: 'reference_number', align: 'left'},
           { name: 'status', label: '', field: 'status', align: 'center' },
           { name: 'action', label: '', align: 'center' },
         ],
@@ -197,11 +197,7 @@ export default {
         }).catch((error) => {
           console.error('NO', error)
         }).finally(() => {
-          console.warn('== DELIVERY->FN', this.deliveryTable.loading)
-          setTimeout(() => {
-            this.deliveryTable.loading = false
-            console.info('== DELIVERY->FN', this.deliveryTable.loading)
-          }, 1000)
+          this.deliveryTable.loading = false
         })
     },
     loadOrder (request = Object.assign({})) {
