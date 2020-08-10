@@ -625,7 +625,7 @@ export default {
         .then((response) => {
           let message = response.data.code + ' - #' + response.data.id
           this.FORM.response.success({message:message})
-          this.onSaved()
+          this.$router.go(-1)
         })
         .catch((error) => {
           console.warn(error)
@@ -664,38 +664,6 @@ export default {
             })
           })
       })
-    },
-
-    onSaved () {
-      if (this.rsForm.sample || !this.$app.can('items-push')) return this.$router.go(-1)
-      this.$q.dialog({ title: 'ACCURATE', message: 'are push to accurate?', cancel: true })
-      .onOk(() => {
-        this.onPush()
-      })
-      .onCancel(() => {
-          this.$router.go(-1)
-      })
-
-    },
-
-    onPush () {
-      let { method, mode, apiUrl } = this.FORM.meta();
-      let url = `${apiUrl}/accurate/push`
-      this.$q.loading.show()
-      this.$axios.post(url)
-        .then((response) => {
-          let msg = response.data.d[0] || ''
-          if (response.data.s)
-            this.$app.notify.success('ACCURATE', msg)
-          else
-            this.$app.notify.warning('ACCURATE', msg)
-
-          this.$router.go(-1)
-        }).catch((error) => {
-          this.$app.response.error(error.response || error)
-        }).finally(() => {
-          this.$q.loading.hide()
-        })
     },
   },
 }

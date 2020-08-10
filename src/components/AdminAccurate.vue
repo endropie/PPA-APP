@@ -1,7 +1,5 @@
 <template>
   <div>
-    <!-- ACCURATE -->
-    <!-- <q-icon name="mdi-alpha-a-circle"></q-icon> -->
     <q-btn outline dense :color="isAccurated ? 'white' : 'warning'" icon="mdi-alpha-a" @click="onAccurate"/>
   </div>
 </template>
@@ -11,11 +9,9 @@ import { openURL } from 'quasar'
 import { mapState, mapActions } from 'vuex'
 
 export default {
-  data () {
-    return {
-      //
-    }
-  },
+  data: () => ({
+    //
+  }),
   computed: {
     ...mapState('admin', ['ACCURATE']),
     isAccurated () {
@@ -40,11 +36,13 @@ export default {
         cancel: this.isAccurated ? 'Disconnet' : null,
         persistent: true
       }).onOk(() => {
-        // window.location.href = ('http://localhost:8000/accurate/login?redirect_uri=http://localhost:8080/%23/accurate')
-
         let redirect = this.$axios.defaults.baseURL + '/accurate/login?redirect_uri=' + window.location.origin + '/%23/accurate'
         window.location.href = redirect
       }).onCancel(() => {
+        if (this.$axios.defaults.headers.common['X-Accurate']) {
+          console.info('DELETE', 'X-Accurate')
+          delete this.$axios.defaults.headers.common['X-Accurate']
+        }
         this.$store.dispatch('admin/assignAccurate', null)
       })
     }

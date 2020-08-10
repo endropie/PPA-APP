@@ -31,12 +31,6 @@
                   <q-item-section>Reguler Validasi</q-item-section>
                   <q-item-section avatar><q-icon name="done_all"/></q-item-section>
                 </q-item>
-                <q-item clickable v-close-popup
-                  @click="push"
-                  v-if="!rsView.sample && $app.can('items-push')">
-                  <q-item-section>Sync (Accurate)</q-item-section>
-                  <q-item-section avatar><q-icon name="mdi-database-export"/></q-item-section>
-                </q-item>
                 <q-separator />
                 <q-item clickable v-close-popup
                   @click="VIEW.delete"
