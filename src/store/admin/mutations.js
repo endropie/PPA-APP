@@ -59,6 +59,11 @@ export const setAccurate = (state, values) => {
   LocalStorage.set('ACCURATE', JSON.stringify(state.ACCURATE))
 }
 
+export const unsetAccurate = (state) => {
+  state.ACCURATE = null
+  if (LocalStorage.has('ACCURATE')) LocalStorage.remove('ACCURATE')
+}
+
 export const setConfig = (state, values) => {
   state.CONFIG = Object.assign(state.CONFIG, values)
   LocalStorage.set('CONFIG', JSON.stringify(state.CONFIG))

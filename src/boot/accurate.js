@@ -1,10 +1,9 @@
 
 export default ({ app, router, store, Vue}) => {
   router.beforeEach((to, from, next) => {
-    if (to.path == '/accurate' && (to.query['accurate[auth][access_token]'] && to.query['accurate[db][session]']))
+    if (to.path == '/accurate' && to.query['X-Accurate'])
     {
-      console.warn('ACCURATE SET', to);
-      store.dispatch('admin/assignAccurate', to.query)
+      store.dispatch('admin/assignAccurate', {'token': to.query['X-Accurate']})
       next('/admin')
     }
     else next()
