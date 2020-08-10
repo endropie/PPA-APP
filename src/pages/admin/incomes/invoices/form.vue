@@ -182,7 +182,7 @@ export default {
       const page = Number(paginate.rowsPerPage) === Number(this.deliveryTable.pagination.rowsPerPage)
                  ? paginate.page : 1
 
-      let api = `${this.deliveryTable.api}?status=CONFIRMED&invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}`
+      let api = `${this.deliveryTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}`
       console.warn('api', api)
       this.deliveryTable.loading = true
       this.$axios.get(api)
