@@ -24,16 +24,33 @@
             :TABLE.sync="TABLE"
             :menus="[
               { shortcut: true,
-                label: $tc('form.add'),
+                tooltip: true,
+                label: $tc('form.add_new'),
                 detail: $tc('messages.form_new'),
                 icon: 'add',
                 hidden: !$app.can('items-create'),
                 to: `${TABLE.resource.uri}/create`
-              }
+              },
+              { shortcut: true,
+                tooltip: true,
+                label: $tc('items.sample.add'),
+                detail: $tc('messages.form_new'),
+                icon: 'mdi-tag-plus',
+                hidden: !$app.can('items-sample'),
+                to: `${TABLE.resource.uri}/create-sample`
+              },
+              { shortcut: true,
+                tooltip: true,
+                label: 'All sync',
+                detail: $tc('messages.form_new'),
+                icon: 'mdi-database-refresh',
+                hidden:!$app.can('items-push'),
+                actions: () => pushAll()
+              },
             ]">
 
             <div class="row q-col-gutter-xs" >
-              <ux-select-filter class="col-12 col-sm-4"
+              <ux-select-filter class="col-12 col-sm-3"
                 v-model="FILTERABLE.fill.customer_id.value" clearable
                 :label="$tc('general.customer')"
                 dense hide-bottom-space hide-dropdown-icon
@@ -43,7 +60,7 @@
                 :options="CustomerOptions"
                 @input="FILTERABLE.submit" />
 
-              <q-select class="col-12 col-sm-4"
+              <q-select class="col-12 col-sm-3"
                 dense use-chips hide-dropdown-icon
                 placeholder="Stock"
                 :options="['FM','WIP','FG','NC','NCR']"
@@ -61,16 +78,18 @@
                   <q-tooltip>{{$tc('label.all')}}</q-tooltip>
                 </q-btn>
               </q-select>
+              <q-select class="col-12 col-sm-3" input-class="no-wrap"
+                dense standout="bg-blue-grey-5 text-white"
+                :options="['REGULER','SAMPLE','SAMPLE:DEPICT','SAMPLE:ENGINERY','SAMPLE:PRICE','SAMPLE:VALIDATE']"
+                v-model="FILTERABLE.fill.sample_in.value"
+                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
+                :dark="LAYOUT.isDark"
+                @input="FILTERABLE.submit"
+              />
 
-              <div class="col-12 col-sm-4">
-                <div class="row  justify-end">
-                  <q-checkbox
-                    left-label label="Sample"
-                    v-model="FILTERABLE.fill.sampled.value"
-                    true-value="true"
-                    false-value=""
-                    @input="FILTERABLE.submit"
-                  />
+
+              <div class="col-12 col-sm-3">
+                <div class="row justify-end no-wrap">
                   <q-checkbox
                     left-label label="Disable"
                     v-model="FILTERABLE.fill.enable.value"
@@ -102,8 +121,12 @@
 
         <q-td slot="body-cell" slot-scope="rs" :props="rs">
           <div v-if="rs.col.name === 'prefix'">
-            <q-btn v-if="isCanUpdate" dense flat color="grey" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`"/>
+            <q-btn dense flat color="grey" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`"/>
+            <!-- <q-btn v-if="isCanUpdate" dense flat color="grey" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`"/>
             <q-btn v-if="isCanDelete" dense flat color="grey" icon="delete" @click.native="TABLE.delete(rs.row)" />
+            <q-btn v-if="isCanPush" dense flat color="light" icon="mdi-database-export" title="upload"
+              @click.native="push(rs.row)"
+            /> -->
           </div>
 
           <div v-else-if="rs.col.name === 'customer'">
@@ -171,8 +194,8 @@ export default {
       },
       FILTERABLE: {
         fill: {
-          sampled: {
-            value: '',
+          sample_in: {
+            value: 'REGULER',
             type: 'string',
             transform: (value) => { return null }
           },
@@ -203,8 +226,8 @@ export default {
           { name: 'prefix', label: '', align: 'left', required: true,},
 
           { name: 'customer', label: this.$tc('general.cust')+'.', field: 'customer_id', align: 'left', sortable: true},
-          { name: 'part_number', label: this.$tc('label.part')+' #', field: 'part_number', align: 'left', sortable: true },
           { name: 'part_name', label: this.$tc('items.part_name'), field: 'part_name', align: 'left', sortable: true },
+          { name: 'part_subname', label: this.$app.setting('item.subname_label'), field: 'part_subname', align: 'left', sortable: true },
           // { name: 'enable', label:this.$tc('label.active'), field: 'enable', align: 'center', sortable: true },
 
           // Item stocks
@@ -248,6 +271,9 @@ export default {
     this.INDEX.load()
   },
   computed: {
+    isCanPush () {
+      return this.$app.can('items-push')
+    },
     isCanUpdate(){
       return this.$app.can('items-update')
     },
@@ -270,6 +296,42 @@ export default {
     totalStock(id, label) {
       if(!this.MAPINGKEY['itemstocks'][id]) return 0
       return Number(this.MAPINGKEY['itemstocks'][id][label])
+    },
+    push (row) {
+      let url = `${this.TABLE.resource.api}/${row.id}/accurate/push`
+      console.warn('pusher', url);
+      this.$q.loading.show()
+      this.$axios.post(url)
+        .then((response) => {
+          let msg = response.data.d[0] || ''
+          return (response.data.s)
+            ? this.$app.notify.success('ACCURATE PUSH', msg)
+            : this.$app.notify.warning('ACCURATE PUSH', msg)
+        }).catch((error) => {
+          this.$app.response.error(error.response || error)
+        }).finally(() => {
+          this.$q.loading.hide()
+        })
+    },
+    pushAll () {
+      let url = `${this.TABLE.resource.api}/all/accurate/push`
+      this.$q.loading.show()
+      this.$axios.post(url)
+        .then((response) => {
+          console.warn('OK', response.data.filter(x => x.s === true).length);
+          let arrMsg = []
+          if (response.data.filter(x => x.s === true).length) {
+            arrMsg.push(response.data.filter(x => x.s === true).length + ' success')
+          }
+          if (response.data.filter(x => x.s === false).length) {
+            arrMsg.push(response.data.filter(x => x.s === false).length + ' failed')
+          }
+          this.$app.notify.info('ACCURATE SYNC', String(arrMsg.join(',') + ' to customer sync.'))
+        }).catch((error) => {
+          this.$app.response.error(error.response || error)
+        }).finally(() => {
+          this.$q.loading.hide()
+        });
     }
   },
 }

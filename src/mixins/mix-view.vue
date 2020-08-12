@@ -3,9 +3,6 @@ import axios from 'axios'
 // import GlobalMix from './mix-global.vue'
 import MixPage from '@/mixins/mix-page.vue'
 import MixSheet from '@/mixins/mix-sheet.vue'
-import { Script } from 'vm';
-import { type } from 'os';
-import showVue from '../pages/admin/common/items/show.vue';
 
 export default {
   mixins: [MixPage, MixSheet],
@@ -70,7 +67,8 @@ export default {
             }
           })
           .catch(error => {
-            if(!error.response) error.response = {}
+            console.error(error.response || error)
+            if (!error.response) error.response = {}
             this.$router.replace({
               path: '/admin/error',
               query: {

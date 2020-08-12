@@ -109,12 +109,12 @@
         <q-td slot="body-cell-item" slot-scope="rs" :props="rs">
           <div class="column" v-if="rs.row.packing_items.item">
             <span>{{ rs.row.packing_items.item.part_name }}</span>
-            <span class="text-weight-light">No. {{ rs.row.packing_items.item.part_number }}</span>
+            <span class="text-weight-light">[{{rs.row.packing_items.item.customer_code}}] {{ rs.row.packing_items.item.part_subname || '--' }}</span>
           </div>
         </q-td>
         <q-td slot="body-cell-item_number" slot-scope="rs" :props="rs">
           <div v-if="rs.row.packing_items.item">
-            {{ rs.row.packing_items.item.part_number }}
+            {{ rs.row.packing_items.item.part_subname }}
           </div>
         </q-td>
         <q-td slot="body-cell-item_name" slot-scope="rs" :props="rs">
@@ -199,8 +199,6 @@ export default {
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'customer_id', label: this.$tc('general.cust'), align: 'left'},
           { name: 'item', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left' },
-          // { name: 'item_name', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left', sortable: true },
-          // { name: 'item_number', label: this.$tc('label.number', 1, {v:this.$tc('label.part')}), align: 'left', sortable: false },
           { name: 'shift_id', label: 'Shift', field: 'shift_id', align: 'left'},
           { name: 'worktime', label: 'Worktime', field: 'worktime', align: 'left', sortable: true },
           { name: 'created_at', label: this.$tc('form.create',2), field: 'created_at', align: 'center'},
@@ -224,7 +222,7 @@ export default {
     ItemOptions() {
       return (this.SHEET.items.data.map(item => ({
         label: item.part_name,
-        sublabel:`[${item.customer_code}] ${item.part_number}`,
+        sublabel:`[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id
       })) || [])
     },

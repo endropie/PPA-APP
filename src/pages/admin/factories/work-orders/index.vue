@@ -63,7 +63,7 @@
 
                 <q-select class="col" style="min-width:120px"
                   v-model="FILTERABLE.fill.status.value" clearable
-                  :options="['OPEN', 'ON:PROCESS', 'HAS:PRODUCTED', 'HAS:PACKED', 'PRODUCTED', 'PACKED', 'CLOSED']"
+                  :options="['OPEN', 'ON:PROCESS', 'ON:DIRECT', 'HAS:PRODUCTED', 'HAS:PACKED', 'PRODUCTED', 'PACKED', 'CLOSED']"
                   :label=" $tc('label.state')"
                   dense hide-bottom-space hide-dropdown-icon
                   standout="bg-blue-grey-5 text-white"
@@ -164,8 +164,11 @@
         </q-td>
 
         <q-td slot="body-cell-persentase" slot-scope="rs" :props="rs" class="no-padding">
-           <div class="column q-gutter-xs q-py-xs" style="min-width:205px"
-            v-if="['OPEN', 'PRODUCTED', 'PACKED', 'CLOSED'].find(x => x === rs.row.status) && (rs.row.summary_productions > 0 || rs.row.summary_packings > 0)">
+          <div v-if="rs.row.stockist_direct">
+            <q-chip square color="blue-grey" text-color="white" :label="`DIRECT [${rs.row.stockist_direct}]`" />
+          </div>
+          <div class="column q-gutter-xs q-py-xs" style="min-width:205px"
+            v-else-if="filterPersentase(rs)">
             <div class="row no-wrap items-center text-left">
               <q-chip dense square color="lime-8" text-color="white" class="q-my-none" style="width:50px">WIP</q-chip>
               <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.summary_items) ? (rs.row.summary_productions/rs.row.summary_items) : 0">
@@ -315,8 +318,8 @@ export default {
     ItemOptions() {
       return (this.SHEET.items.data.map(item => ({
         // item: item,
-        label: `${item.part_name} - ${item.part_number}`,
-        sublabel:`[${item.customer_code}] ${item.part_number}`,
+        label: `${item.part_name}`,
+        sublabel:`[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id
       })) || [])
     },
@@ -334,6 +337,11 @@ export default {
       if (row.is_relationship) return false
       return this.$app.can('work-orders-delete')
     },
+    filterPersentase (rs) {
+      if (rs.row.summary_productions <= 0) return false
+      // if (rs.row.summary_packings <= 0) return false
+      return ['OPEN', 'PRODUCTED', 'PACKED', 'CLOSED'].find(x => x === rs.row.status)
+    }
   },
 }
 </script>

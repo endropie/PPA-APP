@@ -50,7 +50,6 @@
         <thead>
           <q-tr>
             <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
-            <!-- <q-th key="part_number">{{$tc('items.part_number')}}</q-th> -->
             <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
             <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
             <q-th key="AVA"># FG #</q-th>
@@ -62,7 +61,7 @@
             <q-td key="item_id" width="35%" >
               <div v-if="row.item" class="column text-body2">
                 <span class="text-subtitle2">{{row.item.part_name}}</span>
-                <span class="text-small" v-if="row.item.part_number">No. {{row.item.part_number}}</span>
+                <span class="text-small">[{{row.item.customer_code}}] {{row.item.part_subname}}</span>
               </div>
             </q-td>
             <q-td key="unit_id" width="10%" >
@@ -80,14 +79,14 @@
                 v-model="row.quantity" type="number" :min="0"
                 outlined dense hide-bottom-space no-error-icon align="center"
                 :dark="LAYOUT.isDark" color="blue-grey-5"
-                :suffix="row.item_id ? `/ ${$app.number_format(row.maximum / row.unit_rate)}` : ''"
+                :suffix="row.item_id ? `/ ${$app.number_format(row.maximum / row.unit_rate, $app.get(row, 'unit.decimal_in') || 0)}` : ''"
                 v-validate="`gt_value:0|max_value: ${maximality(row.maximum, FGSTOCK[index]) / row.unit_rate}`"
                 :error="errors.has(`outgoing_good_verifications.${index}.quantity`)"
               />
             </q-td>
             <q-td key="AVA" width="15%" align="center">
               <q-chip square class="text-weight-medium">
-                {{$app.number_format(FGSTOCK[index] / row.unit_rate)}}
+                {{$app.number_format(FGSTOCK[index] / row.unit_rate, $app.get(row, 'unit.decimal_in') || 0)}}
               </q-chip>
             </q-td>
             <q-td key="encasement" width="35%">
@@ -262,11 +261,16 @@ export default {
       if(!val) return;
       else if (this.rsForm.outgoing_good_verifications[index].item.unit_id === val) {
         this.rsForm.outgoing_good_verifications[index].unit_rate = 1
+        this.rsForm.outgoing_good_verifications[index].unit = null
       }
       else {
         if(this.rsForm.outgoing_good_verifications[index].item.item_units) {
           this.rsForm.outgoing_good_verifications[index].item.item_units.map((itemUnit)=> {
-            if (itemUnit.unit_id == val) this.rsForm.outgoing_good_verifications[index].unit_rate = itemUnit.rate
+            if (itemUnit.unit_id == val) {
+
+              this.rsForm.outgoing_good_verifications[index].unit = itemUnit.unit
+              this.rsForm.outgoing_good_verifications[index].unit_rate = itemUnit.rate
+            }
           })
         }
       }

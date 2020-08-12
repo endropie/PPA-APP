@@ -121,7 +121,7 @@
                   :error="errors.has(`delivery_order_items.${index}.item_id`)"
                   @input="(val)=>{ setItemReference(index, val) }"
                   :loading="SHEET['items'].loading" >
-                  <small v-if="row.item.part_number" class="absolute-bottom">[{{row.item.customer_code}}] {{row.item.part_number}}</small>
+                  <small class="absolute-bottom">[{{row.item.customer_code}}] {{row.item.part_subname}}</small>
                 </ux-select>
               </q-td>
               <q-td key="quantity" width="25%">
@@ -205,7 +205,7 @@
             <tr v-for="(row, index) in request_order.request_order_items" :key="index">
               <td>
                 <span>{{row.item.part_name}}</span><br/>
-                <span class="text-small">No. {{row.item.part_number}}</span>
+                <span class="text-small">[{{row.item.customer_code}}] {{row.item.part_subname}}</span>
               </td>
               <td class="text-center">{{row.item.unit.code}}</td>
               <td class="text-right">{{$app.number_format(row.quantity)}}</td>
@@ -264,7 +264,7 @@
             <tr v-for="(row, index) in reconcile.delivery_order_items" :key="index">
               <td>
                 <span>{{row.item.part_name}}</span><br/>
-                <span class="text-small">No. {{row.item.part_number}}</span>
+                <span class="text-small">{{row.item.customer_code}} {{row.item.part_subname}}</span>
               </td>
               <td class="text-center">{{row.item.unit.code}}</td>
               <td class="text-right">{{$app.number_format(row.quantity)}}</td>
@@ -356,7 +356,7 @@ export default {
     },
     ItemOptions() {
       let ITEM = this.SHEET.items.data.filter((item) => item.customer_id === this.rsForm.customer_id)
-      return (ITEM.map(item => ({label: `${item.part_name}`, sublabel:`${item.code} - ${item.part_number}`, value: item.id})) || [])
+      return (ITEM.map(item => ({label: `${item.part_name}`, sublabel:`${item.code} - ${item.part_subname}`, value: item.id})) || [])
     },
     ItemUnitOptions() {
       let vars = []

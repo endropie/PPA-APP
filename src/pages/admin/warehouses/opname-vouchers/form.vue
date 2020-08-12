@@ -34,7 +34,7 @@
           :source-keys="['part_name', 'part_number']"
           option-value="id" emit-value map-options
           :option-label="(item) => item.part_name || rsForm.item.part_name"
-          :option-sublabel="(item) => `[${item.customer_code}] ${item.part_number}`"
+          :option-sublabel="(item) => `[${item.customer_code}] ${item.part_subname || '--'}`"
           :option-disable="(item) => !item.enable"
           :options-dark="LAYOUT.isDark"
           :dark="LAYOUT.isDark"
@@ -42,7 +42,7 @@
           :error="errors.has(`item_id`)"
           :error-message="errors.first(`item_id`)" >
           <span slot="hint" v-if="rsForm.item_id && rsForm.item">
-            [{{rsForm.item.customer_code}}] {{rsForm.item.part_number}}
+            [{{rsForm.item.customer_code}}] {{rsForm.item.part_subname || '--'}}
           </span>
         </ux-select>
       </div>

@@ -3,7 +3,7 @@
     <div class="index-page bg-grey-2 window-height window-width column items-center no-wrap">
       <div class="banner bg-primary flex flex-center">
         <span v-if="$q.screen.gt.xs" >
-          <q-icon name="widgets" class="text-h1" color="blue-7" /> {{$app.name}}
+          {{APP_NAME}}
         </span>
       </div>
       <div class="text-center">
@@ -11,10 +11,10 @@
           <!-- <img src="~assets/quasar-play-logo-full.svg"> -->
           <q-icon name="widgets" class="text-h2" color="blue-7" />
           <div class="text-h4 text-orange-14 text-weight-bolder" style="font: courier">
-            {{ $app.name || 'MANUFACTURE PLAY' }}
+            {{ APP_NAME }}
           </div>
           <div class="text-orange-8 text-weight-light">
-            {{ $app.description || 'Administration Manufacture' }}
+            {{ APP_DESCRIPTION }}
           </div>
           <br>
 
@@ -43,7 +43,7 @@
               aria-multiline >
               <span class="q-ml-sm column" style="line-height:normal">
                 <span>ANDROID APP V.1</span>
-                <span style="font-size:70%">Build.7</span>
+                <span style="font-size:70%">Build.10</span>
               </span>
               <q-tooltip>Download Mobile App</q-tooltip>
             </q-btn>
@@ -56,38 +56,54 @@
 
 
           <privacy-policy ref="privacy" />
-          <modal ref="modal" >
-            <template slot="footer" >
-              <div class="row justify-around text-light full-width">
-                <span>
-                  store:{{$store.getters['admin/CONFIG'].general.baseURL}} <br/>
-                </span>
-                <span>
-                  axios:{{$axios.defaults.baseURL}}
-                </span>
-              </div>
-            </template>
-            <div class="column" style="min-width:300px">
-              <q-select
-                label="Host API"
-                v-model="baseURL"
-                :options="servers"
-                :loading="loadingSeturl">
-                <template slot="after">
-                  <q-btn dense
-                    :disable="baseURL === BASEURL"
-                    :flat="baseURL === BASEURL"
-                    :icon="baseURL !== BASEURL ? 'refresh' : 'done'"
-                    :color="baseURL !== BASEURL ? 'warning' : 'primary'"
-                  @click="saveBaseURL()" />
-
-                </template>
-              </q-select>
-            </div>
-          </modal>
         </div>
       </div>
     </div>
+    <q-btn class="fixed-bottom-right" flat color="blue-grey" icon="device_hub" @click="openSetURL" />
+
+    <q-dialog ref="modal" style="min-width:300px" persistent>
+      <q-card style="min-width:280px">
+        <q-bar dark class="bg-blue-grey text-white">
+          <div class="col text-left text-weight-bold"> Host-API</div>
+          <q-space />
+          <q-btn dense flat round icon="clear" v-close-popup />
+        </q-bar>
+        <q-card-section>
+          <q-select dense
+            v-model="baseURL"
+            :options="servers">
+            <q-btn slot="before" flat dense icon="edit" color="blue-grey">
+              <q-popup-edit v-model="baseURL" :offset="[0, 10]" >
+                <template  v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
+                  <q-input v-model="baseURL" dense autofocus>
+                    <template v-slot:prepend>
+                      <q-icon name="device_hub" color="blue-grey" />
+                    </template>
+                    <template v-slot:after>
+                      <q-btn flat dense color="negative" icon="cancel" @click.stop="cancel" />
+                      <q-btn flat dense color="positive" icon="check_circle" @click.stop="val => { set(val); saveBaseURL() }"/>
+                    </template>
+                  </q-input>
+                </template>
+              </q-popup-edit>
+            </q-btn>
+            <template slot="after">
+              <q-btn dense
+                :disable="baseURL === BASEURL"
+                :flat="baseURL === BASEURL"
+                :icon="baseURL !== BASEURL ? 'save' : 'done'"
+                :color="baseURL !== BASEURL ? 'warning' : 'primary'"
+                @click="saveBaseURL()"
+              />
+            </template>
+          </q-select>
+        </q-card-section>
+        <q-separator/>
+        <q-card-actions align="right" class="text-blue-grey">
+          <div><q-icon name="language" class="q-mr-xs" />{{$axios.defaults.baseURL}}</div>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -101,9 +117,8 @@ export default {
   },
   data () {
     return {
-      servers:['http://localhost:8000', 'http://ppa.virmata.com'],
-      baseURL: null,
-      loadingSeturl: false
+      servers:['http://localhost:8000', 'http://localhost:8001', 'http://ppa.virmata.com'],
+      baseURL: null
     }
   },
   created () {
@@ -111,24 +126,43 @@ export default {
   },
   computed: {
     BASEURL () {
-      return this.$store.state.admin.CONFIG.general.baseURL
+      return this.$q.localStorage.getItem('BASE_URL')
+    },
+    APP_NAME () {
+      let name = 'MANUFACTURE PLAY'
+      if (this.$app.setting('general.app_brand')) {
+        name = this.$app.setting('general.app_brand')
+      }
+      return name
+    },
+    APP_DESCRIPTION () {
+      let name = 'Administration Manufacture'
+      if (this.$app.setting('general.app_description')) {
+        name = this.$app.setting('general.app_description')
+      }
+      return name
     }
   },
   methods: {
     launch () {
       openURL('http://quasar-framework.org')
     },
-    openSetURL (){
-      this.baseURL = this.$store.state.admin.CONFIG.general.baseURL
+    openSetURL () {
+      this.baseURL = this.$q.localStorage.getItem('BASE_URL')
       this.$refs.modal.show()
     },
-    saveBaseURL (){
-      this.loadingSeturl = true
-
+    saveBaseURL () {
+      this.$q.loading.show()
+      this.$q.localStorage.set('BASE_URL', this.baseURL)
+      this.$axios.setHeader([{ key:'baseURL', value: this.baseURL }])
+      window.location.reload()
       setTimeout(() => {
-        const newURL = this.$store.commit('admin/setBaseURL', this.baseURL)
-        this.loadingSeturl = false
-      }, 1000);
+        this.$q.loading.hide()
+      }, 2000);
+    },
+    addBaseURL (val) {
+      this.baseURL = val
+      this.saveBaseURL()
     },
     viewPrivacyPolicy () {
       this.$refs.privacy.show()

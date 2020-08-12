@@ -131,8 +131,9 @@
           :dark="LAYOUT.isDark">
             <q-tr>
               <q-th key="prefix"></q-th>
+              <q-th key="lots" v-if="IS_LOTS">{{$tc('label.lots')}}</q-th>
               <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
-              <q-th key="part_name">{{$tc('items.part_number')}}</q-th>
+              <q-th key="part_subname">{{$app.setting('item.subname_label')}}</q-th>
               <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
               <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
               <q-th key="note">{{$tc('label.note')}}</q-th>
@@ -148,15 +149,22 @@
                   <q-icon v-else name="done_all" color="light"/>
                 </q-btn>
               </q-td>
+              <q-td key="lots" width="20%" v-if="IS_LOTS">
+                <q-input readonly
+                  :value="row.lots"
+                  outlined dense hide-bottom-space
+                  color="blue-grey-5"
+                />
+              </q-td>
               <q-td key="item_id" width="35%">
                 <q-input readonly
                   :value="row.item ? row.item.part_name : null"
                   outlined dense hide-bottom-space color="blue-grey-5"
                   :dark="LAYOUT.isDark" />
               </q-td>
-              <q-td key="part_number" width="35%" style="min-width:150px">
+              <q-td key="part_subname" width="35%" style="min-width:150px">
                 <q-input readonly
-                  :value="row.item ? row.item.part_number : null"
+                  :value="row.item ? row.item.part_subname : null"
                   outlined dense hide-bottom-space color="blue-grey-5"
                   :dark="LAYOUT.isDark" />
               </q-td>
@@ -197,10 +205,10 @@
                   v-if="row.item"
                   v-text="row.item.part_name" />
               </q-td>
-              <q-td key="part_number" width="35%">
+              <q-td key="part_subname" width="35%">
                 <span class="q-px-sm text-strike"
                   v-if="row.item"
-                  v-text="row.item.part_number" />
+                  v-text="row.item.part_subname" />
               </q-td>
 
               <q-td key="unit_id" width="20%">
@@ -210,7 +218,7 @@
               </q-td>
 
               <q-td key="quantity" width="20%">
-                <span class="q-px-sm text-strike" v-text="$app.number_format(row.quantity)" />
+                <span class="q-px-sm text-strike" v-text="$app.number_format(row.quantity, row.unit.decimal_in)" />
               </q-td>
 
               <q-td key="note" width="35%">
@@ -304,6 +312,13 @@ export default {
 
   },
   computed: {
+    IS_LOTS() {
+      if (this.FORM.data.deleted_at) return false
+      if (this.FORM.data.transaction !== 'REGULER') return false
+      if (this.FORM.data.order_mode !== 'NONE') return false
+      if (!this.FORM.data.customer) return false
+      return this.FORM.data.customer.order_lots
+    },
     IS_EDITABLE() {
       if (Object.keys(this.FORM.data.has_relationship || {}).length > 0) return false
 
@@ -350,7 +365,7 @@ export default {
 
         return (Items.map(item => ({
           label: item.part_name,
-          sublabel: `[${item.customer_code}] - No.${item.part_number}`,
+          sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
           disable: !item.enable,
           value: item.id}) || []))
     },

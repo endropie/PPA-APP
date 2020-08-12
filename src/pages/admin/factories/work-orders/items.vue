@@ -150,7 +150,7 @@
           <!-- <code>({{Object.keys(rs.row)}})</code> -->
           <div class="column" v-if="rs.row.work_order_item.item">
             <span>{{rs.row.work_order_item.item.part_name}}</span>
-            <span class="text-weight-light">[{{rs.row.work_order_item.item.customer_code}}]<font>{{rs.row.work_order_item.item.part_number}}</font></span>
+            <span class="text-weight-light">[{{rs.row.work_order_item.item.customer_code}}] <font>{{rs.row.work_order_item.item.part_subname || '--'}}</font></span>
           </div>
         </q-td>
 
@@ -282,8 +282,8 @@ export default {
     },
     ItemOptions() {
       return (this.SHEET.items.data.map(item => ({
-        label: `${item.part_name} - ${item.part_number}`,
-        sublabel:`[${item.customer_code}] ${item.part_number}`,
+        label: `${item.part_name}`,
+        sublabel:`[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id
       })) || [])
     },

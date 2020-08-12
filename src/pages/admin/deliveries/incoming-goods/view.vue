@@ -10,6 +10,9 @@
           color="blue-grey" text-color="white"
           label="SAMPLE" v-if="rsView.transaction === 'SAMPLE'" />
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
+
+        <q-btn dense flat round color="blue-grey" icon="settings" @click="$refs['config'].show()" />
+        <config-page ref="config" persistent />
       </div>
       <div class="row q-col-gutter-md" >
         <div class="col-12">
@@ -70,21 +73,28 @@
           </div>
         </div>
         <div class="col-12">
-          <q-table ref="table" bordered class="no-highlight no-shadow" color="secondary" separator="vertical" dense hide-bottom :dark="LAYOUT.isDark"
-            :data="rsView.incoming_good_items"
-            no-data-label = "No Detail"
-            :rows-per-page-options ="[0]"
-            :pagination="{page: null, rowsPerPage: 0 }"
-            :columns="[
-              { name: 'part_name', label: $tc('items.part_name'), align: 'left', field: (v)=> v.item.part_name},
-              { name: 'part_number', label: $tc('items.part_number'), align: 'left', field: (v)=> v.item.part_number},
-              { name: 'unit_id', label: $tc('label.unit'), align: 'center', field: (v)=> v.unit.code},
-              { name: 'quantity', label: $tc('label.quantity'), align: 'right',
-                field: (v)=> v.quantity, format: (v) => $app.number_format(v)},
-              { name: 'note', label: $tc('label.note'), align: 'left', field: 'note', style: `min-width:25%;`},
-            ]"
-          >
-          </q-table>
+          <q-markup-table dense bordered square separator="cell" class="table-print no-shadow no-highlight"  :dark="LAYOUT.isDark">
+            <thead>
+            <q-tr style="line-height:25px">
+              <q-th width="15%" v-if="IS_LOTS">{{ $tc('label.lots') }}</q-th>
+              <q-th width="25%" v-if="!isHideColumn('part_name')">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th width="20%" v-if="!isHideColumn('part_subname')">{{ $app.setting('item.subname_label') }}</q-th>
+              <q-th width="10%" v-if="!isHideColumn('unit')">{{ $tc('label.unit') }}</q-th>
+              <q-th width="10%" v-if="!isHideColumn('quantity')">{{ $tc('label.quantity') }}</q-th>
+              <q-th width="20%" v-if="!isHideColumn('note')">{{ $tc('label.note') }}</q-th>
+            </q-tr>
+            </thead>
+            <tbody>
+              <q-tr v-for="(row, index) in rsView.incoming_good_items" :key="index" :request-order-item-id="row.id">
+                <q-td v-if="IS_LOTS">{{row.lots || '-'}}</q-td>
+                <q-td v-if="!isHideColumn('part_name')">{{row.item.part_name}}</q-td>
+                <q-td v-if="!isHideColumn('part_subname')">{{row.item.part_subname}}</q-td>
+                <q-td v-if="!isHideColumn('unit')" class="text-center">{{row.unit.code}}</q-td>
+                <q-td v-if="!isHideColumn('quantity')" class="text-right">{{$app.number_format(row.quantity, row.unit.decimal_in)}}</q-td>
+                <q-td v-if="!isHideColumn('note')" style="width:180px"> {{row.note}} </q-td>
+              </q-tr>
+            </tbody>
+          </q-markup-table>
         </div>
         <div class="col-12">
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
@@ -161,11 +171,11 @@
 
 import MixView from '@/mixins/mix-view.vue'
 import PagePrint from '@/components/page-print'
-import PagePrintBreak from '@/components/page-print-break'
+import ConfigPage from './config.vue'
 
 export default {
   mixins: [MixView],
-  components: { PagePrint, PagePrintBreak },
+  components: { PagePrint, ConfigPage },
   data () {
     return {
       VIEW: {
@@ -192,6 +202,12 @@ export default {
     isCanDelete() {
       return this.$app.can('incoming-goods-delete')
     },
+    IS_LOTS() {
+      if (this.rsView.transaction !== 'REGULER') return false
+      if (this.rsView.order_mode !== 'NONE') return false
+      if (!this.rsView.customer) return false
+      return this.rsView.customer.order_lots
+    },
     IS_REVISE() {
       if (this.IS_EDITABLE) return false
       if (this.rsView.deleted_at) return false
@@ -212,6 +228,16 @@ export default {
     },
   },
   methods: {
+    isHideColumn(val) {
+      const setting = this.$store.state.admin.SETTING.incoming_good
+        ? this.$store.state.admin.SETTING.incoming_good['hide_view_columns'] || []
+        : []
+
+      if (setting.some(v => val === v)) return true
+
+      const hidden = this.$store.state.admin.CONFIG.incoming_good['hide_view_columns'] || []
+      return Boolean( hidden.some(v => val === v) )
+    },
     setRestoration () {
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/restoration`)
     },
@@ -226,12 +252,7 @@ export default {
         this.setView(data || {})
       })
     },
-    btnIcon (str) {
-      return !this.$q.screen.lt.sm ? str : undefined
-    },
-    print() {
-      window.print()
-    },
+
     setView(data) {
       this.rsView =  JSON.parse(JSON.stringify(data))
     },

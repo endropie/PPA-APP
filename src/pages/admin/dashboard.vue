@@ -1,9 +1,10 @@
 <template>
   <q-page padding class="page-admin">
     <div class="row content-stretch">
+      <item-sample-validation class="col-12 col-md-4 q-pa-xs" style="min-width:200px" />
+      <incoming-validation class="col-12 col-md-4 q-pa-xs" style="min-width:200px" />
+      <work-order-validation class="col-12 col-md-4 q-pa-xs" style="min-width:200px" />
       <item-histories class="col-12 q-pa-xs" />
-      <incoming-validation class="col-12 col-md-auto q-pa-xs" style="min-width:50%" />
-      <work-order-validation class="col-12 col-md-auto q-pa-xs" style="min-width:50%" />
     </div>
   </q-page>
 </template>
@@ -11,6 +12,7 @@
 <script>
 import MixPage from '@/mixins/mix-page.vue'
 import ItemHistories from '@/pages/admin/common/items/dashboard-histories'
+import ItemSampleValidation from '@/pages/admin/common/items/dashboard-validation'
 import IncomingValidation from '@/pages/admin/deliveries/incoming-goods/dashboard-validation'
 import WorkOrderValidation from '@/pages/admin/factories/work-orders/dashboard-validation'
 
@@ -18,6 +20,7 @@ export default {
   mixins:[MixPage],
   components: {
     ItemHistories,
+    ItemSampleValidation,
     IncomingValidation,
     WorkOrderValidation
   },

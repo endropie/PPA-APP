@@ -48,6 +48,9 @@
               }
             ]"
           />
+
+          <q-btn dense flat round color="blue-grey" icon="settings" @click="$refs['config'].show()" />
+          <config-delivery-order ref="config" persistent />
         </q-card-actions>
       </q-card>
 
@@ -140,44 +143,46 @@
               class="table-print no-shadow no-highlight th-uppercase">
               <thead>
               <q-tr>
-                <q-th class="text-left">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-                <q-th class="text-left">{{ $tc('label.no', 1, {v: $tc('label.part')}) }}</q-th>
-                <q-th key="PCS" class="text-right" v-if="isDoubleUnit">Unit (PCS)</q-th>
-                <q-th key="KG" class="text-right" v-if="isDoubleUnit">Unit (KG)</q-th>
-                <q-th class="text-right" v-if="!isDoubleUnit">{{ $tc('label.quantity') }}</q-th>
-                <q-th class="text-left" width="10%" v-if="!isDoubleUnit">{{ $tc('label.unit') }}</q-th>
+                <q-th v-if="!isHideColumn('part_name')" class="text-left">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+                <q-th v-if="!isHideColumn('part_subname')" class="text-left">{{ $app.setting('item.subname_label') }}</q-th>
+                <q-th v-if="isDoubleUnit & !isHideColumn('quantity')" key="PCS" class="text-right" >Unit (PCS)</q-th>
+                <q-th v-if="isDoubleUnit & !isHideColumn('quantity')" key="KG" class="text-right" >Unit (KG)</q-th>
+                <q-th v-if="!isDoubleUnit & !isHideColumn('quantity')" class="text-right" >{{ $tc('label.quantity') }}</q-th>
+                <q-th v-if="!isDoubleUnit & !isHideColumn('unit')" class="text-left" width="10%" >{{ $tc('label.unit') }}</q-th>
                 <q-th v-if="rsView.is_internal && !remain_only && !isDoubleUnit" class="print-hide">Reconcile</q-th>
-                <q-th>{{ $tc('label.encasement') }}</q-th>
+                <q-th v-if="!isHideColumn('encasement')">{{ $tc('label.encasement') }}</q-th>
               </q-tr>
               </thead>
               <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
                 <q-tr :delivery-order-item-id="row.id"
                   v-show="isRowMain(row)" >
-                  <q-td>
+                  <q-td v-if="!isHideColumn('part_name')">
                     <span class="text-weight-medium" v-if="Boolean(mode)">{{mode}}:&nbsp;</span>
                     <span class="text-weight-medium" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">Material:&nbsp;</span>
                     <span v-if="row.item"> {{row.item.part_name}} </span>
                   </q-td>
-                  <q-td>
-                    <span v-if="row.item"> {{row.item.part_number}} </span>
+                  <q-td v-if="!isHideColumn('part_subname')" key="part_subname">
+                    <span v-if="row.item"> {{row.item.part_subname}} </span>
                   </q-td>
-                  <q-td key="PCS" v-if="isDoubleUnit" class="text-right">
-                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
+                  <q-td v-if="!isHideColumn('quantity') && isDoubleUnit" key="PCS" class="text-right">
+                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row), row.unit.decimal_in) + ' PCS'}}
                   </q-td>
-                  <q-td key="KG" v-if="isDoubleUnit" class="text-right">
-                    {{!valKG(row) ? '' : $app.number_format(valKG(row),0) + ' KG'}}
+                  <q-td v-if="!isHideColumn('quantity') && isDoubleUnit" key="KG" class="text-right">
+                    {{!valKG(row) ? '' : $app.number_format(valKG(row), row.unit.decimal_in) + ' KG'}}
                   </q-td>
-                  <q-td key="quantity" v-if="!isDoubleUnit" class="text-right">
+                  <q-td  v-if="!isHideColumn('quantity') && !isDoubleUnit" key="quantity" class="text-right">
                     <span v-if="rsView.is_internal && remain_only">
-                      {{$app.number_format(Number(row.quantity) - (row.amount_reconcile / (row.unit_rate||1)),0)}}
+                      {{$app.number_format(Number(row.quantity) - (row.amount_reconcile / (row.unit_rate||1)), row.unit.decimal_in)}}
                     </span>
-                    <span v-else>{{$app.number_format(row.quantity,0)}}</span>
+                    <span v-else>{{$app.number_format(row.quantity, row.unit.decimal_in)}}</span>
                   </q-td>
-                  <q-td key="unit" v-if="!isDoubleUnit" class="text-left">{{row.unit.code}}</q-td>
-                  <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only && !isDoubleUnit">
-                    {{$app.number_format(row.amount_reconcile,0)}}
+                  <q-td v-if="!isHideColumn('unit') && !isDoubleUnit" key="unit"  class="text-left">
+                    {{row.unit.code}}
                   </q-td>
-                  <q-td>
+                  <q-td v-if="rsView.is_internal && !remain_only && !isDoubleUnit" class="print-hide text-right">
+                    {{$app.number_format(row.amount_reconcile, row.unit.decimal_in)}}
+                  </q-td>
+                  <q-td v-if="!isHideColumn('encasement')">
                     <div class="row cursor-pointer">
                       <span>{{row.encasement}}</span>
                       <template v-if="String(mode).toUpperCase() !== 'JASA' && rsView.status === 'OPEN'">
@@ -204,23 +209,25 @@
                 <q-tr :delivery-order-item-id="row.id"
                   v-show="isRowMain(row)"
                   v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
-                  <q-td>
+                  <q-td v-if="!isHideColumn('part_name')">
                     <span class="text-weight-medium">Jasa:&nbsp;</span>
                     <span v-if="row.item"> {{row.item.part_name}} </span>
                   </q-td>
-                  <q-td>
-                    <span v-if="row.item"> {{row.item.part_number}} </span>
+                  <q-td v-if="!isHideColumn('part_subname')">
+                    <span v-if="row.item"> {{row.item.part_subname}} </span>
                   </q-td>
-                  <q-td key="PCS" v-if="isDoubleUnit" class="text-right">
-                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row),0) + ' PCS'}}
+                  <q-td  v-if="!isHideColumn('quantity') && isDoubleUnit" key="PCS" class="text-right">
+                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row), row.unit.decimal_in) + ' PCS'}}
                   </q-td>
-                  <q-td key="KG" v-if="isDoubleUnit" class="text-right">
-                    {{!valKG(row) ? '' : $app.number_format(valKG(row),0) + ' KG'}}
+                  <q-td v-if="!isHideColumn('quantity') && isDoubleUnit" key="KG" class="text-right">
+                    {{!valKG(row) ? '' : $app.number_format(valKG(row), row.unit.decimal_in) + ' KG'}}
                   </q-td>
-                  <q-td class="text-right" v-if="!isDoubleUnit">{{$app.number_format(row.quantity,0)}}</q-td>
-                  <q-td class="text-left" v-if="!isDoubleUnit">{{row.unit.code}}</q-td>
-                  <q-td class="print-hide text-right" v-if="rsView.is_internal && !remain_only && !isDoubleUnit"></q-td>
-                  <q-td></q-td>
+                  <q-td v-if="!isHideColumn('quantity') && !isDoubleUnit" class="text-right">
+                    {{$app.number_format(row.quantity, row.unit.decimal_in)}}
+                  </q-td>
+                  <q-td v-if="!isHideColumn('unit') && !isDoubleUnit" class="text-left">{{row.unit.code}}</q-td>
+                  <q-td v-if="rsView.is_internal && !remain_only && !isDoubleUnit" class="print-hide text-right"></q-td>
+                  <q-td v-if="!isHideColumn('encasement')"></q-td>
                 </q-tr>
               </tbody>
               <tbody >
@@ -286,10 +293,11 @@
 <script>
 import MixView from '@/mixins/mix-view.vue'
 import PagePrint from '@/components/page-print'
+import ConfigDeliveryOrder from './config.vue'
 
 export default {
   mixins: [MixView],
-  components: { PagePrint },
+  components: { PagePrint, ConfigDeliveryOrder },
   data () {
     return {
       VIEW: {
@@ -347,8 +355,15 @@ export default {
         this.setView(data || {})
       })
     },
-    print() {
-      window.print()
+    isHideColumn(val) {
+      const setting = this.$store.state.admin.SETTING.sj_delivery
+        ? this.$store.state.admin.SETTING.sj_delivery['hide_view_columns'] || []
+        : []
+
+      if (setting.some(v => val === v)) return true
+
+      const config = this.$store.state.admin.CONFIG.sj_delivery['hide_view_columns'] || []
+      return Boolean( config.some(v => val === v) )
     },
     isRowMain(row) {
       return this.IS_MAINROW || Math.round(row.unit_amount) !== Math.round(row.amount_reconcile)
@@ -382,10 +397,6 @@ export default {
         }
       }
       return null
-    },
-    getBaseUnit(detail) {
-      if(detail.unit_rate == 1) return ''
-      return `(${detail.unit_amount} ${detail.item.unit.code})`
     },
     getArrayPage(c) {
       if (c.delivery_mode === 'SEPARATE') return ['Material', 'Jasa']

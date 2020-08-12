@@ -1,9 +1,5 @@
-import { colors, LocalStorage } from 'quasar'
+import { colors, LocalStorage, Dark } from 'quasar'
 import axios from 'axios'
-
-export const setNow = (state) => {
-  state.NOW = new Date()
-}
 
 export const SetLeftDrawer = (state, val) => {
   state.PAGE.leftDrawer = val
@@ -31,7 +27,6 @@ export const setPageMeta = (state, meta) => {
     tabs: [],
     ...meta
   }
-  // console.error('update->PAGEMETA', state.PAGEMETA, meta)
 }
 
 export const setLogin = (state, val) => {
@@ -59,15 +54,25 @@ export const setSetting = (state, values) => {
   LocalStorage.set('SETTING', JSON.stringify(state.SETTING))
 }
 
+export const setAccurate = (state, values) => {
+  state.ACCURATE = Object.assign(state.ACCURATE, values)
+  LocalStorage.set('ACCURATE', JSON.stringify(state.ACCURATE))
+}
+
+export const unsetAccurate = (state) => {
+  state.ACCURATE = null
+  if (LocalStorage.has('ACCURATE')) LocalStorage.remove('ACCURATE')
+}
+
 export const setConfig = (state, values) => {
   state.CONFIG = Object.assign(state.CONFIG, values)
-  LocalStorage.set('SETTING', JSON.stringify(state.CONFIG))
+  LocalStorage.set('CONFIG', JSON.stringify(state.CONFIG))
 }
 
 export const setBaseURL = (state, value) => {
   state.CONFIG.general.baseURL = value
   axios.defaults.baseURL = value
-  LocalStorage.set('SETTING', JSON.stringify(state.CONFIG))
+  LocalStorage.set('CONFIG', JSON.stringify(state.CONFIG))
 
   return value
 }

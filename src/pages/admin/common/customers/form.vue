@@ -129,45 +129,68 @@
             <q-item>
               <q-item-section >
                 <div class="row q-col-gutter-sm">
-                  <q-field class="col-4" borderless >
-                    <q-toggle name="with_tax"
-                      label="Tax"
-                      v-model="rsForm.with_tax"
+                  <q-field dense class="col-12" borderless >
+                    <q-toggle name="with_ppn"
+                      label="PPN" left-label
+                      v-model="rsForm.with_ppn"
                       :false-value="0"
                       :true-value="1"
-                      :dark="LAYOUT.isDark"/>
+                    />
+                    <q-input type="number"
+                      class="q-pl-md full-width"
+                      name="ppn" suffix="% PPN"
+                      v-model="rsForm.ppn"
+                      :disable="!Boolean(rsForm.with_ppn)"
+                      v-validate="`${(rsForm.with_ppn ? 'required|gt_value:0|max_value:100' :'')}`"
+                      :error="errors.has('ppn')"
+                      :error-message="errors.first('ppn')"
+                    />
                   </q-field>
-                  <q-field class="col-8" borderless>
+                  <q-field dense class="col-12" borderless>
                     <q-toggle name="with_pph"
-                      label="PPH"
+                      label="PPH" left-label
                       v-model="rsForm.with_pph"
                       :false-value="0"
                       :true-value="1"
-                      :dark="LAYOUT.isDark"/>
+                    />
+
+                    <q-input dense type="number"
+                      class="q-pl-md full-width"
+                      suffix="% PPH"
+                      value="2"
+                      :disable="!Boolean(rsForm.with_pph)" readonly
+                    />
                   </q-field>
-                  <q-input name="tax" class="col-4"
-                    label="Tax [PPN]" type="number"
-                    filled
-                    v-model="rsForm.tax"
-                    :dark="LAYOUT.isDark"
-                    :error="errors.has('tax')"
-                    :error-message="errors.first('tax')" />
-                  <q-input name="pph_material" class="col-4"
-                    label="Material" type="number"
-                    filled
-                    v-model="rsForm.pph_material"
-                    :dark="LAYOUT.isDark"
-                    :error="errors.has('pph_material')"
-                    :error-message="errors.first('pph_material')" />
 
-                  <q-input name="pph_service" class="col-4"
-                    label="Service" type="number"
-                    filled
-                    v-model="rsForm.pph_service"
-                    :dark="LAYOUT.isDark"
-                    :error="errors.has('pph_service')"
-                    :error-message="errors.first('pph_service')" />
+                  <q-input type="number" class="col-6"
+                    filled label="% Service"
+                    name="sen_service"
+                    v-model="rsForm.sen_service"
+                    :disable="!Boolean(rsForm.with_pph)"
+                    v-validate="(rsForm.with_pph ? 'required|gt_value:0|max_value:100' :'')"
+                    :error="errors.has('sen_service')"
+                    :error-message="errors.first('sen_service')"
+                  />
 
+                  <q-field dense borderless class="col-auto">
+                    <div slot="control">
+                      <q-checkbox class="col-12 col-sm-auto"
+                        :label="$tc('customers.service.exclude')"
+                        v-model="rsForm.exclude_service"
+                        :disable="!Boolean(rsForm.with_pph)"
+                        :true-value="1" :false-value="0"
+                      />
+
+                      <q-checkbox class="col-12 col-sm-auto"
+                        :label="$tc('customers.service.bounded')"
+                        v-model="rsForm.bounded_service"
+                        :disable="!Boolean(rsForm.with_pph && rsForm.with_ppn)"
+                        :true-value="1" :false-value="0"
+                      >
+                      <q-tooltip>{{$tc('customers.tooltip.service_bounded')}}</q-tooltip>
+                    </q-checkbox>
+                    </div>
+                  </q-field>
                 </div>
 
               </q-item-section>
@@ -291,6 +314,13 @@
                 :false-value="0"
                 :true-value="1"
                 :dark="LAYOUT.isDark"/>
+              <q-checkbox name="order_lots" class="text-faded"
+                label="Lots Order"
+                v-model="rsForm.order_lots"
+                :false-value="0"
+                :true-value="1"
+                v-show="rsForm.order_mode == 'NONE'"
+              />
             </div>
           </q-field>
         </div>
@@ -346,18 +376,21 @@ export default {
           npwp: null,
           bank_account: null,
 
-          with_tax: 1,
+          with_ppn: 1,
           with_pph: 1,
-          tax: 0,
-          pph_material: 0,
-          pph_service: 0,
-
+          ppn: 0,
+          sen_service: null,
+          exclude_service: 0,
+          bounded_service: 0,
 
           invoice_mode: null,
           delivery_mode: null,
           order_mode: null,
-          customer_contacts:[ {id:null} ]
+          customer_contacts:[ {id:null} ],
 
+          order_manual_allowed: 0,
+          order_monthly_actived: 0,
+          order_lots: 0,
         }
       }
     }
@@ -365,7 +398,6 @@ export default {
   created(){
     // Component Page Mounted!
     this.init()
-
   },
   computed:{
     ProvinceOptions() {
@@ -413,7 +445,7 @@ export default {
         .then((response) => {
           let message = response.data.name + ' - #' + response.data.id
           this.FORM.response.success({message:message})
-          this.FORM.toIndex()
+          this.onSaved()
         })
         .catch((error) => {
           this.FORM.response.fields(error.response)
@@ -428,6 +460,38 @@ export default {
 
       });
     },
+
+
+    onSaved () {
+      if (!this.$app.can('customers-push')) return this.FORM.toIndex()
+      this.$q.dialog({ title: 'ACCURATE', message: 'are push to accurate?', cancel: true })
+      .onOk(() => {
+        this.onPush()
+      })
+      .onCancel(() => {
+        this.FORM.toIndex()
+      })
+
+    },
+
+    onPush () {
+      let { method, mode, apiUrl } = this.FORM.meta();
+      let url = `${apiUrl}/accurate/push`
+      this.$q.loading.show()
+      this.$axios.post(url)
+        .then((response) => {
+          let msg = response.data.d[0] || ''
+          if (response.data.s)
+            this.$app.notify.success('ACCURATE', msg)
+          else
+            this.$app.notify.warning('ACCURATE', msg)
+          this.FORM.toIndex()
+        }).catch((error) => {
+          this.$app.response.error(error.response || error)
+        }).finally(() => {
+          this.$q.loading.hide()
+        })
+    }
   },
 }
 </script>

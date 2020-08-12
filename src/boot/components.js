@@ -2,6 +2,7 @@ import Modal from '@/components/Modal'
 import AdminMenuItem from '@/components/AdminMenuItem'
 import AdminTabs from 'components/AdminTabs'
 import AdminHeader from 'components/AdminHeader'
+import AdminAccurate from 'components/AdminAccurate'
 import ListItem from '@/components/ListItem'
 
 import UXModalView from '@/components/UXModalView'
@@ -21,6 +22,7 @@ export default async ({ app, store, router, Vue }) => {
   Vue.component('modal', Modal)
   Vue.component('Admin-tabs', AdminTabs)
   Vue.component('admin-header', AdminHeader)
+  Vue.component('admin-accurate', AdminAccurate)
   Vue.component('admin-menu-item', AdminMenuItem)
   Vue.component('list-item', ListItem)
 

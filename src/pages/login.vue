@@ -3,7 +3,7 @@
     <div class="index-page bg-grey-2 window-height window-width column items-center no-wrap">
       <div class="banner bg-primary flex flex-center">
         <span v-if="$q.screen.gt.xs" >
-          <q-icon name="widgets" class="text-h1" color="blue-7" /> {{$app.name}}
+          {{APP_NAME}}
         </span>
       </div>
       <div class="text-center" >
@@ -11,7 +11,7 @@
           <!-- <img src="~assets/quasar-play-logo-full.svg"> -->
           <q-icon name="widgets" class="text-h2" color="blue-7" />
           <div class="text-h6 text-orange-14 text-weight-bolder" style="font: courier">
-            {{ $app.name || 'MANUFACTURE PLAY' }}
+            {{APP_NAME}}
           </div>
           <div class="text-orange-8 text-weight-light">
             {{ $app.description || 'Administration Manufacture' }}
@@ -125,11 +125,17 @@ export default {
     }
   },
   computed: {
-
     ...mapGetters('admin', [
       'USER',
       'AUTH'
-    ])
+    ]),
+    APP_NAME () {
+      let name = 'MANUFACTURE PLAY'
+      if (this.$app.setting('general.app_brand')) {
+        name = this.$app.setting('general.app_brand')
+      }
+      return name
+    }
   },
   created() {
     // User Lock System

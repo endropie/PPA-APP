@@ -1,8 +1,9 @@
 <template>
     <q-card highlight class="main-box no-margin no-shadow" :dark="LAYOUT.isDark">
       <q-card-section>
-        <span class="text-h4" header>{{$tc('general.incoming_good')}}</span>
+        <span class="text-h4 text-uppercase text-blue-grey" header>{{$tc('general.incoming_good')}}</span>
       </q-card-section>
+      <q-separator inset/>
       <q-card-section class="row q-col-gutter-xs" v-if="FORM.show">
         <div class="col-12 self-center">
           <q-chip outline square color="primary" >
@@ -69,8 +70,20 @@
           :error-message="errors.first('indexed_number_digit')" />
 
       </q-card-section>
+      <q-separator inset />
+      <q-card-section class="row">
+        <q-select class="col-12"
+          name="show"
+          label="Hide View Columns"
+          v-model="rsForm.hide_view_columns"
+          :options="['part_name', 'part_subname', 'quantity', 'unit', 'note']"
+          multiple use-chips
+          :dark="LAYOUT.isDark"
+          :error="errors.has('hide_view_columns')"
+          :error-message="errors.first('hide_view_columns')" />
+
+      </q-card-section>
       <q-card-actions class="q-gutter-sm" align="right">
-          <!-- <q-btn color="light" size="sm" @click="setForm(FORM.data)">Reset</q-btn> -->
           <q-btn dense color="positive"  @click="onSave()">Save</q-btn>
       </q-card-actions>
 
@@ -141,7 +154,8 @@ export default {
     init() {
       this.FORM.loading = true
       this.FORM.show = false
-      this.rsForm = JSON.parse(JSON.stringify(this.$store.state.admin.SETTING[this.FORM.resource.name]))
+      const resource = JSON.parse(JSON.stringify(this.$store.state.admin.SETTING[this.FORM.resource.name]))
+      this.rsForm = { ...this.rsForm, ...resource }
 
       setTimeout(() => {
         this.FORM.loading = false

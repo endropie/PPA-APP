@@ -92,7 +92,7 @@
         <q-td slot="body-cell-item" slot-scope="rs" :props="rs" class="no-padding" style="width:35px">
           <div v-if="rs.row.item" class="column text-body2">
             <span>{{ rs.row.item.part_name }}</span>
-            <small class="text-weight-light">[{{rs.row.item.customer_code}}] {{rs.row.item.part_number}}</small>
+            <small class="text-weight-light">[{{rs.row.item.customer_code}}] {{rs.row.item.part_subname || '--'}}</small>
           </div>
         </q-td>
 

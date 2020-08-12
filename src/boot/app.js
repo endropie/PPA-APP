@@ -1,4 +1,4 @@
-import { Dialog, Notify, date } from 'quasar'
+import { Dialog, Notify, date, Dark } from 'quasar'
 import _lodash from 'lodash'
 import moment from 'moment'
 
@@ -8,6 +8,19 @@ moment.locale('id')
 export default async ({ app, store, router, Vue }) => {
   Vue.prototype.$_ = _lodash
   Vue.prototype.$app = {
+    name: process.env.APP_NAME,
+    description: process.env.APP_DESCRIPTION,
+    get: _lodash.get,
+    set: _lodash.set,
+    setting: (aval) => {
+      const setting = Object.assign({}, store.getters['admin/SETTING'])
+      return _lodash.get(setting, aval)
+    },
+    config: (attr, val = undefined) => {
+      if (val === undefined) return store.getters['admin/CONFIG'][attr]
+      const newData = Object.assign({}, { [attr]: val })
+      store.dispatch('admin/setItemConfig', newData)
+    },
     can: (v = null) => {
       // console.warn('CAN', v, (v === null || (typeof v === 'string' && v === '') || (typeof v === 'object' && v.length === 0)) ? 'SKIP' : 'NEXT')
       if (v === null || (typeof v === 'string' && v === '') || (typeof v === 'object' && v.length === 0)) return true
@@ -181,4 +194,8 @@ export default async ({ app, store, router, Vue }) => {
     moment: moment,
     date: date
   }
+
+  setTimeout(() => {
+    Dark.set(store.getters['admin/LAYOUT'].isDark)
+  }, 100)
 }

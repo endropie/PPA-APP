@@ -124,7 +124,7 @@
               <q-td key="item" width="40%">
                 <div v-if="Boolean(row.item)" style="line-height:normal">
                   <span>{{row.item.part_name}}</span><br/>
-                  <small>No. {{row.item.part_number}}</small>
+                  <small>[{{row.item.customer_code}}] {{row.item.part_subname}}</small>
                 </div>
               </q-td>
               <q-td key="quantity" width="20%" >
@@ -137,14 +137,14 @@
                   :error="errors.has(`outgoing_good_items.${index}.quantity`)">
 
                   <span slot="append" class="text-subtitle2">
-                    {{`/ ${$app.number_format(row.MAX / row.unit_rate)}`}}
+                    {{`/ ${$app.number_format(row.MAX / row.unit_rate, $app.get(row, 'unit.decimal_in') || 0)}`}}
                   </span>
 
                   <q-btn slot="after"
                     dense flat color="primary"
                     icon="done_all"
                     v-if="!row.quantity"
-                    @click="row.quantity = row.MAX" >
+                    @click="row.quantity = row.MAX / row.unit_rate" >
                     <q-tooltip>{{$tc('label.all')}}</q-tooltip>
                   </q-btn>
                 </q-input>
@@ -180,9 +180,9 @@
                   {{exItem.item.part_name}}
                 </span>
               </q-td>
-              <q-td key="part_number">
+              <q-td key="part_subname">
                 <span v-if="Boolean(exItem.item)" class="text-strike">
-                  {{exItem.item.part_number}}
+                  {{exItem.item.part_subname}}
                 </span>
               </q-td>
               <q-td key="unit_id" width="20%" >
@@ -374,12 +374,16 @@ export default {
     setUnitReference(index, val) {
       if(!val) return;
       else if (this.rsForm.outgoing_good_items[index].item.unit_id === val) {
+        this.rsForm.outgoing_good_items[index].unit = null
         this.rsForm.outgoing_good_items[index].unit_rate = 1
       }
       else {
         if(this.rsForm.outgoing_good_items[index].item.item_units) {
           this.rsForm.outgoing_good_items[index].item.item_units.map((itemUnit)=> {
-            if (itemUnit.unit_id == val) this.rsForm.outgoing_good_items[index].unit_rate = itemUnit.rate
+            if (itemUnit.unit_id == val) {
+              this.rsForm.outgoing_good_items[index].unit = itemUnit.unit
+              this.rsForm.outgoing_good_items[index].unit_rate = itemUnit.rate
+            }
           })
         }
       }

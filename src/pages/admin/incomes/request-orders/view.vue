@@ -54,50 +54,57 @@
           <q-markup-table dense bordered square separator="cell" class="table-print no-shadow no-highlight"  :dark="LAYOUT.isDark">
             <thead>
             <q-tr style="line-height:25px">
+              <q-th width="30%" v-if="IS_LOTS && !IS_ITEM_SUMMARY">LOTS</q-th>
               <q-th width="30%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th width="30%">{{ $tc('label.number', 1, {v: $tc('label.part')}) }}</q-th>
+              <q-th width="30%">{{ $app.setting('item.subname_label') }}</q-th>
               <q-th width="10%">{{ $tc('label.unit') }}</q-th>
               <q-th width="10%">{{ $tc('label.quantity') }}</q-th>
               <q-th width="10%">{{ $tc('label.send') }}</q-th>
               <q-th width="10%">{{ $tc('label.balance') }}</q-th>
             </q-tr>
             </thead>
-            <tbody>
-              <template v-if="IS_ITEM_SUMMARY">
-                <q-tr v-for="(row, index) in SUM_ITEMS" :key="index">
+            <tbody v-if="IS_ITEM_SUMMARY">
+              <q-tr v-for="(row, index) in SUM_ITEMS" :key="index">
+                <q-td>{{row.item.part_name}}</q-td>
+                <q-td>{{row.item.part_subname}}</q-td>
+                <q-td class="text-center">{{row.item.unit.code}}</q-td>
+                <q-td class="text-right">{{$app.number_format(row.unit_amount, $app.get(row, 'item.unit.decimal_in'))}}</q-td>
+                <q-td class="text-right">{{$app.number_format(row.amount_delivery, $app.get(row, 'item.unit.decimal_in'))}}</q-td>
+                <q-td class="text-right">
+                  <div v-if="Math.round(row.unit_amount - row.amount_delivery) > 0">
+                    {{$app.number_format((row.unit_amount - row.amount_delivery), $app.get(row, 'item.unit.decimal_in'))}}
+                  </div>
+                  <div v-else class="text-center">
+                    -
+                  </div>
+                </q-td>
+              </q-tr>
+            </tbody>
+            <template  v-if="!IS_ITEM_SUMMARY">
+              <tbody v-for="(row, index) in rsView.request_order_items" :key="index">
+                <q-tr :request-order-item-id="row.id">
+                  <td v-if="IS_LOTS">
+                    <span v-if="row.incoming_good_item && row.incoming_good_item.lots">
+                      {{ row.incoming_good_item.lots }}
+                    </span>
+                    <span v-else>-</span>
+                  </td>
                   <q-td>{{row.item.part_name}}</q-td>
-                  <q-td>{{row.item.part_number}}</q-td>
-                  <q-td class="text-center">{{row.item.unit.code}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.unit_amount,0)}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.amount_delivery,0)}}</q-td>
-                  <q-td class="text-right">
-                    <div v-if="Math.round(row.unit_amount - row.amount_delivery) > 0">
-                      {{$app.number_format((row.unit_amount - row.amount_delivery),0)}}
-                    </div>
-                    <div v-else class="text-center">
-                      -
-                    </div>
-                  </q-td>
-                </q-tr>
-              </template>
-              <template v-else>
-                <q-tr v-for="(row, index) in rsView.request_order_items" :key="index" :request-order-item-id="row.id">
-                  <q-td>{{row.item.part_name}}</q-td>
-                  <q-td>{{row.item.part_number}}</q-td>
-                  <q-td class="text-center">{{row.unit.code}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.quantity,0)}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.amount_delivery/(row.unit_rate||1),0)}}</q-td>
+                  <q-td>{{row.item.part_subname}}</q-td>
+                  <q-td class="text-center">{{row.unit.code}} </q-td>
+                  <q-td class="text-right">{{$app.number_format(row.quantity, row.unit.decimal_in)}}</q-td>
+                  <q-td class="text-right">{{$app.number_format(row.amount_delivery/(row.unit_rate||1), row.unit.decimal_in)}}</q-td>
                   <q-td class="text-right">
                     <div v-if="Math.round(row.quantity - row.amount_delivery/(row.unit_rate||1)) > 0">
-                      {{$app.number_format((row.quantity - row.amount_delivery/(row.unit_rate||1)),0)}}
+                      {{$app.number_format((row.quantity - row.amount_delivery/(row.unit_rate||1)), row.unit.decimal_in)}}
                     </div>
                     <div v-else class="text-center">
                       -
                     </div>
                   </q-td>
                 </q-tr>
-              </template>
-            </tbody>
+              </tbody>
+            </template>
           </q-markup-table>
         </div>
         <div class="col-12 text-weight-light text-italic" v-if="rsView.begin_date || rsView.until_date">
@@ -108,7 +115,7 @@
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
             <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
         </div>
-        <div class="col-12">
+        <div class="col-12" v-if="false">
           <q-btn dense flat color="secondary" class="print-hide float-right"
             :label="$tc('form.show',1, {v:$tc('general.sj_delivery')})"
             v-show="!show_delivery" @click="show_delivery = true"/>
@@ -175,22 +182,59 @@
             }
           ]">
         </ux-btn-dropdown>
+      </div>
 
-        <q-btn-dropdown v-show="false" dense round color="blue-grey" :class="{'full-width': $q.screen.lt.sm}"
-          :label="`DELIVERY (${rsView.delivery_orders.length})`"
-          menu-anchor="bottom left" menu-self="top left" v-if="rsView.delivery_orders.length">
-          <q-list :dark="LAYOUT.isDark" class="main-box">
-            <q-item clickable v-ripple @click="showDO(link.id)" :dark="LAYOUT.isDark"
-              v-for="(link, index) in rsView.delivery_orders" :key="index">
-              <q-item-section>
-                {{link.fullnumber || link.number}}
-              </q-item-section>
-              <q-item-section side>
-                <ux-badge-status :row="link" />
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
+      <div class="print-hide q-my-md full-width">
+        <q-separator class="q-my-md" />
+        <div class="row justify-end q-col-gutter-sm">
+          <div class="col-12 col-sm-6 col-md-4" v-if="rsView.delivery_orders">
+            <q-card>
+              <q-expansion-item header-class="bg-cyan-8 text-white" icon="local_shipping" :label="`SJDO ${$tc('general.sj_delivery', 2)} (${rsView.delivery_orders.length})`">
+                <q-list bordered separator :dark="LAYOUT.isDark" class="main-box">
+                  <q-item clickable v-ripple @click="showDO(link.id)" :dark="LAYOUT.isDark"
+                    v-for="(link, index) in rsView.delivery_orders" :key="index">
+                    <q-item-section>
+                      {{link.fullnumber || link.number}}
+                    </q-item-section>
+                    <q-item-section side>
+                      <ux-chip-status dense square :row="link" />
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-expansion-item>
+            </q-card>
+          </div>
+          <div class="col-12 col-sm-6 col-md-4" v-if="rsView.acc_invoices">
+            <q-card>
+              <q-expansion-item header-class="bg-teal-8 text-white" icon="mdi-shopping" :label="`${$tc('general.invoice', 2)} (${rsView.acc_invoices.length})`">
+                <q-list separator bordered :dark="LAYOUT.isDark" class="main-box">
+                  <q-item :dark="LAYOUT.isDark"
+                    v-for="(invoice, index) in rsView.acc_invoices" :key="index">
+                    <q-item-section side>
+                      <q-btn flat dense color="blue-grey" icon="description" :to="`${VIEW.resource.uri}/invoice-conclusion/${invoice.id}`" />
+                    </q-item-section>
+                    <q-item-section>
+                      {{invoice.number}}
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-btn flat dense color="blue-grey" icon="mdi-database-remove" @click="forget(invoice)" />
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section>
+                      <q-btn dense color="teal-8" :label="$tc('form.add_new')" @click="$refs['modalAddInv'].show()" />
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-expansion-item>
+            </q-card>
+          </div>
+        </div>
+        <modal-invoice-form ref="modalAddInv"
+          :delivery-orders="rsView.delivery_orders"
+          :request-order-id="rsView.id"
+          @done="init"
+        />
       </div>
     </page-print>
     <q-inner-loading :showing="VIEW.loading">
@@ -204,11 +248,10 @@
 
 import MixView from '@/mixins/mix-view.vue'
 import PagePrint from '@/components/page-print'
-import PagePrintBreak from '@/components/page-print-break'
-
+import ModalInvoiceForm from './modal-invoice-form'
 export default {
   mixins: [MixView],
-  components: { PagePrint, PagePrintBreak },
+  components: { PagePrint, ModalInvoiceForm },
   data () {
     return {
       VIEW: {
@@ -230,6 +273,10 @@ export default {
       '$route' : 'init',
   },
   computed: {
+    IS_LOTS () {
+      if (!this.rsView.customer) return false
+      return this.rsView.customer.order_lots
+    },
     IS_CLOSE() {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
@@ -293,6 +340,52 @@ export default {
     setView(data) {
       this.rsView =  data
     },
+    push (row) {
+      this.$q.loading.show()
+      let url = `/api/v1/incomes/request-orders/invoice/${row.id}/accurate/push`
+      this.$axios.post(url)
+        .then((response) => {
+          console.warn('OK', response)
+          let msg = response.data.d[0] || ''
+          return (response.data.s)
+            ? this.$app.notify.success('[ACCURATE]', msg)
+            : this.$app.notify.warning('[ACCURATE]', msg)
+          this.init();
+        })
+        .catch(error => {
+          this.$app.response.error(error.response || error)
+        })
+        .finally(()=>{
+          this.$q.loading.hide()
+        })
+    },
+    forget (row) {
+      const submit = (row) => {
+        this.$q.loading.show()
+        let url = `/api/v1/incomes/request-orders/invoice/${row.id}/accurate/forget`
+        this.$axios.post(url)
+          .then((response) => {
+            let msg = response.data.d[0] || ''
+            if (response.data.s)  {
+              this.$app.notify.success('[ACCURATE]', msg)
+            }
+            else this.$app.notify.warning('[ACCURATE]', msg)
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response || error)
+          })
+          .finally(()=>{
+            this.$q.loading.hide()
+          })
+      }
+
+      this.$q.dialog({title:'DELETE CONFIRM', message: 'Are you sure to delete?', cancel: true})
+      .onOk(() => {
+        submit(row)
+      })
+
+    },
     setClose() {
       const submit = () => {
         this.VIEW.show = false
@@ -336,7 +429,7 @@ export default {
           .catch(error => {
             this.$app.response.error(error.response, 'FORM CLOSED')
           })
-          .finally(()=>{
+          .finally(() => {
             this.VIEW.show = true
             setTimeout(() => {
               this.VIEW.loading = false

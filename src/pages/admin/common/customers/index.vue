@@ -24,7 +24,14 @@
                 icon: 'add',
                 hidden:!$app.can('customers-create'),
                 to: `${TABLE.resource.uri}/create`
-              }
+              },
+              { shortcut: true,
+                label: 'Accurate sync',
+                detail: $tc('messages.form_new'),
+                icon: 'mdi-database-refresh',
+                hidden:!$app.can('customers-create'),
+                actions: () => pushAll()
+              },
             ]">
 
             <div class="row q-col-gutter-xs" >
@@ -51,6 +58,9 @@
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
           <q-btn v-if="isCanUpdate" dense flat color="light" icon="edit"   :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" />
           <q-btn v-if="isCanDelete" dense flat color="light" icon="delete" @click.native="TABLE.delete(rs.row)" />
+          <q-btn v-if="isCanAccurate" dense flat color="light" icon="mdi-database-export" title="upload"
+            @click.native="push(rs.row)"
+          />
 
           <!-- Resource show -->
           <!-- <q-btn :to="`${TABLE.resource.uri}/${rs.row.id}`"  flat round color="light" size="sm" icon="menu" /> -->
@@ -112,13 +122,54 @@ export default {
     this.INDEX.load()
   },
   computed:{
-
+    isCanAccurate () {
+      return this.$app.can('customers-update')
+    },
     isCanUpdate(){
       return this.$app.can('customers-update')
     },
     isCanDelete(){
       return this.$app.can('customers-delete')
     },
+  },
+  methods: {
+    push (row) {
+      let url = `${this.TABLE.resource.api}/${row.id}/accurate/push`
+      this.$q.loading.show()
+      this.$axios.post(url)
+        .then((response) => {
+          console.warn('ACCURATE', response)
+          let msg = response.data.d[0] || ''
+          return (response.data.s)
+            ? this.$app.notify.success('ACCURATE PUSH', msg)
+            : this.$app.notify.warning('ACCURATE PUSH', msg)
+        }).catch((error) => {
+          console.error('ACCURATE', error.response || error)
+          this.$app.response.error(error.response || error)
+        }).finally(() => {
+          this.$q.loading.hide()
+        })
+    },
+    pushAll () {
+      let url = `${this.TABLE.resource.api}/all/accurate/push`
+      this.$q.loading.show()
+      this.$axios.post(url)
+        .then((response) => {
+          console.warn('OK', response.data.filter(x => x.s === true).length);
+          let arrMsg = []
+          if (response.data.filter(x => x.s === true).length) {
+            arrMsg.push(response.data.filter(x => x.s === true).length + ' success')
+          }
+          if (response.data.filter(x => x.s === false).length) {
+            arrMsg.push(response.data.filter(x => x.s === false).length + ' failed')
+          }
+          this.$app.notify.info('ACCURATE SYNC', String(arrMsg.join(',') + ' to customer sync.'))
+        }).catch((error) => {
+          this.$app.response.error(error.response || error)
+        }).finally(() => {
+          this.$q.loading.hide()
+        });
+    }
   }
 }
 </script>

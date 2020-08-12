@@ -48,7 +48,7 @@
 
         </div>
       </div>
-      <div class="col-12 row">
+      <div class="col-12 row q-col-gutter-x-sm">
         <div class="col-12 col-sm-auto  column q-pb-sm">
           <span class="text-small text-grey">Stockist Material</span>
           <q-btn-toggle spread class="no-shadow text-no-wrap" style="border:1px solid #027be3"
@@ -59,7 +59,6 @@
             :options="CONFIG.items['stockists'].map(x => ({...x, color:null})).filter(stockist => ['FM','NC','NCR'].indexOf(stockist.value) > -1 )"
           />
         </div>
-        <q-space />
         <div class="col-12 col-sm-auto column q-pb-sm">
           <span class="text-small text-grey">Line Filter</span>
           <q-btn-toggle spread class="no-shadow" style="border:1px solid #027be3"
@@ -73,6 +72,14 @@
               {label: 'All', value: 'ALL'}
             ]"
           />
+        </div>
+        <q-space />
+        <div class="col-12 col-sm-auto q-pb-sm column items-center">
+          <q-checkbox class="self-center"
+            label="FG Direct"
+            v-model="rsForm.stockist_direct"
+            true-value="FG" :false-value="null"
+            :disable="Boolean(rsForm.id)" />
         </div>
       </div>
       <div class="col-12">
@@ -110,7 +117,7 @@
                   @input="(val) => setItemReference(index, val)">
                   <q-tooltip v-if="!rsForm.line_id" :offset="[0, 10]">Select a Pre-Line , first! </q-tooltip>
                   <small class="absolute-bottom text-weight-light" v-if="row.item_id">
-                    [{{row.item.customer_code}}] No.{{row.item.part_number}}
+                    [{{row.item.customer_code}}] {{row.item.part_subname || '--'}}
                   </small>
                 </ux-select>
               </q-td>
@@ -137,7 +144,7 @@
                   outlined dense hide-bottom-space no-error-icon
                   v-validate="`required|gt_value:0`"
                   :error="errors.has(`work_order_items.${index}.target`)"
-                  @input="() => { row.quantity = calcQuantity(row)}"
+                  @input="() => { row.quantity = setQuantity(row)}"
                 />
               </q-td>
               <q-td key="ngratio"  width="15%">
@@ -150,7 +157,7 @@
                   :error="errors.has(`work_order_items.${index}.ngratio`)"
                   :error-message="errors.first(`work_order_items.${index}.ngratio`)"
                   :disable="!rsForm.line_id || !rsForm.work_order_items[index].item_id"
-                  @input="() => { row.quantity = calcQuantity(row) }"
+                  @input="() => { row.quantity = setQuantity(row) }"
                   />
               </q-td>
               <q-td key="quantity"  width="25%">
@@ -159,10 +166,18 @@
                   :dark="LAYOUT.isDark" color="blue-grey-6"
                   v-model="row.quantity" disable
                   outlined dense hide-bottom-space no-error-icon align="right"
-                  v-validate="`required|gt_value:0|max_value:${Math.ceil(MaxStock[index] / (row.unit_rate || 1))}`"
+                  v-validate="`required|gt_value:0|max_value:${unitValueMax(index, row)}`"
                   :error="errors.has(`work_order_items.${index}.quantity`)"
-                  :suffix="' / '+ Math.ceil((MaxStock[index] || 0) / (row.unit_rate || 1))"
-                />
+                  :suffix="' / '+ unitValueMax(index, row)"
+                >
+                  <q-btn slot="after" dense flat icon="done_all"
+                    v-if="!rsForm.id && unitValueMax(index, row) > 0"
+                    v-show="unitValueMax(index, row) !== row.target"
+                    @click="() => {
+                      row.target = unitValueMax(index, row)
+                      row.quantity = setQuantity(row)
+                    }" />
+                </q-input>
               </q-td>
             </q-tr>
             <q-tr>
@@ -228,7 +243,8 @@ export default {
           shift_id: null,
           stockist_from: 'FM',
           description: null,
-          mode_line: 'SINGLE',
+          mode_line: 'ALL',
+          stockist_direct: null,
           work_order_items: [
             {
               id:null,
@@ -291,7 +307,7 @@ export default {
       })
       .map(item => ({
         label: item.part_name,
-        sublabel: `[${item.customer_code}] ${item.part_number}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id,
         disable: !item.enable,
         row: item
@@ -334,7 +350,7 @@ export default {
         }
       }
 
-      this.FORM.data.work_order_items.forEach(item => {
+      this.FORM.data.work_order_items.map(item => {
         if (stockItem.hasOwnProperty(item.item_id)) {
           stockItem[item.item_id].totals[this.FORM.data.stockist_from] += Number(item.unit_amount)
         }
@@ -399,9 +415,17 @@ export default {
       val = Math.ceil(val)
       return this.$app.number_format(Number(val || 0) / Number(row.unit_rate || 1))
     },
-    calcQuantity(row) {
-      // console.log(this.FORM)
-      return Math.ceil(Number(row.target) + (Number(row.target) * Number(row.ngratio) / 100))
+    setQuantity(row) {
+      const v = Number(row.target) + (Number(row.target) * Number(row.ngratio) / 100)
+      return Boolean(row.ngratio) ? Math.ceil(v) : v
+    },
+    unitValueMax (index, row) {
+      if (!row.unit_rate) return null
+      const value = parseFloat((this.MaxStock[index] || 0) / (row.unit_rate || 1))
+      if (row.unit && row.unit.decimal_in) {
+        return value.toFixed(row.unit.decimal_in)
+      }
+      return value.toFixed(0)
     },
     loadItemOptions(data = this.rsForm) {
       let params = ['has_stocks=FM,NC,NCR']
@@ -442,8 +466,10 @@ export default {
     },
     setUnitReference(index, val) {
 
-      if(!val) return;
-      else if (this.rsForm.work_order_items[index].item.unit_id === val) {
+      if(!val) return
+      this.rsForm.work_order_items[index].unit = this.MAPINGKEY['units'][val]
+
+      if (this.rsForm.work_order_items[index].item.unit_id === val) {
         this.rsForm.work_order_items[index].unit_rate = 1
       }
       else {
@@ -487,8 +513,6 @@ export default {
           return
         }
 
-        // console.warn(this.rsForm)
-        // return;
         this.FORM.loading = true
         let {method, mode, apiUrl} = this.FORM.meta();
         this.$axios.set(method, apiUrl, this.rsForm)

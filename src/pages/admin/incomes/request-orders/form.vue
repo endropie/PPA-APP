@@ -1,6 +1,6 @@
 <template>
 <q-page padding class="main-page justify-center">
-  <q-card inline class="main-box" :dark="LAYOUT.isDark" v-if="FORM.show">
+  <q-card inline class="main-box" v-if="FORM.show">
     <q-card-section>
       <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" hide-menu>
         <q-chip square outline slot="optional" icon="assignment" color="blue-grey" class="text-weight-normal"
@@ -98,7 +98,10 @@
                   :loading="SHEET['items'].loading"
                   @input="(val)=>{ setItemReference(index, val) }"
                 >
-                  <small v-if="row.item" class="absolute-bottom text-weight-light"> {{row.item.part_number}} </small>
+                  <small v-if="row.item" class="absolute-bottom">
+                    [{{row.item.customer_code}}]
+                    {{row.item.part_subname}}
+                  </small>
                   <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
                 </ux-select>
               </q-td>
@@ -217,7 +220,7 @@ export default {
           request_order_items:[
             {
               id:null,
-              item_id: null, item: {},
+              item_id: null,
               quantity: null,
               price: 0,
               unit_id: null,
@@ -266,7 +269,7 @@ export default {
     },
     ItemOptions() {
       let items = this.SHEET.items.data.filter((item) => item.customer_id === this.rsForm.customer_id)
-      return (items.map(item => ({label: item.part_name, sublabel: `[${item.customer_code}] No.${item.part_number}`, value: item.id, disable: !item.enable})) || [])
+      return (items.map(item => ({label: item.part_name, sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`, value: item.id, disable: !item.enable})) || [])
     },
     ItemUnitOptions() {
       let vars = []

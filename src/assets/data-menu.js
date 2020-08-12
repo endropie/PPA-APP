@@ -7,7 +7,7 @@ const common = [
     path: 'customers',
     lang: 'general.customer',
     resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'items-read' } },
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'customers-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'customers-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'customers-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'customers-read' } }
@@ -19,11 +19,18 @@ const common = [
     icon: 'style',
     lang: 'general.item',
     resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'items-read' } },
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'items-read;items-validation;items-sample' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'items-create' } },
+      { page: 'form-sample', path: 'create-sample', meta: { mode: 'create', permission: 'items-sample' } },
+      { page: 'form-sample', path: ':id/edit-sample', meta: { mode: 'edit', permission: 'items-sample' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'items-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'items-read' } }
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'items-read;items-validation;items-sample' } }
     ]
+  },
+  {
+    name: 'New Part Sample',
+    path: 'items/create-sample',
+    icon: 'style'
   },
   {
     name: 'Employee',
@@ -73,7 +80,21 @@ const incomes = [
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'request-orders-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'request-orders-update' } },
       { page: 'form-reference', path: ':id/edit-reference', meta: { mode: 'edit', permission: 'request-orders-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'request-orders-read;pre-deliveries-create' } }
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'request-orders-read;pre-deliveries-create' } },
+      { page: 'invoice-conclusion', path: 'invoice-conclusion/:id', meta: { mode: 'view', permission: 'request-orders-read' } }
+    ]
+  },
+  {
+    name: 'Invoices',
+    icon: 'shop',
+    path: 'invoices',
+    lang: 'general.invoice',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'request-orders-read;pre-deliveries-create' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'request-orders-create' } },
+      // { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'request-orders-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'request-orders-read;pre-deliveries-create' } },
+
     ]
   }
 ]
@@ -163,9 +184,10 @@ const deliveries = [
     icon: 'move_to_inbox',
     path: 'incoming-goods',
     lang: 'general.incoming_good',
-    param: `?status=OPEN`,
+    param: `?`,
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'incoming-goods-read' } },
+      { page: 'index-items', path: 'items', icon: 'list', meta: { permission: 'incoming-goods-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'incoming-goods-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'incoming-goods-update' } },
       { page: 'restoration', path: ':id/restoration', meta: { mode: 'edit', permission: 'incoming-goods-create' } },
@@ -220,12 +242,25 @@ const deliveries = [
     lang: 'general.sj_delivery',
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'sj-delivery-orders-read' } },
+      { page: 'index-items', path: 'items', icon: 'list', meta: { permission: 'sj-delivery-orders-read' } },
       { page: 'form-sample', path: 'create-sample', meta: {mode: 'create', permission: 'sj-delivery-orders-create'}},
       { page: 'form-sample', path: ':id/edit-sample', meta: {mode: 'edit', permission: 'sj-delivery-orders-update'}},
       { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
       { page: 'revision-internal', path: ':id/revision-internal', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
       { page: 'reconcile', path: ':id/reconcile', meta: { mode: 'edit', permission: 'sj-delivery-orders-create' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'sj-delivery-orders-read' } }
+    ]
+  },
+  {
+    name: 'DEPORTATIONS',
+    icon: 'local_offer',
+    path: 'deportation-goods',
+    lang: 'general.deportation_goods',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'deportation-goods-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'deportation-goods-update'}},
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'deportation-goods-update'}},
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'deportation-goods-read' } }
     ]
   },
   {
@@ -239,6 +274,18 @@ const deliveries = [
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'schedule-boards-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'schedule-boards-read' } }
     ]
+  },
+  {
+    path: 'incoming-goods/items',
+    icon: 'list',
+    lang: 'general.incoming_good_items',
+    meta: { permission: 'incoming-goods-read' }
+  },
+  {
+    path: 'delivery-orders/items',
+    icon: 'list',
+    lang: 'general.sj_delivery_items',
+    meta: { permission: 'sj-delivery-orders-read' }
   }
 ]
 

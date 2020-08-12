@@ -40,7 +40,15 @@
                   <td>{{rsView.shift ? rsView.shift.name : '-'}}</td>
                 </tr>
               </q-markup-table>
-              <q-toggle class="print-hide float-right" v-model="show_preline" :label="$tc('form.show',1,{v:$tc('items.preline')})"/>
+              <div class="print-hide float-right">
+                <q-chip square color="grey" text-color="white"
+                  :label="`DIRECT [${rsView.stockist_direct}]`"
+                  v-if="rsView.stockist_direct" />
+                <q-toggle
+                  v-model="show_preline"
+                  :label="$tc('form.show',1,{v:$tc('items.preline')})"
+                  v-if="!rsView.stockist_direct" />
+              </div>
             </div>
           </div>
         </div>
@@ -53,9 +61,9 @@
           <q-markup-table bordered dense square class="table-print no-highlight no-shadow transparent" separator="cell" :dark="LAYOUT.isDark" >
             <thead>
               <tr>
-                <th>{{this.$tc('general.cust')}}</th>
-                <th class="text-left">{{this.$tc('label.no', 1, {v:this.$tc('label.part')})}}</th>
-                <th class="text-left">{{this.$tc('label.name', 1, {v:this.$tc('label.part')})}}</th>
+                <th>{{$tc('general.cust')}}</th>
+                <th class="text-left">{{$tc('label.name', 1, {v:$tc('label.part')})}}</th>
+                <th class="text-left">{{$app.setting('item.subname_label')}}</th>
                 <th class="text-right">{{$tc('label.quantity')}}</th>
                 <th>{{$tc('label.unit')}}</th>
                 <th>%NG</th>
@@ -70,8 +78,8 @@
                 <q-td key="part_name" width="30%">
                   {{row.item.part_name}}
                 </q-td>
-                <q-td key="part_number" width="30%">
-                  {{row.item.part_number}}
+                <q-td key="part_subname" width="30%">
+                  {{row.item.part_subname}}
                 </q-td>
                 <q-td key="target" class="text-right">
                   {{row.target}}
@@ -86,7 +94,7 @@
                   {{row.quantity}}
                 </q-td>
               </q-tr>
-              <q-tr v-if="show_preline">
+              <q-tr v-if="!rsView.stockist_direct && show_preline">
                 <q-td colspan="100%" style="padding:2px">
                   <div class="row q-col-gutter-sm">
                     <div class="col"  v-for="(itemLine, index) in row.work_order_item_lines" :key="index">
@@ -99,7 +107,7 @@
                           <span v-if="MAPINGKEY['lines']" >
                             {{MAPINGKEY['lines'][itemLine.line_id].name}}
                             <q-badge v-if="itemLine.work_production_items"
-                              :label="`${$app.number_format(itemLine.amount_line / (row.unit_rate||1),0)} / ${$app.number_format(itemLine.unit_amount / (row.unit_rate||1),0)}`"
+                              :label="`${$app.number_format(itemLine.amount_line / (row.unit_rate||1), row.unit.decimal_in)} / ${$app.number_format(itemLine.unit_amount / (row.unit_rate||1), row.unit.decimal_in)}`"
                               :color="rsView.has_producted ? 'red-10' : 'primary'"/>
                           </span>
                           <span v-else>
@@ -200,6 +208,12 @@
                 actions: () => setPacked()
               },
               {
+                label: 'VALIDATED', color:'green', icon: 'done_all',
+                detail: $tc('messages.process_validation'),
+                hidden: !IS_DIRECTED || !$app.can('work-orders-validation'),
+                actions: () => setDirectValidated()
+              },
+              {
                 label: 'CLOSE', color:'green', icon: 'done_all',
                 detail: $tc('messages.process_close'),
                 hidden: !IS_CLOSE || !$app.can('work-orders-close'),
@@ -208,7 +222,7 @@
               {
                 label: String($tc('form.revision')).toUpperCase(), color:'orange', icon: 'edit',
                 detail: $tc('messages.process_revise'),
-                hidden: !IS_REVISE || !$app.can('work-orders-revision'),
+                hidden: true, // !IS_REVISE || !$app.can('work-orders-revision'),
                 actions: () => setRevision()
               },
               {
@@ -271,19 +285,27 @@ export default {
       if (!['PRODUCTED', 'PACKED'].find(x => x === this.rsView.status)) return false
       return true
     },
-    IS_PRODUCTED() {
+    IS_DIRECTED() {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status != 'OPEN') return false
+      return Boolean(this.rsView.stockist_direct)
+    },
+    IS_PRODUCTED() {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'OPEN') return false
+      if (this.IS_DIRECTED) return false
       return true
     },
     IS_PACKED() {
       if (this.rsView.deleted_at) return false
-      if (this.rsView.status != 'PRODUCTED') return false
+      if (this.rsView.status !== 'PRODUCTED') return false
+      if (this.IS_DIRECTED) return false
       return true
     },
     IS_CLOSE() {
       if (this.rsView.deleted_at) return false
       if (['CLOSED'].find(x => x === this.rsView.status)) return false
+      if (this.IS_DIRECTED) return false
       return true
     },
     IS_VOID() {
@@ -357,8 +379,6 @@ export default {
     totalAmount (detail) {
       return Math.round(detail.unit_amount)
     },
-
-
 
     setReopen () {
       const submit = () => {
@@ -477,6 +497,39 @@ export default {
       this.$q.dialog({
           title: this.$tc('form.confirm', 1, {v:'CLOSE'}),
           message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_close')}),
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          submit()
+        })
+    },
+
+    setDirectValidated () {
+      const submit = () => {
+        this.VIEW.show = false
+        this.VIEW.loading = true
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=directed&nodata=true`
+        this.$axios.put(url)
+          .then((response) => {
+            const data = response.data
+            this.$app.notify.success('DIRECT VALIDATED', `WO [${response.data.fullnumber || response.data.number}] validate sucess!`)
+            this.init()
+          })
+          .catch(error => {
+            console.error(error.response || error)
+            this.$app.response.error(error.response, 'DIRECT VALIDATED')
+          })
+          .finally(()=>{
+            this.VIEW.show = true
+            setTimeout(() => {
+              this.VIEW.loading = false
+            }, 1000);
+          })
+      }
+
+      this.$q.dialog({
+          title: this.$tc('form.confirm', 1, {v:'DIRECT-VALIDATED'}),
+          message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_validation')}),
           cancel: true,
           persistent: true
         }).onOk(() => {

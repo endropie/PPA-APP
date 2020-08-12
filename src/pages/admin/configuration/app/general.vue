@@ -8,7 +8,7 @@
           name="app_brand"
           label="Application Brand"
           v-model="rsForm.app_brand"
-          v-validate="'required|min:4|max:25'"
+          v-validate="'required|max:12'"
           :dark="LAYOUT.isDark"
           :error="errors.has('app_brand')"
           :error-message="errors.first('app_brand')"

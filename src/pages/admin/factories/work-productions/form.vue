@@ -29,7 +29,7 @@
             <ux-date name="date" type="date" class="col-12" style="min-width:200px"
               :label="$tc('label.date')" stack-label
               v-model="rsForm.date"
-              v-validate="`required|date_format:yyyy-MM-dd` + FORM.ifCreate(`|after:${$app.moment().add(-1,'days').format('YYYY-MM-DD')}`,'')"
+              v-validate="`required|date_format:yyyy-MM-dd` + FORM.ifCreate(`|before:${$app.moment().add(1,'days').format('YYYY-MM-DD')}`,'')"
               :date-options="(date) => FORM.ifCreate(date <= $app.moment().format('YYYY/MM/DD'), true)"
               :dark="LAYOUT.isDark"
               :error="errors.has('date')"
@@ -109,8 +109,8 @@
                     </ux-select-filter>
 
                     <q-input dense readonly tabindex="100" class="col-12 col-md-6"
-                      :label="$tc('items.part_number')" stack-label
-                      :value="row.item ? row.item.part_number : null"
+                      :label="$app.setting('item.subname_label')" stack-label
+                      :value="row.item ? row.item.part_subname : null"
                       outlined hide-bottom-space color="blue-grey-5"
                       :dark="LAYOUT.isDark" />
 
@@ -122,7 +122,7 @@
                       outlined hide-bottom-space no-error-icon align="right"
                       v-validate="`required|gt_value:0|max_value:${MaxStock[index] / (row.unit_rate||1)}`"
                       :error="errors.has(`work_production_items.${index}.quantity`)"
-                      :suffix="' / '+ $app.number_format(MaxStock[index] / (row.unit_rate||1))" />
+                      :suffix=" ` / ${$app.number_format(MaxStock[index] / (row.unit_rate||1), ($app.get(row, 'unit.decimal_in') || 0))}`" />
 
                     <q-select dense class="col-12 col-sm-4 col-md-2"
                       :name="`work_production_items.${index}.unit_id`"
@@ -310,7 +310,7 @@ export default {
       })
       return (ITEM.map(item => ({
         label: item.part_name,
-        sublabel: `[${item.customer_code}] ${item.part_number}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id,
         disable: !item.enable,
         row: item
@@ -477,11 +477,13 @@ export default {
       if(!val) return;
       else if (this.rsForm.work_production_items[index].item.unit_id === val) {
         this.rsForm.work_production_items[index].unit_rate = 1
+        this.rsForm.work_production_items[index].unit = null
       }
       else {
         if(this.rsForm.work_production_items[index].item.item_units) {
           this.rsForm.work_production_items[index].item.item_units.find((unitItem)=> {
             if (unitItem.unit_id == val) {
+              this.rsForm.work_production_items[index].unit = unitItem.unit
               this.rsForm.work_production_items[index].unit_rate = unitItem.rate
               return true
             }

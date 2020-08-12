@@ -26,6 +26,14 @@
           :dark="LAYOUT.isDark"
           :error="errors.has('name')"
           :error-message="errors.first('name')" />
+        <q-input type="number" input-style="text-align:left"
+          name="decimal_in"
+          :label="$tc('label.quantity', 1, {v: 'decimal'})"
+          v-model="rsForm.decimal_in"
+          v-validate="'required|gt_value:-1|max_value:6'"
+          :dark="LAYOUT.isDark"
+          :error="errors.has('decimal_in')"
+          :error-message="errors.first('decimal_in')" />
       </form>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />

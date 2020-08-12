@@ -358,7 +358,7 @@ export default {
       } )
       return (Items.map(item => ({
         label: item.part_name,
-        sublabel: `[${item.customer_code}] ${item.part_number}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id,
         stamp: this.$app.number_format(total(item.id)),
         disable: !item.enable,

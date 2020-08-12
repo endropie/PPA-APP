@@ -22,6 +22,7 @@
           <span v-else class="text-uppercase text-weight-reguler" v-text="$route.meta.title" />
         </q-toolbar-title>
         <admin-header :class="LAYOUT.isDark ? ' ': ''" />
+        <admin-accurate class="q-ml-sm" />
         <!-- <q-btn v-show="false" aria-label="Menu" class="within-iframe-hide" icon="assignment" flat round dense @click="RIGHTDRAWER = !RIGHTDRAWER" /> -->
 
       </q-toolbar>
@@ -35,17 +36,17 @@
       show-if-above
       v-if="!NODRAWER">
       <q-scroll-area :class="LAYOUT.isDark ? 'bg-black text-primary' : 'bg-white text-primary'" style="width: 100%; height: 100%;">
-        <div :style="{'height': miniState ? '72px': '115px'}"
+        <div :style="{'height': miniState ? '50px': '115px'}"
           class="row flex-center opacity-1"
           :class="{
             'bg-primary text-white' : LAYOUT.isDark,
             'bg-grey-2 text-primary': !LAYOUT.isDark,
           }" >
           <!-- <img alt="Quasar logo" src="~assets/quasar-logo.svg" style="height: 75px; width 75px;"> -->
-          <q-icon name="widgets" class="text-h3" />
-          <div class="caption q-ml-md" :class="{'hidden': miniState}">
-            <!-- Quasar v{{ $q.version }} -->
-            PPA Play <BR/>V-{{'1.0'}}
+          <q-icon name="widgets" :class="miniState ? 'text-h4' : 'text-h3'"  />
+          <div class="column q-ml-md"  :class="{'hidden' : miniState}">
+            <span class="text-h6">{{$app.setting('general.app_brand') || $app.name}}</span>
+            <span class="caption text-small text-weight-light">MANUPLAY V.2</span>
           </div>
         </div>
         <q-list class="menu" :class="{'dimmed' : miniState}">
@@ -98,14 +99,24 @@ export default {
     }
   },
   created() {
-    this.$axios.validToken(
-      (response) => {
-        // if(process.env.DEV) console.warn('$axios.validToken', (typeof response).toUpperCase(), response)
-        if(response.status === 401 || response.status === 500) {
-          this.setLogoff()
-        }
+    this.$q.loading.show()
+    this.$axios.validToken((response) => {
+      this.$q.loading.hide()
+      if(response.status >= 200 && response.status <= 300) {
+        return
       }
-    )
+      else if(response.status === 401) {
+        this.setLogoff()
+      }
+      else if(response.status >= 400) {
+        console.error('APA', response)
+      }
+      else this.$q.dialog({
+        message: 'Netwok error!',
+        ok: 'redirect',
+        cancel: 'skip'
+      }).onOk(() => { this.$router.push('/') })
+    })
   },
   computed: {
     ...mapState('admin', [
@@ -120,9 +131,6 @@ export default {
   },
   methods: {
     openURL,
-    ...mapActions( {
-      setTime: 'admin/TIMESTART'
-    }),
     resetScroll (el, done) {
       document.documentElement.scrollTop = 0
       document.body.scrollTop = 0

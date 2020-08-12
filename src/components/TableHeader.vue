@@ -14,7 +14,9 @@
             :to="menu.to || undefined" v-ripple
             @click="actionsCall(menu)"
             v-show="menu.shortcut && $q.screen.gt.sm"
-            v-if="!menu.hidden" />
+            v-if="!menu.hidden" >
+            <q-tooltip v-if="menu.tooltip" > {{typeof menu.tooltip === 'string' ? menu.tooltip : menu.label}} </q-tooltip>
+          </q-btn>
         </template>
         <q-btn v-if="!hideMenu"
           v-show="ShowMenus"

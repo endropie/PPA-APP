@@ -66,8 +66,8 @@
               <thead>
                 <tr>
                   <th>{{$tc('general.cust')}}</th>
-                  <th class="text-left">{{$tc('label.no', 1, {v:$tc('label.part')})}}</th>
                   <th class="text-left">{{$tc('label.name', 1, {v:$tc('label.part')})}}</th>
+                  <th class="text-left">{{$app.setting('item.subname_label')}}</th>
                   <th class="text-right">{{$tc('label.quantity')}}</th>
                   <th>{{$tc('label.unit')}}</th>
                   <th>%NG</th>
@@ -82,8 +82,8 @@
                   <q-td key="part_name" width="30%">
                     {{row.item.part_name}}
                   </q-td>
-                  <q-td key="part_number" width="30%">
-                    {{row.item.part_number}}
+                  <q-td key="part_subname" width="30%">
+                    {{row.item.part_subname}}
                   </q-td>
                   <q-td key="target" class="text-right">
                     {{row.target}}

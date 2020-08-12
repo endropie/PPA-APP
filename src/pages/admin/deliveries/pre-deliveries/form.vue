@@ -95,7 +95,7 @@
                   :error-message="errors.first(`pre_delivery_items.${index}.item_id`)"
                   @input="(val)=>{ setItemReference(index, val) }"
                 >
-                  <small class="absolute-bottom" v-if="row.item_id">No. {{row.item.part_number}}</small>
+                  <small class="absolute-bottom" v-if="row.item_id && row.item">[{{row.item.customer_code}}] {{row.item.part_subname}}</small>
                   <q-tooltip v-if="!IssetCustomerID" :offset="[0, 10]">Select a customer, first! </q-tooltip>
                 </ux-select>
               </q-td>
@@ -303,7 +303,7 @@ export default {
 
       return (data.map(item => ({
         label: `${item.part_name}`,
-        sublabel: `[${item.customer_code}] ${item.part_number}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id,
         disable: !item.enable,
         data: item

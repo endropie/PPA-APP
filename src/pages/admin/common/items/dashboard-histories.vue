@@ -1,16 +1,16 @@
 <template>
 <div>
   <q-card dense class="main-box" :dark="LAYOUT.isDark" style="min-width:200px">
-    <q-card-section class="bg-primary text-white" style="opacity: 0.85">
+    <q-card-section class="bg-primary text-white q-py-sm" style="opacity: 0.85">
       <q-btn dense flat round
         class="float-right relative-position" style="top:-5px"
         :icon="show ? 'arrow_drop_up' : 'arrow_drop_down'"
         @click="show = !show"/>
-      <div class="text-subtitle2 no-wrap">PART HISTORIES</div>
+      <div class="text-subtitle2 text-uppercase text-truncate ellipsis">Part Histories</div>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
     <q-card-section v-show="show" class="q-pa-sm">
-      <q-table dense class="no-shadow"
+      <q-table dense class="no-shadow" style="height:200px"
         :data="data"
         :columns="columns"
         :loading="loading"
@@ -34,7 +34,7 @@
             <div v-if="rs.row.item">
               {{rs.row.item.part_name}}<br/>
               <span class="text-caption text-faded">
-                [{{rs.row.item.customer_code}}] {{ rs.row.item.part_number }}
+                [{{rs.row.item.customer_code}}] {{ rs.row.item.part_subname }}
               </span>
             </div>
             <div v-else v-text="$tc('messages.no_data')" />

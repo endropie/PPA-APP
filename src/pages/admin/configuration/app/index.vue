@@ -7,15 +7,19 @@
           <q-tabs class="text-primary" v-model="tab" vertical >
             <q-tab name="general"
               icon="dashboard"
-              :label="$tc('label.general')"
+              :label="$q.screen.lt.sm ? undefined : $tc('label.general')"
+              v-if="$app.can()"/>
+            <q-tab name="item"
+              icon="style"
+              :label="$q.screen.lt.sm ? undefined : $tc('general.item')"
               v-if="$app.can()"/>
             <q-tab name="incoming_good"
               icon="move_to_inbox"
-              :label="$tc('general.incoming_good')"
+              :label="$q.screen.lt.sm ? undefined : $tc('general.incoming_good')"
               v-if="$app.can()"/>
-            <q-tab name="outgoing_good"
+            <q-tab name="delivery_order"
               icon="unarchive"
-              :label="$tc('general.outgoing_good')"
+              :label="$q.screen.lt.sm ? undefined : $tc('general.sj_delivery')"
               v-if="$app.can()"/>
           </q-tabs>
         </template>
@@ -27,7 +31,14 @@
               <commponet :is="components[tab]" />
             </q-tab-panel>
 
+            <q-tab-panel name="item">
+              <commponet :is="components[tab]" />
+            </q-tab-panel>
+
             <q-tab-panel name="incoming_good">
+              <commponet :is="components[tab]" />
+            </q-tab-panel>
+            <q-tab-panel name="delivery_order">
               <commponet :is="components[tab]" />
             </q-tab-panel>
 
@@ -41,14 +52,18 @@
 
 <script>
 import FormGeneral from './general'
+import FormItem from './item'
 import FormIncomingGood from './incoming_good'
+import FormDeliveryOrder from './delivery_order'
 
 export default {
   data () {
     return {
       components : {
         general: FormGeneral,
+        item: FormItem,
         incoming_good: FormIncomingGood,
+        delivery_order: FormDeliveryOrder,
       },
       tab: 'general',
       splitterModel: 20

@@ -69,7 +69,7 @@
           <q-tr>
             <q-th key="prefix"></q-th>
             <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
-            <q-th key="part_number">{{$tc('items.part_number')}}</q-th>
+            <q-th key="part_subname">{{$app.setting('item.subname_label')}}</q-th>
             <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
             <q-th key="target">{{$tc('label.quantity')}}</q-th>
             <q-th key="ngratio">%NG</q-th>
@@ -96,9 +96,9 @@
                 </ux-select-filter>
 
               </q-td>
-              <q-td key="part_number" width="35%" style="min-width:150px">
+              <q-td key="part_subname" width="35%" style="min-width:150px">
                 <q-input readonly
-                  :value="row.item ? row.item.part_number : null"
+                  :value="row.item ? row.item.part_subname : null"
                   outlined dense hide-bottom-space color="blue-grey-5"
                   :dark="LAYOUT.isDark" />
               </q-td>
@@ -273,7 +273,7 @@ export default {
       })
       return (ITEM.map(item => ({
         label: item.part_name,
-        sublabel: `[${item.customer_code}] ${item.part_number}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id,
         disable: !item.enable,
         row: item

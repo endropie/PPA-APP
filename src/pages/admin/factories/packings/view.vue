@@ -75,7 +75,7 @@
               <q-tr v-if="rsView.packing_items">
                 <q-td key="part" width="30%">
                   <div>{{rsView.packing_items.item.part_name}}</div>
-                  <small>{{rsView.packing_items.item.part_number}}</small>
+                  <small>[{{rsView.packing_items.item.customer_code}}] {{rsView.packing_items.item.part_subname}}</small>
                 </q-td>
                 <q-td key="unit_id" class="text-left">
                   {{rsView.packing_items.unit.code}}

@@ -147,14 +147,14 @@
                 :error="errors.has(`delivery_order_items.${index}.item_id`)"
                 @input="(val) => setItemReference(index, val)"
               >
-                <small v-if="row.item_id && row.item && row.item.part_number" class="absolute-bottom">
-                  [{{row.item.customer_code}}] {{row.item.part_number}}
+                <small v-if="row.item_id && row.item && row.item.part_subname" class="absolute-bottom">
+                  [{{row.item.customer_code}}] {{row.item.part_subname}}
                 </small>
               </ux-select>
               <q-field v-else filled dense color="blue-grey">
                 <div class="column" v-if="row.item">
                   <span class="text-subtitle2"> {{row.item.part_name}} </span>
-                  <span class="text-caption"> No. {{row.item.part_number}} ({{row.request_order_item_id}})</span>
+                  <span class="text-caption"> No. {{row.item.part_subname}} ({{row.request_order_item_id}})</span>
                 </div>
               </q-field>
             </q-td>
@@ -311,14 +311,14 @@
                 :error="errors.has(`partitions.${partitionIndex}.delivery_order_items.${index}.item_id`)"
                 @input="(val) => setItemReference(index, val, partitionIndex)"
               >
-                <small v-if="row.item_id && row.item && row.item.part_number" class="absolute-bottom">
-                  [{{row.item.customer_code}}] {{row.item.part_number}}
+                <small v-if="row.item_id && row.item && row.item.part_subname" class="absolute-bottom">
+                  [{{row.item.customer_code}}] {{row.item.part_subname}}
                 </small>
               </ux-select>
               <q-field v-else filled dense color="blue-grey">
                 <div class="column" v-if="row.item">
                   <span class="text-subtitle2"> {{row.item.part_name}} </span>
-                  <span class="text-caption"> No. {{row.item.part_number}} ({{row.request_order_item_id}})</span>
+                  <span class="text-caption"> No. {{row.item.part_subname}} ({{row.request_order_item_id}})</span>
                 </div>
               </q-field>
             </q-td>
@@ -343,7 +343,7 @@
                 v-validate="`required|gt_value:0|max_value:${Number(MaxMultiMount[partitionIndex][index]) / Number(row.unit_rate || 1)}`"
                 :error="errors.has(`partitions.${partitionIndex}.delivery_order_items.${index}.quantity`)">
                 <span slot="append" class="text-body2">
-                / <q-badge :label="$app.number_format(Number(MaxMultiMount[partitionIndex][index]) / Number(row.unit_rate || 1),0)" />
+                / <q-badge :label="$app.number_format(Number(MaxMultiMount[partitionIndex][index]) / Number(row.unit_rate || 1), row.unit.decimal_in)" />
                 </span>
               </q-input>
             </q-td>
@@ -422,11 +422,11 @@
             <tr v-for="(row, index) in dialog_request_order.request_order_items" :key="index">
               <td>
                 <span>{{row.item.part_name}}</span><br/>
-                <span class="text-small">No. {{row.item.part_number}}</span>
+                <span class="text-small">No. {{row.item.part_subname}}</span>
               </td>
               <td class="text-center">{{row.item.unit.code}}</td>
-              <td class="text-right">{{$app.number_format(row.quantity)}}</td>
-              <td class="text-right">{{$app.number_format(row.amount_delivery)}}</td>
+              <td class="text-right">{{$app.number_format(row.quantity, row.unit.decimal_in)}}</td>
+              <td class="text-right">{{$app.number_format(row.amount_delivery, row.unit.decimal_in)}}</td>
               <td class="text-center">
                 <q-btn dense flat icon="add_circle" @click="addNewDetail(row, dialog_request_order.partitionIndex )"/>
               </td>
@@ -562,7 +562,7 @@ export default {
     },
     ItemOptions() {
       let ITEM = this.SHEET.items.data.filter((item) => item.customer_id === this.rsForm.customer_id)
-      return (ITEM.map(item => ({label: `${item.part_name}`, sublabel:`${item.code} - ${item.part_number}`, value: item.id})) || [])
+      return (ITEM.map(item => ({label: `${item.part_name}`, sublabel:`[${item.customer_code}] ${item.part_subname || '-'}`, value: item.id})) || [])
     },
     ItemUnitOptions() {
       let vars = []

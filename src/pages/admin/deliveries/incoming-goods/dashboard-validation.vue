@@ -1,16 +1,16 @@
 <template>
 <div>
   <q-card dense class="main-box" :dark="LAYOUT.isDark" style="min-width:200px">
-    <q-card-section class="bg-primary text-white" style="opacity: 0.85">
+    <q-card-section class="bg-primary text-white q-py-sm" style="opacity: 0.85">
       <q-btn dense flat round
         class="float-right relative-position" style="top:-5px"
         :icon="show ? 'arrow_drop_up' : 'arrow_drop_down'"
         @click="show = !show"/>
-      <div class="text-subtitle2 text-uppercase no-wrap">Validasi {{ $tc('general.incoming_good') }}</div>
+      <div class="text-subtitle2 text-uppercase text-truncate ellipsis">{{ $tc('general.incoming_good') }}</div>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
     <q-card-section v-show="show" class="q-pa-sm">
-      <q-table dense class="no-shadow"
+      <q-table dense class="no-shadow" style="height:180px"
         :data="rowData"
         :columns="columns"
         :loading="loading"

@@ -94,19 +94,16 @@
             color="dark" text-color="white"
             v-if="rs.row.transaction == 'RETURN'"/>
         </q-td>
-        <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding" style="width:35px">
+
+        <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="q-py-none" style="width:35px">
           <ux-chip-status dense square :row="rs.row" class="" />
-          <span v-if="!rs.row.deleted_at && Number(rs.row.total_unit_delivery) > 0 && ['OPEN','CLOSED'].some(x => x === rs.row.status)">
-            <q-chip dense square icon="local_shipping"
-              label="DELIVERED"
+          <span v-if="false && !rs.row.deleted_at && Number(rs.row.total_unit_delivery) > 0 && ['OPEN','CLOSED'].some(x => x === rs.row.status)">
+            <q-chip dense square icon="mdi-truck-check"
               color="orange-10" text-color="white"
-              v-if="Math.round(rs.row.total_unit_amount) === Math.round(rs.row.total_unit_delivery)" >
-            </q-chip>
-            <q-chip dense square icon="local_shipping"
-              label="SEMI-DELIVERED"
+              v-if="Math.round(rs.row.total_unit_amount) === Math.round(rs.row.total_unit_delivery)" />
+            <q-chip dense square icon="mdi-truck"
               color="orange" text-color="white"
-              v-else>
-            </q-chip>
+              v-else />
 
             <q-tooltip>
               {{$tc('label.total')}}: {{$app.number_format(rs.row.total_unit_amount)}} |
@@ -125,6 +122,14 @@
         <q-td slot="body-cell-date" slot-scope="rs" :props="rs" class="text-uppercase">
           <span v-if="rs.row.date"> {{ $app.moment(rs.row.date).format('DD/MM/YYYY') }}</span>
           <span v-else>-</span>
+        </q-td>
+
+        <q-td slot="body-cell-customer_id" slot-scope="rs" :props="rs" class="text-uppercase no-padding">
+          <div class="column">
+            <span v-if="rs.value"> {{ rs.value }}</span>
+            <span v-else>-</span>
+            <span v-if="rs.row.reference_number" class="text-caption text-small text-grey"> No. {{rs.row.reference_number}} </span>
+          </div>
         </q-td>
 
         <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
@@ -184,7 +189,10 @@ export default {
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', label: '', align: 'left', field: 'status'},
           { name: 'customer_id', label: this.$tc('general.customer'), align: 'left', field: (row) => row.customer.name , sortable: true },
-          { name: 'reference_number', label: 'No. Reference', field: 'reference_number', align: 'left', sortable: true },
+          { name: 'counter_delivered', label: 'Delivery', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.delivered : '-', sortable: true},
+          { name: 'counter_confirmed', label: 'Confirm', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.confirmed : '-', sortable: true},
+          { name: 'counter_invoiced', label: 'Invoiced', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.invoiced : '-', sortable: true},
+          // { name: 'reference_number', label: 'No. Reference', field: 'reference_number', align: 'left', sortable: true },
           { name: 'actived_date', label: this.$tc('label.expired'), field: 'actived_date', align: 'center', sortable: true,
             format:(v)=> v ? this.$app.moment(v).format('ll') : '-', classes: 'text-uppercase'},
           { name: 'created_at', label: this.$tc('form.create',2), align: 'center', sortable: true, field: 'created_at'},
