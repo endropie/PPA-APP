@@ -143,6 +143,7 @@
               class="table-print no-shadow no-highlight th-uppercase">
               <thead>
               <q-tr>
+                <q-th v-if="IS_LOTS">LOTS</q-th>
                 <q-th v-if="!isHideColumn('part_name')" class="text-left">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
                 <q-th v-if="!isHideColumn('part_subname')" class="text-left">{{ $app.setting('item.subname_label') }}</q-th>
                 <q-th v-if="isDoubleUnit & !isHideColumn('quantity')" key="PCS" class="text-right" >Unit (PCS)</q-th>
@@ -156,6 +157,7 @@
               <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
                 <q-tr :delivery-order-item-id="row.id"
                   v-show="isRowMain(row)" >
+                  <q-td v-if="IS_LOTS"> {{row.number_lots}} </q-td>
                   <q-td v-if="!isHideColumn('part_name')">
                     <span class="text-weight-medium" v-if="Boolean(mode)">{{mode}}:&nbsp;</span>
                     <span class="text-weight-medium" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">Material:&nbsp;</span>
@@ -189,7 +191,7 @@
                         <q-popup-edit v-model="row.encasement" content-class="" :cover="false" :offset="[0, 10]"
                           @save="(val,init) => setEncasement(index, val, init)"
                           >
-                          <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
+                          <template v-slot="{ value, emitValue, set, cancel }">
                             <q-input autofocus dense :value="value" :label="$tc('label.encasement')" stack-label
                               @input="emitValue"
                             >
@@ -209,6 +211,7 @@
                 <q-tr :delivery-order-item-id="row.id"
                   v-show="isRowMain(row)"
                   v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
+                  <q-td v-if="IS_LOTS"> {{row.number_lots}} </q-td>
                   <q-td v-if="!isHideColumn('part_name')">
                     <span class="text-weight-medium">Jasa:&nbsp;</span>
                     <span v-if="row.item"> {{row.item.part_name}} </span>
@@ -316,6 +319,9 @@ export default {
     this.init()
   },
   computed: {
+    IS_LOTS() {
+      return Boolean(this.rsView.customer && this.rsView.customer.order_lots)
+    },
     IS_MAINROW() {
       return Boolean(!this.rsView.is_internal || !this.remain_only)
     },
@@ -355,7 +361,7 @@ export default {
         this.setView(data || {})
       })
     },
-    isHideColumn(val) {
+    isHideColumn (val) {
       const setting = this.$store.state.admin.SETTING.sj_delivery
         ? this.$store.state.admin.SETTING.sj_delivery['hide_view_columns'] || []
         : []
@@ -365,8 +371,12 @@ export default {
       const config = this.$store.state.admin.CONFIG.sj_delivery['hide_view_columns'] || []
       return Boolean( config.some(v => val === v) )
     },
-    isRowMain(row) {
+    isRowMain (row) {
       return this.IS_MAINROW || Math.round(row.unit_amount) !== Math.round(row.amount_reconcile)
+    },
+    getOrderLot (row) {
+      // return
+      console.warn('LOT', row.number_lots)
     },
     valPCS(row) {
       if (row.unit_id === 1) {
