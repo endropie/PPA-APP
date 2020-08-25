@@ -31,16 +31,20 @@
         />
         </div>
       </q-card-section>
-      <q-card-section v-if="rsForm.order_mode">
+      <q-card-section v-if="rsForm.customer">
         <q-table title="SJ Delivery"
-          v-if="rsForm.order_mode !== 'NONE'"
+          v-if="!rsForm.customer.is_invoice_request"
           flat dense bordered separator='cell'
           style="max-height: calc( 100vh - 100px )"
+          table-header-class="text-uppercase"
           :data="deliveryTable.data"
           :columns="deliveryTable.columns"
           :pagination.sync="deliveryTable.pagination"
            @request="deliveryTable.request"
         >
+          <template slot="top-right">
+            <q-checkbox v-model="deliveryTable.isConfirmed" @input="loadDelivery" label="Confirmed" />
+          </template>
           <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
             <q-checkbox left-label
               :disable="rs.row.status !== 'CONFIRMED'"
@@ -71,6 +75,9 @@
           :pagination.sync="orderTable.pagination"
            @request="orderTable.request"
         >
+          <template slot="top-right">
+            <q-checkbox v-model="orderTable.isClosed" @input="loadOrder" label="Closed" />
+          </template>
           <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
             <q-checkbox left-label
               :disable="rs.row.status !== 'CLOSED'"
@@ -117,18 +124,19 @@ export default {
         data: [],
         loding: false,
         columns: [
-          { name: 'number', label: 'number', field: 'number', align: 'left'},
-          { name: 'indexed_number', label: 'index', field: 'indexed_number', align: 'left'},
+          { name: 'number', label: 'number', field: 'number', align: 'left' },
+          { name: 'indexed_number', label: 'index', field: 'indexed_number', align: 'left' },
           { name: 'status', label: '', field: 'status', align: 'center' },
-          { name: 'action', label: '', align: 'center' },
+          { name: 'action', label: '', align: 'center' }
         ],
         pagination: {
           // sortBy: 'desc',
           // descending: false,
           page: 1,
           rowsPerPage: 10,
-          rowsNumber: 0,
+          rowsNumber: 0
         },
+        isConfirmed: false,
         request: this.loadDelivery
       },
       orderTable: {
@@ -136,21 +144,22 @@ export default {
         data: [],
         loding: false,
         columns: [
-          { name: 'number', label: 'number', field: 'number', align: 'left'},
-          { name: 'reference_number', label: 'Reference', field: 'reference_number', align: 'left'},
+          { name: 'number', label: 'number', field: 'number', align: 'left' },
+          { name: 'reference_number', label: 'Reference', field: 'reference_number', align: 'left' },
           { name: 'status', label: '', field: 'status', align: 'center' },
-          { name: 'action', label: '', align: 'center' },
+          { name: 'action', label: '', align: 'center' }
         ],
         pagination: {
           page: 1,
           rowsPerPage: 10,
-          rowsNumber: 0,
+          rowsNumber: 0
         },
+        isClosed: false,
         request: this.loadOrder
       }
     }
   },
-  created(){
+  created () {
     // Component Page Created!
     this.init()
   },
@@ -158,20 +167,21 @@ export default {
     //
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.rsForm = Object.assign(this.rsForm || this.setDefault(), data)
-        this.loadDelivery()
       })
     },
     setCustomer (v) {
+      this.rsForm.customer = v
       this.rsForm.customer_id = v ? v.id : null
       this.rsForm.order_mode = v ? v.order_mode : null
       this.deliveryTable.data = []
-      this.rsForm.request_orders= []
+      this.rsForm.request_orders = []
       this.rsForm.delivery_orders = []
-      if (this.rsForm.order_mode !== 'NONE') this.loadDelivery()
-      if (this.rsForm.order_mode === 'NONE') this.loadOrder()
+
+      if (this.rsForm.customer && !this.rsForm.customer.is_invoice_request) this.loadDelivery()
+      if (this.rsForm.customer && this.rsForm.customer.is_invoice_request) this.loadOrder()
     },
     loadDelivery (request = Object.assign({})) {
       let parameter = []
@@ -180,9 +190,10 @@ export default {
       const paginate = request.pagination || {}
       const limit = paginate.rowsPerPage || this.deliveryTable.pagination.rowsPerPage
       const page = Number(paginate.rowsPerPage) === Number(this.deliveryTable.pagination.rowsPerPage)
-                 ? paginate.page : 1
+        ? paginate.page : 1
+      const status = this.deliveryTable.isConfirmed ? '&status=CONFIRMED' : ''
 
-      let api = `${this.deliveryTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}`
+      let api = `${this.deliveryTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}${status}`
       console.warn('api', api)
       this.deliveryTable.loading = true
       this.$axios.get(api)
@@ -195,7 +206,7 @@ export default {
           this.deliveryTable.pagination.rowsPerPage = response.data.per_page
           this.deliveryTable.pagination.rowsNumber = response.data.total
         }).catch((error) => {
-          console.error('NO', error)
+          console.error('NO', error.response || error)
         }).finally(() => {
           this.deliveryTable.loading = false
         })
@@ -207,9 +218,10 @@ export default {
       const paginate = request.pagination || {}
       const limit = paginate.rowsPerPage || this.orderTable.pagination.rowsPerPage
       const page = Number(paginate.rowsPerPage) === Number(this.orderTable.pagination.rowsPerPage)
-                 ? paginate.page : 1
+        ? paginate.page : 1
+      const status = this.deliveryTable.isConfirmed ? '&status=CLOSED' : ''
 
-      let api = `${this.orderTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}`
+      let api = `${this.orderTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}${status}`
       console.warn('api', api)
       this.orderTable.loading = true
       this.$axios.get(api)
@@ -234,48 +246,47 @@ export default {
         this.$axios.post(this.FORM.resource.api, data)
           .then((response) => {
             let message = `${response.data.message || response.messageText}`
-            this.FORM.response.success({message:message})
+            this.FORM.response.success({ message: message })
             this.FORM.toView(response.data.id)
           })
           .catch(error => {
             this.FORM.response.fields(error.response)
             this.FORM.response.error(error.response || error, 'Submit')
           })
-          .finally(()=> {
+          .finally(() => {
             this.$q.loading.hide()
           })
-
       }
-
 
       this.$validator.validate().then(result => {
         if (!result) {
           return this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
           })
         }
 
-        if (this.rsForm.order_mode === 'NONE' && !this.rsForm.request_orders.length) {
+        if (this.rsForm.customer && this.rsForm.customer.is_invoice_request && !this.rsForm.request_orders.length) {
           return this.$q.dialog({
             html: true,
-            message:'SO/PO not selected!. <br>Please pick some sales orders, first.'
+            message: 'SO/PO not selected!. <br>Please pick some sales orders, first.'
           })
         }
 
-        if (this.rsForm.order_mode !== 'NONE' && !this.rsForm.delivery_orders.length) {
+        if (this.rsForm.customer && !this.rsForm.customer.is_invoice_request && !this.rsForm.delivery_orders.length) {
           return this.$q.dialog({
             html: true,
-            message:'SJDO not selected!. <br>Please pick some delivery, first.'
+            message: 'SJDO not selected!. <br>Please pick some delivery, first.'
           })
         }
 
         submit()
       })
-
     }
   }
 }
 
 </script>
-
