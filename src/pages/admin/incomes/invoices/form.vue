@@ -40,7 +40,8 @@
           :data="deliveryTable.data"
           :columns="deliveryTable.columns"
           :pagination.sync="deliveryTable.pagination"
-           @request="deliveryTable.request"
+          :loading="deliveryTable.loading"
+          @request="deliveryTable.request"
         >
           <template slot="top-right">
             <q-checkbox v-model="deliveryTable.isConfirmed" @input="loadDelivery" label="Confirmed" />
@@ -73,7 +74,8 @@
           :data="orderTable.data"
           :columns="orderTable.columns"
           :pagination.sync="orderTable.pagination"
-           @request="orderTable.request"
+          :loading="orderTable.loading"
+          @request="orderTable.request"
         >
           <template slot="top-right">
             <q-checkbox v-model="orderTable.isClosed" @input="loadOrder()" label="Closed" />
@@ -122,7 +124,7 @@ export default {
       deliveryTable: {
         api: '/api/v1/incomes/delivery-orders',
         data: [],
-        loding: false,
+        loading: false,
         columns: [
           { name: 'number', label: 'number', field: 'number', align: 'left' },
           { name: 'indexed_number', label: 'index', field: 'indexed_number', align: 'left' },
@@ -142,7 +144,7 @@ export default {
       orderTable: {
         api: '/api/v1/incomes/request-orders',
         data: [],
-        loding: false,
+        loading: false,
         columns: [
           { name: 'number', label: 'number', field: 'number', align: 'left' },
           { name: 'reference_number', label: 'Reference', field: 'reference_number', align: 'left' },
@@ -237,6 +239,7 @@ export default {
           console.error('NO', error)
         }).finally(() => {
           this.orderTable.loading = false
+          console.warn('loading', this.orderTable.loading)
         })
     },
     save () {
