@@ -76,7 +76,7 @@
            @request="orderTable.request"
         >
           <template slot="top-right">
-            <q-checkbox v-model="orderTable.isClosed" @input="loadOrder" label="Closed" />
+            <q-checkbox v-model="orderTable.isClosed" @input="loadOrder()" label="Closed" />
           </template>
           <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
             <q-checkbox left-label
@@ -219,7 +219,7 @@ export default {
       const limit = paginate.rowsPerPage || this.orderTable.pagination.rowsPerPage
       const page = Number(paginate.rowsPerPage) === Number(this.orderTable.pagination.rowsPerPage)
         ? paginate.page : 1
-      const status = this.deliveryTable.isConfirmed ? '&status=CLOSED' : ''
+      const status = this.orderTable.isClosed ? '&status=CLOSED' : ''
 
       let api = `${this.orderTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}${status}`
       console.warn('api', api)
