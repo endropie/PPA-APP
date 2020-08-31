@@ -248,7 +248,7 @@ export default {
         this.$q.loading.show()
         this.$axios.post(this.FORM.resource.api, data)
           .then((response) => {
-            let message = `${response.data.message || response.messageText}`
+            let message = response.data.number
             this.FORM.response.success({ message: message })
             this.FORM.toView(response.data.id)
           })
