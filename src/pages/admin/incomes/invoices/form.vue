@@ -3,35 +3,57 @@
     <q-card inline class="main-box" v-if="rsForm">
       <q-card-section class="q-x-md">
         <div class="row q-col-gutter-x-sm">
-        <ux-select
-          class="col-12 col-sm-6"
-          name="customer_id"
-          :label="$tc('general.customer')" stack-label
-          v-model="rsForm.customer_id"
-          filter clearable
-          source="/api/v1/incomes/customers?mode=all"
-          option-value="id"
-          :option-label="(e) => `[${e.code}] ${e.name}`"
-          map-options
-          v-validate="'required'"
-          :error="errors.has('customer_id')"
-          :error-message="errors.first('customer_id')"
-          @input="setCustomer"
-          :hint="rsForm.order_mode ? `[${rsForm.order_mode}]` : undefined"
-        />
+          <ux-select
+            class="col-12 col-sm-6"
+            name="customer_id"
+            :label="$tc('general.customer')" stack-label
+            v-model="rsForm.customer_id"
+            filter clearable
+            source="/api/v1/incomes/customers?mode=all"
+            option-value="id"
+            :option-label="(e) => `[${e.code}] ${e.name}`"
+            map-options
+            v-validate="'required'"
+            :error="errors.has('customer_id')"
+            :error-message="errors.first('customer_id')"
+            @input="setCustomer"
+            :hint="rsForm.order_mode ? `[${rsForm.order_mode}]` : undefined"
+          />
 
-        <ux-date
-          class="col-12 col-sm-6"
-          name="date"
-          :label="$tc('label.date')" stack-label
-          v-model="rsForm.date"
-          v-validate="'required'"
-          :error="errors.has('date')"
-          :error-message="errors.first('date')"
-        />
+          <ux-date
+            class="col-12 col-sm-6"
+            name="date"
+            :label="$tc('label.date')" stack-label
+            v-model="rsForm.date"
+            v-validate="'required'"
+            :error="errors.has('date')"
+            :error-message="errors.first('date')"
+          />
         </div>
       </q-card-section>
       <q-card-section v-if="rsForm.customer">
+        <div class="row">
+          <q-field borderless>
+            <div slot="control">
+              <q-chip v-for="(value, ikey) in rsForm.request_orders" :key="value.id"
+                square removable
+                class="glossy"
+                icon="bookmark"
+                color="primary" text-color="white"
+                :label="value.fullnumber"
+                @remove="rsForm.request_orders.splice(ikey, 1)"
+              />
+              <q-chip  v-for="(value, ikey) in rsForm.delivery_orders" :key="value.id"
+                square removable
+                class="glossy"
+                icon="bookmark"
+                color="primary" text-color="white"
+                :label="value.fullnumber"
+                @remove="rsForm.delivery_orders.splice(ikey, 1)"
+              />
+            </div>
+          </q-field>
+        </div>
         <q-table title="SJ Delivery"
           v-if="!rsForm.customer.is_invoice_request"
           flat dense bordered separator='cell'
@@ -44,7 +66,41 @@
           @request="deliveryTable.request"
         >
           <template slot="top-right">
-            <q-checkbox v-model="deliveryTable.isConfirmed" @input="loadDelivery" label="Confirmed" />
+            <div class="q-gutter-sm" :class="{'row':1}">
+
+              <q-field dense outlined>
+                <q-checkbox
+                  slot="control"
+                  class="no-padding"
+                  dense
+                  left-label label="CONFIRMED"
+                  v-model="deliveryTable.isConfirmed"
+                  @input="loadDelivery"
+                />
+
+              </q-field>
+
+              <ux-select v-model="deliveryTable.request_order_id"
+                dense outlined hide-dropdown-icon
+                :placeholder="$tc('general.request_order')"
+                style="min-width:180px"
+                :source="`/api/v1/incomes/request-orders?mode=all&--limit=50&customer_id=${rsForm.customer_id}`"
+                :source-key="['number', 'reference_number', 'indexed_number', 'description']"
+                option-label="fullnumber"
+                :option-sublabel="(opt) =>  `Ref: ${opt.reference_number || '-'}` "
+                option-value="id"
+                filter clearable emit-value map-options
+                @input="loadDelivery()"
+              />
+
+              <q-select v-model="deliveryTable.filters"
+                dense outlined hide-dropdown-icon
+                multiple use-input use-chips new-value-mode="add"
+                placeholder="Searching..."
+                @input="loadDelivery()"
+              />
+
+            </div>
           </template>
           <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
             <q-checkbox left-label
@@ -71,6 +127,7 @@
           v-else
           flat dense bordered separator='cell'
           style="max-height: calc( 100vh - 100px )"
+          table-header-class="text-uppercase"
           :data="orderTable.data"
           :columns="orderTable.columns"
           :pagination.sync="orderTable.pagination"
@@ -78,7 +135,15 @@
           @request="orderTable.request"
         >
           <template slot="top-right">
-            <q-checkbox v-model="orderTable.isClosed" @input="loadOrder()" label="Closed" />
+            <div :class="{'row':1}">
+              <q-checkbox v-model="orderTable.isClosed" @input="loadOrder()" left-label label="CLOSED" class="on-right" />
+              <q-select v-model="orderTable.filters"
+                dense outlined hide-dropdown-icon
+                multiple use-input use-chips new-value-mode="add"
+                placeholder="Searching..."
+                @input="loadOrder()"
+              />
+            </div>
           </template>
           <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
             <q-checkbox left-label
@@ -126,7 +191,7 @@ export default {
         data: [],
         loading: false,
         columns: [
-          { name: 'number', label: 'number', field: 'number', align: 'left' },
+          { name: 'number', label: 'number', field: 'fullnumber', align: 'left' },
           { name: 'indexed_number', label: 'index', field: 'indexed_number', align: 'left' },
           { name: 'status', label: '', field: 'status', align: 'center' },
           { name: 'action', label: '', align: 'center' }
@@ -138,6 +203,8 @@ export default {
           rowsPerPage: 10,
           rowsNumber: 0
         },
+        request_order_id: null,
+        filters: null,
         isConfirmed: false,
         request: this.loadDelivery
       },
@@ -146,7 +213,7 @@ export default {
         data: [],
         loading: false,
         columns: [
-          { name: 'number', label: 'number', field: 'number', align: 'left' },
+          { name: 'number', label: 'number', field: 'fullnumber', align: 'left' },
           { name: 'reference_number', label: 'Reference', field: 'reference_number', align: 'left' },
           { name: 'status', label: '', field: 'status', align: 'center' },
           { name: 'action', label: '', align: 'center' }
@@ -157,6 +224,7 @@ export default {
           rowsNumber: 0
         },
         isClosed: false,
+        filters: null,
         request: this.loadOrder
       }
     }
@@ -166,7 +234,11 @@ export default {
     this.init()
   },
   computed: {
-    //
+    ItemSelected () {
+      if (this.rsForm.request_orders.length) return this.rsForm.request_orders
+      if (this.rsForm.delivery_orders.length) return this.rsForm.delivery_orders
+      return []
+    }
   },
   methods: {
     init () {
@@ -191,11 +263,12 @@ export default {
       parameter.push(`customer_id=${this.rsForm.customer_id}`)
       const paginate = request.pagination || {}
       const limit = paginate.rowsPerPage || this.deliveryTable.pagination.rowsPerPage
-      const page = Number(paginate.rowsPerPage) === Number(this.deliveryTable.pagination.rowsPerPage)
-        ? paginate.page : 1
+      const page = Number(paginate.rowsPerPage) === Number(this.deliveryTable.pagination.rowsPerPage) ? paginate.page : 1
       const status = this.deliveryTable.isConfirmed ? '&status=CONFIRMED' : ''
+      const filters = this.deliveryTable.filters ? `&search=${this.deliveryTable.filters.join('+')}` : ''
+      const order = this.deliveryTable.request_order_id ? `&request_order_id=${this.deliveryTable.request_order_id}` : ''
 
-      let api = `${this.deliveryTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}${status}`
+      let api = `${this.deliveryTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}${order}`
       console.warn('api', api)
       this.deliveryTable.loading = true
       this.$axios.get(api)
@@ -219,11 +292,11 @@ export default {
       parameter.push(`customer_id=${this.rsForm.customer_id}`)
       const paginate = request.pagination || {}
       const limit = paginate.rowsPerPage || this.orderTable.pagination.rowsPerPage
-      const page = Number(paginate.rowsPerPage) === Number(this.orderTable.pagination.rowsPerPage)
-        ? paginate.page : 1
+      const page = Number(paginate.rowsPerPage) === Number(this.orderTable.pagination.rowsPerPage) ? paginate.page : 1
       const status = this.orderTable.isClosed ? '&status=CLOSED' : ''
+      const filters = this.orderTable.filters ? `&search=${this.orderTable.filters.join('+')}` : ''
 
-      let api = `${this.orderTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}${status}`
+      let api = `${this.orderTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}`
       console.warn('api', api)
       this.orderTable.loading = true
       this.$axios.get(api)

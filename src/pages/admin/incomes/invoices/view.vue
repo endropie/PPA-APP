@@ -3,15 +3,20 @@
     <page-print v-if="VIEW.show">
       <div slot="header-tags" class="print-hide">
         <!-- header-tags -->
-        <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
+        <ux-chip-status :row="rsView" tag outline small square icon='bookmark' :color-options="{INVOICED:'green'}" />
       </div>
       <div class="row justify-around q-col-gutter-y-sm" >
         <div class="col-12">
-          <div class="row justify-between q-gutter-sm" >
-            <div class="items-end q-pt-lg">
-              <div class="text-h6 q-px-xs">REKAP INVOICE #{{rsView.fullnumber || rsView.number}}</div>
-              <div class="text-uppercase q-px-xs" v-if="rsView.customer">
-                [{{rsView.customer.code}}] {{rsView.customer.name}}
+          <div class="row justify justify-between q-gutter-sm" >
+            <div class="sel q-pt-lg q-px-xs">
+              <div class="text-h6 ">REKAP INVOICE #{{rsView.fullnumber || rsView.number}}</div>
+              <div class="text-uppercase row full-width">
+                <span v-if="rsView.customer">[{{rsView.customer.code}}] {{rsView.customer.name}}</span>
+              </div>
+            </div>
+            <div class="content-end self-end q-pt-lg">
+              <div class="text-uppercase">
+                <span v-if="rsView.invoiced_number">No. Invoice {{rsView.invoiced_number}}</span>
               </div>
             </div>
             <div class="column items-start q-gutter-sm">
@@ -59,7 +64,7 @@
         <q-btn :label="$tc('form.back')" icon="cancel" color="dark" :class="{'full-width': $q.screen.lt.sm}" v-go-back.single />
         <q-btn :label="$tc('form.print')" icon="print" color="grey" :class="{'full-width': $q.screen.lt.sm}" @click.native="print()" />
         <q-space />
-        <q-btn :label="$tc('form.confirm')" icon="done_all" color="positive" :class="{'full-width': $q.screen.lt.sm}" @click="confirmed()" v-if="rsView.status == 'OPEN'" />
+        <q-btn :label="$tc('form.confirm')" icon="done_all" color="positive" :class="{'full-width': $q.screen.lt.sm}" @click="setConfirmed()" v-if="rsView.status == 'OPEN'" />
         <q-btn :label="$tc('form.delete')" icon="delete" color="negative" :class="{'full-width': $q.screen.lt.sm}" @click="VIEW.delete" />
       </div>
     </page-print>
@@ -151,9 +156,9 @@ export default {
     setView (data) {
       this.rsView = data
     },
-    confirmed () {
+    setConfirmed () {
       const submit = () => {
-        // this.$q.loading.show()
+        this.$q.loading.show()
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/confirmed`
 
         this.$axios.post(url)
@@ -170,82 +175,6 @@ export default {
           })
           .finally(() => {
             this.$q.loading.hide()
-          })
-      }
-
-      submit()
-    },
-    forget (row) {
-      const submit = (row) => {
-        this.$q.loading.show()
-        let url = `/api/v1/incomes/request-orders/invoice/${row.id}/accurate/forget`
-        this.$axios.post(url)
-          .then((response) => {
-            let msg = response.data.d[0] || ''
-            if (response.data.s) {
-              this.$app.notify.success('[ACCURATE]', msg)
-            } else this.$app.notify.warning('[ACCURATE]', msg)
-            this.init()
-          })
-          .catch(error => {
-            this.$app.response.error(error.response || error)
-          })
-          .finally(() => {
-            this.$q.loading.hide()
-          })
-      }
-
-      this.$q.dialog({ title: 'DELETE CONFIRM', message: 'Are you sure to delete?', cancel: true })
-        .onOk(() => {
-          submit(row)
-        })
-    },
-    setClose () {
-      const submit = () => {
-        this.VIEW.show = false
-        this.VIEW.loading = true
-        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=close&nodata=true`
-        this.$axios.put(url)
-          .then((response) => {
-            this.init()
-          })
-          .catch(error => {
-            this.$app.response.error(error.response, 'FORM CLOSED')
-          })
-          .finally(() => {
-            this.VIEW.show = true
-            setTimeout(() => {
-              this.VIEW.loading = false
-            }, 1000)
-          })
-      }
-
-      this.$q.dialog({
-        title: this.$tc('form.confirm', 1, { v: 'CLOSE' }),
-        message: this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_close') }),
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        submit()
-      })
-    },
-    setRecalculate () {
-      const submit = () => {
-        // this.VIEW.show = false
-        this.VIEW.loading = true
-        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=calculate&nodata=true`
-        this.$axios.put(url)
-          .then((response) => {
-            this.init()
-          })
-          .catch(error => {
-            this.$app.response.error(error.response, 'FORM CLOSED')
-          })
-          .finally(() => {
-            this.VIEW.show = true
-            setTimeout(() => {
-              this.VIEW.loading = false
-            }, 1000)
           })
       }
 
