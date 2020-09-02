@@ -2,7 +2,7 @@
   <q-page padding>
     <q-card inline class="main-box" v-if="rsForm">
       <q-card-section class="q-x-md">
-        <div class="row q-col-gutter-x-sm">
+        <div class="row q-col-gutter-x-sm q-pb-md">
           <ux-select
             class="col-12 col-sm-6"
             name="customer_id"
@@ -30,10 +30,13 @@
             :error-message="errors.first('date')"
           />
         </div>
-      </q-card-section>
-      <q-card-section v-if="rsForm.customer">
-        <div class="row">
-          <q-field borderless>
+        <div v-if="rsForm.customer">
+          <q-field dense borderless
+            v-if="rsForm.request_orders.length || rsForm.delivery_orders.length"
+          >
+            <div slot="hint" class="text-right">
+              dadada
+            </div>
             <div slot="control">
               <q-chip v-for="(value, ikey) in rsForm.request_orders" :key="value.id"
                 square removable
@@ -53,109 +56,116 @@
               />
             </div>
           </q-field>
-        </div>
-        <q-table title="SJ Delivery"
-          v-if="!rsForm.customer.is_invoice_request"
-          flat dense bordered separator='cell'
-          style="max-height: calc( 100vh - 100px )"
-          table-header-class="text-uppercase"
-          :data="deliveryTable.data"
-          :columns="deliveryTable.columns"
-          :pagination.sync="deliveryTable.pagination"
-          :loading="deliveryTable.loading"
-          @request="deliveryTable.request"
-        >
-          <template slot="top-right">
-            <div class="q-gutter-sm" :class="{'row':1}">
+          <q-table title="SJ Delivery"
+            v-if="!rsForm.customer.is_invoice_request"
+            flat dense bordered separator='cell'
+            style="max-height: calc( 100vh - 100px )"
+            table-header-class="text-uppercase"
+            :data="deliveryTable.data"
+            :columns="deliveryTable.columns"
+            :pagination.sync="deliveryTable.pagination"
+            :loading="deliveryTable.loading"
+            @request="deliveryTable.request"
+          >
+            <template slot="top-right">
+              <div class="q-gutter-sm" :class="{'row':1}">
 
-              <q-field dense outlined>
-                <q-checkbox
-                  slot="control"
-                  class="no-padding"
-                  dense
-                  left-label label="CONFIRMED"
-                  v-model="deliveryTable.isConfirmed"
-                  @input="loadDelivery"
+                <q-field dense outlined>
+                  <q-checkbox
+                    slot="control"
+                    class="no-padding"
+                    dense
+                    left-label label="CONFIRMED"
+                    v-model="deliveryTable.isConfirmed"
+                    @input="loadDelivery"
+                  />
+
+                </q-field>
+
+                <ux-select v-model="deliveryTable.request_order_id"
+                  dense outlined hide-dropdown-icon
+                  :placeholder="$tc('general.request_order')"
+                  style="min-width:180px"
+                  :source="`/api/v1/incomes/request-orders?mode=all&--limit=50&customer_id=${rsForm.customer_id}`"
+                  :source-key="['number', 'reference_number', 'indexed_number', 'description']"
+                  option-label="fullnumber"
+                  :option-sublabel="(opt) =>  `Ref: ${opt.reference_number || '-'}` "
+                  option-value="id"
+                  filter clearable emit-value map-options
+                  @input="loadDelivery()"
                 />
 
-              </q-field>
+                <q-select v-model="deliveryTable.filters"
+                  dense outlined hide-dropdown-icon
+                  multiple use-input use-chips new-value-mode="add"
+                  placeholder="Searching..."
+                  @input="loadDelivery()"
+                />
 
-              <ux-select v-model="deliveryTable.request_order_id"
-                dense outlined hide-dropdown-icon
-                :placeholder="$tc('general.request_order')"
-                style="min-width:180px"
-                :source="`/api/v1/incomes/request-orders?mode=all&--limit=50&customer_id=${rsForm.customer_id}`"
-                :source-key="['number', 'reference_number', 'indexed_number', 'description']"
-                option-label="fullnumber"
-                :option-sublabel="(opt) =>  `Ref: ${opt.reference_number || '-'}` "
-                option-value="id"
-                filter clearable emit-value map-options
-                @input="loadDelivery()"
+              </div>
+            </template>
+            <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
+              <q-checkbox left-label
+                :disable="rs.row.status !== 'CONFIRMED'"
+                :value="Boolean(rsForm.delivery_orders.find(e => e.id === rs.row.id))"
+                @input="!Boolean(rsForm.delivery_orders.find(e => e.id === rs.row.id))
+                  ? rsForm.delivery_orders.push(rs.row)
+                  : rsForm.delivery_orders = rsForm.delivery_orders.filter(e => e.id !== rs.row.id)
+                "
               />
 
-              <q-select v-model="deliveryTable.filters"
-                dense outlined hide-dropdown-icon
-                multiple use-input use-chips new-value-mode="add"
-                placeholder="Searching..."
-                @input="loadDelivery()"
+              <!-- <q-btn dense outline size="sm" color="blue-grey" icon="check"
+                @click="rsForm.delivery_orders.push(rs.row)"
+                v-if="!rsForm.delivery_orders.find(e => e.id === rs.row.id)"
               />
 
-            </div>
-          </template>
-          <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
-            <q-checkbox left-label
-              :disable="rs.row.status !== 'CONFIRMED'"
-              :value="Boolean(rsForm.delivery_orders.find(e => e.id === rs.row.id))"
-              @input="!Boolean(rsForm.delivery_orders.find(e => e.id === rs.row.id))
-                ? rsForm.delivery_orders.push(rs.row)
-                : rsForm.delivery_orders = rsForm.delivery_orders.filter(e => e.id !== rs.row.id)
-              "
-            />
-
-            <!-- <q-btn dense outline size="sm" color="blue-grey" icon="check"
-              @click="rsForm.delivery_orders.push(rs.row)"
-              v-if="!rsForm.delivery_orders.find(e => e.id === rs.row.id)"
-            />
-
-            <q-btn dense outline size="sm" color="negative" icon="clear"
-              @click="rsForm.delivery_orders = rsForm.delivery_orders.filter(e => e.id !== rs.row.id)"
-              v-if="rsForm.delivery_orders.find(e => e.id === rs.row.id)"
-            /> -->
-          </q-td>
-        </q-table>
-        <q-table title="Sales Order"
-          v-else
-          flat dense bordered separator='cell'
-          style="max-height: calc( 100vh - 100px )"
-          table-header-class="text-uppercase"
-          :data="orderTable.data"
-          :columns="orderTable.columns"
-          :pagination.sync="orderTable.pagination"
-          :loading="orderTable.loading"
-          @request="orderTable.request"
-        >
-          <template slot="top-right">
-            <div :class="{'row':1}">
-              <q-checkbox v-model="orderTable.isClosed" @input="loadOrder()" left-label label="CLOSED" class="on-right" />
-              <q-select v-model="orderTable.filters"
-                dense outlined hide-dropdown-icon
-                multiple use-input use-chips new-value-mode="add"
-                placeholder="Searching..."
-                @input="loadOrder()"
+              <q-btn dense outline size="sm" color="negative" icon="clear"
+                @click="rsForm.delivery_orders = rsForm.delivery_orders.filter(e => e.id !== rs.row.id)"
+                v-if="rsForm.delivery_orders.find(e => e.id === rs.row.id)"
+              /> -->
+            </q-td>
+          </q-table>
+          <q-table title="Sales Order"
+            v-else
+            flat dense bordered separator='cell'
+            style="max-height: calc( 100vh - 100px )"
+            table-header-class="text-uppercase"
+            :data="orderTable.data"
+            :columns="orderTable.columns"
+            :pagination.sync="orderTable.pagination"
+            :loading="orderTable.loading"
+            @request="orderTable.request"
+          >
+            <template slot="top-right">
+              <div :class="{'row q-gutter-sm':1}">
+                <q-field dense outlined>
+                  <q-checkbox slot="control" dense class="on-right"
+                    left-label label="CLOSED"
+                    v-model="orderTable.isClosed"
+                    @input="loadOrder()"
+                  />
+                </q-field>
+                <q-select
+                  dense outlined hide-dropdown-icon
+                  v-model="orderTable.filters"
+                  multiple use-input use-chips new-value-mode="add"
+                  placeholder="Searching..."
+                  @input="loadOrder()"
+                />
+              </div>
+            </template>
+            <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
+              <q-checkbox  dense
+                :disable="rs.row.status !== 'CLOSED'"
+                :value="Boolean(rsForm.request_orders.find(e => e.id === rs.row.id))"
+                @input="!Boolean(rsForm.request_orders.find(e => e.id === rs.row.id))
+                  ? rsForm.request_orders.push(rs.row)
+                  : rsForm.request_orders = rsForm.request_orders.filter(e => e.id !== rs.row.id)
+                "
               />
-            </div>
-          </template>
-          <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
-            <q-checkbox left-label
-              :disable="rs.row.status !== 'CLOSED'"
-              :value="Boolean(rsForm.request_orders.find(e => e.id === rs.row.id))"
-              @input="!Boolean(rsForm.request_orders.find(e => e.id === rs.row.id))
-                ? rsForm.request_orders.push(rs.row)
-                : rsForm.request_orders = rsForm.request_orders.filter(e => e.id !== rs.row.id)
-              "
-            />
-          </q-td>
-        </q-table>
+            </q-td>
+          </q-table>
+        </div>
       </q-card-section>
       <q-card-actions align="right">
         <q-btn color="grey-5" :label="$tc('form.reset')" @click="init()" />
@@ -183,6 +193,7 @@ export default {
         date: this.$app.moment().format('YYYY-MM-DD'),
         customer_id: null,
         order_mode: null,
+        invoice_mode: null,
         delivery_orders: [],
         request_orders: []
       }),
@@ -250,6 +261,7 @@ export default {
       this.rsForm.customer = v
       this.rsForm.customer_id = v ? v.id : null
       this.rsForm.order_mode = v ? v.order_mode : null
+      this.rsForm.invoice_mode = v ? v.invoice_mode : null
       this.deliveryTable.data = []
       this.rsForm.request_orders = []
       this.rsForm.delivery_orders = []
@@ -269,7 +281,7 @@ export default {
       const order = this.deliveryTable.request_order_id ? `&request_order_id=${this.deliveryTable.request_order_id}` : ''
 
       let api = `${this.deliveryTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}${order}`
-      console.warn('api', api)
+      console.info('[PLAY] API GET:', api)
       this.deliveryTable.loading = true
       this.$axios.get(api)
         .then((response) => {
@@ -297,7 +309,7 @@ export default {
       const filters = this.orderTable.filters ? `&search=${this.orderTable.filters.join('+')}` : ''
 
       let api = `${this.orderTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}`
-      console.warn('api', api)
+      console.info('[PLAY] API GET:', api)
       this.orderTable.loading = true
       this.$axios.get(api)
         .then((response) => {
@@ -326,9 +338,16 @@ export default {
             this.FORM.toView(response.data.id)
           })
           .catch(error => {
-            console.warn(error.response || error)
             this.FORM.response.fields(error.response)
             this.FORM.response.error(error.response || error, 'Submit')
+            if (error.response && error.response.data.errors) {
+              if (error.response.data.errors.hasOwnProperty('order_mode')) {
+                this.$app.notify.error(String(error.response.data.errors.order_mode))
+              }
+              if (error.response.data.errors.hasOwnProperty('invoice_mode')) {
+                this.$app.notify.error(String(error.response.data.errors.invoice_mode))
+              }
+            }
           })
           .finally(() => {
             this.$q.loading.hide()
