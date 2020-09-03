@@ -46,7 +46,7 @@ export default {
 
   forecast: 'Forecast',
   request_order: 'Sales Order | Pemesanan Penjualan',
-  invoice: 'Invoices | Faktur Penjualan',
+  acc_invoice: 'Invoice Collect | Rekap Faktur',
 
   operator: 'Operator',
   brand: 'Brand',

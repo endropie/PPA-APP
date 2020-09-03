@@ -85,10 +85,10 @@ const incomes = [
     ]
   },
   {
-    name: 'Invoices',
+    name: 'Invoice-Collect',
     icon: 'shop',
     path: 'invoices',
-    lang: 'general.invoice',
+    lang: 'general.acc_invoice',
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'request-orders-read;pre-deliveries-create' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'request-orders-create' } },
