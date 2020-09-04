@@ -34,9 +34,6 @@
           <q-field dense borderless
             v-if="rsForm.request_orders.length || rsForm.delivery_orders.length"
           >
-            <div slot="hint" class="text-right">
-              dadada
-            </div>
             <div slot="control">
               <q-chip v-for="(value, ikey) in rsForm.request_orders" :key="value.id"
                 square removable
@@ -64,6 +61,7 @@
             :data="deliveryTable.data"
             :columns="deliveryTable.columns"
             :pagination.sync="deliveryTable.pagination"
+            :rows-per-page-options="[10, 20, 50, 100, 250, 500]"
             :loading="deliveryTable.loading"
             @request="deliveryTable.request"
           >
@@ -133,6 +131,7 @@
             :data="orderTable.data"
             :columns="orderTable.columns"
             :pagination.sync="orderTable.pagination"
+            :rows-per-page-options="[10, 20, 50, 100, 250, 500]"
             :loading="orderTable.loading"
             @request="orderTable.request"
           >
