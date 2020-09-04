@@ -29,8 +29,8 @@
             <ux-date name="date" type="date" class="col-12" style="min-width:200px"
               :label="$tc('label.date')" stack-label
               v-model="rsForm.date"
-              v-validate="`required|date_format:yyyy-MM-dd` + FORM.ifCreate(`|before:${$app.moment().add(1,'days').format('YYYY-MM-DD')}`,'')"
-              :date-options="(date) => FORM.ifCreate(date <= $app.moment().format('YYYY/MM/DD'), true)"
+              v-validate="`required|date_format:yyyy-MM-dd` + FORM.ifCreate(`|before:${$app.moment().add(2,'days').format('YYYY-MM-DD')}|after:${$app.moment().add(-2,'days').format('YYYY-MM-DD')}`,'')"
+              :date-options="(date) => FORM.ifCreate(date < $app.moment().add(2, 'days').format('YYYY/MM/DD') && date > $app.moment().add(-2, 'days').format('YYYY/MM/DD'), true)"
               :dark="LAYOUT.isDark"
               :error="errors.has('date')"
               :error-message="errors.first('date')"
@@ -189,20 +189,19 @@ import MixForm from '@/mixins/mix-form.vue'
 export default {
   mixins: [MixForm],
   data () {
-
     return {
-      SHEET:{
-        customers: {api:'/api/v1/incomes/customers?mode=all'},
-        units: {api:'/api/v1/references/units?mode=all'},
-        lines: {api:'/api/v1/references/lines?mode=all'},
-        shifts: {api:'/api/v1/references/shifts?mode=all'},
-        items: {autoload:false, api:'/api/v1/common/items?mode=all'},
-        work_order_item_lines: {autoload:false, api:'/api/v1/factories/work-orders?mode=lines&has_amount_line=true'},
+      SHEET: {
+        customers: { api: '/api/v1/incomes/customers?mode=all' },
+        units: { api: '/api/v1/references/units?mode=all' },
+        lines: { api: '/api/v1/references/lines?mode=all' },
+        shifts: { api: '/api/v1/references/shifts?mode=all' },
+        items: { autoload: false, api: '/api/v1/common/items?mode=all' },
+        work_order_item_lines: { autoload: false, api: '/api/v1/factories/work-orders?mode=lines&has_amount_line=true' }
       },
       FORM: {
-        resource:{
+        resource: {
           uri: '/admin/factories/work-productions',
-          api: '/api/v1/factories/work-productions',
+          api: '/api/v1/factories/work-productions'
         }
       },
       rsForm: {},
@@ -217,15 +216,16 @@ export default {
           description: null,
           work_production_items: [
             {
-              id:null,
+              id: null,
               stockist: null,
               item_id: null,
               quantity: null,
-              target:null,
+              target: null,
               unit_id: null,
               unit_rate: 1,
               ngratio: 0,
-              item: {}, unit: {},
+              item: {},
+              unit: {},
               work_order_item_line_id: null
             }
           ]
@@ -233,26 +233,26 @@ export default {
       }
     }
   },
-  created(){
+  created () {
     // Component Page Mounted!
     this.init()
   },
   computed: {
-    DetailRequired() {
+    DetailRequired () {
       return Boolean(this.rsForm.line_id && this.rsForm.date && this.rsForm.shift_id)
     },
-    IssetDetails() {
+    IssetDetails () {
       if (this.rsForm.work_production_items) {
         return this.rsForm.work_production_items.some((item) => item.item_id)
       }
       return false
     },
-    WorkOrderItemLineOptions() {
+    WorkOrderItemLineOptions () {
       if (!this.rsForm.line_id) return []
       if (!this.SHEET['work_order_item_lines'].data.length) return []
 
       const hasold = (id) => (this.FORM.data.work_production_items)
-          ? this.FORM.data.work_production_items.find(x => x.work_order_item_line_id === id) : null
+        ? this.FORM.data.work_production_items.find(x => x.work_order_item_line_id === id) : null
 
       let Item = []
       let data = this.SHEET['work_order_item_lines'].data.filter(itemline => {
@@ -267,10 +267,10 @@ export default {
         return true
       })
 
-      if(Item.length) this.SHEET.load('items', `or_ids=${Item.join(',')}`)
+      if (Item.length) this.SHEET.load('items', `or_ids=${Item.join(',')}`)
 
       return data.map(itemline => {
-        const work_order = itemline.work_order_item.work_order || {}
+        const wo = itemline.work_order_item.work_order || {}
 
         let total = Number(itemline.unit_amount) - Number(itemline.amount_line)
         const old = hasold(itemline.id)
@@ -278,29 +278,29 @@ export default {
 
         if (itemline.work_order_item.unit_rate) total = total / itemline.work_order_item.unit_rate
         return ({
-          label: work_order.fullnumber || work_order.number,
+          label: wo.fullnumber || wo.number,
           value: itemline.id,
           stamp: this.$app.number_format(total),
           item_id: (itemline.work_order_item.item_id || null),
-          stockist: (work_order.stockist_from),
+          stockist: (wo.stockist_from),
           rowdata: itemline
         })
       })
     },
-    StockistOptions() {
-      return this.CONFIG.items['stockists'].filter(stockist => ['FM','NC','NCR'].indexOf(stockist.value) > -1 )
+    StockistOptions () {
+      return this.CONFIG.items['stockists'].filter(stockist => ['FM', 'NC', 'NCR'].indexOf(stockist.value) > -1)
     },
-    LineOptions() {
+    LineOptions () {
       let data = this.SHEET.lines.data || []
-      return data.map(line => ({label: line.name, value: line.id, row:line}))
+      return data.map(line => ({ label: line.name, value: line.id, row: line }))
     },
-    ShiftOptions() {
-      return (this.SHEET.shifts.data.map(line => ({label: line.name, value: line.id})) || [])
+    ShiftOptions () {
+      return (this.SHEET.shifts.data.map(line => ({ label: line.name, value: line.id })) || [])
     },
-    UnitOptions() {
-      return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
+    UnitOptions () {
+      return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
-    ItemOptions() {
+    ItemOptions () {
       if (this.SHEET.items.data.length <= 0) return []
       let ITEM = this.SHEET.items.data.filter((item) => {
         // if (!item.item_prelines || !item.item_prelines.length) return false
@@ -316,43 +316,43 @@ export default {
         row: item
       })) || [])
     },
-    ItemUnitOptions() {
+    ItemUnitOptions () {
       let vars = []
 
       for (const i in this.rsForm.work_production_items) {
         if (this.rsForm.work_production_items.hasOwnProperty(i)) {
           let rsItem = this.rsForm.work_production_items[i]
-          vars[i] = ( this.UnitOptions || [])
-          vars[i] = vars[i].filter((unit)=> {
-            if(!rsItem.item_id) return false
-            if(rsItem.item) {
-
-              if(rsItem.item.unit_id === unit.value) return true
-              if(rsItem.item.item_units) {
-                let filtered = rsItem.item.item_units.filter((fill)=> fill.unit_id === unit.value)
-                if(filtered.length > 0) return true
+          vars[i] = (this.UnitOptions || [])
+          vars[i] = vars[i].filter((unit) => {
+            if (!rsItem.item_id) return false
+            if (rsItem.item) {
+              if (rsItem.item.unit_id === unit.value) return true
+              if (rsItem.item.item_units) {
+                let filtered = rsItem.item.item_units.filter((fill) => fill.unit_id === unit.value)
+                if (filtered.length > 0) return true
               }
             }
-            return false;
+            return false
           })
         }
       }
       return vars
     },
-    ValidMultiple() {
+    ValidMultiple () {
       if (!this.rsForm.multiple) return ''
 
-      let failed = this.rsForm.work_production_items.some((x,i,a) => {
+      let failed = this.rsForm.work_production_items.some((x, i, a) => {
         return (x.quantity * x.unit_rate * this.rsForm.multiple) > this.MaxStock[i]
       })
       return failed ? `is_not:${this.rsForm.multiple}` : ``
     },
-    MaxStock() {
-      let stockItem =  {}
+    MaxStock () {
+      let stockItem = {}
       let moveItem = {
         set: function (id, val) {
-          if (!this.hasOwnProperty(id)) this[id] = 0
-            this[id] += Number(val)
+          let fm = this
+          if (!fm.hasOwnProperty(id)) fm[id] = 0
+          fm[id] += Number(val)
         },
         get: function (id) {
           return this.hasOwnProperty(id) ? this[id] : 0
@@ -362,7 +362,6 @@ export default {
       this.WorkOrderItemLineOptions.map(detail => {
         stockItem[detail.rowdata.id] = Number(detail.rowdata.unit_amount) - Number(detail.rowdata.amount_line)
       })
-
 
       if (this.ROUTE.meta.mode !== 'create') {
         this.FORM.data.work_production_items.map(detail => {
@@ -381,58 +380,56 @@ export default {
         return max
       })
     },
-    MAPINGKEY() {
+    MAPINGKEY () {
       let variables = {
-        'customers' : {},
+        'customers': {},
         'units': {},
-        'items': {},
+        'items': {}
       }
 
       this.SHEET['customers'].data.map(value => { variables['customers'][value.id] = value })
       this.SHEET['units'].data.map(value => { variables['units'][value.id] = value })
       this.SHEET['items'].data.map(value => { variables['items'][value.id] = value })
 
-      return variables;
+      return variables
     }
   },
-  watch:{
-      '$route' : 'init'
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
-        if (this.ROUTE.meta.mode === 'create' && this.ROUTE.query && this.ROUTE.query.clone)
-        {
+        if (this.ROUTE.meta.mode === 'create' && this.ROUTE.query && this.ROUTE.query.clone) {
           this.FORM.show = false
           this.FORM.loading = true
 
           let apiUrl = `${this.FORM.resource.api}/${this.ROUTE.query.clone}`
           this.$axios.get(apiUrl)
             .then((response) => {
-              data = Object.assign(response.data, {number:null})
+              data = Object.assign(response.data, { number: null })
               this.FORM.data = JSON.parse(JSON.stringify(data))
               this.setForm(data)
-              setTimeout(() => this.FORM.show = true, 500)
+              setTimeout(() => { this.FORM.show = true }, 500)
             })
             .catch(error => {
-              this.FORM.response.error(error.response || error, this.$tc('messages.fail', 1, {v:this.$tc('form.clone')}).toUpperCase())
+              this.FORM.response.error(error.response || error, this.$tc('messages.fail', 1, { v: this.$tc('form.clone') }).toUpperCase())
               this.setForm(this.setDefault())
-              setTimeout(() => this.FORM.show = true, 500)
+              setTimeout(() => { this.FORM.show = true }, 500)
             })
             .finally(() => {
-              setTimeout(() => this.FORM.loading = false, 500)
+              setTimeout(() => { this.FORM.loading = false }, 500)
             })
-        }
-        else this.setForm(data || this.setDefault())
+        } else this.setForm(data || this.setDefault())
       })
     },
-    setForm(data) {
-      this.rsForm =  JSON.parse(JSON.stringify(data))
-      if(data.id) this.loadItemOptions(data)
-      if(data.hasOwnProperty('has_relationship') && data['has_relationship'].length > 0) {
+    setForm (data) {
+      this.rsForm = JSON.parse(JSON.stringify(data))
+      if (data.id) this.loadItemOptions(data)
+      if (data.hasOwnProperty('has_relationship') && data['has_relationship'].length > 0) {
         this.FORM.has_relationship = data.has_relationship
 
-        let message = data['has_relationship'].join("-")
+        let message = data['has_relationship'].join('-')
         this.$q.dialog({
           title: 'Work Order has Related',
           message: message,
@@ -446,7 +443,7 @@ export default {
         })
       }
     },
-    loadItemOptions(data = this.rsForm) {
+    loadItemOptions (data = this.rsForm) {
       if (data.line_id && data.shift_id && data.date) {
         let params = [`ondate=${data.date}`, `onshift=${data.shift_id}`]
         if (this.FORM.data.work_production_items) {
@@ -456,15 +453,14 @@ export default {
         this.SHEET.load('work_order_item_lines', params.join('&'))
       }
     },
-    setItemReference(index, val) {
+    setItemReference (index, val) {
       this.rsForm.work_production_items[index].work_order_item_line_id = null
 
-      if(!val){
+      if (!val) {
         this.rsForm.work_production_items[index].unit_id = null
         this.rsForm.work_production_items[index].unit = {}
         this.rsForm.work_production_items[index].item = {}
-      }
-      else{
+      } else {
         this.rsForm.work_production_items[index].item = this.MAPINGKEY['items'][val]
         let baseUnitID = this.MAPINGKEY['items'][val].unit_id
         this.rsForm.work_production_items[index].unit_id = baseUnitID
@@ -472,17 +468,15 @@ export default {
         this.rsForm.work_production_items[index].unit = this.MAPINGKEY['units'][baseUnitID]
       }
     },
-    setUnitReference(index, val) {
-
-      if(!val) return;
+    setUnitReference (index, val) {
+      if (!val) return null
       else if (this.rsForm.work_production_items[index].item.unit_id === val) {
         this.rsForm.work_production_items[index].unit_rate = 1
         this.rsForm.work_production_items[index].unit = null
-      }
-      else {
-        if(this.rsForm.work_production_items[index].item.item_units) {
-          this.rsForm.work_production_items[index].item.item_units.find((unitItem)=> {
-            if (unitItem.unit_id == val) {
+      } else {
+        if (this.rsForm.work_production_items[index].item.item_units) {
+          this.rsForm.work_production_items[index].item.item_units.find((unitItem) => {
+            if (unitItem.unit_id === val) {
               this.rsForm.work_production_items[index].unit = unitItem.unit
               this.rsForm.work_production_items[index].unit_rate = unitItem.rate
               return true
@@ -491,52 +485,54 @@ export default {
         }
       }
     },
-    addNewItem() {
+    addNewItem () {
       let newEntri = Object.assign(this.setDefault().work_production_items[0])
       this.rsForm.work_production_items.push(newEntri)
     },
-    removeItem(index) {
+    removeItem (index) {
       this.rsForm.work_production_items.splice(index, 1)
-      if(this.rsForm.work_production_items.length < 1) this.addNewItem()
+      if (this.rsForm.work_production_items.length < 1) this.addNewItem()
     },
-    onSave() {
+    onSave () {
       const submit = () => {
         this.FORM.loading = true
-        let {method, mode, apiUrl} = this.FORM.meta();
+        let { method, apiUrl } = this.FORM.meta()
         this.$axios.set(method, apiUrl, this.rsForm)
-        .then((response) => {
-          let message = response.data.number + ' - #' + response.data.id
-          this.FORM.response.success({message:message})
-          this.FORM.toView(response.data.id)
-        })
-        .catch((error) => {
-          this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error, this.$tc('messages.fail', 1, {v:this.$tc('form.save')}).toUpperCase())
-        })
-        .finally(()=>{
-          this.FORM.loading = false
-        });
+          .then((response) => {
+            let message = response.data.number + ' - #' + response.data.id
+            this.FORM.response.success({ message: message })
+            this.FORM.toView(response.data.id)
+          })
+          .catch((error) => {
+            this.FORM.response.fields(error.response)
+            this.FORM.response.error(error.response || error, this.$tc('messages.fail', 1, { v: this.$tc('form.save') }).toUpperCase())
+          })
+          .finally(() => {
+            this.FORM.loading = false
+          })
       }
 
       this.$validator.validate().then(result => {
-
         if (!result) {
           return this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
           })
         }
 
         this.$q.dialog({
           title: this.$tc('form.confirm'),
-          message: this.$tc('messages.to_sure', 1, {v: this.$tc('form.save')}),
+          message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.save') }),
           cancel: true,
           persistent: true
         }).onOk(() => {
           submit()
         })
-      });
-    },
-  },
+      })
+    }
+  }
 }
 </script>
