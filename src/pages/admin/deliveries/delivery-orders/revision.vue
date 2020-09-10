@@ -492,20 +492,20 @@ export default {
   mixins: [MixForm],
   data () {
     return {
-      SHEET:{
-        request_orders: {autoload: false, api:'/api/v1/incomes/request-orders?mode=all'},
-        request_order_items: {autoload: false, api:''},
-        items: {autoload:false, api:'/api/v1/common/items?mode=all'},
-        customers: {api:'/api/v1/incomes/customers?mode=all'},
-        employees: {api:'/api/v1/common/employees?mode=all'},
-        vehicles: {api:'/api/v1/references/vehicles?mode=all'},
-        units: {api:'/api/v1/references/units?mode=all'},
-        reasons: {api:'/api/v1/references/reasons?mode=all'},
+      SHEET: {
+        request_orders: { autoload: false, api: '/api/v1/incomes/request-orders?mode=all' },
+        request_order_items: { autoload: false, api: '' },
+        items: { autoload: false, api: '/api/v1/common/items?mode=all' },
+        customers: { api: '/api/v1/incomes/customers?mode=all' },
+        employees: { api: '/api/v1/common/employees?mode=all' },
+        vehicles: { api: '/api/v1/references/vehicles?mode=all' },
+        units: { api: '/api/v1/references/units?mode=all' },
+        reasons: { api: '/api/v1/references/reasons?mode=all' }
       },
-      FORM:{
-        resource:{
+      FORM: {
+        resource: {
           api: '/api/v1/incomes/delivery-orders',
-          uri: '/admin/deliveries/delivery-orders',
+          uri: '/admin/deliveries/delivery-orders'
         }
       },
       rsForm: null,
@@ -513,7 +513,7 @@ export default {
       isPartition: false,
       dialog_request_order: { show: false, data: null },
       dialog_reason: { reason: null, reason_description: null },
-      setDefault:()=>{
+      setDefault: () => {
         return {
           number: null,
           transaction: null,
@@ -528,88 +528,88 @@ export default {
           revise_number: null,
           description: null,
           delivery_order_items: [{
-            id:null,
-            item_id: null, item: {},
+            id: null,
+            item_id: null,
+            item: {},
             quantity: null,
 
             unit_id: null,
             unit_rate: 1
-          }],
+          }]
         }
       }
     }
   },
-  created() {
+  created () {
     // Component Page Created!
     this.init()
-
   },
   computed: {
-    IS_REVISE() {
+    IS_REVISE () {
       if (this.rsForm.deleted_at) return false
       if (this.rsForm.is_internal) return false
       if (this.rsForm.reconcile_id && this.rsForm.status !== 'OPEN') return false
       return true
     },
-    ReasonOptions() {
+    ReasonOptions () {
       return (this.SHEET.reasons.data
         .filter(item => item.enable)
-        .map(item => ({label: item.name, value: item.id})) || [])
-        .concat([{ label: 'Others', value: null}])
+        .map(item => ({ label: item.name, value: item.id })) || [])
+        .concat([{ label: 'Others', value: null }])
     },
-    UnitOptions() {
-      return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
+    UnitOptions () {
+      return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
-    ItemOptions() {
+    ItemOptions () {
       let ITEM = this.SHEET.items.data.filter((item) => item.customer_id === this.rsForm.customer_id)
-      return (ITEM.map(item => ({label: `${item.part_name}`, sublabel:`[${item.customer_code}] ${item.part_subname || '-'}`, value: item.id})) || [])
+      return (ITEM.map(item => ({ label: `${item.part_name}`, sublabel: `[${item.customer_code}] ${item.part_subname || '-'}`, value: item.id })) || [])
     },
-    ItemUnitOptions() {
+    ItemUnitOptions () {
       let vars = []
       for (const i in this.rsForm.delivery_order_items) {
         if (this.rsForm.delivery_order_items.hasOwnProperty(i)) {
           let rsItem = this.rsForm.delivery_order_items[i]
-          vars[i] = ( this.UnitOptions || [])
-          vars[i] = vars[i].filter((unit)=> {
-            if(!rsItem.item_id) return false
-            if(rsItem.item) {
-              if(rsItem.item.unit_id === unit.value) return true
-              if(rsItem.item.item_units) {
-                let filtered = rsItem.item.item_units.filter((fill)=> fill.unit_id == unit.value)
-                if(filtered.length > 0) return true
+          vars[i] = (this.UnitOptions || [])
+          vars[i] = vars[i].filter((unit) => {
+            if (!rsItem.item_id) return false
+            if (rsItem.item) {
+              if (rsItem.item.unit_id === unit.value) return true
+              if (rsItem.item.item_units) {
+                let filtered = rsItem.item.item_units.filter((fill) => fill.unit_id === unit.value)
+                if (filtered.length > 0) return true
               }
             }
-            return false;
+            return false
           })
         }
       }
       return vars
     },
 
-    ItemUnitMultiOptions() {
+    ItemUnitMultiOptions () {
       return this.rsPartitions.map(partition => {
         let vars = []
         for (const i in partition.delivery_order_items) {
           if (partition.delivery_order_items.hasOwnProperty(i)) {
             let rsItem = partition.delivery_order_items[i]
-            vars[i] = ( this.UnitOptions || [])
-            vars[i] = vars[i].filter((unit)=> {
-              if(!rsItem.item_id) return false
-              if(rsItem.item) {
-                if(rsItem.item.unit_id === unit.value) return true
-                if(rsItem.item.item_units) {
-                  let filtered = rsItem.item.item_units.filter((fill)=> fill.unit_id == unit.value)
-                  if(filtered.length > 0) return true
+            vars[i] = (this.UnitOptions || [])
+            vars[i] = vars[i].filter((unit) => {
+              if (!rsItem.item_id) return false
+              if (rsItem.item) {
+                if (rsItem.item.unit_id === unit.value) return true
+                if (rsItem.item.item_units) {
+                  let filtered = rsItem.item.item_units.filter((fill) => fill.unit_id === unit.value)
+                  if (filtered.length > 0) return true
                 }
               }
-              return false;
+              return false
             })
           }
         }
         return vars
       })
     },
-    MaxMount() {
+    MaxMount () {
       return this.rsForm.delivery_order_items.map((detail, index) => {
         if (!detail.request_order_item) return 0
         const oldRow = (detail.request_order_item.request_order_id !== this.FORM.data.request_order_id)
@@ -619,7 +619,7 @@ export default {
         return Number(detail.request_order_item.unit_amount) - Number(detail.request_order_item.amount_delivery) + Number(oldAmount)
       })
     },
-    MaxMultiMount() {
+    MaxMultiMount () {
       return this.rsPartitions.map(rs => {
         return (rs.delivery_order_items.map(detail => {
           if (!detail.request_order_item) return 0
@@ -631,24 +631,24 @@ export default {
         }) || [])
       })
     },
-    MAPINGKEY(){
+    MAPINGKEY () {
       let variables = {
         'request_order_items': {},
         'units': {},
-        'items': {},
+        'items': {}
       }
       this.SHEET['units'].data.map(value => { variables['units'][value.id] = value })
       this.SHEET['items'].data.map(value => { variables['items'][value.id] = value })
       this.SHEET['request_order_items'].data.map(value => { variables['request_order_items'][value.id] = value })
 
-      return variables;
+      return variables
     }
   },
-  watch:{
-      '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
       })
@@ -656,51 +656,47 @@ export default {
     setDialogRequestOrder (val, partitionIndex) {
       this.$q.loading.show()
       this.$axios.get(`/api/v1/incomes/request-orders/${val.id}?mode=view`)
-      .then(response => {
-        this.dialog_request_order = Object.assign({
-          ...val,
-          request_order_items: response.data.request_order_items || []
+        .then(response => {
+          this.dialog_request_order = Object.assign({
+            ...val,
+            request_order_items: response.data.request_order_items || []
+          })
+          if (typeof partitionIndex !== 'undefined') this.dialog_request_order.partitionIndex = partitionIndex
+          this.$refs['dialog-request-order'].show()
         })
-        if (typeof partitionIndex !== 'undefined') this.dialog_request_order.partitionIndex = partitionIndex
-        this.$refs['dialog-request-order'].show()
-      })
-      .catch(error => {
-        this.$app.error(error.response || error)
-      })
-      .finally(()=> {
-        this.$q.loading.hide()
-      })
+        .catch(error => {
+          this.$app.error(error.response || error)
+        })
+        .finally(() => {
+          this.$q.loading.hide()
+        })
     },
     setRequestOrder (val, partitionIndex) {
       if (typeof partitionIndex !== 'undefined') {
         this.rsPartitions[partitionIndex].request_order_id = val ? val.id : null
-      }
-      else {
+      } else {
         this.rsForm.request_order_id = val ? val.id : null
       }
     },
-    setItemReference(index, val, partitionIndex) {
+    setItemReference (index, val, partitionIndex) {
       if (typeof partitionIndex !== 'undefined') {
         if (!val) {
           this.rsPartitions[partitionIndex].delivery_order_items[index].unit_id = null
           this.rsPartitions[partitionIndex].delivery_order_items[index].unit = {}
           this.rsPartitions[partitionIndex].delivery_order_items[index].item = {}
-        }
-        else {
+        } else {
           this.rsPartitions[partitionIndex].delivery_order_items[index].item = this.MAPINGKEY['items'][val]
           let baseUnitID = this.MAPINGKEY['items'][val].unit_id
           this.rsPartitions[partitionIndex].delivery_order_items[index].unit_id = baseUnitID
           this.rsPartitions[partitionIndex].delivery_order_items[index].unit_rate = 1
           this.rsPartitions[partitionIndex].delivery_order_items[index].unit = this.MAPINGKEY['units'][baseUnitID]
         }
-      }
-      else {
+      } else {
         if (!val) {
           this.rsForm.delivery_order_items[index].unit_id = null
           this.rsForm.delivery_order_items[index].unit = {}
           this.rsForm.delivery_order_items[index].item = {}
-        }
-        else {
+        } else {
           this.rsForm.delivery_order_items[index].item = this.MAPINGKEY['items'][val]
           let baseUnitID = this.MAPINGKEY['items'][val].unit_id
           this.rsForm.delivery_order_items[index].unit_id = baseUnitID
@@ -710,34 +706,31 @@ export default {
       }
     },
     setUnitReference (index, val, partitionIndex) {
-      if(!val) return;
+      if (!val) return
       if (typeof partitionIndex !== 'undefined') {
         if (this.rsPartitions[partitionIndex].delivery_order_items[index].item.unit_id === val) {
           this.rsPartitions[partitionIndex].delivery_order_items[index].unit_rate = 1
-        }
-        else {
-          if(this.rsPartitions[partitionIndex].delivery_order_items[index].item.item_units) {
-            this.rsPartitions[partitionIndex].delivery_order_items[index].item.item_units.map((itemUnit)=> {
-              if (itemUnit.unit_id == val) this.rsPartitions[partitionIndex].delivery_order_items[index].unit_rate = itemUnit.rate
+        } else {
+          if (this.rsPartitions[partitionIndex].delivery_order_items[index].item.item_units) {
+            this.rsPartitions[partitionIndex].delivery_order_items[index].item.item_units.map((itemUnit) => {
+              if (itemUnit.unit_id === val) this.rsPartitions[partitionIndex].delivery_order_items[index].unit_rate = itemUnit.rate
             })
           }
         }
-      }
-      else {
+      } else {
         if (this.rsForm.delivery_order_items[index].item.unit_id === val) {
           this.rsForm.delivery_order_items[index].unit_rate = 1
-        }
-        else {
-          if(this.rsForm.delivery_order_items[index].item.item_units) {
-            this.rsForm.delivery_order_items[index].item.item_units.map((itemUnit)=> {
-              if (itemUnit.unit_id == val) this.rsForm.delivery_order_items[index].unit_rate = itemUnit.rate
+        } else {
+          if (this.rsForm.delivery_order_items[index].item.item_units) {
+            this.rsForm.delivery_order_items[index].item.item_units.map((itemUnit) => {
+              if (itemUnit.unit_id === val) this.rsForm.delivery_order_items[index].unit_rate = itemUnit.rate
             })
           }
         }
       }
     },
     setForm (data) {
-      this.rsForm =  Object.assign({},this.setDefault(), data)
+      this.rsForm = Object.assign({}, this.setDefault(), data)
       this.SHEET.load('items', `customer_id=${this.rsForm.customer_id}`)
     },
     setPartition (v) {
@@ -747,34 +740,40 @@ export default {
             transaction: this.FORM.data.transaction,
             request_order: this.FORM.data.request_order,
             request_order_id: this.FORM.data.request_order_id,
-            delivery_order_items: [], //this.FORM.data.delivery_order_items,
+            delivery_order_items: [] // this.FORM.data.delivery_order_items,
           })
         }
       }
     },
 
     addPartition (val) {
-      const entri = { transaction:null, request_order_id:null, request_order: null, delivery_order_items: [], description: null, ...val}
+      const entri = { transaction: null, request_order_id: null, request_order: null, delivery_order_items: [], description: null, ...val }
       this.rsPartitions.push(entri)
     },
-    removePartition(partitionIndex) {
+    removePartition (partitionIndex) {
       this.rsPartitions.splice(partitionIndex, 1)
     },
 
-    addNewDetail(entri, partitionIndex) {
-      entri =  typeof entri === 'undefined'
+    addNewDetail (entri, partitionIndex) {
+      entri = typeof entri === 'undefined'
         ? {
-            id: null, quantity: null,
-            item_id: null, item: null,
-            unit_id: null, unit: null,
-            unit_rate: 1,
-            request_order_item_id: null,
-            request_order_item: null
-          }
+          id: null,
+          quantity: null,
+          item_id: null,
+          item: null,
+          unit_id: null,
+          unit: null,
+          unit_rate: 1,
+          request_order_item_id: null,
+          request_order_item: null
+        }
         : {
-          id: null, quantity: null,
-          item_id: entri.item_id, item: entri.item,
-          unit_id: entri.unit_id, unit: entri.unit,
+          id: null,
+          quantity: null,
+          item_id: entri.item_id,
+          item: entri.item,
+          unit_id: entri.unit_id,
+          unit: entri.unit,
           unit_rate: entri.unit_rate,
           request_order_item_id: entri.id,
           request_order_item: entri
@@ -786,8 +785,7 @@ export default {
           return this.$q.notify('PART HAS READY')
         }
         this.rsPartitions[partitionIndex].delivery_order_items.push(entri)
-      }
-      else {
+      } else {
         const some = this.rsForm.delivery_order_items.find(x => x.request_order_item_id === entri.id)
         if (entri.request_order_item_id && some) {
           return this.$q.notify('PART HAS READY')
@@ -795,11 +793,10 @@ export default {
         this.rsForm.delivery_order_items.push(entri)
       }
     },
-    removeDetail(index, partitionIndex) {
+    removeDetail (index, partitionIndex) {
       if (typeof partitionIndex !== 'undefined') {
         this.rsPartitions[partitionIndex].delivery_order_items.splice(index, 1)
-      }
-      else {
+      } else {
         this.rsForm.delivery_order_items.splice(index, 1)
       }
     },
@@ -811,32 +808,36 @@ export default {
         ? { ...this.rsForm, partitions: this.rsPartitions } : this.rsForm
       data = { ...data, ...this.dialog_reason }
       const apiUrl = `${this.FORM.resource.api}/${this.ROUTE.params.id}?mode=${mode}`
+      this.$q.loading.show()
       this.$axios.set(method, apiUrl, data)
-      .then((response) => {
-        let message = response.data.number + ' - #' + response.data.id
-        this.FORM.response.success({ message: message})
-        this.FORM.toView(response.data.id)
-      })
-      .catch((error) => {
-        this.FORM.response.fields(error.response)
-        this.FORM.response.error(error.response || error, 'REVISION FAILED')
-      })
-      .finally(()=>{
-        this.FORM.loading = false
-      });
+        .then((response) => {
+          let message = response.data.number + ' - #' + response.data.id
+          this.FORM.response.success({ message: message })
+          this.FORM.toView(response.data.id)
+        })
+        .catch((error) => {
+          this.FORM.response.fields(error.response)
+          this.FORM.response.error(error.response || error, 'REVISION FAILED')
+        })
+        .finally(() => {
+          this.$q.loading.hide()
+        })
     },
-    onSave() {
+    onSave () {
       this.$validator.validate().then(result => {
         if (!result) {
           return this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
           })
         }
 
         this.$refs['dialog-submit'].show()
       })
-    },
-  },
+    }
+  }
 }
 </script>
