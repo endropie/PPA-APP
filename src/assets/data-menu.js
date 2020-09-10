@@ -202,10 +202,10 @@ const deliveries = [
     path: 'delivery-internals',
     lang: 'general.delivery_internal',
     resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'pre-deliveries-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'pre-deliveries-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'pre-deliveries-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'pre-deliveries-read' } }
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-internals-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-internals-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'delivery-internals-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-internals-read' } }
     ]
   },
   {

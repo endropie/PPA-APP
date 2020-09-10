@@ -24,7 +24,7 @@
                 detail: $tc('messages.form_new'),
                 icon: 'add',
                 shortcut: true,
-                hidden:!$app.can('sj-delivery-orders-create'),
+                hidden:!$app.can('delivery-internals-create'),
                 to: `${TABLE.resource.uri}/create`
               },
               { label: $tc('label.trash'),
