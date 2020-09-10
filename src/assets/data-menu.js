@@ -93,7 +93,7 @@ const incomes = [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'request-orders-read;pre-deliveries-create' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'request-orders-create' } },
       // { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'request-orders-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'request-orders-read;pre-deliveries-create' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'request-orders-read;pre-deliveries-create' } }
 
     ]
   }
@@ -146,8 +146,8 @@ const warehouses = [
     lang: 'general.opname_stock',
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'opname-stocks-read' } },
-      { page: 'form', path: 'create', icon: 'list', meta: {mode: 'create', permission: 'opname-stocks-create' } },
-      { page: 'form', path: ':id/edit', icon: 'list', meta: {mode: 'edit', permission: 'opname-stocks-update' } },
+      { page: 'form', path: 'create', icon: 'list', meta: { mode: 'create', permission: 'opname-stocks-create' } },
+      { page: 'form', path: ':id/edit', icon: 'list', meta: { mode: 'edit', permission: 'opname-stocks-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'opname-stocks-read' } }
     ]
   },
@@ -197,6 +197,18 @@ const deliveries = [
     ]
   },
   {
+    name: 'Delivery internal',
+    icon: 'assignment',
+    path: 'delivery-internals',
+    lang: 'general.delivery_internal',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'pre-deliveries-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'pre-deliveries-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'pre-deliveries-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'pre-deliveries-read' } }
+    ]
+  },
+  {
     name: 'Pre-Delivery Orders',
     icon: 'assignment',
     path: 'pre-deliveries',
@@ -243,8 +255,8 @@ const deliveries = [
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'sj-delivery-orders-read' } },
       { page: 'index-items', path: 'items', icon: 'list', meta: { permission: 'sj-delivery-orders-read' } },
-      { page: 'form-sample', path: 'create-sample', meta: {mode: 'create', permission: 'sj-delivery-orders-create'}},
-      { page: 'form-sample', path: ':id/edit-sample', meta: {mode: 'edit', permission: 'sj-delivery-orders-update'}},
+      { page: 'form-sample', path: 'create-sample', meta: { mode: 'create', permission: 'sj-delivery-orders-create' } },
+      { page: 'form-sample', path: ':id/edit-sample', meta: { mode: 'edit', permission: 'sj-delivery-orders-update' } },
       { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
       { page: 'revision-internal', path: ':id/revision-internal', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
       { page: 'reconcile', path: ':id/reconcile', meta: { mode: 'edit', permission: 'sj-delivery-orders-create' } },
@@ -258,8 +270,8 @@ const deliveries = [
     lang: 'general.deportation_goods',
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'deportation-goods-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'deportation-goods-update'}},
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'deportation-goods-update'}},
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'deportation-goods-update' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'deportation-goods-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'deportation-goods-read' } }
     ]
   },
@@ -310,7 +322,7 @@ const factories = [
     icon: 'work',
     path: 'work-orders/items',
     page: 'items',
-    lang: 'general.work_order_items',
+    lang: 'general.work_order_items'
   },
   {
     name: 'Work Production',
