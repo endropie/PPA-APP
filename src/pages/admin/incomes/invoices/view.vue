@@ -163,7 +163,6 @@ export default {
 
         this.$axios.post(url)
           .then((response) => {
-            console.warn('OK', response)
             let msg = response.data.message[0] || ''
             if (response.data.success) this.$app.notify.success('[ACCURATE]', msg)
             else this.$app.notify.warning('[ACCURATE]', msg)

@@ -31,28 +31,6 @@
           />
         </div>
         <div v-if="rsForm.customer">
-          <q-field dense borderless
-            v-if="rsForm.request_orders.length || rsForm.delivery_orders.length"
-          >
-            <div slot="control">
-              <q-chip v-for="(value, ikey) in rsForm.request_orders" :key="value.id"
-                square removable
-                class="glossy"
-                icon="bookmark"
-                color="primary" text-color="white"
-                :label="value.fullnumber"
-                @remove="rsForm.request_orders.splice(ikey, 1)"
-              />
-              <q-chip  v-for="(value, ikey) in rsForm.delivery_orders" :key="value.id"
-                square removable
-                class="glossy"
-                icon="bookmark"
-                color="primary" text-color="white"
-                :label="value.fullnumber"
-                @remove="rsForm.delivery_orders.splice(ikey, 1)"
-              />
-            </div>
-          </q-field>
           <q-table title="SJ Delivery"
             v-if="!rsForm.customer.is_invoice_request"
             flat dense bordered separator='cell'
@@ -65,45 +43,77 @@
             :loading="deliveryTable.loading"
             @request="deliveryTable.request"
           >
-            <template slot="top-right">
-              <div class="q-gutter-sm" :class="{'row':1}">
 
-                <q-field dense outlined>
-                  <q-checkbox
-                    slot="control"
-                    class="no-padding"
-                    dense
-                    left-label label="CONFIRMED"
-                    v-model="deliveryTable.isConfirmed"
-                    @input="loadDelivery"
+            <template slot="top">
+              <div class="row fit">
+                <div class="q-table__control" style="max-width:300px">
+                  <span class="text-h6">SJ DELIVERY</span>
+                  <q-btn rounded unelevated
+                    class="q-mx-sm" size="sm"
+                    color="blue-grey-5"
+                    :label="`${rsForm.delivery_orders.length} record`"
+                    @click="deliveryTable.hideChecked = !deliveryTable.hideChecked"
+                    v-if="rsForm.delivery_orders.length"
                   />
+                </div>
+                <div class="q-table__separator col"></div>
+                <div class="q-table__control">
+                  <div class="q-gutter-sm" :class="{'row':1}">
+                    <q-field dense outlined>
+                      <q-checkbox
+                        slot="control"
+                        class="no-padding"
+                        dense
+                        left-label label="CONFIRMED"
+                        v-model="deliveryTable.isConfirmed"
+                        @input="loadDelivery"
+                      />
 
-                </q-field>
+                    </q-field>
 
-                <ux-select v-model="deliveryTable.request_order_id"
-                  dense outlined hide-dropdown-icon
-                  :placeholder="$tc('general.request_order')"
-                  style="min-width:180px"
-                  :source="`/api/v1/incomes/request-orders?mode=all&--limit=50&customer_id=${rsForm.customer_id}`"
-                  :source-key="['number', 'reference_number', 'indexed_number', 'description']"
-                  option-label="fullnumber"
-                  :option-sublabel="(opt) =>  `Ref: ${opt.reference_number || '-'}` "
-                  option-value="id"
-                  filter clearable emit-value map-options
-                  @input="loadDelivery()"
-                />
+                    <ux-select v-model="deliveryTable.request_order_id"
+                      dense outlined hide-dropdown-icon
+                      :placeholder="$tc('general.request_order')"
+                      style="min-width:180px"
+                      :source="`/api/v1/incomes/request-orders?mode=all&--limit=50&customer_id=${rsForm.customer_id}`"
+                      :source-key="['number', 'reference_number', 'indexed_number', 'description']"
+                      option-label="fullnumber"
+                      :option-sublabel="(opt) =>  `Ref: ${opt.reference_number || '-'}` "
+                      option-value="id"
+                      filter clearable emit-value map-options
+                      @input="loadDelivery()"
+                    />
 
-                <q-select v-model="deliveryTable.filters"
-                  dense outlined hide-dropdown-icon
-                  multiple use-input use-chips new-value-mode="add"
-                  placeholder="Searching..."
-                  @input="loadDelivery()"
-                />
+                    <q-select v-model="deliveryTable.filters"
+                      dense outlined hide-dropdown-icon
+                      multiple use-input use-chips new-value-mode="add"
+                      placeholder="Searching..."
+                      @input="loadDelivery()"
+                    />
 
+                  </div>
+                </div>
+              </div>
+              <div class="row fit" v-if="!deliveryTable.hideChecked && rsForm.delivery_orders.length">
+                <q-card flat bordered class="fit q-mt-sm">
+                  <q-card-section class="no-padding">
+                    <q-chip v-for="(value, ikey) in rsForm.delivery_orders" :key="value.id"
+                      square removable
+                      class="glossy"
+                      icon="bookmark"
+                      color="primary" text-color="white"
+                      :label="value.fullnumber"
+                      @remove="rsForm.delivery_orders.splice(ikey, 1)"
+                    />
+                  </q-card-section>
+                </q-card>
               </div>
             </template>
+            <q-th slot="header-cell-action">
+              <q-checkbox dense keep-color :value="ValCheckDeliveryTable" @input="setAllDeliveryTable" />
+            </q-th>
             <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
-              <q-checkbox left-label
+              <q-checkbox dense
                 :disable="rs.row.status !== 'CONFIRMED'"
                 :value="Boolean(rsForm.delivery_orders.find(e => e.id === rs.row.id))"
                 @input="!Boolean(rsForm.delivery_orders.find(e => e.id === rs.row.id))
@@ -123,8 +133,7 @@
               /> -->
             </q-td>
           </q-table>
-          <q-table title="Sales Order"
-            v-else
+          <q-table v-else title="Sales Order"
             flat dense bordered separator='cell'
             style="max-height: calc( 100vh - 100px )"
             table-header-class="text-uppercase"
@@ -135,24 +144,56 @@
             :loading="orderTable.loading"
             @request="orderTable.request"
           >
-            <template slot="top-right">
-              <div :class="{'row q-gutter-sm':1}">
-                <q-field dense outlined>
-                  <q-checkbox slot="control" dense class="on-right"
-                    left-label label="CLOSED"
-                    v-model="orderTable.isClosed"
-                    @input="loadOrder()"
+            <template slot="top">
+              <div class="row fit">
+                <div class="q-table__control" style="max-width:300px">
+                  <span class="text-h6">SALES ORDER</span>
+                  <q-btn rounded unelevated
+                    class="q-mx-sm" size="sm"
+                    color="blue-grey-5"
+                    :label="`${rsForm.request_orders.length} record`"
+                    @click="orderTable.hideChecked = !orderTable.hideChecked"
+                    v-if="rsForm.request_orders.length"
                   />
-                </q-field>
-                <q-select
-                  dense outlined hide-dropdown-icon
-                  v-model="orderTable.filters"
-                  multiple use-input use-chips new-value-mode="add"
-                  placeholder="Searching..."
-                  @input="loadOrder()"
-                />
+                </div>
+                <div class="q-table__separator col"></div>
+                <div class="q-table__control">
+                  <div :class="{'row justify-end q-gutter-sm':1}">
+                    <q-field dense outlined>
+                      <q-checkbox slot="control" dense class="on-right"
+                        left-label label="CLOSED"
+                        v-model="orderTable.isClosed"
+                        @input="loadOrder()"
+                      />
+                    </q-field>
+                    <q-select
+                      dense outlined hide-dropdown-icon
+                      v-model="orderTable.filters"
+                      multiple use-input use-chips new-value-mode="add"
+                      placeholder="Searching..."
+                      @input="loadOrder()"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row fit" v-if="!orderTable.hideChecked && rsForm.request_orders.length">
+                <q-card flat bordered class="fit q-mt-sm">
+                  <q-card-section class="no-padding">
+                    <q-chip v-for="(value, ikey) in rsForm.request_orders" :key="value.id"
+                      square removable
+                      class="glossy"
+                      icon="bookmark"
+                      color="primary" text-color="white"
+                      :label="value.fullnumber"
+                      @remove="rsForm.request_orders.splice(ikey, 1)"
+                    />
+                  </q-card-section>
+                </q-card>
               </div>
             </template>
+            <q-th slot="header-cell-action">
+              <q-checkbox dense :value="ValCheckOrderTable" @input="setAllOrderTable" />
+            </q-th>
             <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
               <q-checkbox  dense
                 :disable="rs.row.status !== 'CLOSED'"
@@ -214,8 +255,9 @@ export default {
           rowsNumber: 0
         },
         request_order_id: null,
-        filters: null,
+        hideChecked: true,
         isConfirmed: false,
+        filters: null,
         request: this.loadDelivery
       },
       orderTable: {
@@ -233,6 +275,7 @@ export default {
           rowsPerPage: 10,
           rowsNumber: 0
         },
+        hideChecked: true,
         isClosed: false,
         filters: null,
         request: this.loadOrder
@@ -244,6 +287,14 @@ export default {
     this.init()
   },
   computed: {
+    ValCheckOrderTable () {
+      if (!this.orderTable.data.length) return false
+      return this.orderTable.data.length === this.orderTable.data.filter(x => this.rsForm.request_orders.find(z => z.id === x.id)).length
+    },
+    ValCheckDeliveryTable () {
+      if (!this.deliveryTable.data.length) return false
+      return this.deliveryTable.data.length === this.deliveryTable.data.filter(x => this.rsForm.delivery_orders.find(z => z.id === x.id)).length
+    },
     ItemSelected () {
       if (this.rsForm.request_orders.length) return this.rsForm.request_orders
       if (this.rsForm.delivery_orders.length) return this.rsForm.delivery_orders
@@ -267,6 +318,28 @@ export default {
 
       if (this.rsForm.customer && !this.rsForm.customer.is_invoice_request) this.loadDelivery()
       if (this.rsForm.customer && this.rsForm.customer.is_invoice_request) this.loadOrder()
+    },
+    setAllOrderTable (checkAll) {
+      this.orderTable.data.map(row => {
+        const found = this.rsForm.request_orders.find(e => e.id === row.id)
+        if (checkAll === true && !found) {
+          this.rsForm.request_orders.push(row)
+        }
+        if (checkAll === false && found) {
+          this.rsForm.request_orders = this.rsForm.request_orders.filter(e => e.id !== row.id)
+        }
+      })
+    },
+    setAllDeliveryTable (checkAll) {
+      this.deliveryTable.data.map(row => {
+        const found = this.rsForm.delivery_orders.find(e => e.id === row.id)
+        if (checkAll === true && !found) {
+          this.rsForm.delivery_orders.push(row)
+        }
+        if (checkAll === false && found) {
+          this.rsForm.delivery_orders = this.rsForm.delivery_orders.filter(e => e.id !== row.id)
+        }
+      })
     },
     loadDelivery (request = Object.assign({})) {
       let parameter = []
@@ -319,11 +392,12 @@ export default {
           this.orderTable.pagination.page = response.data.current_page
           this.orderTable.pagination.rowsPerPage = response.data.per_page
           this.orderTable.pagination.rowsNumber = response.data.total
-        }).catch((error) => {
-          console.error('NO', error)
-        }).finally(() => {
+        })
+        .catch((error) => {
+          this.$app.notify.error({ message: error.response ? (error.response.data.message || error.response.statusText) : error })
+        })
+        .finally(() => {
           this.orderTable.loading = false
-          console.warn('loading', this.orderTable.loading)
         })
     },
     save () {
