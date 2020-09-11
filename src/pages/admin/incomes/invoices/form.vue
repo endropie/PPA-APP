@@ -288,13 +288,13 @@ export default {
   },
   computed: {
     ValCheckOrderTable () {
-      if (!this.orderTable.data.length) return false
       const data = this.orderTable.data.filter(x => x.status === 'CLOSED')
+      if (!data.length) return false
       return data.length === data.filter(x => this.rsForm.request_orders.find(z => z.id === x.id)).length
     },
     ValCheckDeliveryTable () {
-      if (!this.deliveryTable.data.length) return false
       const data = this.deliveryTable.data.filter(x => x.status === 'CONFIRMED')
+      if (!data.length) return false
       return data.length === data.filter(x => this.rsForm.delivery_orders.find(z => z.id === x.id)).length
     },
     ItemSelected () {
