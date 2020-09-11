@@ -289,11 +289,13 @@ export default {
   computed: {
     ValCheckOrderTable () {
       if (!this.orderTable.data.length) return false
-      return this.orderTable.data.length === this.orderTable.data.filter(x => this.rsForm.request_orders.find(z => z.id === x.id)).length
+      const data = this.orderTable.data.filter(x => x.status === 'CLOSED')
+      return data.length === data.filter(x => this.rsForm.request_orders.find(z => z.id === x.id)).length
     },
     ValCheckDeliveryTable () {
       if (!this.deliveryTable.data.length) return false
-      return this.deliveryTable.data.length === this.deliveryTable.data.filter(x => this.rsForm.delivery_orders.find(z => z.id === x.id)).length
+      const data = this.deliveryTable.data.filter(x => x.status === 'CONFIRMED')
+      return data.length === data.filter(x => this.rsForm.delivery_orders.find(z => z.id === x.id)).length
     },
     ItemSelected () {
       if (this.rsForm.request_orders.length) return this.rsForm.request_orders
@@ -320,7 +322,7 @@ export default {
       if (this.rsForm.customer && this.rsForm.customer.is_invoice_request) this.loadOrder()
     },
     setAllOrderTable (checkAll) {
-      this.orderTable.data.map(row => {
+      this.orderTable.data.filter(x => x.status === 'CLOSED').map(row => {
         const found = this.rsForm.request_orders.find(e => e.id === row.id)
         if (checkAll === true && !found) {
           this.rsForm.request_orders.push(row)
@@ -331,7 +333,7 @@ export default {
       })
     },
     setAllDeliveryTable (checkAll) {
-      this.deliveryTable.data.map(row => {
+      this.deliveryTable.data.filter(x => x.status === 'CONFIRMED').map(row => {
         const found = this.rsForm.delivery_orders.find(e => e.id === row.id)
         if (checkAll === true && !found) {
           this.rsForm.delivery_orders.push(row)
