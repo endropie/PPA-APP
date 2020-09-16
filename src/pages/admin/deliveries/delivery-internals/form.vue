@@ -138,6 +138,11 @@
         </tbody>
       </q-markup-table>
 
+      <q-input dense type="text"
+        class="q-mb-sm"
+        v-model="rsForm.internal_notes"
+        :label="$tc('label.note') + ' Internal'"
+      />
       <q-input type="textarea" autogrow
         filled class="q-mb-sm" input-style="min-height:45px"
         v-model="rsForm.option.description"
@@ -177,6 +182,7 @@ export default {
           date: this.$app.moment().format('YYYY-MM-DD'),
           customer: null,
           customer_id: null,
+          internal_notes: null,
           option: {
             delivery_internal_items: [
               {

@@ -118,13 +118,6 @@
                 VIEW.delete()
               }
             },
-            // { label: $tc('form.validation').toUpperCase(), color:'teal', icon: 'check',
-            //  hidden: !IS_EDITABLE || !this.$app.can('delivery-internals-validation'),
-            //  detail:$tc('messages.process_validation'),
-            //  actions: () => {
-            //    setValidation()
-            //  }
-            // },
             { label: 'VOID', color:'red', icon: 'block',
               hidden: !IS_VOID || !$app.can('delivery-internals-delete'),
               detail: $tc('messages.process_void'),
@@ -197,48 +190,6 @@ export default {
     },
     setView (data) {
       this.rsView = data
-    },
-    setConfirmation () {
-      const submit = () => {
-        this.VIEW.show = false
-        this.VIEW.loading = true
-        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=confirmation&nodata=true`
-        this.$axios.put(url)
-          .then((response) => {
-            const data = response.data
-            this.setView(data)
-          })
-          .catch(error => {
-            this.$app.response.error(error.response, 'FORM REVISION')
-          })
-          .finally(() => {
-            this.VIEW.show = true
-            setTimeout(() => {
-              this.VIEW.loading = false
-            }, 1000)
-          })
-      }
-
-      this.$validator.validate().then(result => {
-        if (!result) {
-          return this.$q.notify({
-            color: 'negative',
-            icon: 'error',
-            position: 'top-right',
-            timeout: 3000,
-            message: this.$tc('messages.to_complete_form')
-          })
-        }
-
-        this.$q.dialog({
-          title: this.$tc('form.confirm'),
-          message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.validation') }),
-          cancel: true,
-          persistent: true
-        }).onOk(() => {
-          submit()
-        })
-      })
     }
   }
 }
