@@ -61,62 +61,11 @@
           </table-header>
         </template>
 
-        <q-td slot="body-cell" slot-scope="rs" :props="rs">
-          <div v-if="rs.col.name === 'prefix'">
-            <!-- <q-btn dense flat color="grey" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`"/> -->
-            <!-- <q-btn v-if="isCanUpdate" dense flat color="grey" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`"/>
-            <q-btn v-if="isCanDelete" dense flat color="grey" icon="delete" @click.native="TABLE.delete(rs.row)" />
-            <q-btn v-if="isCanPush" dense flat color="light" icon="mdi-database-export" title="upload"
-              @click.native="push(rs.row)"
-            /> -->
-          </div>
-
-          <div v-else-if="rs.col.name === 'customer'">
-            <span v-if="rs.row.customer" v-text="rs.row.customer.code"/>
-            <span v-else v-text="'-'" />
-          </div>
-
-          <div v-else-if="rs.col.name === 'brand'">
-            <span v-if="rs.row.brand" v-text="rs.row.brand.name"/>
-            <span v-else v-text="'-'" />
-          </div>
-
-          <div v-else-if="rs.col.name === 'specification'">
-            <span v-if="rs.row.specification" v-text="rs.row.specification.name"/>
-            <span v-else v-text="'-'" />
-          </div>
-
-          <div v-else-if="rs.col.name === 'enable'">
-            <q-avatar size="24px" class="shadow-1"
-            :color="rs.row.enable ? 'green' : 'red'" text-color="white"
-            :icon="rs.row.enable ? 'mdi-check-outline' : 'block'" />
-          </div>
-
-          <div v-else-if="rs.col.name === 'WO'">
-            <span v-if="Boolean(rs.value !== 0)">
-              {{rs.value}}
-              <q-tooltip>
-                FM({{$app.number_format(rs.row.totals['WOFM'])}})
-                NC({{$app.number_format(rs.row.totals['WONC'])}})
-                NCR({{$app.number_format(rs.row.totals['WONCR'])}})
-              </q-tooltip>
-            </span>
-            <span v-else v-text="'-'" />
-          </div>
-
-          <div v-else-if="rs.col.name === 'PDO'">
-            <span v-if="Boolean(rs.value !== 0)">
-              {{rs.value}}
-              <q-tooltip>
-                REGULER({{$app.number_format(rs.row.totals['PDO.REG'])}})
-                RETURN({{$app.number_format(rs.row.totals['PDO.RET'])}})
-              </q-tooltip>
-            </span>
-            <span v-else v-text="'-'" />
-          </div>
-
-          <div v-else>{{rs.value}}</div>
-
+        <q-td slot="body-cell-amount_delivery_balance_reguler" slot-scope="rs" :props="rs">
+          {{(rs.row.amount_delivery_task_reguler || 0) - (rs.row.amount_delivery_load_reguler || 0)}}
+        </q-td>
+        <q-td slot="body-cell-amount_delivery_balance_return" slot-scope="rs" :props="rs">
+          {{(rs.row.amount_delivery_task_return || 0) - (rs.row.amount_delivery_load_return || 0)}}
         </q-td>
       </q-table>
     </q-pull-to-refresh>
@@ -166,14 +115,16 @@ export default {
         columns: [
           { name: 'prefix', label: '', align: 'left', required: true },
 
-          { name: 'customer', label: this.$tc('general.cust') + '.', field: 'customer_id', align: 'left', sortable: true },
+          { name: 'customer_code', label: this.$tc('general.cust') + '.', field: 'customer_code', align: 'left', sortable: true },
           { name: 'part_name', label: this.$tc('items.part_name'), field: 'part_name', align: 'left', sortable: true },
           { name: 'part_subname', label: this.$app.setting('item.subname_label'), field: 'part_subname', align: 'left', sortable: true },
           { name: 'amount_delivery_task_reguler', label: `${this.$tc('general.delivery_task', 2)}(REG)`, field: 'amount_delivery_task_reguler' },
           { name: 'amount_delivery_task_return', label: `${this.$tc('general.delivery_task', 2)}(RET)`, field: 'amount_delivery_task_return' },
           { name: 'amount_delivery_verify', label: this.$tc('general.delivery_verify', 2), field: 'amount_delivery_verify' },
           { name: 'amount_delivery_load_reguler', label: `${this.$tc('general.delivery_load', 2)}(REG)`, field: 'amount_delivery_load_reguler' },
-          { name: 'amount_delivery_load_return', label: `${this.$tc('general.delivery_load', 2)}(RET)`, field: 'amount_delivery_load_return' }
+          { name: 'amount_delivery_load_return', label: `${this.$tc('general.delivery_load', 2)}(RET)`, field: 'amount_delivery_load_return' },
+          { name: 'amount_delivery_balance_reguler', label: 'Balance (REG)' },
+          { name: 'amount_delivery_balance_return', label: 'Balance (RET)' }
         ],
         hideColumns: ['code']
       }
