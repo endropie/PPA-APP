@@ -152,10 +152,17 @@
               }
             },
             { label: 'PDO', color:'blue-10', icon: 'assignment',
-              hidden: !this.$app.can('pre-deliveries-create'),
+              hidden: !this.$app.can('pre-deliveries-create') || rsView.status !== 'VALIDATED',
               detail: $tc('form.add_new',1, {v:'PDO'}),
               actions: () => {
                 $router.push(`/admin/deliveries/pre-deliveries/create?incoming_good_id=${ROUTE.params.id}`)
+              }
+            },
+            { label: 'DELIVERY (TASK)', color:'blue-10', icon: 'assignment',
+              hidden: !this.$app.can('delivery-tasks-create') || rsView.status !== 'VALIDATED' || rsView.has_relationship.delivery_task === true,
+              detail: $tc('form.add_new',1, {v:'PDO'}),
+              actions: () => {
+                $router.push(`/admin/deliveries/delivery-tasks/create?incoming_good_id=${ROUTE.params.id}`)
               }
             },
           ]"/>
@@ -179,56 +186,56 @@ export default {
   data () {
     return {
       VIEW: {
-        resource:{
+        resource: {
           api: '/api/v1/warehouses/incoming-goods',
           uri: '/admin/deliveries/incoming-goods',
           params: '?mode=view'
         }
       },
       rsView: {},
-      count: 0,
+      count: 0
     }
   },
-  created() {
+  created () {
     this.init()
   },
   computed: {
-    isCanCreate() {
+    isCanCreate () {
       return this.$app.can('incoming-goods-create')
     },
-    isCanUpdate() {
+    isCanUpdate () {
       return this.$app.can('incoming-goods-update')
     },
-    isCanDelete() {
+    isCanDelete () {
       return this.$app.can('incoming-goods-delete')
     },
-    IS_LOTS() {
+    IS_LOTS () {
       if (this.rsView.transaction !== 'REGULER') return false
       if (this.rsView.order_mode !== 'NONE') return false
       if (!this.rsView.customer) return false
       return this.rsView.customer.order_lots
     },
-    IS_REVISE() {
+    IS_REVISE () {
       if (this.IS_EDITABLE) return false
       if (this.rsView.deleted_at) return false
-      if (['VOID','OPEN'].find(x => x === this.rsView.status)) return false
+      if (['VOID', 'OPEN'].find(x => x === this.rsView.status)) return false
       return true
     },
-    IS_VOID() {
+    IS_VOID () {
       if (this.IS_EDITABLE) return false
       if (this.rsView.deleted_at) return false
       if (!this.$app.can('incoming-goods-void')) return false
       if (['VOID'].find(x => x === this.rsView.status)) return false
       return true
     },
-    IS_EDITABLE() {
+    IS_EDITABLE () {
       if (this.rsView.deleted_at || this.rsView.status !== 'OPEN') return false
       if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
       return true
-    },
+    }
   },
   methods: {
-    isHideColumn(val) {
+    isHideColumn (val) {
       const setting = this.$store.state.admin.SETTING.incoming_good
         ? this.$store.state.admin.SETTING.incoming_good['hide_view_columns'] || []
         : []
@@ -236,7 +243,7 @@ export default {
       if (setting.some(v => val === v)) return true
 
       const hidden = this.$store.state.admin.CONFIG.incoming_good['hide_view_columns'] || []
-      return Boolean( hidden.some(v => val === v) )
+      return Boolean(hidden.some(v => val === v))
     },
     setRestoration () {
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/restoration`)
@@ -247,15 +254,15 @@ export default {
     setValidation () {
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/validation`)
     },
-    init() {
+    init () {
       this.VIEW.load((data) => {
         this.setView(data || {})
       })
     },
 
-    setView(data) {
-      this.rsView =  JSON.parse(JSON.stringify(data))
-    },
+    setView (data) {
+      this.rsView = JSON.parse(JSON.stringify(data))
+    }
   }
 }
 </script>

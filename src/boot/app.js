@@ -191,6 +191,10 @@ export default async ({ app, store, router, Vue }) => {
       if (!date) return ''
       return moment(date).format(format || 'DD/MM/YYYY')
     },
+    classDimmed (bool) {
+      if (bool) return Dark.isActive ? 'dimmed' : 'light-dimmed'
+      return ''
+    },
     moment: moment,
     date: date
   }
