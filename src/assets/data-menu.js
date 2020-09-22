@@ -196,109 +196,45 @@ const deliveries = [
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'incoming-goods-read;delivery-tasks-create' } }
     ]
   },
-  {
-    name: 'Delivery internal',
-    icon: 'assignment',
-    path: 'delivery-internals',
-    lang: 'general.delivery_internal',
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-internals-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-internals-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'delivery-internals-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-internals-read' } }
-    ]
-  },
-  {
-    name: 'Pre-Delivery Orders',
-    icon: 'assignment',
-    path: 'pre-deliveries',
-    lang: 'general.pre_delivery',
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'pre-deliveries-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'pre-deliveries-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'pre-deliveries-update' } },
-      { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'pre-deliveries-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'pre-deliveries-read' } }
-    ]
-  },
-  {
-    name: 'Outgoing Verification',
-    icon: 'assignment_turned_in',
-    path: 'outgoing-verifications',
-    lang: 'general.outgoing_verification',
-    param: `?unvalidated=1`,
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'outgoing-verifications-read' } },
-      { page: 'create', path: 'create', meta: { mode: 'create', permission: 'outgoing-verifications-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'outgoing-verifications-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'outgoing-verifications-read' } }
-    ]
-  },
-  {
-    name: 'Outgoing Good',
-    icon: 'unarchive',
-    path: 'outgoing-goods',
-    lang: 'general.outgoing_good',
-    param: ``,
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'outgoing-goods-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'outgoing-goods-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'outgoing-goods-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'outgoing-goods-read' } }
-    ]
-  },
-  {
-    name: 'SJDO',
-    icon: 'local_offer',
-    path: 'delivery-orders',
-    lang: 'general.sj_delivery',
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'sj-delivery-orders-read' } },
-      { page: 'index-items', path: 'items', icon: 'list', meta: { permission: 'sj-delivery-orders-read' } },
-      { page: 'form-sample', path: 'create-sample', meta: { mode: 'create', permission: 'sj-delivery-orders-create' } },
-      { page: 'form-sample', path: ':id/edit-sample', meta: { mode: 'edit', permission: 'sj-delivery-orders-update' } },
-      { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
-      { page: 'revision-internal', path: ':id/revision-internal', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
-      { page: 'reconcile', path: ':id/reconcile', meta: { mode: 'edit', permission: 'sj-delivery-orders-create' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'sj-delivery-orders-read' } }
-    ]
-  },
-  {
-    name: 'DEPORTATIONS',
-    icon: 'local_offer',
-    path: 'deportation-goods',
-    lang: 'general.deportation_goods',
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'deportation-goods-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'deportation-goods-update' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'deportation-goods-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'deportation-goods-read' } }
-    ]
-  },
-  {
-    name: 'Schedule Board',
-    icon: 'work',
-    path: 'schedule-boards',
-    lang: 'general.schedule_board',
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'schedule-boards-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'schedule-boards-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'schedule-boards-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'schedule-boards-read' } }
-    ]
-  },
-  {
-    path: 'incoming-goods/items',
-    icon: 'list',
-    lang: 'general.incoming_good_items',
-    meta: { permission: 'incoming-goods-read' }
-  },
-  {
-    path: 'delivery-orders/items',
-    icon: 'list',
-    lang: 'general.sj_delivery_items',
-    meta: { permission: 'sj-delivery-orders-read' }
-  },
+  // {
+  //   name: 'Pre-Delivery Orders',
+  //   icon: 'assignment',
+  //   path: 'pre-deliveries',
+  //   lang: 'general.pre_delivery',
+  //   resources: [
+  //     { page: 'index', path: '', icon: 'list', meta: { permission: 'pre-deliveries-read' } },
+  //     { page: 'form', path: 'create', meta: { mode: 'create', permission: 'pre-deliveries-create' } },
+  //     { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'pre-deliveries-update' } },
+  //     { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'pre-deliveries-update' } },
+  //     { page: 'view', path: ':id', meta: { mode: 'view', permission: 'pre-deliveries-read' } }
+  //   ]
+  // },
+  // {
+  //   name: 'Outgoing Verification',
+  //   icon: 'assignment_turned_in',
+  //   path: 'outgoing-verifications',
+  //   lang: 'general.outgoing_verification',
+  //   param: `?unvalidated=1`,
+  //   resources: [
+  //     { page: 'index', path: '', icon: 'list', meta: { permission: 'outgoing-verifications-read' } },
+  //     { page: 'create', path: 'create', meta: { mode: 'create', permission: 'outgoing-verifications-create' } },
+  //     { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'outgoing-verifications-update' } },
+  //     { page: 'view', path: ':id', meta: { mode: 'view', permission: 'outgoing-verifications-read' } }
+  //   ]
+  // },
+  // {
+  //   name: 'Outgoing Good',
+  //   icon: 'unarchive',
+  //   path: 'outgoing-goods',
+  //   lang: 'general.outgoing_good',
+  //   param: ``,
+  //   resources: [
+  //     { page: 'index', path: '', icon: 'list', meta: { permission: 'outgoing-goods-read' } },
+  //     { page: 'form', path: 'create', meta: { mode: 'create', permission: 'outgoing-goods-create' } },
+  //     { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'outgoing-goods-update' } },
+  //     { page: 'view', path: ':id', meta: { mode: 'view', permission: 'outgoing-goods-read' } }
+  //   ]
+  // },
   {
     name: 'Delivery (outstanding)',
     icon: 'work',
@@ -343,6 +279,70 @@ const deliveries = [
       // { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'delivery-verifies-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-verifies-read' } }
     ]
+  },
+  {
+    name: 'SJDO',
+    icon: 'local_offer',
+    path: 'delivery-orders',
+    lang: 'general.sj_delivery',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'sj-delivery-orders-read' } },
+      { page: 'index-items', path: 'items', icon: 'list', meta: { permission: 'sj-delivery-orders-read' } },
+      { page: 'form-sample', path: 'create-sample', meta: { mode: 'create', permission: 'sj-delivery-orders-create' } },
+      { page: 'form-sample', path: ':id/edit-sample', meta: { mode: 'edit', permission: 'sj-delivery-orders-update' } },
+      { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
+      { page: 'revision-internal', path: ':id/revision-internal', meta: { mode: 'edit', permission: 'sj-delivery-orders-revision' } },
+      { page: 'reconcile', path: ':id/reconcile', meta: { mode: 'edit', permission: 'sj-delivery-orders-create' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'sj-delivery-orders-read' } }
+    ]
+  },
+  {
+    name: 'DEPORTATIONS',
+    icon: 'local_offer',
+    path: 'deportation-goods',
+    lang: 'general.deportation_goods',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'deportation-goods-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'deportation-goods-update' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'deportation-goods-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'deportation-goods-read' } }
+    ]
+  },
+  {
+    name: 'Delivery (Internal)',
+    icon: 'assignment',
+    path: 'delivery-internals',
+    lang: 'general.delivery_internal',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-internals-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-internals-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'delivery-internals-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-internals-read' } }
+    ]
+  },
+  {
+    name: 'Schedule Board',
+    icon: 'work',
+    path: 'schedule-boards',
+    lang: 'general.schedule_board',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'schedule-boards-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'schedule-boards-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'schedule-boards-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'schedule-boards-read' } }
+    ]
+  },
+  {
+    path: 'incoming-goods/items',
+    icon: 'list',
+    lang: 'general.incoming_good_items',
+    meta: { permission: 'incoming-goods-read' }
+  },
+  {
+    path: 'delivery-orders/items',
+    icon: 'list',
+    lang: 'general.sj_delivery_items',
+    meta: { permission: 'sj-delivery-orders-read' }
   }
 ]
 
