@@ -78,7 +78,7 @@
     </q-card-section>
     <q-separator inset />
     <!-- SINGLE-REVISION -->
-    <q-card-section :class="this.$app.classDimmed(!rsForm.customer_id) ">
+    <q-card-section :class="$app.classDimmed(!rsForm.customer_id) ">
       <!-- COLUMN:: Part items lists -->
       <q-markup-table bordered class="main-box no-shadow no-highlight q-mb-sm"
         dense separator="horizontal"
@@ -101,7 +101,7 @@
               <ux-select dense outlined hide-bottom-space
                 v-model="row.item"
                 filter clearable
-                :source="`/api/v1/common/items?mode=all&--limit=50&customer_id=${rsForm.customer_id}`"
+                :source="`/api/v1/common/items?mode=all&--limit=50&enable=1&customer_id=${rsForm.customer_id}`"
                 :source-key="['part_name', 'part_number', 'code']"
                 option-label="part_name"
                 :option-sublabel="(opt) => `[${opt.customer_code}] ${opt.part_number}`"

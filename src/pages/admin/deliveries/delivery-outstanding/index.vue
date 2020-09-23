@@ -26,7 +26,7 @@
 
             <div class="row q-col-gutter-xs">
               <ux-date
-                v-model="FILTERABLE.fill.delivery_outstanding.value"
+                v-model="FILTERABLE.fill.delivery_task_date.value"
                 dense hide-bottom-space hide-dropdown-icon
                 standout="bg-blue-grey-5 text-white"
                 @input="FILTERABLE.submit"
@@ -89,17 +89,12 @@ export default {
           //   type: 'string',
           //   transform: (value) => { return '' }
           // },
-          enable: {
-            value: '',
-            type: 'string',
-            transform: (value) => { return '' }
-          },
           customer_id: {
             value: null,
             type: 'integer',
             transform: (value) => { return null }
           },
-          delivery_outstanding: {
+          delivery_task_date: {
             value: this.$app.moment().format('YYYY-MM-DD'),
             type: 'string',
             transform: (value) => { return '' }

@@ -30,6 +30,7 @@
             name="date"
             :label="$tc('label.date')" stack-label
             v-model="rsForm.date"
+            :disable="Boolean(rsForm.item_id)"
             v-validate="'required'"
             :error="errors.has('date')"
             :error-message="errors.first('date')"
@@ -49,16 +50,13 @@
       </div>
     </q-card-section>
     <q-separator spaced inset />
-    <q-card-section  class="column" :class="{
-      'dimmed': !Boolean(rsForm.customer) && $q.dark.isActive,
-      'light-dimmed': !Boolean(rsForm.customer) && !$q.dark.isActive
-    }">
+    <q-card-section class="column" :class="$app.classDimmed(!Boolean(rsForm.customer_id && rsForm.date))">
 
       <ux-select dense outlined
         :label="$tc('label.part')"
         v-model="rsForm.item"
         filter clearable
-        :source="`/api/v1/common/items?mode=all&--limit=50&customer_id=${rsForm.customer_id}`"
+        :source="`/api/v1/common/items?mode=all&--limit=50&enable=1&delivery_task_date=${rsForm.date}&customer_id=${rsForm.customer_id}`"
         :source-key="['part_name', 'part_number', 'code']"
         option-label="part_name"
         :option-sublabel="(opt) => `[${opt.customer_code}] ${opt.part_number}`"
