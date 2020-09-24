@@ -138,23 +138,22 @@
         </tbody>
       </q-markup-table>
       <div class="row q-col-gutter-sm">
-        <div class="col-12 col-md-6">
-          <q-input type="textarea" autogrow
-            filled class="col-sm-6 q-mb-sm self-start" input-style="min-height:93px"
-            v-model="rsForm.option.description"
-            :label="$tc('label.description')" stack-label
-          />
-        </div>
-        <div class="col-12 col-md-6">
+        <q-input type="textarea" autogrow
+          filled class="col-sm-6 q-mb-sm self-start" input-style="min-height:75px"
+          v-model="rsForm.option.description"
+          :label="$tc('label.description')" stack-label
+        />
+        <div class="col-sm-6">
+          [{{rsForm.reason_id}}]
           <q-select type="text" autogrow
-            filled class="q-mb-sm"
+            class="q-mb-sm"
             emit-value map-options
             v-model="rsForm.reason_id"
             :options="ReasonOptions"
             :label="$tc('label.reason')"
           />
           <q-input type="text" autogrow
-            filled class="q-mb-sm"
+            class="q-mb-sm"
             v-model="rsForm.reason_description"
             :label="$tc('label.note') + ' Internal'"
           />
@@ -223,7 +222,7 @@ export default {
       return (this.SHEET.reasons.data
         .filter(item => item.enable)
         .map(item => ({ label: item.name, value: item.id })) || [])
-        .concat([{ label: this.$tc('label.others'), value: null }])
+        .concat([{ label: 'Others', value: null }])
     }
   },
   watch: {
