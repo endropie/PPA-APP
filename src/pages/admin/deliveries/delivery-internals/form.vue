@@ -10,27 +10,17 @@
     </q-card-section>
     <q-separator />
     <q-card-section>
-      <!-- <div class="row q-gutter-x-sm justify-end">
-        <q-input dense
-          name="number"
-          v-model="rsForm.number" type="text"
-          placeholder="Auto [Generate]"
-          :error="errors.has('number')"
-          :error-message="errors.first('number')"
-        >
-          <span slot="before" class="text-subtitle1 on-right" v-text="$tc('label.number')"></span>
-        </q-input>
-      </div> -->
       <div class="row q-col-gutter-x-md">
         <div class="col-12 col-md-6">
           <ux-select
             name="customer_id"
             :label="$tc('general.customer')"  stack-label
             v-model="rsForm.customer"
+            filter clearable
             source="api/v1/incomes/customers?mode=all"
             :option-label="(item) => `[${item.code}] ${item.name}`"
             option-value="id"
-            filter clearable
+            v-validate="'required'"
             :error="errors.has('customer_id')"
             :error-message="errors.first('customer_id')"
             @input="(v) => {
@@ -138,24 +128,28 @@
         </tbody>
       </q-markup-table>
       <div class="row q-col-gutter-sm">
-        <q-input type="textarea" autogrow
-          filled class="col-sm-6 q-mb-sm self-start" input-style="min-height:75px"
-          v-model="rsForm.option.description"
-          :label="$tc('label.description')" stack-label
-        />
-        <div class="col-sm-6">
-          [{{rsForm.reason_id}}]
+        <div class="col-12 col-md-6">
+          <q-input type="textarea" autogrow
+            filled class="q-mb-sm self-start" input-style="min-height:95px"
+            v-model="rsForm.option.description"
+            :label="$tc('label.description')" stack-label
+          />
+        </div>
+        <div class="col-12 col-md-6">
           <q-select type="text" autogrow
-            class="q-mb-sm"
+            filled class="q-mb-sm"
             emit-value map-options
             v-model="rsForm.reason_id"
             :options="ReasonOptions"
             :label="$tc('label.reason')"
           />
           <q-input type="text" autogrow
-            class="q-mb-sm"
+            name="reason_description"
+            filled class="q-mb-sm"
             v-model="rsForm.reason_description"
             :label="$tc('label.note') + ' Internal'"
+            v-validate="Boolean(rsForm.reason_id) ? '' : 'required'"
+            :error="errors.has('reason_description')"
           />
         </div>
       </div>
@@ -222,7 +216,7 @@ export default {
       return (this.SHEET.reasons.data
         .filter(item => item.enable)
         .map(item => ({ label: item.name, value: item.id })) || [])
-        .concat([{ label: 'Others', value: null }])
+        .concat([{ label: this.$tc('label.others'), value: null }])
     }
   },
   watch: {
