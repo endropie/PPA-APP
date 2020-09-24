@@ -35,7 +35,12 @@ export default {
   sj_delivery: 'Delivery (SJDO) | Surat Jalan',
   sj_delivery_items: 'Delivery (SJDO) Details | Detail Surat Jalan',
   sj_internal: 'Delivery (Intern) | Surat Jalan Sementara',
-  deportation_goods: 'Pengembalian Barang | Deportation Goods',
+  delivery_internal: 'Delivery (Intern) | Surat Jalan Sementara',
+  delivery_outstanding: 'Delivery (Outstanding)  | Skema Pengirimam',
+  delivery_task: 'Delivery (PDO) | PDO',
+  delivery_verify: 'Delivery (Verified) | Verify',
+  delivery_load: 'Delivery (Loading) | Load',
+  deportation_goods: 'Delivery (Deportation) | Deportation',
   schedule_board: 'Penjadwalan |Jadwal Pengiriman & Penjemputan',
 
   work_order: 'SPK | Surat Perintah Kerja',
@@ -46,7 +51,7 @@ export default {
 
   forecast: 'Forecast',
   request_order: 'Sales Order | Pemesanan Penjualan',
-  invoice: 'Invoices | Faktur Penjualan',
+  acc_invoice: 'Invoice Collect | Rekap Faktur',
 
   operator: 'Operator',
   brand: 'Brand',

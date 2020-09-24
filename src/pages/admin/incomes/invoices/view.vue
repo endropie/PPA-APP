@@ -3,24 +3,21 @@
     <page-print v-if="VIEW.show">
       <div slot="header-tags" class="print-hide">
         <!-- header-tags -->
+        <ux-chip-status :row="rsView" tag outline small square icon='bookmark' :color-options="{INVOICED:'green'}" />
       </div>
       <div class="row justify-around q-col-gutter-y-sm" >
         <div class="col-12">
-          <div class="row justify-between q-gutter-sm" >
-            <div class="items-end q-pt-lg">
-              <div class="text-h6 q-px-xs">REKAP INVOICE #{{rsView.fullnumber || rsView.number}}</div>
-              <q-markup-table class="super-dense no-shadow" separator="none" :dark="LAYOUT.isDark">
-                <tbody v-if="rsView.request_order">
-                  <tr>
-                    <td class="text-uppercase">{{$tc('general.customer')}}</td>
-                    <td v-if="rsView.request_order">{{ rsView.request_order.customer.name }}</td>
-                  </tr>
-                  <tr>
-                    <td class="text-uppercase">{{$tc('label.transaction')}}</td>
-                    <td class="text-weight-bold">{{ rsView.request_order.transaction || '-'}}</td>
-                  </tr>
-                </tbody>
-              </q-markup-table>
+          <div class="row justify justify-between q-gutter-sm" >
+            <div class="sel q-pt-lg q-px-xs">
+              <div class="text-h6 ">REKAP INVOICE #{{rsView.fullnumber || rsView.number}}</div>
+              <div class="text-uppercase row full-width">
+                <span v-if="rsView.customer">[{{rsView.customer.code}}] {{rsView.customer.name}}</span>
+              </div>
+            </div>
+            <div class="content-end self-end q-pt-lg">
+              <div class="text-uppercase">
+                <span v-if="rsView.invoiced_number">No. Invoice {{rsView.invoiced_number}}</span>
+              </div>
             </div>
             <div class="column items-start q-gutter-sm">
               <q-markup-table dense square bordered class="super-dense no-shadow " separator="cell" :dark="LAYOUT.isDark">
@@ -67,6 +64,7 @@
         <q-btn :label="$tc('form.back')" icon="cancel" color="dark" :class="{'full-width': $q.screen.lt.sm}" v-go-back.single />
         <q-btn :label="$tc('form.print')" icon="print" color="grey" :class="{'full-width': $q.screen.lt.sm}" @click.native="print()" />
         <q-space />
+        <q-btn :label="$tc('form.confirm')" icon="done_all" color="positive" :class="{'full-width': $q.screen.lt.sm}" @click="setConfirmed()" v-if="rsView.status == 'OPEN'" />
         <q-btn :label="$tc('form.delete')" icon="delete" color="negative" :class="{'full-width': $q.screen.lt.sm}" @click="VIEW.delete" />
       </div>
     </page-print>
@@ -88,50 +86,49 @@ export default {
       bottomTab: null,
       VIEW: {
         data: {},
-        resource:{
+        resource: {
           api: '/api/v1/incomes/invoices',
-          uri: '/admin/incomes/invoices',
+          uri: '/admin/incomes/invoices'
         }
       },
       rsView: {},
       show_delivery: false
     }
   },
-  created() {
+  created () {
     this.init()
   },
-  watch:{
-      '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   computed: {
-    IS_CLOSE() {
+    IS_CLOSE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
       return true
     },
-    IS_VOID() {
+    IS_VOID () {
       if (this.IS_EDITABLE) return false
       if (['VOID'].find(x => x === this.rsView.status)) return false
       return true
     },
-    IS_EDITABLE() {
+    IS_EDITABLE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
 
       return true
     },
-    SUM_ITEMS() {
+    SUM_ITEMS () {
       let data = []
       this.rsView.request_order_items.map((detail) => {
         const index = data.findIndex(x => {
-          return x.item_id == detail.item_id
+          return x.item_id === detail.item_id
         })
         if (index > -1) {
           data[index].unit_amount += detail.unit_amount
           data[index].amount_delivery += detail.amount_delivery
           data[index].quantity += detail.quantity
-        }
-        else {
+        } else {
           data.push(JSON.parse(JSON.stringify(detail)))
         }
       })
@@ -139,122 +136,45 @@ export default {
     }
   },
   methods: {
-    init() {
+    init () {
       this.VIEW.load((data) => {
         this.setView(data || {})
       })
     },
-    showDO(id) {
+    showDO (id) {
       let params = {
         path: '/admin/deliveries/delivery-orders/view',
         params: { id: id },
-        meta: { mode: 'view'},
+        meta: { mode: 'view' },
         actions: {
           // actions
         }
       }
 
-      this.$refs.modal.show(params);
+      this.$refs.modal.show(params)
     },
-    setView(data) {
-      this.rsView =  data
+    setView (data) {
+      this.rsView = data
     },
-    push (row) {
-      this.$q.loading.show()
-      let url = `/api/v1/incomes/request-orders/invoice/${row.id}/accurate/push`
-      this.$axios.post(url)
-        .then((response) => {
-          console.warn('OK', response)
-          let msg = response.data.d[0] || ''
-          return (response.data.s)
-            ? this.$app.notify.success('[ACCURATE]', msg)
-            : this.$app.notify.warning('[ACCURATE]', msg)
-          this.init();
-        })
-        .catch(error => {
-          this.$app.response.error(error.response || error)
-        })
-        .finally(()=>{
-          this.$q.loading.hide()
-        })
-    },
-    forget (row) {
-      const submit = (row) => {
+    setConfirmed () {
+      const submit = () => {
         this.$q.loading.show()
-        let url = `/api/v1/incomes/request-orders/invoice/${row.id}/accurate/forget`
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/confirmed`
+
         this.$axios.post(url)
           .then((response) => {
-            let msg = response.data.d[0] || ''
-            if (response.data.s)  {
-              this.$app.notify.success('[ACCURATE]', msg)
-            }
+            let msg = response.data.message[0] || ''
+            if (response.data.success) this.$app.notify.success('[ACCURATE]', msg)
             else this.$app.notify.warning('[ACCURATE]', msg)
+
             this.init()
           })
           .catch(error => {
             this.$app.response.error(error.response || error)
           })
-          .finally(()=>{
+          .finally(() => {
             this.$q.loading.hide()
           })
-      }
-
-      this.$q.dialog({title:'DELETE CONFIRM', message: 'Are you sure to delete?', cancel: true})
-      .onOk(() => {
-        submit(row)
-      })
-
-    },
-    setClose() {
-      const submit = () => {
-        this.VIEW.show = false
-        this.VIEW.loading = true
-        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=close&nodata=true`
-        this.$axios.put(url)
-          .then((response) => {
-            const data = response.data
-            this.init()
-          })
-          .catch(error => {
-            this.$app.response.error(error.response, 'FORM CLOSED')
-          })
-          .finally(()=>{
-            this.VIEW.show = true
-            setTimeout(() => {
-              this.VIEW.loading = false
-            }, 1000);
-          })
-      }
-
-      this.$q.dialog({
-        title: this.$tc('form.confirm', 1, {v:'CLOSE'}),
-        message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_close')}),
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        submit()
-      })
-    },
-    setRecalculate() {
-      const submit = () => {
-        // this.VIEW.show = false
-        this.VIEW.loading = true
-        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=calculate&nodata=true`
-        this.$axios.put(url)
-          .then((response) => {
-            const data = response.data
-            this.init()
-          })
-          .catch(error => {
-            this.$app.response.error(error.response, 'FORM CLOSED')
-          })
-          .finally(() => {
-            this.VIEW.show = true
-            setTimeout(() => {
-              this.VIEW.loading = false
-            }, 1000);
-          })
-
       }
 
       submit()

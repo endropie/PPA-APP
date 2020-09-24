@@ -204,37 +204,7 @@
               </q-expansion-item>
             </q-card>
           </div>
-          <div class="col-12 col-sm-6 col-md-4" v-if="rsView.acc_invoices">
-            <q-card>
-              <q-expansion-item header-class="bg-teal-8 text-white" icon="mdi-shopping" :label="`${$tc('general.invoice', 2)} (${rsView.acc_invoices.length})`">
-                <q-list separator bordered :dark="LAYOUT.isDark" class="main-box">
-                  <q-item :dark="LAYOUT.isDark"
-                    v-for="(invoice, index) in rsView.acc_invoices" :key="index">
-                    <q-item-section side>
-                      <q-btn flat dense color="blue-grey" icon="description" :to="`${VIEW.resource.uri}/invoice-conclusion/${invoice.id}`" />
-                    </q-item-section>
-                    <q-item-section>
-                      {{invoice.number}}
-                    </q-item-section>
-                    <q-item-section side>
-                      <q-btn flat dense color="blue-grey" icon="mdi-database-remove" @click="forget(invoice)" />
-                    </q-item-section>
-                  </q-item>
-                  <q-item>
-                    <q-item-section>
-                      <q-btn dense color="teal-8" :label="$tc('form.add_new')" @click="$refs['modalAddInv'].show()" />
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-expansion-item>
-            </q-card>
-          </div>
         </div>
-        <modal-invoice-form ref="modalAddInv"
-          :delivery-orders="rsView.delivery_orders"
-          :request-order-id="rsView.id"
-          @done="init"
-        />
       </div>
     </page-print>
     <q-inner-loading :showing="VIEW.loading">
@@ -248,10 +218,9 @@
 
 import MixView from '@/mixins/mix-view.vue'
 import PagePrint from '@/components/page-print'
-import ModalInvoiceForm from './modal-invoice-form'
 export default {
   mixins: [MixView],
-  components: { PagePrint, ModalInvoiceForm },
+  components: { PagePrint },
   data () {
     return {
       VIEW: {

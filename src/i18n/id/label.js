@@ -14,6 +14,7 @@ export default {
   continue: 'Lanjutkan',
   category: 'Kategori {v}',
   color: 'Warna',
+  delivery_note: 'Delivery note',
   date: 'Tanggal',
   description: 'Keterangan',
   detail: 'Detail {v}',

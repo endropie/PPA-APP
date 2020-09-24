@@ -70,7 +70,7 @@
           <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
             <div class="" style="max-width:50%">
               <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
-              <address class="text-weight-light">{{rsView.customer_address}}</address>
+              <address class="text-normal" style="font-style: normal">{{rsView.customer_address}}</address>
               <div class="text-weight-medium" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
               <div class="text-weight-medium" v-if="rsView.vehicle">{{$tc('label.transport')}}: {{rsView.vehicle.number}}</div>
               <!-- <div class="text-weight-medium" v-if="rsView.indexed_number">{{$tc('label.no',1, {v:'Index'})}}: {{rsView.indexed_number}}</div> -->
@@ -143,6 +143,7 @@
               class="table-print no-shadow no-highlight th-uppercase">
               <thead>
               <q-tr>
+                <q-th v-if="IS_LOTS">LOTS</q-th>
                 <q-th v-if="!isHideColumn('part_name')" class="text-left">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
                 <q-th v-if="!isHideColumn('part_subname')" class="text-left">{{ $app.setting('item.subname_label') }}</q-th>
                 <q-th v-if="isDoubleUnit & !isHideColumn('quantity')" key="PCS" class="text-right" >Unit (PCS)</q-th>
@@ -156,6 +157,7 @@
               <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
                 <q-tr :delivery-order-item-id="row.id"
                   v-show="isRowMain(row)" >
+                  <q-td v-if="IS_LOTS"> {{row.number_lots}} </q-td>
                   <q-td v-if="!isHideColumn('part_name')">
                     <span class="text-weight-medium" v-if="Boolean(mode)">{{mode}}:&nbsp;</span>
                     <span class="text-weight-medium" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">Material:&nbsp;</span>
@@ -189,7 +191,7 @@
                         <q-popup-edit v-model="row.encasement" content-class="" :cover="false" :offset="[0, 10]"
                           @save="(val,init) => setEncasement(index, val, init)"
                           >
-                          <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
+                          <template v-slot="{ value, emitValue, set, cancel }">
                             <q-input autofocus dense :value="value" :label="$tc('label.encasement')" stack-label
                               @input="emitValue"
                             >
@@ -209,6 +211,7 @@
                 <q-tr :delivery-order-item-id="row.id"
                   v-show="isRowMain(row)"
                   v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
+                  <q-td v-if="IS_LOTS"> {{row.number_lots}} </q-td>
                   <q-td v-if="!isHideColumn('part_name')">
                     <span class="text-weight-medium">Jasa:&nbsp;</span>
                     <span v-if="row.item"> {{row.item.part_name}} </span>
@@ -240,8 +243,8 @@
             </q-markup-table>
           </div>
           <div v-show="Boolean(rsView.description)">
-              <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
-              <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
+              <div class="q-my-xs">{{$tc('label.description')}}:</div>
+              <div class="q-my-xs" style="min-height:30px">{{ rsView.description }}</div>
           </div>
           <q-space />
           <div class="page-break-inside">
@@ -301,7 +304,7 @@ export default {
   data () {
     return {
       VIEW: {
-        resource:{
+        resource: {
           api: '/api/v1/incomes/delivery-orders',
           uri: '/admin/deliveries/delivery-orders',
           params: '?mode=view'
@@ -309,53 +312,56 @@ export default {
       },
       rsView: {},
       remain_only: true,
-      isDoubleUnit: false,
+      isDoubleUnit: false
     }
   },
-  created() {
+  created () {
     this.init()
   },
   computed: {
-    IS_MAINROW() {
+    IS_LOTS () {
+      return Boolean(this.rsView.customer && this.rsView.customer.order_lots)
+    },
+    IS_MAINROW () {
       return Boolean(!this.rsView.is_internal || !this.remain_only)
     },
-    IS_CONFIRM() {
+    IS_CONFIRM () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
       return true
     },
-    IS_RECON() {
+    IS_RECON () {
       if (this.rsView.deleted_at) return false
       if (!this.rsView.is_internal) return false
       if (this.rsView.status !== 'CONFIRMED') return false
       return true
     },
-    IS_REVISE() {
+    IS_REVISE () {
       if (this.rsView.deleted_at) return false
-      if (this.rsView.transaction == 'SAMPLE') return false
+      if (this.rsView.transaction === 'SAMPLE') return false
       if (this.rsView.status !== 'OPEN' && this.rsView.is_internal) return false
       if (this.rsView.status !== 'OPEN' && this.rsView.reconcile_id) return false
       return true
     },
-    IS_VOID() {
+    IS_VOID () {
       if (this.rsView.deleted_at) return false
       return true
     },
-    IS_EDITABLE() {
+    IS_EDITABLE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
       if (this.rsView.transaction !== 'SAMPLE') return false
       if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
       return true
-    },
+    }
   },
   methods: {
-    init() {
+    init () {
       this.VIEW.load((data) => {
         this.setView(data || {})
       })
     },
-    isHideColumn(val) {
+    isHideColumn (val) {
       const setting = this.$store.state.admin.SETTING.sj_delivery
         ? this.$store.state.admin.SETTING.sj_delivery['hide_view_columns'] || []
         : []
@@ -363,56 +369,56 @@ export default {
       if (setting.some(v => val === v)) return true
 
       const config = this.$store.state.admin.CONFIG.sj_delivery['hide_view_columns'] || []
-      return Boolean( config.some(v => val === v) )
+      return Boolean(config.some(v => val === v))
     },
-    isRowMain(row) {
+    isRowMain (row) {
       return this.IS_MAINROW || Math.round(row.unit_amount) !== Math.round(row.amount_reconcile)
     },
-    valPCS(row) {
+    getOrderLot (row) {
+      // return
+      console.warn('LOT', row.number_lots)
+    },
+    valPCS (row) {
       if (row.unit_id === 1) {
         return Number(row.quantity)
-      }
-      else if (row.item.unit_id === 1) {
+      } else if (row.item.unit_id === 1) {
         return Number(row.unit_amount)
-      }
-      else if (row.item && row.item.item_units) {
+      } else if (row.item && row.item.item_units) {
         const find = row.item.item_units.find(u => u.unit_id === 1)
         if (find) {
-          return (Number(row.unit_amount) / Number(find.rate||1))
+          return (Number(row.unit_amount) / Number(find.rate || 1))
         }
       }
       return null
     },
-    valKG(row) {
+    valKG (row) {
       if (row.unit_id === 2) {
         return Number(row.quantity)
-      }
-      else if (row.item.unit_id === 2) {
+      } else if (row.item.unit_id === 2) {
         return Number(row.unit_amount)
-      }
-      else if (row.item && row.item.item_units) {
+      } else if (row.item && row.item.item_units) {
         const find = row.item.item_units.find(u => u.unit_id === 2)
         if (find) {
-          return (Number(row.unit_amount) / Number(find.rate||1))
+          return (Number(row.unit_amount) / Number(find.rate || 1))
         }
       }
       return null
     },
-    getArrayPage(c) {
+    getArrayPage (c) {
       if (c.delivery_mode === 'SEPARATE') return ['Material', 'Jasa']
       else return ['']
     },
-    setView(data) {
-      this.rsView =  data
+    setView (data) {
+      this.rsView = data
     },
-    setRevision() {
+    setRevision () {
       const page = this.rsView.is_internal ? 'revision-internal' : 'revision'
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/${page}`)
     },
-    setReconciliation() {
+    setReconciliation () {
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/reconcile`)
     },
-    setConfirmation() {
+    setConfirmation () {
       const submit = () => {
         this.VIEW.show = false
         this.VIEW.loading = true
@@ -425,25 +431,28 @@ export default {
           .catch(error => {
             this.$app.response.error(error.response, 'FORM REVISION')
           })
-          .finally(()=>{
+          .finally(() => {
             this.VIEW.show = true
             setTimeout(() => {
               this.VIEW.loading = false
-            }, 1000);
+            }, 1000)
           })
       }
 
       this.$validator.validate().then(result => {
         if (!result) {
           return this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
-          });
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
+          })
         }
 
         this.$q.dialog({
           title: this.$tc('form.confirm'),
-          message: this.$tc('messages.to_sure', 1, {v: this.$tc('form.validation')}),
+          message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.validation') }),
           cancel: true,
           persistent: true
         }).onOk(() => {
@@ -451,14 +460,14 @@ export default {
         })
       })
     },
-    setEncasement(index, val, init) {
+    setEncasement (index, val, init) {
       const save = () => this.rsView.delivery_order_items[index].encasement = val
       const cancel = () => this.rsView.delivery_order_items[index].encasement = init
       if (this.rsView.delivery_order_items[index].id) {
         const row = this.rsView.delivery_order_items[index]
         this.VIEW.loading = true
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=item-encasement&nodata=true`
-        this.$axios.put(url, {id: row.id, encasement: val})
+        this.$axios.put(url, { id: row.id, encasement: val })
           .then((response) => {
             save()
             this.$app.notify.success('Data Updated!')
@@ -467,13 +476,12 @@ export default {
             cancel()
             this.$app.response.error(error.response, 'Update Encasement')
           })
-          .finally(()=>{
+          .finally(() => {
             setTimeout(() => {
               this.VIEW.loading = false
-            }, 1000);
+            }, 1000)
           })
-      }
-      else cancel()
+      } else cancel()
     }
   }
 }

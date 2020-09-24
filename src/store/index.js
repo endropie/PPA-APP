@@ -3,7 +3,6 @@ import Vuex from 'vuex'
 
 // import example from './module-example'
 import admin from './admin'
-import dbs from './dbs'
 
 Vue.use(Vuex)
 
@@ -16,8 +15,7 @@ export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
       // example
-      admin,
-      dbs
+      admin
     },
 
     // enable strict mode (adds overhead!)

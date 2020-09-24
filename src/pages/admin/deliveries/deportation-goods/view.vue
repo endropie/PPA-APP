@@ -14,8 +14,8 @@
         <div class="col-12">
           <div class="row justify-between q-gutter-sm" >
             <div class="items-end q-pt-lg">
-              <div class="text-h6">
-                DEPORTATION GOOD
+              <div class="text-h6 text-uppercase">
+                {{$tc('general.deportation_goods')}}
               </div>
               <div v-if="rsView.customer">
                  {{ rsView.customer.name }}
@@ -62,6 +62,30 @@
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
             <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
         </div>
+      </div>
+      <q-space />
+      <div class="page-break-inside">
+        <q-markup-table dense class="no-shadow text-weight-light" style="">
+          <tr class="text-center">
+            <td width="21%" style="min-height:30px">
+              <div class="sign-name">Diterima Oleh</div>
+              <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+            </td>
+            <td width="21%">
+              <div class="sign-name">Outgoing Oleh</div>
+              <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+            </td>
+            <td width="21%">
+              <div class="sign-name">Security</div>
+              <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+            </td>
+            <td width="21%" class="text-capitalize">
+              <div class="sign-name">Hormat Kami</div>
+              <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.created_user">(<q-space/>{{rsView.created_user.name}}<q-space/>)</div>
+              <div class="sign-tag row no-wrap q-mx-lg" v-else>( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+            </td>
+          </tr>
+        </q-markup-table>
       </div>
       <div class="row q-gutter-xs print-hide" style="padding-top:50px">
         <q-btn :label="$tc('form.back')" color="dark" icon="cancel" :to="`${VIEW.resource.uri}?return`" />
@@ -233,3 +257,21 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+.info, .info th
+  text-transform uppercase
+  font-size 11px
+  font-weight 500
+
+.table-print
+  .q-table tr, .q-table td
+    line-height normal
+    height unset !important
+  .q-table td
+    padding-top 2px
+    padding-bottom 2px
+.sign-tag
+  margin-top 40px
+  vertical-align bottom
+</style>

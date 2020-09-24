@@ -210,7 +210,6 @@
             <q-item-section class="">
               <div class="row q-col-gutter-xs">
 
-
                 <q-input :name="`customer_contacts.${index}.name`" class="col-12 col-sm-5"
                   label="Name"  stack-label
                   placeholder="Enter fullname ..."
@@ -321,6 +320,13 @@
                 :true-value="1"
                 v-show="rsForm.order_mode == 'NONE'"
               />
+              <q-checkbox name="invoice_request_required" class="text-faded"
+                label="Invoice by Request Order"
+                v-model="rsForm.invoice_request_required"
+                :false-value="0"
+                :true-value="1"
+                v-show="rsForm.order_mode == 'NONE'"
+              />
             </div>
           </q-field>
         </div>
@@ -340,28 +346,23 @@
 
 <script>
 import MixForm from '@/mixins/mix-form.vue'
-import Readme from '@/../README.md'
-
 export default {
   mixins: [MixForm],
-  components: {
-    Readme
-  },
   data () {
     return {
-      SHEET:{
-        provinces: {data:[], api:'/api/v1/references/provinces?mode=all'},
+      SHEET: {
+        provinces: { data: [], api: '/api/v1/references/provinces?mode=all' }
       },
-      FORM:{
-        resource:{
+      FORM: {
+        resource: {
           uri: '/admin/common/customers',
-          api: '/api/v1/incomes/customers',
-        },
+          api: '/api/v1/incomes/customers'
+        }
       },
       rsForm: {},
-      setDefault:()=>{
+      setDefault: () => {
         return {
-          code:null,
+          code: null,
           name: null,
           phone: null,
           fax: null,
@@ -386,29 +387,29 @@ export default {
           invoice_mode: null,
           delivery_mode: null,
           order_mode: null,
-          customer_contacts:[ {id:null} ],
+          customer_contacts: [ { id: null } ],
 
           order_manual_allowed: 0,
           order_monthly_actived: 0,
-          order_lots: 0,
+          order_lots: 0
         }
       }
     }
   },
-  created(){
+  created () {
     // Component Page Mounted!
     this.init()
   },
-  computed:{
-    ProvinceOptions() {
-      return (this.SHEET.provinces.data.map(item => ({label: item.name, value: item.id})) || [])
+  computed: {
+    ProvinceOptions () {
+      return (this.SHEET.provinces.data.map(item => ({ label: item.name, value: item.id })) || [])
     }
   },
-  watch:{
-    '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
       })
@@ -418,73 +419,68 @@ export default {
       this.rsForm = JSON.parse(JSON.stringify(data))
     },
 
-    addNewContact(autofocus = true){
-      let newEntri = {id:null, label:null, name: null, phone:null};
+    addNewContact (autofocus = true) {
+      let newEntri = { id: null, label: null, name: null, phone: null }
 
       this.rsForm.customer_contacts.push(newEntri)
     },
-    removeContact(index) {
-        this.rsForm.customer_contacts.splice(index, 1)
-        if(this.rsForm.customer_contacts.length < 1) this.addNewContact()
+    removeContact (index) {
+      this.rsForm.customer_contacts.splice(index, 1)
+      if (this.rsForm.customer_contacts.length < 1) this.addNewContact()
     },
 
-    onSave() {
-
+    onSave () {
       this.$validator.validate().then(result => {
         if (!result) {
           this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
-          });
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
+          })
 
-          return;
+          return
         }
         this.FORM.loading = true
-        let {method, mode, apiUrl} = this.FORM.meta();
+        let { method, apiUrl } = this.FORM.meta()
         this.$axios.set(method, apiUrl, this.rsForm)
-        .then((response) => {
-          let message = response.data.name + ' - #' + response.data.id
-          this.FORM.response.success({message:message})
-          this.onSaved()
-        })
-        .catch((error) => {
-          this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error)
-        })
-        .finally(()=>{
-          setTimeout(() => {
-            this.FORM.loading = false
-          }, 2000)
-
-        });
-
-      });
+          .then((response) => {
+            let message = response.data.name + ' - #' + response.data.id
+            this.FORM.response.success({ message: message })
+            this.onSaved()
+          })
+          .catch((error) => {
+            this.FORM.response.fields(error.response)
+            this.FORM.response.error(error.response || error)
+          })
+          .finally(() => {
+            setTimeout(() => {
+              this.FORM.loading = false
+            }, 2000)
+          })
+      })
     },
-
 
     onSaved () {
       if (!this.$app.can('customers-push')) return this.FORM.toIndex()
       this.$q.dialog({ title: 'ACCURATE', message: 'are push to accurate?', cancel: true })
-      .onOk(() => {
-        this.onPush()
-      })
-      .onCancel(() => {
-        this.FORM.toIndex()
-      })
-
+        .onOk(() => {
+          this.onPush()
+        })
+        .onCancel(() => {
+          this.FORM.toIndex()
+        })
     },
 
     onPush () {
-      let { method, mode, apiUrl } = this.FORM.meta();
+      let { apiUrl } = this.FORM.meta()
       let url = `${apiUrl}/accurate/push`
       this.$q.loading.show()
       this.$axios.post(url)
         .then((response) => {
           let msg = response.data.d[0] || ''
-          if (response.data.s)
-            this.$app.notify.success('ACCURATE', msg)
-          else
-            this.$app.notify.warning('ACCURATE', msg)
+          if (response.data.s) { this.$app.notify.success('ACCURATE', msg) } else { this.$app.notify.warning('ACCURATE', msg) }
           this.FORM.toIndex()
         }).catch((error) => {
           this.$app.response.error(error.response || error)
@@ -492,6 +488,6 @@ export default {
           this.$q.loading.hide()
         })
     }
-  },
+  }
 }
 </script>

@@ -4,10 +4,10 @@ export default {
   order_PO: 'PO',
   order_ACCUMULATE: 'Akumulasi',
   service: {
-    bounded: 'Jasa Terikat',
-    exclude: 'Exclude Harga Jasa',
+    bounded: 'Kawasan terikat',
+    exclude: 'Exclude Harga Jasa'
   },
   tooltip: {
-    service_bounded: 'Tanpa PPN materal',
+    service_bounded: 'Tanpa PPN materal'
   }
 }
