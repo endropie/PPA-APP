@@ -500,7 +500,7 @@ export default {
         employees: { api: '/api/v1/common/employees?mode=all' },
         vehicles: { api: '/api/v1/references/vehicles?mode=all' },
         units: { api: '/api/v1/references/units?mode=all' },
-        reasons: { api: '/api/v1/references/reasons?mode=all' }
+        reasons: { api: '/api/v1/references/reasons?mode=all&type=DELIVERY_ORDER_REVISE' }
       },
       FORM: {
         resource: {

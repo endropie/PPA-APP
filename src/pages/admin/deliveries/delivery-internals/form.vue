@@ -137,17 +137,28 @@
           </q-tr>
         </tbody>
       </q-markup-table>
-
-      <q-input dense type="text"
-        class="q-mb-sm"
-        v-model="rsForm.internal_notes"
-        :label="$tc('label.note') + ' Internal'"
-      />
-      <q-input type="textarea" autogrow
-        filled class="q-mb-sm" input-style="min-height:45px"
-        v-model="rsForm.option.description"
-        :label="$tc('label.description')" stack-label
-      />
+      <div class="row q-col-gutter-sm">
+        <q-input type="textarea" autogrow
+          filled class="col-sm-6 q-mb-sm self-start" input-style="min-height:75px"
+          v-model="rsForm.option.description"
+          :label="$tc('label.description')" stack-label
+        />
+        <div class="col-sm-6">
+          [{{rsForm.reason_id}}]
+          <q-select type="text" autogrow
+            class="q-mb-sm"
+            emit-value map-options
+            v-model="rsForm.reason_id"
+            :options="ReasonOptions"
+            :label="$tc('label.reason')"
+          />
+          <q-input type="text" autogrow
+            class="q-mb-sm"
+            v-model="rsForm.reason_description"
+            :label="$tc('label.note') + ' Internal'"
+          />
+        </div>
+      </div>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
     <q-card-actions class="q-mx-lg">
@@ -169,6 +180,9 @@ export default {
   mixins: [MixForm],
   data () {
     return {
+      SHEET: {
+        reasons: { api: '/api/v1/references/reasons?mode=all&type=DELIVERY_INTERNAL' }
+      },
       FORM: {
         resource: {
           api: '/api/v1/incomes/delivery-internals',
@@ -182,7 +196,8 @@ export default {
           date: this.$app.moment().format('YYYY-MM-DD'),
           customer: null,
           customer_id: null,
-          internal_notes: null,
+          reason_id: null,
+          reason_description: null,
           option: {
             delivery_internal_items: [
               {
@@ -203,7 +218,12 @@ export default {
     this.init()
   },
   computed: {
-    // code
+    ReasonOptions () {
+      return (this.SHEET.reasons.data
+        .filter(item => item.enable)
+        .map(item => ({ label: item.name, value: item.id })) || [])
+        .concat([{ label: 'Others', value: null }])
+    }
   },
   watch: {
     '$route': 'init'
