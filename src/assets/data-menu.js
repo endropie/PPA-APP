@@ -245,7 +245,7 @@ const deliveries = [
     ]
   },
   {
-    name: 'Delivery (Task)',
+    name: 'Pre Delivery',
     icon: 'work',
     path: 'delivery-tasks',
     lang: 'general.delivery_task',

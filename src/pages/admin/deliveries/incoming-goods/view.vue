@@ -151,14 +151,7 @@
                 VIEW.void(()=> init() )
               }
             },
-            { label: 'PDO', color:'blue-10', icon: 'assignment',
-              hidden: !this.$app.can('pre-deliveries-create') || rsView.status !== 'VALIDATED',
-              detail: $tc('form.add_new',1, {v:'PDO'}),
-              actions: () => {
-                $router.push(`/admin/deliveries/pre-deliveries/create?incoming_good_id=${ROUTE.params.id}`)
-              }
-            },
-            { label: 'DELIVERY (TASK)', color:'blue-10', icon: 'assignment',
+            { label: $tc('general.delivery_task'), color:'blue-10', icon: 'assignment',
               hidden: !this.$app.can('delivery-tasks-create') || rsView.status !== 'VALIDATED' || rsView.has_relationship.delivery_task === true,
               detail: $tc('form.add_new',1, {v:'PDO'}),
               actions: () => {
