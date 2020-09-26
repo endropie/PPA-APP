@@ -94,6 +94,9 @@ export default async ({ app, store, router, Vue }) => {
             case 422:
               mode.message = 'The fields was not failed!'
               mode.detail = (ErrRes.data.message || ErrRes.statusText)
+              if (ErrRes.data.errors && ErrRes.data.errors) {
+                mode.detail = ErrRes.data.errors[Object.keys(ErrRes.data.errors)[0]][0]
+              }
               break
             case 501:
               mode.message = (title || 'PROCESS NOT ALLOWED!')

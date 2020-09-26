@@ -141,7 +141,7 @@
               <ux-select dense outlined hide-bottom-space
                 v-model="row.item"
                 filter clearable
-                :source="`/api/v1/common/items?mode=all&--limit=50&delivery_verify_date=${rsForm.date}&customer_id=${rsForm.customer_id}`"
+                :source="`/api/v1/common/items?mode=all&--limit=50&delivery_date=${rsForm.date}&customer_id=${rsForm.customer_id}`"
                 :source-key="['part_name', 'part_number', 'code']"
                 option-label="part_name"
                 :option-sublabel="(opt) => `[${opt.customer_code}] ${opt.part_number}`"
@@ -161,10 +161,18 @@
             <q-td name="quantity">
               <q-input type="number" dense outlined hide-bottom-space
                 v-model="row.quantity"
-                v-validate="'required|gt_value:0'"
+                v-validate="`required|gt_value:0|max_value:${UnitMax[rowIndex]}`"
                 :name="`delivery_load_items.${rowIndex}.quantity`"
+                :data-vv-as="$tc('label.quantity')"
                 :error="errors.has(`delivery_load_items.${rowIndex}.quantity`)"
-              />
+                :error-message="errors.first(`delivery_load_items.${rowIndex}.quantity`)"
+              >
+
+                <span slot="append" class="text-subtitle2" >
+                  <span v-if="UnitMax[rowIndex] > 0">/ {{$app.number_format(UnitMax[rowIndex])}}</span>
+                  <span v-else>[~]</span>
+                </span>
+              </q-input>
             </q-td>
             <q-td name="satuan">
               <q-select type="text" dense outlined hide-bottom-space
@@ -265,6 +273,24 @@ export default {
     this.init()
   },
   computed: {
+    UnitMax () {
+      let maximum = Object.assign({
+        total: {},
+        add: function (id, v) {
+          if (!maximum.total[id]) maximum.total[id] = 0
+          maximum.total[id] += v
+        }
+      })
+      return this.rsForm.delivery_load_items.map((detail, i) => {
+        if (!detail.item) return 0
+        const amount = detail.item.amount_delivery
+        let available = (amount['VERIFY'] - amount['LOAD.REG'] + amount['LOAD.RET'])
+        if (!maximum.total[detail.item.id]) maximum.total[detail.item.id] = 0
+        const result = available - maximum.total[detail.item.id]
+        maximum.add(detail.item.id, detail.quantity * detail.unit_rate)
+        return result / (detail.unit_rate || 1)
+      })
+    },
     UnitOptions () {
       return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
     },

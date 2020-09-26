@@ -56,7 +56,7 @@
         :label="$tc('label.part')"
         v-model="rsForm.item"
         filter clearable
-        :source="`/api/v1/common/items?mode=all&--limit=50&enable=1&delivery_task_date=${rsForm.date}&customer_id=${rsForm.customer_id}`"
+        :source="`/api/v1/common/items?mode=all&--limit=50&enable=1&delivery_date=${rsForm.date}&customer_id=${rsForm.customer_id}`"
         :source-key="['part_name', 'part_number', 'code']"
         option-label="part_name"
         :option-sublabel="(opt) => `[${opt.customer_code}] ${opt.part_number}`"
