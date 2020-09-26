@@ -24,8 +24,8 @@
                 detail: $tc('messages.form_new'),
                 icon: 'add',
                 shortcut: true,
-                hidden:!$app.can('delivery-internals-create'),
-                to: `${TABLE.resource.uri}/create`
+                hidden:!$app.can('delivery-verifies-create'),
+                to: `${TABLE.resource.uri}/multi-create`
               },
               { label: $tc('label.trash'),
                 detail:  $tc('messages.show_deleted'),
