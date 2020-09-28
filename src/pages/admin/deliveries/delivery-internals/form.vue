@@ -147,7 +147,7 @@
             name="reason_description"
             filled class="q-mb-sm"
             v-model="rsForm.reason_description"
-            :label="$tc('label.note') + ' Internal'"
+            :label="$tc('label.reason') + ' Internal'"
             v-validate="Boolean(rsForm.reason_id) ? '' : 'required'"
             :error="errors.has('reason_description')"
           />
@@ -216,7 +216,7 @@ export default {
       return (this.SHEET.reasons.data
         .filter(item => item.enable)
         .map(item => ({ label: item.name, value: item.id })) || [])
-        .concat([{ label: this.$tc('label.others'), value: null }])
+        .concat([{ label: this.$tc('label.others'), value: 0 }])
     }
   },
   watch: {
