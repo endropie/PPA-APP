@@ -59,13 +59,36 @@
           </q-markup-table>
         </div>
         <div class="col-12">
-            <div class="q-mb-sm text-italic">{{$tc('label.description')}}:</div>
-            <div class="q-mb-md text-weight-light" style="">{{ rsView.description }}</div>
+          <div class="q-mb-sm text-italic">{{$tc('label.description')}}:</div>
+          <div class="q-mb-md text-weight-light" style="">{{ rsView.description }}</div>
         </div>
         <div class="col-12 row q-gutter-xs print-hide " style="padding-top:50px">
           <q-btn :label="$tc('form.back')" icon="cancel"  color="dark" :to="`${VIEW.resource.uri}?return`" />
           <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="VIEW.print()" />
           <q-space />
+          <q-btn-dropdown outline class="no-dropdown-icon"
+            :color="'secondary'" icon="local_shipping"
+            menu-anchor="bottom left" menu-self="top left">
+            <span slot="label" class="on-right">
+              {{`SJDO (${rsView.delivery_orders.length})`}}
+            </span>
+            <div class="row q-pa-md" :class="{'bg-faded text-white': LAYOUT.isDark}">
+              <div class="column">
+                <div class="text-subtitle2 q-mb-md">SJ-DELIVERY ORDER</div>
+                <template v-for="(link, index) in rsView.delivery_orders">
+                  <q-btn dense class="q-ma-xs" :key="index"
+                    color="secondary" icon="open_in_new"
+                    :label="`${link.fullnumber || link.number}`"
+                    @click="showDO(link.id)" />
+                </template>
+              </div>
+
+              <q-separator vertical inset class="q-mx-lg" v-show="false" />
+
+              <div class="column">
+              </div>
+            </div>
+          </q-btn-dropdown>
           <ux-btn-dropdown color="blue-grey"
             :options="[
               { label: $tc('form.add_new'), color:'green', icon: 'add',
@@ -82,10 +105,12 @@
                   VIEW.void(()=> init() )
                 }
               },
-            ]"/>
+            ]"
+          />
         </div>
       </div>
     </page-print>
+    <ux-modal-view ref="modal"  fit icon="local_shipping" :title="$tc('general.sj_delivery')" />
   </q-page>
 </template>
 
@@ -120,16 +145,16 @@ export default {
       return true
     },
     IS_VOID () {
-      if (this.IS_EDITABLE) return false
       if (this.rsView.deleted_at) return false
-      if (['VOID', 'REVISED', 'CLOSED'].find(x => x === this.rsView.status)) return false
+      if (this.rsView.revise_id) return false
+      if (this.rsView.status !== 'OPEN') return false
+      if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
       return true
     },
     IS_EDITABLE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.revise_id) return false
       if (this.rsView.status !== 'OPEN') return false
-      if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
       return true
     }
   },
@@ -142,34 +167,16 @@ export default {
     setView (data) {
       this.rsView = data
     },
-    setClose () {
-      const submit = () => {
-        this.VIEW.show = false
-        this.VIEW.loading = true
-        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=close&nodata=true`
-        this.$axios.put(url)
-          .then((response) => {
-            this.init()
-          })
-          .catch(error => {
-            this.$app.response.error(error.response, 'FORM CLOSED')
-          })
-          .finally(() => {
-            this.VIEW.show = true
-            setTimeout(() => {
-              this.VIEW.loading = false
-            }, 1000)
-          })
+    showDO (id) {
+      let mode = {
+        path: '/admin/deliveries/delivery-orders/view',
+        params: { id: id },
+        meta: { mode: 'view' },
+        actions: {
+          // actions
+        }
       }
-
-      this.$q.dialog({
-        title: this.$tc('form.confirm', 1, { v: 'CLOSE' }),
-        message: this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_close') }),
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        submit()
-      })
+      this.$refs.modal.show(mode)
     }
   }
 }
