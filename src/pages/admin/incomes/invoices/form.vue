@@ -123,8 +123,8 @@
             <q-th slot="header-cell-action">
               <q-checkbox dense keep-color :value="ValCheckDeliveryTable" @input="setAllDeliveryTable" />
             </q-th>
-            <q-td slot="body-cell-date" align="center">
-              {{$app.moment(v).format('DD/MM/YYYY')}}
+            <q-td slot="body-cell-date" slot-scope="rs" :props="rs" align="center">
+              {{$app.moment(rs.row.date).format('DD/MM/YYYY')}}
             </q-td>
             <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
               <q-checkbox dense
@@ -210,8 +210,8 @@
             <q-th slot="header-cell-action">
               <q-checkbox dense :value="ValCheckOrderTable" @input="setAllOrderTable" />
             </q-th>
-            <q-td slot="body-cell-date" align="center">
-              {{$app.moment(v).format('DD/MM/YYYY')}}
+            <q-td slot="body-cell-date" slot-scope="rs" :props="rs" align="center">
+              {{$app.moment(rs.row.date).format('DD/MM/YYYY')}}
             </q-td>
             <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
               <q-checkbox  dense
