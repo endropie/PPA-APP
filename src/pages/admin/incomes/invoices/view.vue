@@ -64,8 +64,33 @@
         <q-btn :label="$tc('form.back')" icon="cancel" color="dark" :class="{'full-width': $q.screen.lt.sm}" v-go-back.single />
         <q-btn :label="$tc('form.print')" icon="print" color="grey" :class="{'full-width': $q.screen.lt.sm}" @click.native="print()" />
         <q-space />
-        <q-btn :label="$tc('form.confirm')" icon="done_all" color="positive" :class="{'full-width': $q.screen.lt.sm}" @click="setConfirmed()" v-if="rsView.status == 'OPEN'" />
-        <q-btn :label="$tc('form.delete')" icon="delete" color="negative" :class="{'full-width': $q.screen.lt.sm}" @click="VIEW.delete" />
+        <ux-btn-dropdown  color="blue-grey" :class="{'full-width': $q.screen.lt.sm}"
+          :options="[
+           { label: $tc('form.add_new'), color:'green', icon: 'add',
+              hidden: !$app.can('acc-invoices-create'),
+              detail: $tc('messages.process_create'),
+              actions: () => {
+                $router.push(`${VIEW.resource.uri}/create`)
+              }
+            },
+            { label: 'CONFIRM', color:'positive', icon: 'done_all',
+              hidden: !IS_CLOSE || !$app.can('acc-invoices-confirm'),
+              detail: $tc('messages.confirm'),
+              actions: () => {
+                setConfirmed()
+              }
+            },
+            { label: 'DELETE', color:'red', icon: 'delete',
+              hidden: !IS_EDITABLE || !$app.can('acc-invoices-delete'),
+              detail: $tc('messages.process_delete'),
+              actions: () => {
+                VIEW.delete()
+              }
+            }
+          ]">
+        </ux-btn-dropdown>
+        <!-- <q-btn :label="$tc('form.confirm')" icon="done_all" color="positive" :class="{'full-width': $q.screen.lt.sm}" @click="setConfirmed()" v-if="rsView.status == 'OPEN'" /> -->
+        <!-- <q-btn :label="$tc('form.delete')" icon="delete" color="negative" :class="{'full-width': $q.screen.lt.sm}" @click="VIEW.delete" /> -->
       </div>
     </page-print>
     <q-inner-loading :showing="VIEW.loading">
@@ -107,15 +132,9 @@ export default {
       if (this.rsView.status !== 'OPEN') return false
       return true
     },
-    IS_VOID () {
-      if (this.IS_EDITABLE) return false
-      if (['VOID'].find(x => x === this.rsView.status)) return false
-      return true
-    },
     IS_EDITABLE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
-
       return true
     },
     SUM_ITEMS () {

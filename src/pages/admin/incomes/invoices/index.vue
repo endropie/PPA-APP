@@ -68,7 +68,6 @@
                 :dark="LAYOUT.isDark"
                 @input="FILTERABLE.submit"/>
 
-
               <q-select class="col-12" autocomplete="off"
                 multiple use-chips use-input new-value-mode="add"
                 dense hide-dropdown-icon
@@ -87,7 +86,6 @@
           </table-header>
         </template>
 
-
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
           <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`"/>
         </q-td>
@@ -95,6 +93,10 @@
         <q-td slot="body-cell-date" slot-scope="rs" :props="rs" class="text-uppercase">
           <span v-if="rs.row.date"> {{ $app.moment(rs.row.date).format('DD/MM/YYYY') }}</span>
           <span v-else>-</span>
+        </q-td>
+
+        <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="q-py-none" style="width:35px">
+          <ux-chip-status dense square :row="rs.row" :color-options="{INVOICED: 'green'}" />
         </q-td>
 
         <q-td slot="body-cell-customer_id" slot-scope="rs" :props="rs" class="text-uppercase no-padding">
@@ -129,7 +131,7 @@ export default {
   data () {
     return {
       SHEET: {
-        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'}
+        customers: { data: [], api: '/api/v1/incomes/customers?mode=all' }
       },
       FILTERABLE: {
         fill: {
@@ -150,62 +152,60 @@ export default {
           }
         }
       },
-      TABLE:{
+      TABLE: {
         mode: 'index',
-        resource:{
+        resource: {
           api: '/api/v1/incomes/invoices',
-          uri: '/admin/incomes/invoices',
+          uri: '/admin/incomes/invoices'
         },
         columns: [
-          { name: 'prefix', label: '', align: 'left'},
+          { name: 'prefix', label: '', align: 'left' },
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'customer_id', label: this.$tc('general.customer'), align: 'left', field: (row) => row.customer ? row.customer.name : '- N/A -' , sortable: true },
+          { name: 'status', label: '', align: 'left', field: 'status' },
+          { name: 'customer_id', label: this.$tc('general.customer'), align: 'left', field: (row) => row.customer ? row.customer.name : '- N/A -', sortable: true, style: 'width:50%' },
           // { name: 'counter_delivered', label: 'Delivery', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.delivered : '-', sortable: true},
           // { name: 'counter_confirmed', label: 'Confirm', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.confirmed : '-', sortable: true},
           // { name: 'counter_invoiced', label: 'Invoiced', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.invoiced : '-', sortable: true},
-          // // { name: 'reference_number', label: 'No. Reference', field: 'reference_number', align: 'left', sortable: true },
-          // { name: 'actived_date', label: this.$tc('label.expired'), field: 'actived_date', align: 'center', sortable: true,
-          //   format:(v)=> v ? this.$app.moment(v).format('ll') : '-', classes: 'text-uppercase'},
-          // { name: 'created_at', label: this.$tc('form.create',2), align: 'center', sortable: true, field: 'created_at'},
+          { name: 'created_at', label: this.$tc('form.create', 2), align: 'center', sortable: true, field: 'created_at' }
         ]
-      },
+      }
     }
   },
   created () {
     this.INDEX.load()
   },
   computed: {
-    isCanUpdate(){
+    isCanUpdate () {
       return this.$app.can('request-orders-update')
     },
-    isCanDelete(){
+    isCanDelete () {
       return this.$app.can('request-orders-delete')
     },
-    CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
-    },
+    CustomerOptions () {
+      return (this.SHEET.customers.data.map(item => ({ label: [item.code, item.name].join(' - '), value: item.id })) || [])
+    }
   },
   methods: {
-    isEditable(row) {
-      if(row.deleted_at) return false
+    isEditable (row) {
+      if (row.deleted_at) return false
       if (row.order_mode !== 'PO') return false
       if (row.status !== 'OPEN') return false
       if (row.hasOwnProperty('is_relationship') && row.is_relationship) return false
       return true
     },
     isEditRef (row) {
-      if(row.deleted_at) return false
-      if(row.order_mode === 'PO') return false
-      if(row.status === 'CLOSED') return false
+      if (row.deleted_at) return false
+      if (row.order_mode === 'PO') return false
+      if (row.status === 'CLOSED') return false
       return true
     },
     isEditRefExpired (row) {
-      if(row.deleted_at) return false
-      if(row.order_mode !== 'PO') return false
-      if(row.status === 'CLOSED') return false
+      if (row.deleted_at) return false
+      if (row.order_mode !== 'PO') return false
+      if (row.status === 'CLOSED') return false
       return row.is_relationship
-    },
+    }
   }
 }
 </script>

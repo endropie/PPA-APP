@@ -7,7 +7,7 @@
             class="col-12 col-sm-6"
             name="customer_id"
             :label="$tc('general.customer')" stack-label
-            v-model="rsForm.customer_id"
+            v-model="rsForm.customer"
             filter clearable
             source="/api/v1/incomes/customers?mode=all"
             option-value="id"
@@ -207,6 +207,11 @@
           </q-table>
         </div>
       </q-card-section>
+      <code>
+        <!-- {{Object.keys(rsForm)}} -->
+        <!-- {{rsForm.deliveries}} -->
+        <!-- {{rsForm.request_orders}} -->
+      </code>
       <q-card-actions align="right">
         <q-btn color="grey-5" :label="$tc('form.reset')" @click="init()" />
         <q-btn color="positive" :label="$tc('form.save')" @click="save()" />
@@ -307,6 +312,12 @@ export default {
     init () {
       this.FORM.load((data) => {
         this.rsForm = Object.assign(this.rsForm || this.setDefault(), data)
+
+        if (this.rsForm.customer && !this.rsForm.customer.is_invoice_request) this.loadDelivery()
+        if (this.rsForm.customer && this.rsForm.customer.is_invoice_request) this.loadOrder()
+
+        if (this.rsForm.customer && !this.rsForm.customer.is_invoice_request) this.rsForm.delivery_orders = data.delivery_orders
+        if (this.rsForm.customer && this.rsForm.customer.is_invoice_request) this.rsForm.request_orders = data.request_orders
       })
     },
     setCustomer (v) {
@@ -315,6 +326,7 @@ export default {
       this.rsForm.order_mode = v ? v.order_mode : null
       this.rsForm.invoice_mode = v ? v.invoice_mode : null
       this.deliveryTable.data = []
+      this.orderTable.data = []
       this.rsForm.request_orders = []
       this.rsForm.delivery_orders = []
 
@@ -354,7 +366,7 @@ export default {
       const filters = this.deliveryTable.filters ? `&search=${this.deliveryTable.filters.join('+')}` : ''
       const order = this.deliveryTable.request_order_id ? `&request_order_id=${this.deliveryTable.request_order_id}` : ''
 
-      let api = `${this.deliveryTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}${order}`
+      let api = `${this.deliveryTable.api}?invoicing=true&or_acc_invoice_id=${this.rsForm.id}&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}${order}`
       console.info('[PLAY] API GET:', api)
       this.deliveryTable.loading = true
       this.$axios.get(api)
@@ -382,7 +394,7 @@ export default {
       const status = this.orderTable.isClosed ? '&status=CLOSED' : ''
       const filters = this.orderTable.filters ? `&search=${this.orderTable.filters.join('+')}` : ''
 
-      let api = `${this.orderTable.api}?invoicing=true&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}`
+      let api = `${this.orderTable.api}?invoicing=true&or_acc_invoice_id=${this.rsForm.id}&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}`
       console.info('[PLAY] API GET:', api)
       this.orderTable.loading = true
       this.$axios.get(api)
@@ -404,9 +416,9 @@ export default {
     },
     save () {
       const submit = () => {
-        const data = this.rsForm
         this.$q.loading.show()
-        this.$axios.post(this.FORM.resource.api, data)
+        const { apiUrl, method } = this.FORM.meta()
+        this.$axios.set(method, apiUrl, this.rsForm)
           .then((response) => {
             let message = response.data.number
             this.FORM.response.success({ message: message })

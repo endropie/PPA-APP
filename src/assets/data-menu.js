@@ -90,10 +90,10 @@ const incomes = [
     path: 'invoices',
     lang: 'general.acc_invoice',
     resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'request-orders-read;pre-deliveries-create' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'request-orders-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'request-orders-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'request-orders-read;pre-deliveries-create' } }
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'acc-invoices-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'acc-invoices-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'acc-invoices-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'acc-invoices-read' } }
 
     ]
   }
