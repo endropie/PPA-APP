@@ -123,6 +123,9 @@
             <q-th slot="header-cell-action">
               <q-checkbox dense keep-color :value="ValCheckDeliveryTable" @input="setAllDeliveryTable" />
             </q-th>
+            <q-td slot="body-cell-date" align="center">
+              {{$app.moment(v).format('DD/MM/YYYY')}}
+            </q-td>
             <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
               <q-checkbox dense
                 :disable="rs.row.status !== 'CONFIRMED'"
@@ -207,6 +210,9 @@
             <q-th slot="header-cell-action">
               <q-checkbox dense :value="ValCheckOrderTable" @input="setAllOrderTable" />
             </q-th>
+            <q-td slot="body-cell-date" align="center">
+              {{$app.moment(v).format('DD/MM/YYYY')}}
+            </q-td>
             <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
               <q-checkbox  dense
                 :disable="rs.row.status !== 'CLOSED'"
@@ -255,6 +261,7 @@ export default {
         data: [],
         loading: false,
         columns: [
+          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center' },
           { name: 'number', label: 'number', field: 'fullnumber', align: 'left' },
           { name: 'indexed_number', label: 'index', field: 'indexed_number', align: 'left' },
           { name: 'status', label: '', field: 'status', align: 'center' },
@@ -280,6 +287,7 @@ export default {
         data: [],
         loading: false,
         columns: [
+          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center' },
           { name: 'number', label: 'number', field: 'fullnumber', align: 'left' },
           { name: 'reference_number', label: 'Reference', field: 'reference_number', align: 'left' },
           { name: 'status', label: '', field: 'status', align: 'center' },
