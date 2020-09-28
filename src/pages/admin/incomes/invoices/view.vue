@@ -75,7 +75,7 @@
             },
             { label: 'CONFIRM', color:'positive', icon: 'done_all',
               hidden: !IS_CLOSE || !$app.can('acc-invoices-confirm'),
-              detail: $tc('messages.confirm'),
+              detail: $tc('form.confirm'),
               actions: () => {
                 setConfirmed()
               }

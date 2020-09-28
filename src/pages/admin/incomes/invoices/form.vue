@@ -59,6 +59,18 @@
                 <div class="q-table__separator col"></div>
                 <div class="q-table__control">
                   <div class="q-gutter-sm" :class="{'row':1}">
+                    <ux-date dense outlined
+                      :label="$tc('label.begin')" stack-label
+                      v-model="deliveryTable.begin_date"
+                      :date-options="(date) => date <=  $app.moment(deliveryTable.until_date).format('YYYY/MM/DD')"
+                      @input="deliveryTable.begin_date && deliveryTable.until_date ? loadDelivery() : undefined"
+                    />
+                    <ux-date dense outlined
+                      :label="$tc('label.until')" stack-label
+                      v-model="deliveryTable.until_date"
+                      :date-options="(date) => date >=  $app.moment(deliveryTable.begin_date).format('YYYY/MM/DD')"
+                      @input="deliveryTable.begin_date && deliveryTable.until_date ? loadDelivery() : undefined"
+                    />
                     <q-field dense outlined>
                       <q-checkbox
                         slot="control"
@@ -68,7 +80,6 @@
                         v-model="deliveryTable.isConfirmed"
                         @input="loadDelivery"
                       />
-
                     </q-field>
 
                     <ux-select v-model="deliveryTable.request_order_id"
@@ -121,16 +132,6 @@
                   : rsForm.delivery_orders = rsForm.delivery_orders.filter(e => e.id !== rs.row.id)
                 "
               />
-
-              <!-- <q-btn dense outline size="sm" color="blue-grey" icon="check"
-                @click="rsForm.delivery_orders.push(rs.row)"
-                v-if="!rsForm.delivery_orders.find(e => e.id === rs.row.id)"
-              />
-
-              <q-btn dense outline size="sm" color="negative" icon="clear"
-                @click="rsForm.delivery_orders = rsForm.delivery_orders.filter(e => e.id !== rs.row.id)"
-                v-if="rsForm.delivery_orders.find(e => e.id === rs.row.id)"
-              /> -->
             </q-td>
           </q-table>
           <q-table v-else title="Sales Order"
@@ -159,6 +160,18 @@
                 <div class="q-table__separator col"></div>
                 <div class="q-table__control">
                   <div :class="{'row justify-end q-gutter-sm':1}">
+                    <ux-date dense outlined
+                      :label="$tc('label.begin')" stack-label
+                      v-model="orderTable.begin_date"
+                      :date-options="(date) => date <=  $app.moment(orderTable.until_date).format('YYYY/MM/DD')"
+                      @input="orderTable.begin_date && orderTable.until_date ? loadOrder() : undefined"
+                    />
+                    <ux-date dense outlined
+                      :label="$tc('label.until')" stack-label
+                      v-model="orderTable.until_date"
+                      :date-options="(date) => date >=  $app.moment(orderTable.begin_date).format('YYYY/MM/DD')"
+                      @input="orderTable.begin_date && orderTable.until_date ? loadOrder() : undefined"
+                    />
                     <q-field dense outlined>
                       <q-checkbox slot="control" dense class="on-right"
                         left-label label="CLOSED"
@@ -207,11 +220,6 @@
           </q-table>
         </div>
       </q-card-section>
-      <code>
-        <!-- {{Object.keys(rsForm)}} -->
-        <!-- {{rsForm.deliveries}} -->
-        <!-- {{rsForm.request_orders}} -->
-      </code>
       <q-card-actions align="right">
         <q-btn color="grey-5" :label="$tc('form.reset')" @click="init()" />
         <q-btn color="positive" :label="$tc('form.save')" @click="save()" />
@@ -262,6 +270,8 @@ export default {
         request_order_id: null,
         hideChecked: true,
         isConfirmed: false,
+        begin_date: this.$app.moment().startOf('month').format('YYYY-MM-DD'),
+        until_date: this.$app.moment().endOf('month').format('YYYY-MM-DD'),
         filters: null,
         request: this.loadDelivery
       },
@@ -283,6 +293,8 @@ export default {
         hideChecked: true,
         isClosed: false,
         filters: null,
+        begin_date: this.$app.moment().startOf('month').format('YYYY-MM-DD'),
+        until_date: this.$app.moment().endOf('month').format('YYYY-MM-DD'),
         request: this.loadOrder
       }
     }
@@ -363,10 +375,12 @@ export default {
       const limit = paginate.rowsPerPage || this.deliveryTable.pagination.rowsPerPage
       const page = Number(paginate.rowsPerPage) === Number(this.deliveryTable.pagination.rowsPerPage) ? paginate.page : 1
       const status = this.deliveryTable.isConfirmed ? '&status=CONFIRMED' : ''
+      const begin = this.deliveryTable.begin_date ? `&begin_date=${this.deliveryTable.begin_date}` : ''
+      const until = this.deliveryTable.until_date ? `&until_date=${this.deliveryTable.until_date}` : ''
       const filters = this.deliveryTable.filters ? `&search=${this.deliveryTable.filters.join('+')}` : ''
       const order = this.deliveryTable.request_order_id ? `&request_order_id=${this.deliveryTable.request_order_id}` : ''
 
-      let api = `${this.deliveryTable.api}?invoicing=true&or_acc_invoice_id=${this.rsForm.id}&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}${order}`
+      let api = `${this.deliveryTable.api}?invoicing=true&or_acc_invoice_id=${this.rsForm.id}&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}${order}${begin}${until}`
       console.info('[PLAY] API GET:', api)
       this.deliveryTable.loading = true
       this.$axios.get(api)
@@ -392,9 +406,11 @@ export default {
       const limit = paginate.rowsPerPage || this.orderTable.pagination.rowsPerPage
       const page = Number(paginate.rowsPerPage) === Number(this.orderTable.pagination.rowsPerPage) ? paginate.page : 1
       const status = this.orderTable.isClosed ? '&status=CLOSED' : ''
+      const begin = this.orderTable.begin_date ? `&begin_date=${this.orderTable.begin_date}` : ''
+      const until = this.orderTable.until_date ? `&until_date=${this.orderTable.until_date}` : ''
       const filters = this.orderTable.filters ? `&search=${this.orderTable.filters.join('+')}` : ''
 
-      let api = `${this.orderTable.api}?invoicing=true&or_acc_invoice_id=${this.rsForm.id}&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}`
+      let api = `${this.orderTable.api}?invoicing=true&or_acc_invoice_id=${this.rsForm.id}&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}${begin}${until}`
       console.info('[PLAY] API GET:', api)
       this.orderTable.loading = true
       this.$axios.get(api)
