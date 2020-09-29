@@ -109,7 +109,7 @@
                 style="min-width:100px"
                 :label="$tc('label.unit')"
                 v-model="row.unit"
-                :options="ItemUnitOptions"
+                :options="ItemUnitOptions[rowIndex]"
                 :option-label="opt => opt.code || opt.label"
                 :name="`multi_items.${rowIndex}.unit_id`"
                 v-validate="'required'"
@@ -206,8 +206,9 @@ export default {
         const amount = detail.item.amount_delivery
         let available = (amount['TASK.REG'] + amount['TASK.RET'] - amount['VERIFY'])
         if (!maximum.total[detail.item.id]) maximum.total[detail.item.id] = 0
-        const result = available - maximum.total[detail.item.id]
+        let result = available - maximum.total[detail.item.id]
         maximum.add(detail.item.id, detail.quantity * detail.unit_rate)
+        if (result < 0.1) result = 0
         return result / (detail.unit_rate || 1)
       })
     },
@@ -215,22 +216,23 @@ export default {
       return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
     ItemUnitOptions () {
-      const item = this.rsForm.item
-      return this.UnitOptions
-        .filter((unit) => {
-          if (!item) return
-          if (item.unit_id === unit.value) return true
-
-          const find = item.item_units.find((fill) => fill.unit_id === unit.value)
-          if (item.item_units && find) return true
-        })
-        .map(unit => {
-          if (item.unit_id === unit.value) return { ...unit, rate: 1 }
-          const find = item.item_units.find((fill) => fill.unit_id === unit.value)
-          if (item.item_units && find) {
-            return { ...unit, rate: find.rate }
-          }
-        })
+      return this.rsForm.multi_items.map(detail => {
+        const item = detail.item
+        return this.UnitOptions
+          .filter((unit) => {
+            if (!item) return
+            if (item.unit_id === unit.value) return true
+            const find = item.item_units.find((fill) => fill.unit_id === unit.value)
+            if (item.item_units && find) return true
+          })
+          .map(unit => {
+            if (item.unit_id === unit.value) return { ...unit, rate: 1 }
+            const find = item.item_units.find((fill) => fill.unit_id === unit.value)
+            if (item.item_units && find) {
+              return { ...unit, rate: find.rate }
+            }
+          })
+      })
     }
   },
   watch: {
