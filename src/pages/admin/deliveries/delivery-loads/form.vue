@@ -78,7 +78,7 @@
               name="vehicle_id"
               :label="$tc('general.vehicle')"
               v-model="rsForm.vehicle"
-              source="api/v1/references/vehicles?mode=all"
+              source="api/v1/references/vehicles?mode=all&type=DELIVERY"
               :option-label="(item) => `${item.number}`"
               option-value="id"
               filter clearable

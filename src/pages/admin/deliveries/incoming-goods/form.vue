@@ -239,20 +239,20 @@ export default {
   mixins: [MixForm],
   data () {
     return {
-      SHEET:{
-        units: {api:'/api/v1/references/units?mode=all'},
-        customers: {api:'/api/v1/incomes/customers?mode=all'},
-        vehicles: {api:'/api/v1/references/vehicles?mode=all'},
-        items: {autoload:false, api:'/api/v1/common/items?mode=all'}
+      SHEET: {
+        units: { api: '/api/v1/references/units?mode=all' },
+        customers: { api: '/api/v1/incomes/customers?mode=all' },
+        vehicles: { api: '/api/v1/references/vehicles?mode=all&type=DELIVERY' },
+        items: { autoload: false, api: '/api/v1/common/items?mode=all' }
       },
-      FORM:{
-        resource:{
+      FORM: {
+        resource: {
           uri: '/admin/deliveries/incoming-goods',
-          api: '/api/v1/warehouses/incoming-goods',
-        },
+          api: '/api/v1/warehouses/incoming-goods'
+        }
       },
       rsForm: {},
-      setDefault:()=>{
+      setDefault: () => {
         return {
           number: null,
           date: this.$app.moment().format('YYYY-MM-DD'),
@@ -269,10 +269,11 @@ export default {
           rit: null,
           description: null,
 
-          incoming_good_items:[
+          incoming_good_items: [
             {
-              id:null,
-              item_id: null, item: {},
+              id: null,
+              item_id: null,
+              item: {},
               quantity: null,
 
               unit_id: null,
@@ -286,97 +287,96 @@ export default {
       }
     }
   },
-  created(){
+  created () {
     // Component Page Mounted!
     this.init()
-
   },
   computed: {
-    IS_LOTS() {
+    IS_LOTS () {
       if (this.rsForm.transaction !== 'REGULER') return false
       if (this.rsForm.order_mode !== 'NONE') return false
       if (!this.MAPINGKEY.customers[this.rsForm.customer_id]) return false
       return this.MAPINGKEY.customers[this.rsForm.customer_id].order_lots
     },
-    IS_EDITABLE() {
+    IS_EDITABLE () {
       if (Object.keys(this.FORM.data.has_relationship || {}).length > 0) return false
 
       return this.$app.can('incoming-goods-update')
     },
-    IssetItemDetails() {
-        let items = this.rsForm.incoming_good_items
-        for (const i in items) {
-          if (items.hasOwnProperty(i)) {
-            if(items[i].item_id) return true
-          }
+    IssetItemDetails () {
+      let items = this.rsForm.incoming_good_items
+      for (const i in items) {
+        if (items.hasOwnProperty(i)) {
+          if (items[i].item_id) return true
         }
+      }
 
-        return false
+      return false
     },
-    IssetCustomerID() {
-      return (this.rsForm.customer_id ? true : false)
+    IssetCustomerID () {
+      return (!!this.rsForm.customer_id)
     },
-    RitOptions() {
+    RitOptions () {
       let rits = []
-      for (let i = 0; i < 10; i++) rits.push(i+1)
+      for (let i = 0; i < 10; i++) rits.push(i + 1)
       return rits
     },
-    CustomerOptions() {
+    CustomerOptions () {
       // let label = [item.code, item.name].join('-')
-      return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
+      return (this.SHEET.customers.data.map(item => ({ label: [item.code, item.name].join(' - '), value: item.id })) || [])
     },
-    VehicleOptions() {
-      return this.SHEET.vehicles.data.map(item =>  ({
-          label: item.number,
-          value: item.id
-        })
+    VehicleOptions () {
+      return this.SHEET.vehicles.data.map(item => ({
+        label: item.number,
+        value: item.id
+      })
       )
     },
-    UnitOptions() {
-      return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
+    UnitOptions () {
+      return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
-    ItemOptions() {
-        let orItems = []
-        if(this.FORM.data.incoming_good_items) {
-          orItems = this.FORM.data.incoming_good_items.map(item => item.item_id)
-        }
+    ItemOptions () {
+      let orItems = []
+      if (this.FORM.data.incoming_good_items) {
+        orItems = this.FORM.data.incoming_good_items.map(item => item.item_id)
+      }
 
-        let Items = this.SHEET.items.data || []
-        Items = Items.filter((item) => {
-          if(!item.enable && !orItems.find(x => x === item.id)) return false
-          return item.customer_id === this.rsForm.customer_id
-        })
+      let Items = this.SHEET.items.data || []
+      Items = Items.filter((item) => {
+        if (!item.enable && !orItems.find(x => x === item.id)) return false
+        return item.customer_id === this.rsForm.customer_id
+      })
 
-        return (Items.map(item => ({
-          label: item.part_name,
-          sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
-          disable: !item.enable,
-          value: item.id}) || []))
+      return (Items.map(item => ({
+        label: item.part_name,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
+        disable: !item.enable,
+        value: item.id }) || []))
     },
-    ItemUnitOptions() {
+    ItemUnitOptions () {
       let vars = []
       for (const i in this.rsForm.incoming_good_items) {
         if (this.rsForm.incoming_good_items.hasOwnProperty(i)) {
           let rsItem = this.rsForm.incoming_good_items[i]
-          vars[i] = ( this.UnitOptions || [])
-          vars[i] = vars[i].filter((unit)=> {
-            if(!rsItem.item_id) return false
-            if(rsItem.item) {
-              if(rsItem.item.unit_id === unit.value) return true
-              if(rsItem.item.item_units) {
-                let filtered = rsItem.item.item_units.filter((fill)=> fill.unit_id == unit.value)
-                if(filtered.length > 0) return true
+          vars[i] = (this.UnitOptions || [])
+          vars[i] = vars[i].filter((unit) => {
+            if (!rsItem.item_id) return false
+            if (rsItem.item) {
+              if (rsItem.item.unit_id === unit.value) return true
+              if (rsItem.item.item_units) {
+                let filtered = rsItem.item.item_units.filter((fill) => fill.unit_id === unit.value)
+                if (filtered.length > 0) return true
               }
             }
-            return false;
+            return false
           })
         }
       }
       return vars
     },
-    MAPINGKEY() {
+    MAPINGKEY () {
       let variables = {
-        'customers' : {},
+        'customers': {},
         'units': {},
         'items': {}
       }
@@ -385,28 +385,27 @@ export default {
       this.SHEET['units'].data.map(value => { variables['units'][value.id] = value })
       this.SHEET['items'].data.map(value => { variables['items'][value.id] = value })
 
-      return variables;
+      return variables
     }
   },
-  watch:{
-      '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
       })
     },
-    setForm(data) {
+    setForm (data) {
       this.rsForm = JSON.parse(JSON.stringify(data))
 
       if (this.rsForm.customer_id) {
-        const additonal = this.rsForm.transaction == 'SAMPLE' ? `&sampled=true` : ''
+        const additonal = this.rsForm.transaction === 'SAMPLE' ? `&sampled=true` : ''
         this.SHEET.load('items', `customer_id=${this.rsForm.customer_id}${additonal}`)
       }
 
-      if(data.hasOwnProperty('has_relationship') && Object.keys(data['has_relationship']).length > 0) {
-
+      if (data.hasOwnProperty('has_relationship') && Object.keys(data['has_relationship']).length > 0) {
         this.FORM.response.relationship({
           title: 'Incoming goods has relations!',
           messages: data['has_relationship'],
@@ -420,44 +419,38 @@ export default {
         else if (this.rsForm.date === this.$app.moment().format('YYYY-MM-DD')) {
           this.rsForm.time = this.$app.moment().format('HH:mm')
         }
-
       }
     },
     isNotSample (v) {
       return this.rsForm.transaction !== 'SAMPLE' ? v : ''
     },
-    setTransactionReference(val) {
-      if (val == 'RETURN')
-        this.rsForm.order_mode = 'NONE'
-      else
-        this.rsForm.order_mode = null
+    setTransactionReference (val) {
+      if (val === 'RETURN') { this.rsForm.order_mode = 'NONE' } else { this.rsForm.order_mode = null }
 
       this.setCustomerReference(this.rsForm.customer_id)
     },
-    setCustomerReference(val) {
+    setCustomerReference (val) {
       if (!val) return
 
       if (this.rsForm.customer_id) {
-        const additonal = this.rsForm.transaction == 'SAMPLE' ? `&sampled=true` : ''
+        const additonal = this.rsForm.transaction === 'SAMPLE' ? `&sampled=true` : ''
         this.SHEET.load('items', `customer_id=${this.rsForm.customer_id}${additonal}`)
       }
 
-      if (this.rsForm.transaction == 'REGULER') {
+      if (this.rsForm.transaction === 'REGULER') {
         const customer = this.MAPINGKEY['customers'][val]
         if (customer) {
           this.rsForm.order_mode = this.MAPINGKEY['customers'][val].order_mode
         }
       }
     },
-    setItemReference(index, val) {
-
-      if(!val) {
+    setItemReference (index, val) {
+      if (!val) {
         this.rsForm.incoming_good_items[index].unit_id = null
         this.rsForm.incoming_good_items[index].unit_rate = 1
         this.rsForm.incoming_good_items[index].unit = {}
         this.rsForm.incoming_good_items[index].item = {}
-      }
-      else {
+      } else {
         this.rsForm.incoming_good_items[index].item = this.MAPINGKEY['items'][val]
 
         let baseUnitID = this.MAPINGKEY['items'][val].unit_id
@@ -465,65 +458,63 @@ export default {
         this.rsForm.incoming_good_items[index].unit_rate = 1
         this.rsForm.incoming_good_items[index].unit = this.MAPINGKEY['units'][baseUnitID]
       }
-
     },
-    setUnitReference(index, val) {
-
-      if(!val) return;
+    setUnitReference (index, val) {
+      if (!val) return undefined
       else if (this.rsForm.incoming_good_items[index].item.unit_id === val) {
         this.rsForm.incoming_good_items[index].unit_rate = 1
-      }
-      else {
-        if(this.rsForm.incoming_good_items[index].item.item_units) {
-          this.rsForm.incoming_good_items[index].item.item_units.map((unitItem)=> {
-            if (unitItem.unit_id == val) this.rsForm.incoming_good_items[index].unit_rate = unitItem.rate
+      } else {
+        if (this.rsForm.incoming_good_items[index].item.item_units) {
+          this.rsForm.incoming_good_items[index].item.item_units.map((unitItem) => {
+            if (unitItem.unit_id === val) this.rsForm.incoming_good_items[index].unit_rate = unitItem.rate
           })
         }
       }
     },
 
-    addNewItem(autofocus){
+    addNewItem (autofocus) {
       autofocus = autofocus || false
-      let newEntri = this.setDefault().incoming_good_items[0] // {id:null, item_id: null, quantity: null};
+      let newEntri = this.setDefault().incoming_good_items[0]
 
       this.rsForm.incoming_good_items.push(newEntri)
     },
-    removeItem(index) {
+    removeItem (index) {
       this.rsForm.incoming_good_items.splice(index, 1)
-      if(this.rsForm.incoming_good_items.length < 1) this.addNewItem()
+      if (this.rsForm.incoming_good_items.length < 1) this.addNewItem()
     },
 
-    onSave() {
+    onSave () {
       this.$validator.validate().then(result => {
         if (!result) {
           this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
-          });
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
+          })
 
-          return;
+          return
         }
         this.FORM.loading = true
-        let {method, mode, apiUrl} = this.FORM.meta();
+        let { method, apiUrl } = this.FORM.meta()
         this.$axios.set(method, apiUrl, this.rsForm)
-        .then((response) => {
-          let message = response.data.number + ' - #' + response.data.id
-          this.FORM.response.success({message:message})
-          this.FORM.toView(response.data.id)
-        })
-        .catch((error) => {
-          this.FORM.response.error(error.response || error, 'UPDATE FAILED');
-          this.FORM.response.fields(error.response);
-        })
-        .finally(()=>{
-          setTimeout(() => {
-            this.FORM.loading = false
-          }, 2000)
-
-        });
-
-      });
-    },
-  },
+          .then((response) => {
+            let message = response.data.number + ' - #' + response.data.id
+            this.FORM.response.success({ message: message })
+            this.FORM.toView(response.data.id)
+          })
+          .catch((error) => {
+            this.FORM.response.error(error.response || error, 'UPDATE FAILED')
+            this.FORM.response.fields(error.response)
+          })
+          .finally(() => {
+            setTimeout(() => {
+              this.FORM.loading = false
+            }, 2000)
+          })
+      })
+    }
+  }
 }
 </script>
