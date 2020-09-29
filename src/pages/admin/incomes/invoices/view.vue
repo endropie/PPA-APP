@@ -62,6 +62,7 @@
       </div>
       <div class="row q-gutter-xs print-hide " style="padding-top:50px">
         <q-btn :label="$tc('form.back')" icon="cancel" color="dark" :class="{'full-width': $q.screen.lt.sm}" v-go-back.single />
+        <q-btn :label="$tc('form.edit')" icon="edit" color="positive" :class="{'full-width': $q.screen.lt.sm}" @click="$router.push(`${VIEW.resource.uri}/${ROUTE.params.id}/edit`)"  v-if="IS_EDITABLE" />
         <q-btn :label="$tc('form.print')" icon="print" color="grey" :class="{'full-width': $q.screen.lt.sm}" @click.native="print()" />
         <q-space />
         <ux-btn-dropdown  color="blue-grey" :class="{'full-width': $q.screen.lt.sm}"
