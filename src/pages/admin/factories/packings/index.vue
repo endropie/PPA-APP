@@ -122,9 +122,6 @@
             {{ rs.row.packing_items.item.part_name }}
           </div>
         </q-td>
-        <!-- <q-td slot="body-cell-work_order_id" slot-scope="rs" :props="rs">
-          {{rs.row.packing_items.work_order_number || '-'}}
-        </q-td> -->
         <q-td slot="body-cell-shift_id" slot-scope="rs" :props="rs">
           <div v-if="rs.row.shift"> {{ rs.row.shift.name }}</div>
           <div v-else class="text-center">-</div>
@@ -153,9 +150,7 @@
 
       </q-table>
     </q-pull-to-refresh>
-    <code>
-      {{TABLE.rowData}}
-    </code>
+    <!-- <code> {{TABLE.rowData}}</code> -->
   </q-page>
 </template>
 
