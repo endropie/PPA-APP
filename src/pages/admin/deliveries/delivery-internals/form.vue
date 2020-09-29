@@ -75,10 +75,11 @@
         <thead>
           <q-tr class="text-uppercase" style="line-height:30px">
             <q-th key="prefix" width="50px"></q-th>
-            <q-th key="part" width="40%">{{$tc('items.part_name')}}</q-th>
-            <q-th key="quantity" width="15%">{{$tc('label.quantity')}}</q-th>
-            <q-th key="unit" width="15%">{{$tc('label.unit')}}</q-th>
-            <q-th key="note" width="25%">{{$tc('label.note')}}</q-th>
+            <q-th key="name" width="30%">{{$tc('items.part_name')}}</q-th>
+            <q-th key="subname" width="30%">{{$app.setting('item.subname_label')}}</q-th>
+            <q-th key="quantity" width="10%">{{$tc('label.quantity')}}</q-th>
+            <q-th key="unit" width="10%">{{$tc('label.unit')}}</q-th>
+            <q-th key="note" width="40%">{{$tc('label.note')}}</q-th>
           </q-tr>
         </thead>
         <tbody>
@@ -86,7 +87,7 @@
             <q-td name="prefix">
               <q-btn dense flat outline tabindex="1000" color="negative" icon="clear" @click="removeDetail(rowIndex)" />
             </q-td>
-            <q-td name="part">
+            <q-td name="name">
               <q-input type="text" dense outlined hide-bottom-space
                 v-model="row.name"
                 v-validate="'required'"
@@ -94,25 +95,34 @@
                 :error="errors.has(`option.delivery_internal_items.${rowIndex}.name`)"
                 :autofocus="row.hasOwnProperty('_autofocus')"
                 @focus="delete row._autofocus"
-                />
+              />
+            </q-td>
+            <q-td name="subname">
+              <q-input type="text" dense outlined hide-bottom-space
+                v-model="row.subname"
+                v-validate="'required'"
+                :name="`option.delivery_internal_items.${rowIndex}.subname`"
+                :error="errors.has(`option.delivery_internal_items.${rowIndex}.subname`)"
+              />
             </q-td>
             <q-td name="quantity">
-              <q-input type="number" dense outlined hide-bottom-space
+              <q-input type="number" dense outlined hide-bottom-space no-error-icon
                 v-model="row.quantity"
                 v-validate="'required'"
                 :name="`option.delivery_internal_items.${rowIndex}.quantity`"
                 :error="errors.has(`option.delivery_internal_items.${rowIndex}.quantity`)"
               />
             </q-td>
-            <q-td name="satuan">
-              <q-input type="text" dense outlined hide-bottom-space
+            <q-td name="unit">
+              <q-input type="text" dense outlined hide-bottom-space no-error-icon
                 v-model="row.unit"
                 :name="`option.delivery_internal_items.${rowIndex}.unit`"
                 :error="errors.has(`option.delivery_internal_items.${rowIndex}.unit`)"
               />
             </q-td>
             <q-td name="note">
-              <q-input type="text" dense outlined hide-bottom-space
+              <q-input type="text" dense outlined hide-bottom-space no-error-icon
+                input-style="min-width:150px"
                 v-model="row.note"
                 :name="`option.delivery_internal_items.${rowIndex}.note`"
                 :error="errors.has(`option.delivery_internal_items.${rowIndex}.note`)"
@@ -196,6 +206,7 @@ export default {
             delivery_internal_items: [
               {
                 name: null,
+                subname: null,
                 quantity: null,
                 unit: null,
                 notes: null
