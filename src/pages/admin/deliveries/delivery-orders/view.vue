@@ -429,7 +429,7 @@ export default {
             this.setView(data)
           })
           .catch(error => {
-            this.$app.response.error(error.response, 'FORM REVISION')
+            this.$app.response.error(error.response, 'CONFIRMED FAILED')
           })
           .finally(() => {
             this.VIEW.show = true
