@@ -111,6 +111,13 @@
                 $router.push(`${VIEW.resource.uri}/create`)
               }
             },
+            { label: 'CLOSE', color:'positive', icon: 'done_all',
+              hidden: !IS_EDITABLE || !$app.can('delivery-internals-read'),
+              detail: $tc('messages.process_close'),
+              actions: () => {
+                setClose()
+              }
+            },
             { label: 'DELETE', color:'red', icon: 'delete',
               hidden: !IS_EDITABLE || !$app.can('delivery-internals-delete'),
               detail: $tc('messages.process_delete'),
@@ -190,6 +197,44 @@ export default {
     },
     setView (data) {
       this.rsView = data
+    },
+    setClose () {
+      const submit = () => {
+        this.$q.loading.show()
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=CLOSED&nodata=true`
+        this.$axios.put(url)
+          .then((response) => {
+            const data = response.data
+            this.setView(data)
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'CLOSED FAILED')
+          })
+          .finally(() => {
+            setTimeout(() => { this.$q.loading.hide() }, 1000)
+          })
+      }
+
+      this.$validator.validate().then(result => {
+        if (!result) {
+          return this.$q.notify({
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
+          })
+        }
+
+        this.$q.dialog({
+          title: this.$tc('form.confirm'),
+          message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.close') }),
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          submit()
+        })
+      })
     }
   }
 }
