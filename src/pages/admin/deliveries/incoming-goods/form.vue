@@ -46,7 +46,7 @@
           </ux-select-filter>
 
           <ux-date name="date" type="date" class="col-8"
-            :label="$tc('label.date')" stack-label
+            :label="$tc('warehouses.incoming_date')" stack-label
             v-model="rsForm.date"
             v-validate="`required|date_format:yyyy-MM-dd|before:${$app.moment().add(1,'days').format('YYYY-MM-DD')}`"
             :date-options="(date) => date <= $app.moment().format('YYYY/MM/DD')"
