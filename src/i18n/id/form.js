@@ -19,6 +19,7 @@ export default {
   revision: 'Revisi',
   reconciliation: 'Rekonsiliasi',
   reject: 'Tolak | Ditolak',
+  reopen: 'Kembali "OPEN" status',
   remove: 'Hapus | Dihapus',
   reset: 'Reset | Direset',
   restoration: 'Perbaikan',
@@ -30,6 +31,7 @@ export default {
   submit: 'Submit | Submit',
   temporary: 'Sementara',
   tag: 'Tandai {v} | Ditandai {v}',
+  sync: 'Sinkronisasi {v}',
   update: 'Perubahan | dirubah',
   validation: 'Validasi {v}| Ter-validasi',
   void: 'Pembatal'

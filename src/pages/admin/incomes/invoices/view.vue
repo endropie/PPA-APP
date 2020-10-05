@@ -75,10 +75,24 @@
               }
             },
             { label: 'CONFIRM', color:'positive', icon: 'done_all',
-              hidden: !IS_CLOSE || !$app.can('acc-invoices-confirm'),
+              hidden: !IS_CONFIRM || !$app.can('acc-invoices-confirm'),
               detail: $tc('form.confirm'),
               actions: () => {
                 setConfirmed()
+              }
+            },
+            { label: 'RE-OPEN', color:'blue', icon: 'refresh',
+              hidden: !IS_REOPEN || !$app.can('acc-invoices-confirm'),
+              detail: $tc('form.reopen'),
+              actions: () => {
+                setReopen()
+              }
+            },
+            { label: 'SYNCRONIZE', color:'blue', icon: 'sync_alt',
+              hidden: !IS_REOPEN || !$app.can('acc-invoices-update'),
+              detail: $tc('form.sync', 1, {v: 'Invoices'}),
+              actions: () => {
+                setSync()
               }
             },
             { label: 'DELETE', color:'red', icon: 'delete',
@@ -90,8 +104,6 @@
             }
           ]">
         </ux-btn-dropdown>
-        <!-- <q-btn :label="$tc('form.confirm')" icon="done_all" color="positive" :class="{'full-width': $q.screen.lt.sm}" @click="setConfirmed()" v-if="rsView.status == 'OPEN'" /> -->
-        <!-- <q-btn :label="$tc('form.delete')" icon="delete" color="negative" :class="{'full-width': $q.screen.lt.sm}" @click="VIEW.delete" /> -->
       </div>
     </page-print>
     <q-inner-loading :showing="VIEW.loading">
@@ -128,7 +140,12 @@ export default {
     '$route': 'init'
   },
   computed: {
-    IS_CLOSE () {
+    IS_REOPEN () {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'INVOICED') return false
+      return true
+    },
+    IS_CONFIRM () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
       return true
@@ -186,6 +203,52 @@ export default {
             let msg = response.data.message[0] || ''
             if (response.data.success) this.$app.notify.success('[ACCURATE]', msg)
             else this.$app.notify.warning('[ACCURATE]', msg)
+
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response || error)
+          })
+          .finally(() => {
+            this.$q.loading.hide()
+          })
+      }
+
+      submit()
+    },
+    setReopen () {
+      const submit = () => {
+        this.$q.loading.show()
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/reopened`
+
+        this.$axios.post(url)
+          .then((response) => {
+            let msg = response.data.message[0] || ''
+            if (response.data.success) this.$app.notify.success('[ACCURATE]', msg)
+            else this.$app.notify.warning('[REOPEN]', msg)
+
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response || error)
+          })
+          .finally(() => {
+            this.$q.loading.hide()
+          })
+      }
+
+      submit()
+    },
+    setSync () {
+      const submit = () => {
+        this.$q.loading.show()
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/syncronized`
+
+        this.$axios.post(url)
+          .then((response) => {
+            let msg = response.data.message[0] || ''
+            if (response.data.success) this.$app.notify.success('[ACCURATE-SYNC]', msg)
+            else this.$app.notify.warning('[ACCURATE-REOPEN]', msg)
 
             this.init()
           })
