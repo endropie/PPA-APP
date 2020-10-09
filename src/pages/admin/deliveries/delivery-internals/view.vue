@@ -1,11 +1,11 @@
 <template>
-  <q-page padding class="column justify-start items-center"  v-if="VIEW.show">
+  <q-page padding class="column justify-start items-center" v-if="VIEW.show">
 
-    <page-print v-if="rsView">
+    <page-print v-if="rsView" :style="{'min-width': $q.screen.gt.sm ? '1000px' : '100%'}">
       <div slot="header-tags" class="column no-wrap items-end">
         <div class="print-hide no-padding">
-          <ux-chip-status :row="rsView" tag outline dense square icon='bookmark' class="no-margin" />
-          <!-- <q-chip tag outline small square color="orange-10" class="text-uppercase" :label="$tc('form.temporary')" v-if="rsView.is_internal" /> -->
+          <ux-chip-status :row="rsView" tag outline dense square icon='bookmark' class="q-my-none q-mr-none" />
+          <q-chip tag outline dense square label="REVISED" color="red-10" icon='bookmark' class="q-my-none q-mr-none text-weight-medium" v-if="rsView.revised_number" />
         </div>
         <div class="text-subtitle2 text-weight-bold text-uppercase text-center on-right">
           {{$tc('general.sj_internal',2)}}
@@ -18,24 +18,25 @@
             <address class="text-normal" style="font-style: normal">{{rsView.customer_address}}</address>
             <div class="text-weight-medium" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
             <div class="text-weight-medium" v-if="rsView.vehicle">{{$tc('label.transport')}}: {{rsView.vehicle.number}}</div>
-            <!-- <div class="text-weight-medium" v-if="rsView.indexed_number">{{$tc('label.no',1, {v:'Index'})}}: {{rsView.indexed_number}}</div> -->
           </div>
           <q-space/>
           <div class="on-right" style="max-width:50%">
-            <div class="column items-start">
+            <div class="column items-end">
               <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
                 class="table-print super-dense no-shadow no-highlight th-uppercase"
               >
                 <tbody>
                   <tr>
                     <td>{{$tc('label.number')}}</td>
-                    <td>
-                      {{ rsView.fullnumber || rsView.number }}
-                      </td>
+                    <td>{{ rsView.fullnumber || rsView.number }}</td>
                   </tr>
                   <tr>
                     <td>{{$tc('label.date')}}</td>
                     <td>{{$app.date_format(rsView.date)}}</td>
+                  </tr>
+                  <tr v-if="rsView.revised_number">
+                    <td>REVISED</td>
+                    <td>{{rsView.revised_number}}</td>
                   </tr>
                 </tbody>
               </q-markup-table>
@@ -49,26 +50,28 @@
             <thead>
             <q-tr>
               <q-th auto-width>No.</q-th>
-              <q-th width="40%">{{$tc('label.part')}}</q-th>
-              <q-th width="20%">{{$tc('label.quantity')}}</q-th>
+              <q-th width="30%">{{$tc('label.part')}}</q-th>
+              <q-th width="25%">{{$app.setting('item.subname_label')}}</q-th>
+              <q-th width="15%">{{$tc('label.quantity')}}</q-th>
               <q-th width="15%">{{$tc('label.unit')}}</q-th>
-              <q-th width="30%">{{$tc('label.note')}}</q-th>
+              <q-th width="25%">{{$tc('label.note')}}</q-th>
             </q-tr>
             </thead>
-            <tbody v-for="(row, index) in rsView.option.delivery_internal_items" :key="index">
+            <tbody v-for="(row, index) in rsView.delivery_internal_items" :key="index">
               <q-tr>
                 <q-td>{{index+1}}</q-td>
-                <q-td>{{row.name}}</q-td>
+                <q-td>{{row.name}} <q-icon name="fiber_new" style="font-size:20px" v-if="!row.item_id" /></q-td>
+                <q-td>{{row.subname}}</q-td>
                 <q-td align="right">{{row.quantity}}</q-td>
-                <q-td align="center">{{row.unit}}</q-td>
+                <q-td align="center">{{row.unit.code}}</q-td>
                 <q-td>{{row.note}}</q-td>
               </q-tr>
             </tbody>
           </q-markup-table>
         </div>
-        <div v-show="Boolean(rsView.option.description)">
+        <div v-show="Boolean(rsView.description)">
             <div class="q-my-xs">{{$tc('label.description')}}:</div>
-            <div class="q-my-xs" style="min-height:30px">{{ rsView.option.description }}</div>
+            <div class="q-my-xs" style="min-height:30px">{{ rsView.description }}</div>
         </div>
         <q-space />
         <div class="page-break-inside">
@@ -111,11 +114,18 @@
                 $router.push(`${VIEW.resource.uri}/create`)
               }
             },
-            { label: 'CLOSE', color:'positive', icon: 'done_all',
-              hidden: !IS_EDITABLE || !$app.can('delivery-internals-read'),
-              detail: $tc('messages.process_close'),
+            { label: 'CONFIRM', color:'positive', icon: 'done_all',
+              hidden: !IS_EDITABLE || !$app.can('delivery-internals-confirm'),
+              detail: $tc('messages.process_confirm'),
               actions: () => {
-                setClose()
+                setConfirmation()
+              }
+            },
+            { label: 'REVISION', color:'red-10', icon: 'forward',
+              hidden: !IS_REVISE || !$app.can('delivery-internals-revision'),
+              detail: $tc('messages.process_revise'),
+              actions: () => {
+                setRevision()
               }
             },
             { label: 'DELETE', color:'red', icon: 'delete',
@@ -175,7 +185,11 @@ export default {
     IS_EDITABLE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
-      // if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
+      return true
+    },
+    IS_REVISE () {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.revised_number) return false
       return true
     }
   },
@@ -198,17 +212,47 @@ export default {
     setView (data) {
       this.rsView = data
     },
-    setClose () {
-      const submit = () => {
+    setRevision () {
+      const submit = (data) => {
         this.$q.loading.show()
-        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=CLOSED&nodata=true`
-        this.$axios.put(url)
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/revised`
+        this.$axios.put(url, data)
           .then((response) => {
-            const data = response.data
-            this.setView(data)
+            this.init()
           })
           .catch(error => {
-            this.$app.response.error(error.response, 'CLOSED FAILED')
+            this.$app.response.error(error.response, 'CONFIRM FAILED')
+          })
+          .finally(() => {
+            setTimeout(() => { this.$q.loading.hide() }, 1000)
+          })
+      }
+
+      this.$q.dialog({
+        title: 'REVISION - DELIVERY INTERNAL',
+        message: 'Input Revision number',
+        prompt: {
+          model: '',
+          isValid: val => val.length > 0, // << here is the magic
+          type: 'text' // optional
+        },
+        cancel: true,
+        persistent: true
+      })
+        .onOk(val => {
+          submit({ revised_number: val })
+        })
+    },
+    setConfirmation () {
+      const submit = () => {
+        this.$q.loading.show()
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/confirmed`
+        this.$axios.put(url)
+          .then((response) => {
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'CONFIRM FAILED')
           })
           .finally(() => {
             setTimeout(() => { this.$q.loading.hide() }, 1000)
