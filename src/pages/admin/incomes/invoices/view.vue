@@ -49,7 +49,7 @@
                   </span>
                 </td>
               </tr>
-              <q-tr v-for="(row, index) in delivery.delivery_order_items" :key="index" :request-order-item-id="row.id">
+              <q-tr v-for="(row, index) in delivery.delivery_order_items" :key="index" :delivery-order-item-id="row.id">
                 <q-td>{{row.item.part_name}}</q-td>
                 <q-td>{{row.item.part_subname}}</q-td>
                 <q-td class="text-center">{{row.unit.code}}</q-td>
