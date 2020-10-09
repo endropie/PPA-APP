@@ -84,8 +84,8 @@
               <tbody v-for="(row, index) in rsView.request_order_items" :key="index">
                 <q-tr :request-order-item-id="row.id">
                   <td v-if="IS_LOTS">
-                    <span v-if="row.incoming_good_item && row.incoming_good_item.lots">
-                      {{ row.incoming_good_item.lots }}
+                    <span v-if="row.lots">
+                      {{ row.lots }}
                     </span>
                     <span v-else>-</span>
                   </td>
@@ -225,9 +225,9 @@ export default {
     return {
       VIEW: {
         data: {},
-        resource:{
+        resource: {
           api: '/api/v1/incomes/request-orders',
-          uri: '/admin/incomes/request-orders',
+          uri: '/admin/incomes/request-orders'
         }
       },
       rsView: {},
@@ -235,28 +235,28 @@ export default {
       show_summary: true
     }
   },
-  created() {
+  created () {
     this.init()
   },
-  watch:{
-      '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   computed: {
     IS_LOTS () {
       if (!this.rsView.customer) return false
       return this.rsView.customer.order_lots
     },
-    IS_CLOSE() {
+    IS_CLOSE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
       return true
     },
-    IS_VOID() {
+    IS_VOID () {
       if (this.IS_EDITABLE) return false
       if (['VOID'].find(x => x === this.rsView.status)) return false
       return true
     },
-    IS_EDITABLE() {
+    IS_EDITABLE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
       // if (this.rsView.order_mode !== 'PO') return false
@@ -266,22 +266,21 @@ export default {
 
       return true
     },
-    IS_ITEM_SUMMARY() {
+    IS_ITEM_SUMMARY () {
       if (this.rsView.order_mode !== 'ACCUMULATE') return false
       return this.show_summary
     },
-    SUM_ITEMS() {
+    SUM_ITEMS () {
       let data = []
       this.rsView.request_order_items.map((detail) => {
         const index = data.findIndex(x => {
-          return x.item_id == detail.item_id
+          return x.item_id === detail.item_id
         })
         if (index > -1) {
           data[index].unit_amount += detail.unit_amount
           data[index].amount_delivery += detail.amount_delivery
           data[index].quantity += detail.quantity
-        }
-        else {
+        } else {
           data.push(JSON.parse(JSON.stringify(detail)))
         }
       })
@@ -289,25 +288,25 @@ export default {
     }
   },
   methods: {
-    init() {
+    init () {
       this.VIEW.load((data) => {
         this.setView(data || {})
       })
     },
-    showDO(id) {
+    showDO (id) {
       let params = {
         path: '/admin/deliveries/delivery-orders/view',
         params: { id: id },
-        meta: { mode: 'view'},
+        meta: { mode: 'view' },
         actions: {
           // actions
         }
       }
 
-      this.$refs.modal.show(params);
+      this.$refs.modal.show(params)
     },
-    setView(data) {
-      this.rsView =  data
+    setView (data) {
+      this.rsView = data
     },
     push (row) {
       this.$q.loading.show()
@@ -319,12 +318,11 @@ export default {
           return (response.data.s)
             ? this.$app.notify.success('[ACCURATE]', msg)
             : this.$app.notify.warning('[ACCURATE]', msg)
-          this.init();
         })
         .catch(error => {
           this.$app.response.error(error.response || error)
         })
-        .finally(()=>{
+        .finally(() => {
           this.$q.loading.hide()
         })
     },
@@ -335,64 +333,31 @@ export default {
         this.$axios.post(url)
           .then((response) => {
             let msg = response.data.d[0] || ''
-            if (response.data.s)  {
+            if (response.data.s) {
               this.$app.notify.success('[ACCURATE]', msg)
-            }
-            else this.$app.notify.warning('[ACCURATE]', msg)
+            } else this.$app.notify.warning('[ACCURATE]', msg)
             this.init()
           })
           .catch(error => {
             this.$app.response.error(error.response || error)
           })
-          .finally(()=>{
+          .finally(() => {
             this.$q.loading.hide()
           })
       }
 
-      this.$q.dialog({title:'DELETE CONFIRM', message: 'Are you sure to delete?', cancel: true})
-      .onOk(() => {
-        submit(row)
-      })
-
+      this.$q.dialog({ title: 'DELETE CONFIRM', message: 'Are you sure to delete?', cancel: true })
+        .onOk(() => {
+          submit(row)
+        })
     },
-    setClose() {
+    setClose () {
       const submit = () => {
         this.VIEW.show = false
         this.VIEW.loading = true
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=close&nodata=true`
         this.$axios.put(url)
           .then((response) => {
-            const data = response.data
-            this.init()
-          })
-          .catch(error => {
-            this.$app.response.error(error.response, 'FORM CLOSED')
-          })
-          .finally(()=>{
-            this.VIEW.show = true
-            setTimeout(() => {
-              this.VIEW.loading = false
-            }, 1000);
-          })
-      }
-
-      this.$q.dialog({
-        title: this.$tc('form.confirm', 1, {v:'CLOSE'}),
-        message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_close')}),
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        submit()
-      })
-    },
-    setRecalculate() {
-      const submit = () => {
-        // this.VIEW.show = false
-        this.VIEW.loading = true
-        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=calculate&nodata=true`
-        this.$axios.put(url)
-          .then((response) => {
-            const data = response.data
             this.init()
           })
           .catch(error => {
@@ -402,9 +367,37 @@ export default {
             this.VIEW.show = true
             setTimeout(() => {
               this.VIEW.loading = false
-            }, 1000);
+            }, 1000)
           })
+      }
 
+      this.$q.dialog({
+        title: this.$tc('form.confirm', 1, { v: 'CLOSE' }),
+        message: this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_close') }),
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        submit()
+      })
+    },
+    setRecalculate () {
+      const submit = () => {
+        // this.VIEW.show = false
+        this.VIEW.loading = true
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=calculate&nodata=true`
+        this.$axios.put(url)
+          .then((response) => {
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'FORM CLOSED')
+          })
+          .finally(() => {
+            this.VIEW.show = true
+            setTimeout(() => {
+              this.VIEW.loading = false
+            }, 1000)
+          })
       }
 
       submit()
