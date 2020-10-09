@@ -275,10 +275,10 @@ const deliveries = [
     path: 'delivery-loads',
     lang: 'general.delivery_load',
     resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-verifies-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-verifies-create' } },
-      // { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'delivery-verifies-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-verifies-read' } }
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-loads-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-loads-create' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-loads-read' } },
+      { page: 'view-delivery-orders', path: ':id/delivery-orders', meta: { mode: 'view', permission: 'delivery-loads-read' } }
     ]
   },
   {

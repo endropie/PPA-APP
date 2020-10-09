@@ -27,7 +27,7 @@
             <tbody>
               <tr>
                 <td class="text-weight-medium">{{$tc('label.number')}}</td>
-                <td>{{ rsView.fullnumber || rsView.number }}</td>
+                <td>{{ rsView.fullnumber }}</td>
               </tr>
               <tr>
                 <td class="text-weight-medium">{{$tc('label.date')}}</td>
@@ -62,11 +62,20 @@
           <div class="q-mb-sm text-italic">{{$tc('label.description')}}:</div>
           <div class="q-mb-md text-weight-light" style="">{{ rsView.description }}</div>
         </div>
+        <div class="col-12">
+          <div class="text-weight-medium">
+            SJDO:
+            <span v-for="(link, i) in rsView.delivery_orders" :key="i" @click="showDO(link.id)" class="cursor-pointer">
+              ({{i+1}}) {{link.fullnumber}}
+            </span>
+          </div>
+        </div>
         <div class="col-12 row q-gutter-xs print-hide " style="padding-top:50px">
           <q-btn :label="$tc('form.back')" icon="cancel"  color="dark" :to="`${VIEW.resource.uri}?return`" />
           <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="VIEW.print()" />
+          <q-btn :label="$tc('general.sj_delivery')" icon="print"  color="dark" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/delivery-orders`" />
           <q-space />
-          <q-btn-dropdown outline class="no-dropdown-icon"
+          <q-btn-dropdown outline class="no-dropdown-icon" v-show="false"
             :color="'secondary'" icon="local_shipping"
             menu-anchor="bottom left" menu-self="top left">
             <span slot="label" class="on-right">
@@ -78,7 +87,7 @@
                 <template v-for="(link, index) in rsView.delivery_orders">
                   <q-btn dense class="q-ma-xs" :key="index"
                     color="secondary" icon="open_in_new"
-                    :label="`${link.fullnumber || link.number}`"
+                    :label="`${link.fullnumber}`"
                     @click="showDO(link.id)" />
                 </template>
               </div>
