@@ -9,7 +9,7 @@
     <!-- ROW::1st Customer Identitity -->
     <q-card-section class="row q-col-gutter-x-md">
       <div class="col-12 col-sm-6" >
-        <q-list bordered :dark="LAYOUT.isDark" dense>
+        <q-list bordered class="full-height">
           <q-item-label header>Details</q-item-label>
           <q-separator :dark="LAYOUT.isDark"></q-separator>
           <q-item>
@@ -89,7 +89,7 @@
       <!-- COLUMN::2nd Customer Coporation details -->
       <div class="col-12 col-sm-6" >
         <div class="column q-gutter-sm">
-          <q-list bordered :dark="LAYOUT.isDark" dense>
+          <q-list bordered class="full-height">
             <q-item-label header>Reference Account</q-item-label>
             <q-separator :dark="LAYOUT.isDark"></q-separator>
              <q-item>
@@ -123,7 +123,7 @@
              </q-item>
           </q-list>
 
-          <q-list bordered :dark="LAYOUT.isDark">
+          <q-list bordered class="full-height">
             <q-item-label header>Taxes</q-item-label>
             <q-separator :dark="LAYOUT.isDark"></q-separator>
             <q-item>
@@ -201,8 +201,40 @@
     </q-card-section>
 
     <q-card-section class="row q-col-gutter-sm q-col-gutter-x-md q-mb-lg">
+      <div class="col-12 col-md-6">
+        <q-list dense class="main-box" :dark="LAYOUT.isDark" color="secondary" separator bordered>
+          <q-item-label header >Delivery trip List</q-item-label>
+          <q-separator  :dark="LAYOUT.isDark" />
+          <q-item v-for="(item, index) in rsForm.customer_trips" :key="index">
+            <q-item-section class="">
+              <q-input type="time"
+                :name="`customer_trips.${index}.trip_time`"
+                :data-vv-as="`trip time  ${index+1}`"
+                label="trip time"  stack-label
+                placeholder="Enter trip time ..."
+                dense filled hide-bottom-space
+                v-model="rsForm.customer_trips[index].trip_time"
+                v-validate="rsForm.customer_trips.length > 1 ? 'required' : ''"
+                :error="errors.has(`customer_trips.${index}.trip_time`)"
+                :error-message="errors.first(`customer_trips.${index}.trip_time`)"
+              >
+                <span slot="before" class="text-subtitle2">{{index+1}}</span>
+              </q-input>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn dense flat icon="clear" color="red" @click="removeTrip(index)" />
+            </q-item-section>
+          </q-item>
+          <q-separator spaced inset :dark="LAYOUT.isDark" />
+          <q-item>
+            <q-item-section align="q-pb-sm">
+              <q-btn align="center" dense icon="add" color="positive" label="New contact" @click="addNewTrip()" />
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </div>
       <!-- COLUMN::3th Contact lists -->
-      <div class="col-12">
+      <div class="col-12 col-md-6">
         <q-list dense class="main-box" :dark="LAYOUT.isDark" color="secondary" separator bordered>
           <q-item-label header >Contact List</q-item-label>
           <q-separator  :dark="LAYOUT.isDark" />
@@ -388,6 +420,7 @@ export default {
           delivery_mode: null,
           order_mode: null,
           customer_contacts: [ { id: null } ],
+          customer_trips: [ { id: null } ],
 
           order_manual_allowed: 0,
           order_monthly_actived: 0,
@@ -417,6 +450,17 @@ export default {
 
     setForm (data) {
       this.rsForm = JSON.parse(JSON.stringify(data))
+      console.warn(this.rsForm)
+    },
+
+    addNewTrip () {
+      let newEntri = { id: null, label: null, name: null, phone: null }
+
+      this.rsForm.customer_trips.push(newEntri)
+    },
+    removeTrip (index) {
+      this.rsForm.customer_trips.splice(index, 1)
+      if (this.rsForm.customer_trips.length < 1) this.addNewTrip()
     },
 
     addNewContact (autofocus = true) {
