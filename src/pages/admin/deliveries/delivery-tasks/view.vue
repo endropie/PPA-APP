@@ -33,6 +33,10 @@
                 <td class="text-weight-medium">{{$tc('label.date')}}</td>
                 <td>{{$app.date_format(rsView.date)}}</td>
               </tr>
+              <tr>
+                <td class="text-weight-medium">RIT</td>
+                <td>{{$app.date_format(rsView.date +' '+ rsView.trip_time, 'HH:mm')}}</td>
+              </tr>
             </tbody>
           </q-markup-table>
         </div>

@@ -31,7 +31,7 @@
             :label="$tc('general.customer')"  stack-label
             v-model="rsForm.customer"
             filter clearable
-            source="api/v1/incomes/customers?mode=all"
+            source="api/v1/incomes/customers?mode=all&--with=customer_trips"
             :option-label="(item) => `[${item.code}] ${item.name}`"
             option-value="id"
             :disable="!Boolean(rsForm.transaction) || Boolean(rsForm.delivery_task_items.find(i => i.item_id))"
@@ -53,16 +53,31 @@
               :error="errors.has('date')"
               :error-message="errors.first('date')"
             />
-            <q-input type="time"
-              name="time"
-              :label="$tc('label.time')" stack-label
-              v-model="rsForm.time"
-              v-validate="'required'"
-              :error="errors.has('time')"
-              :error-message="errors.first('time')"
-            />
             <q-space/>
-            <q-select dense outlined
+            <q-input type="time" input-style="min-width:75px"
+              name="trip_time"
+              :label="$tc('label.time')" stack-label
+              v-model="rsForm.trip_time"
+              v-validate="'required'"
+              :error="errors.has('trip_time')"
+              :error-message="errors.first('trip_time')"
+            >
+            <q-btn slot="after" icon="list" :disable="!rsForm.customer" dense outline class="no-padding">
+              <q-menu persistent auto-close>
+                <q-list bordered v-if="rsForm.customer">
+                  <q-item clickable v-for="(ct, indexCT) in rsForm.customer.customer_trips || []" :key="indexCT"
+                    @click="rsForm.trip_time = ct.trip_time"
+                  >
+                    <q-item-section avatar>
+                      <q-icon color="primary" name="timer" />
+                    </q-item-section>
+                    <q-item-section>{{ct.trip_time}}</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
+            </q-input>
+            <!-- <q-select dense outlined
               style="min-width: 80px"
               name="rit"
               v-model="rsForm.rit"
@@ -71,7 +86,7 @@
               v-validate="'required'"
               :error="errors.has('rit')"
               :error-message="errors.first('rit')"
-            />
+            /> -->
           </div>
         </div>
       </div>
@@ -197,7 +212,7 @@ export default {
         return {
           number: null,
           date: this.$app.moment().format('YYYY-MM-DD'),
-          time: null,
+          trip_time: null,
           customer: null,
           customer_id: null,
           description: null,
