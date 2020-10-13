@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="column justify-start items-center" v-if="VIEW.show">
 
-    <page-print v-if="rsView" :style="{'min-width': $q.screen.gt.sm ? '1000px' : '100%'}">
+    <page-print v-if="rsView" :style="{'min-width': $q.screen.gt.sm ? '70%' : '100%'}">
       <div slot="header-tags" class="column no-wrap items-end">
         <div class="print-hide no-padding">
           <ux-chip-status :row="rsView" tag outline dense square icon='bookmark' class="q-my-none q-mr-none" />
@@ -11,7 +11,7 @@
           {{$tc('general.sj_internal',2)}}
         </div>
       </div>
-      <div class="column" style="min-height:11cm;height:auto">
+      <div class="column" style="min-height:3.25in;height:auto">
         <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
           <div class="" style="max-width:50%">
             <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
@@ -57,8 +57,8 @@
               <q-th width="25%">{{$tc('label.note')}}</q-th>
             </q-tr>
             </thead>
-            <tbody v-for="(row, index) in rsView.delivery_internal_items" :key="index">
-              <q-tr>
+            <tbody v-for="(ln, lnIndex) in [1,2,3,4,5,6,7,8]" :key="lnIndex">
+              <q-tr v-for="(row, index) in rsView.delivery_internal_items" :key="index">
                 <q-td>{{index+1}}</q-td>
                 <q-td>{{row.name}} <q-icon name="fiber_new" style="font-size:20px" v-if="!row.item_id" /></q-td>
                 <q-td>{{row.subname}}</q-td>
@@ -73,30 +73,30 @@
             <div class="q-my-xs">{{$tc('label.description')}}:</div>
             <div class="q-my-xs" style="min-height:30px">{{ rsView.description }}</div>
         </div>
-        <q-space />
-        <div class="page-break-inside">
-          <q-markup-table dense :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
-            <tr class="text-center">
-              <td width="21%">
-                <div class="sign-name">Diterima Oleh</div>
-                <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
-              </td>
-              <td width="21%">
-                <div class="sign-name">Outgoing Oleh</div>
-                <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
-              </td>
-              <td width="21%">
-                <div class="sign-name">Security</div>
-                <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
-              </td>
-              <td width="21%" class="text-capitalize">
-                <div class="sign-name">Hormat Kami</div>
-                <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.created_user">(<q-space/>{{rsView.created_user.name}}<q-space/>)</div>
-                <div class="sign-tag row no-wrap q-mx-lg" v-else>( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
-              </td>
-            </tr>
-          </q-markup-table>
-        </div>
+      </div>
+      <q-space />
+      <div class="page-break-inside" style="break-inside: avoid;">
+        <q-markup-table dense :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
+          <tr class="text-center">
+            <td width="21%">
+              <div class="sign-name">Diterima Oleh</div>
+              <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+            </td>
+            <td width="21%">
+              <div class="sign-name">Outgoing Oleh</div>
+              <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+            </td>
+            <td width="21%">
+              <div class="sign-name">Security</div>
+              <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+            </td>
+            <td width="21%" class="text-capitalize">
+              <div class="sign-name">Hormat Kami</div>
+              <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.created_user">(<q-space/>{{rsView.created_user.name}}<q-space/>)</div>
+              <div class="sign-tag row no-wrap q-mx-lg" v-else>( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+            </td>
+          </tr>
+        </q-markup-table>
       </div>
 
       <div class="row q-gutter-xs print-hide" style="padding-top:50px">
@@ -300,4 +300,20 @@ export default {
 .sign-tag
   margin-top 40px
   vertical-align bottom
+
+@media print {
+  html, body {
+      display: block;
+      margin: 0 auto
+  }
+
+  @page {
+    // size:  200mm 125mm;
+    size:  21cm 16cm;
+  }
+
+  .logo {
+    width: 30%;
+  }
+}
 </style>

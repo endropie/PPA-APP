@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="column justify-start items-center">
-    <div class="content" :style="{'min-width': $q.screen.gt.sm ? '1000px' : '100%'}">
+    <div class="content" :style="{'min-width': $q.screen.gt.sm ? '70%' : '100%'}">
       <div class="row q-pb-md print-hide">
         <q-space />
         <q-btn color="grey" icon="print" label="Print" @click="VIEW.print()" />
@@ -9,7 +9,7 @@
         <template v-if="page.data">
           <page-print class="multi-page" v-for="(pageMode, pi) in getArrayPage(page.data.customer)" :key="pi">
           <!-- <page-print v-if="page.data" :class="{'multi-page': pageIndex > 0 }"> -->
-            <div slot="header-title" class="text-uppercase">{{$tc('general.sj_delivery')}}</div>
+            <!-- <div slot="header-title" class="text-uppercase">{{$tc('general.sj_delivery')}}</div> -->
             <div slot="header-tags" class="column no-wrap items-end">
               <div class="print-hide no-padding">
                 <ux-chip-status :row="page.data" tag outline dense square icon='bookmark' class="no-margin" />
@@ -18,7 +18,7 @@
                 <span>{{$tc('general.sj_delivery',2)}} {{page.data.transaction}}</span>
               </div>
             </div>
-            <div class="column" style="min-height:11cm;height:auto">
+            <div class="column" style="min-height:3.25in;height:auto">
               <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
                 <div class="" style="max-width:50%">
                   <div class="text-weight-medium uppercase">To: {{page.data.customer_name}}</div>
@@ -386,11 +386,12 @@ export default {
 @media print {
   html, body {
       display: block;
-      margin: 0;
+      margin: 0 auto
   }
 
   @page {
-    size:  200mm 125mm;
+    // size:  200mm 125mm;
+    size:  21cm 16cm;
   }
 
   .logo {
