@@ -57,7 +57,7 @@
               <q-th width="25%">{{$tc('label.note')}}</q-th>
             </q-tr>
             </thead>
-            <tbody v-for="(ln, lnIndex) in [1,2,3,4,5,6,7,8]" :key="lnIndex">
+            <tbody>
               <q-tr v-for="(row, index) in rsView.delivery_internal_items" :key="index">
                 <q-td>{{index+1}}</q-td>
                 <q-td>{{row.name}} <q-icon name="fiber_new" style="font-size:20px" v-if="!row.item_id" /></q-td>
