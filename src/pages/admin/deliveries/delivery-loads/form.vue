@@ -27,18 +27,17 @@
       <div class="row q-col-gutter-x-md">
         <div class="col-12 col-md-6">
           <ux-select
-            name="customer_id"
             :label="$tc('general.customer')"  stack-label
             v-model="rsForm.customer"
             filter clearable
-            source="api/v1/incomes/customers?mode=all"
+            source="api/v1/incomes/customers?mode=all&--with=customer_trips"
             :option-label="(item) => `[${item.code}] ${item.name}`"
-            option-value="id"
             :disable="Boolean(!rsForm.transaction || rsForm.delivery_load_items.find(i => i.item_id))"
+            v-validate="'required'"
+            name="customer_id" :data-vv-as="$tc('general.customer')"
             :error="errors.has('customer_id')"
             :error-message="errors.first('customer_id')"
             @input="(v) => {
-              rsForm.customer = v ? v : null
               rsForm.customer_id = v ? v.id : null
               rsForm.customer_name = v ? v.name : null
               rsForm.customer_phone = v ? v.phone : null
@@ -46,35 +45,45 @@
               rsForm.order_mode = v ? v.order_mode : null
             }"
           />
-          <div class="row">
-            <ux-date dense
-              name="date" type="date"
+          <div class="row q-col-gutter-x-sm">
+            <ux-date type="date" no-error-icon
+              class="col-12 col-sm-6"
+              :label="$tc('label.date')" stack-label
               v-model="rsForm.date"
               :disable="Boolean(!rsForm.transaction || rsForm.delivery_load_items.find(i => i.item_id))"
               v-validate="'required'"
+              name="date"
               :error="errors.has('date')"
               :error-message="errors.first('date')"
             />
-            <q-space />
-            <q-select dense outlined
-              style="min-width: 80px"
-              name="rit"
-              v-model="rsForm.rit"
-              :options="[1,2,3,4,5,6,7,8,9,10]"
-              prefix="RIT"
+            <q-input type="time" no-error-icon
+              class="col-12 col-sm-6"
+              :label="$tc('label.time')" stack-label
+              :disable="Boolean(!rsForm.customer_id)"
+              v-model="rsForm.trip_time"
               v-validate="'required'"
-              :error="errors.has('rit')"
-              :error-message="errors.first('rit')"
-            />
+              name="trip_time" :data-vv-as="$tc('label.time')"
+              :error="errors.has('trip_time')"
+              :error-message="errors.first('trip_time')"
+            >
+              <q-btn slot="after" icon="list" :disable="!rsForm.customer" dense outline class="no-padding">
+                <q-menu persistent auto-close>
+                  <q-list bordered v-if="rsForm.customer">
+                    <q-item clickable v-for="(ct, indexCT) in rsForm.customer.customer_trips || []" :key="indexCT"
+                      @click="rsForm.trip_time = ct.trip_time"
+                    >
+                      <q-item-section avatar>
+                        <q-icon color="primary" name="timer" />
+                      </q-item-section>
+                      <q-item-section>{{ct.trip_time}}</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-btn>
+            </q-input>
           </div>
           <div class="row q-col-gutter-x-sm">
-            <q-input type="text"
-              :label="$tc('label.delivery_note')"
-              class="col"
-              v-model="rsForm.customer_note"
-              hint=" "
-            />
-            <ux-select class="col"
+            <ux-select class="col-12 col-sm-6"
               name="vehicle_id"
               :label="$tc('general.vehicle')"
               v-model="rsForm.vehicle"
@@ -89,6 +98,23 @@
                 rsForm.vehicle_id = v ? v.id : null
               }"
             />
+            <q-input type="text" class="col-12 col-sm-6"
+              :label="$tc('label.delivery_note')"
+              v-model="rsForm.customer_note"
+              hint=" "
+              :error="errors.has('delivery_note')"
+              :error-message="errors.first('delivery_note')"
+            />
+            <!-- <q-select dense outlined
+              style="min-width: 80px"
+              name="rit"
+              v-model="rsForm.rit"
+              :options="[1,2,3,4,5,6,7,8,9,10]"
+              prefix="RIT"
+              v-validate="'required'"
+              :error="errors.has('rit')"
+              :error-message="errors.first('rit')"
+            /> -->
           </div>
         </div>
         <div class="col-12 col-md-6" >
@@ -159,7 +185,7 @@
               />
             </q-td>
             <q-td name="quantity">
-              <q-input type="number" dense outlined hide-bottom-space
+              <q-input type="number" dense outlined hide-bottom-space no-error-icon
                 v-model="row.quantity"
                 v-validate="`required|gt_value:0|max_value:${UnitMax[rowIndex]}`"
                 :name="`delivery_load_items.${rowIndex}.quantity`"
@@ -167,7 +193,6 @@
                 :error="errors.has(`delivery_load_items.${rowIndex}.quantity`)"
                 :error-message="errors.first(`delivery_load_items.${rowIndex}.quantity`)"
               >
-
                 <span slot="append" class="text-subtitle2" >
                   <span v-if="UnitMax[rowIndex] > 0">/ {{$app.number_format(UnitMax[rowIndex])}}</span>
                   <span v-else>[~]</span>
@@ -175,7 +200,7 @@
               </q-input>
             </q-td>
             <q-td name="satuan">
-              <q-select type="text" dense outlined hide-bottom-space
+              <q-select type="text" dense outlined hide-bottom-space no-error-icon
                 v-model="row.unit"
                 :options="ItemUnitOptions[rowIndex]"
                 :option-label="opt => opt.code || opt.label"
@@ -247,7 +272,7 @@ export default {
           transaction: null,
           order_mode: null,
           date: this.$app.moment().format('YYYY-MM-DD'),
-          rit: null,
+          trip_time: null,
           customer: null,
           customer_id: null,
           customer_name: null,

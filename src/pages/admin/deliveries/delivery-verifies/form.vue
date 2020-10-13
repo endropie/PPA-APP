@@ -36,7 +36,7 @@
             :error-message="errors.first('date')"
           />
           <q-space/>
-          <q-select dense outlined no-error-icon
+          <!-- <q-select dense outlined no-error-icon
             style="min-width: 100px"
             name="rit"
             v-model="rsForm.rit"
@@ -45,7 +45,7 @@
             v-validate="'required'"
             :error="errors.has('rit')"
             :error-message="errors.first('rit')"
-          />
+          /> -->
         </div>
       </div>
     </q-card-section>
