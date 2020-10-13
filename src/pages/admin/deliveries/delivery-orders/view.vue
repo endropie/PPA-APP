@@ -413,11 +413,11 @@ export default {
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/reconcile`)
     },
     setConfirmation () {
-      const submit = () => {
-        this.VIEW.show = false
-        this.VIEW.loading = true
+      const submit = (val) => {
+
+        this.$q.loading.show()
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=confirmation&nodata=true`
-        this.$axios.put(url)
+        this.$axios.put(url, val)
           .then((response) => {
             const data = response.data
             this.setView(data)
@@ -426,9 +426,8 @@ export default {
             this.$app.response.error(error.response, 'CONFIRMED FAILED')
           })
           .finally(() => {
-            this.VIEW.show = true
             setTimeout(() => {
-              this.VIEW.loading = false
+              this.$q.loading.hide()
             }, 1000)
           })
       }
@@ -446,11 +445,16 @@ export default {
 
         this.$q.dialog({
           title: this.$tc('form.confirm'),
-          message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.validation') }),
+          message: 'Input Confirmed number',
+          prompt: {
+            model: '',
+            // isValid: val => val.length > 0,
+            type: 'text' // optional
+          },
           cancel: true,
           persistent: true
-        }).onOk(() => {
-          submit()
+        }).onOk((data) => {
+          submit({ confirmed_number: data })
         })
       })
     },

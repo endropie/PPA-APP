@@ -264,6 +264,7 @@ export default {
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center' },
           { name: 'number', label: 'number', field: 'fullnumber', align: 'left' },
           { name: 'indexed_number', label: 'index', field: 'indexed_number', align: 'left' },
+          { name: 'confirmed_number', label: 'No. Confirm', field: 'confirmed_number', align: 'left' },
           { name: 'status', label: '', field: 'status', align: 'center' },
           { name: 'action', label: '', align: 'center' }
         ],
