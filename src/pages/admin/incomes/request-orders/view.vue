@@ -54,6 +54,7 @@
           <q-markup-table dense bordered square separator="cell" class="table-print no-shadow no-highlight"  :dark="LAYOUT.isDark">
             <thead>
             <q-tr style="line-height:25px">
+              <q-th width="10px">{{ $tc('label.no') }}</q-th>
               <q-th width="30%" v-if="IS_LOTS && !IS_ITEM_SUMMARY">LOTS</q-th>
               <q-th width="30%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th width="30%">{{ $app.setting('item.subname_label') }}</q-th>
@@ -64,7 +65,8 @@
             </q-tr>
             </thead>
             <tbody v-if="IS_ITEM_SUMMARY">
-              <q-tr v-for="(row, index) in SUM_ITEMS" :key="index">
+              <q-tr v-for="(row, index) in SUM_ITEMS" :key="index"  :request-order-item-id="row.id">
+                <q-td>{{index+1}}</q-td>
                 <q-td>{{row.item.part_name}}</q-td>
                 <q-td>{{row.item.part_subname}}</q-td>
                 <q-td class="text-center">{{row.item.unit.code}}</q-td>
@@ -83,6 +85,7 @@
             <template  v-if="!IS_ITEM_SUMMARY">
               <tbody v-for="(row, index) in rsView.request_order_items" :key="index">
                 <q-tr :request-order-item-id="row.id">
+                  <q-td>{{index+1}}</q-td>
                   <td v-if="IS_LOTS">
                     <span v-if="row.lots">
                       {{ row.lots }}
