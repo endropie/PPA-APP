@@ -66,12 +66,12 @@
               <q-menu persistent auto-close>
                 <q-list bordered v-if="rsForm.customer">
                   <q-item clickable v-for="(ct, indexCT) in rsForm.customer.customer_trips || []" :key="indexCT"
-                    @click="rsForm.trip_time = ct.trip_time"
+                    @click="rsForm.trip_time = ct.time"
                   >
                     <q-item-section avatar>
                       <q-icon color="primary" name="timer" />
                     </q-item-section>
-                    <q-item-section>{{ct.trip_time}}</q-item-section>
+                    <q-item-section>{{String(ct.time).substring(0,5)}}</q-item-section>
                   </q-item>
                 </q-list>
               </q-menu>
