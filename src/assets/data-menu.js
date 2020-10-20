@@ -179,6 +179,24 @@ const warehouses = [
 
 const deliveries = [
   {
+    name: 'Delivery (trip)',
+    icon: 'calendar',
+    path: 'delivery-trips',
+    lang: 'general.delivery_calendar',
+    resources: [
+      { page: 'trip-days', path: '', icon: 'calendar', meta: { permission: null } }
+    ]
+  },
+  {
+    name: 'Delivery (outstanding)',
+    icon: 'work',
+    path: 'delivery-outstanding',
+    lang: 'general.delivery_outstanding',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-tasks-read' } }
+    ]
+  },
+  {
     name: 'Incoming Good',
     icon: 'move_to_inbox',
     path: 'incoming-goods',
@@ -193,54 +211,6 @@ const deliveries = [
       { page: 'validation', path: ':id/validation', meta: { mode: 'edit', permission: 'incoming-goods-validation' } },
       { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'incoming-goods-validation' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'incoming-goods-read;delivery-tasks-create' } }
-    ]
-  },
-  // {
-  //   name: 'Pre-Delivery Orders',
-  //   icon: 'assignment',
-  //   path: 'pre-deliveries',
-  //   lang: 'general.pre_delivery',
-  //   resources: [
-  //     { page: 'index', path: '', icon: 'list', meta: { permission: 'pre-deliveries-read' } },
-  //     { page: 'form', path: 'create', meta: { mode: 'create', permission: 'pre-deliveries-create' } },
-  //     { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'pre-deliveries-update' } },
-  //     { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'pre-deliveries-update' } },
-  //     { page: 'view', path: ':id', meta: { mode: 'view', permission: 'pre-deliveries-read' } }
-  //   ]
-  // },
-  // {
-  //   name: 'Outgoing Verification',
-  //   icon: 'assignment_turned_in',
-  //   path: 'outgoing-verifications',
-  //   lang: 'general.outgoing_verification',
-  //   param: `?unvalidated=1`,
-  //   resources: [
-  //     { page: 'index', path: '', icon: 'list', meta: { permission: 'outgoing-verifications-read' } },
-  //     { page: 'create', path: 'create', meta: { mode: 'create', permission: 'outgoing-verifications-create' } },
-  //     { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'outgoing-verifications-update' } },
-  //     { page: 'view', path: ':id', meta: { mode: 'view', permission: 'outgoing-verifications-read' } }
-  //   ]
-  // },
-  // {
-  //   name: 'Outgoing Good',
-  //   icon: 'unarchive',
-  //   path: 'outgoing-goods',
-  //   lang: 'general.outgoing_good',
-  //   param: ``,
-  //   resources: [
-  //     { page: 'index', path: '', icon: 'list', meta: { permission: 'outgoing-goods-read' } },
-  //     { page: 'form', path: 'create', meta: { mode: 'create', permission: 'outgoing-goods-create' } },
-  //     { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'outgoing-goods-update' } },
-  //     { page: 'view', path: ':id', meta: { mode: 'view', permission: 'outgoing-goods-read' } }
-  //   ]
-  // },
-  {
-    name: 'Delivery (outstanding)',
-    icon: 'work',
-    path: 'delivery-outstanding',
-    lang: 'general.delivery_outstanding',
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-tasks-read' } }
     ]
   },
   {
