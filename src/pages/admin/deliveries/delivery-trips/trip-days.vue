@@ -65,11 +65,7 @@
                     class="text-weight-medium"
                     :label="task.fullnumber"
                     v-show="iTask === 0"
-                  >
-                    <q-tooltip>
-                      [{{task}}]
-                    </q-tooltip>
-                  </q-chip>
+                  />
                   <q-btn dense color="blue-grey" size="sm" icon="add" unelevated v-if="TASK_TIME[iTime].filter(x => x.customer_id === cust.id).length > 1" >
                     <q-menu>
                       <q-list bordered>
