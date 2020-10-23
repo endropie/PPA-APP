@@ -8,18 +8,25 @@
 
       <div class="row justify-between q-col-gutter-y-sm" >
         <div class="profile self-bottom">
-          <q-markup-table dense class="super-dense no-shadow no-highlight text-weight-medium">
-            <tr>
-              <td>{{$tc('general.customer')}}</td>
-              <td>
-                <span v-if="rsView.customer"> {{rsView.customer.name}} </span>
-                <span v-else v-text="`-`" />
-              </td>
-            </tr>
-            <tr>
-              <td>{{$tc('label.transaction')}}</td>
-              <td>{{ rsView.transaction }}</td>
-            </tr>
+          <q-markup-table dense separator="none" class="super-dense no-shadow no-highlight text-weight-medium">
+            <tbody>
+              <tr>
+                <td>{{$tc('general.customer')}}</td>
+                <td>
+                  <span v-if="rsView.customer"> {{rsView.customer.name}} </span>
+                </td>
+              </tr>
+              <tr>
+                <td>{{$tc('label.transaction')}}</td>
+                <td>{{ rsView.transaction }}</td>
+              </tr>
+              <tr>
+                <td>{{$tc('general.vehicle')}}</td>
+                <td>
+                  <span v-if="rsView.vehicle"> {{rsView.vehicle.number}} </span>
+                </td>
+              </tr>
+            </tbody>
           </q-markup-table>
         </div>
         <div class="info">
@@ -88,7 +95,8 @@
                   <q-btn dense class="q-ma-xs" :key="index"
                     color="secondary" icon="open_in_new"
                     :label="`${link.fullnumber}`"
-                    @click="showDO(link.id)" />
+                    @click="showDO(link.id)"
+                  />
                 </template>
               </div>
 
@@ -107,6 +115,13 @@
                   $router.push(`${VIEW.resource.uri}/create`)
                 }
               },
+              { label: `${$tc('form.edit')} [${$tc('general.vehicle')}]`, color:'blue-grey', icon: 'add',
+                detail: $tc('messages.process_update'),
+                hidden: !$app.can('delivery-loads-read'),
+                actions: () => {
+                  $refs.dialogChangeVehicle.show()
+                }
+              },
               { label: 'VOID', color:'red', icon: 'block',
                 detail: $tc('messages.process_void'),
                 hidden: !IS_VOID || !$app.can('delivery-loads-void'),
@@ -120,6 +135,27 @@
       </div>
     </page-print>
     <ux-modal-view ref="modal"  fit icon="local_shipping" :title="$tc('general.sj_delivery')" />
+    <q-dialog ref="dialogChangeVehicle" persistent @show="rsForm = $app.clone({ vehicle: rsView.vehicle })">
+      <q-card v-if="rsForm">
+        <q-card-section class="row items-center">
+          <q-avatar icon="local_shipping" color="blue-grey" text-color="white" />
+          <span class="q-ml-sm">
+            <ux-select class="col-12 col-sm-6"
+              :label="$tc('general.vehicle')"
+              v-model="rsForm.vehicle"
+              source="api/v1/references/vehicles?mode=all&type=DELIVERY"
+              option-label="number"
+              option-value="id"
+              filter map-options
+            />
+          </span>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat color="blue-grey" :label="$tc('form.cancel')" v-close-popup />
+          <q-btn color="blue-grey" :label="$tc('form.save')" @click="setVehicle" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -141,7 +177,7 @@ export default {
         }
       },
       rsView: {},
-      count: 0
+      rsForm: null
     }
   },
   created () {
@@ -175,6 +211,21 @@ export default {
     },
     setView (data) {
       this.rsView = data
+    },
+    setVehicle () {
+      console.warn('SET VEHICLE')
+      let url = `${this.VIEW.resource.api}/${this.rsView.id}/save-vehicle?nodata`
+      this.$q.loading.show()
+      this.$axios.put(url, this.rsForm)
+        .then((response) => {
+          this.$app.notify.success(`${this.$tc('general.vehicle')} Changed!`)
+          this.$refs.dialogChangeVehicle.hide()
+          this.init()
+        }).catch((error) => {
+          this.$app.response.error(error.response || error)
+        }).finally(() => {
+          this.$q.loading.hide()
+        })
     },
     showDO (id) {
       let mode = {

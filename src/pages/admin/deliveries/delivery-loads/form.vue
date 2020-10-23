@@ -56,18 +56,21 @@
               :error="errors.has('date')"
               :error-message="errors.first('date')"
             />
-            <q-input type="time" no-error-icon
-              class="col-12 col-sm-6"
-              :label="$tc('label.time')" stack-label
-              :disable="Boolean(!rsForm.customer_id)"
-              v-model="rsForm.trip_time"
-              v-validate="'required'"
-              name="trip_time" :data-vv-as="$tc('label.time')"
+            <q-field borderless no-error-icon class="col-12 col-sm-6"
+              :disable="!rsForm.customer || !rsForm.date"
               :error="errors.has('trip_time')"
               :error-message="errors.first('trip_time')"
             >
-              <q-btn slot="after" icon="list" :disable="!rsForm.customer" dense outline class="no-padding">
-                <q-menu persistent auto-close>
+              <q-input slot="control" type="time" step="1800" no-error-icon
+                name="trip_time" :data-vv-as="$tc('label.time')"
+                class="no-padding no-margin"
+                :label="$tc('label.time')" stack-label
+                :disable="Boolean(!rsForm.customer_id || rsForm.is_untriped)"
+                v-model="rsForm.trip_time"
+                v-validate="Boolean(rsForm.is_untriped) ? '' : 'required'"
+              >
+              <q-btn slot="append" icon="arrow_drop_down" :disable="!rsForm.customer" flat dense  class="no-padding self-end">
+                <q-menu auto-close>
                   <q-list bordered v-if="rsForm.customer">
                     <q-item clickable v-for="(ct, indexCT) in rsForm.customer.customer_trips || []" :key="indexCT"
                       @click="rsForm.trip_time = ct.time"
@@ -81,6 +84,15 @@
                 </q-menu>
               </q-btn>
             </q-input>
+            <q-checkbox slot="append" class="self-end text-subtitle2"
+                v-model="rsForm.is_untriped"
+                label="NO TRIP" left-label
+                :true-value="1" :false-value="0"
+                @input="() => {
+                  if (rsForm.is_untriped) rsForm.trip_time = null
+                }"
+              />
+            </q-field>
           </div>
           <div class="row q-col-gutter-x-sm">
             <ux-select class="col-12 col-sm-6"
@@ -105,16 +117,6 @@
               :error="errors.has('delivery_note')"
               :error-message="errors.first('delivery_note')"
             />
-            <!-- <q-select dense outlined
-              style="min-width: 80px"
-              name="rit"
-              v-model="rsForm.rit"
-              :options="[1,2,3,4,5,6,7,8,9,10]"
-              prefix="RIT"
-              v-validate="'required'"
-              :error="errors.has('rit')"
-              :error-message="errors.first('rit')"
-            /> -->
           </div>
         </div>
         <div class="col-12 col-md-6" >
@@ -273,6 +275,7 @@ export default {
           order_mode: null,
           date: this.$app.moment().format('YYYY-MM-DD'),
           trip_time: null,
+          is_untriped: 0,
           customer: null,
           customer_id: null,
           customer_name: null,
