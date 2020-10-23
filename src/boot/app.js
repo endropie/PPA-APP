@@ -12,6 +12,7 @@ export default async ({ app, store, router, Vue }) => {
     description: process.env.APP_DESCRIPTION,
     get: _lodash.get,
     set: _lodash.set,
+    clone: (v) => JSON.parse(JSON.stringify(v)),
     setting: (aval) => {
       const setting = Object.assign({}, store.getters['admin/SETTING'])
       return _lodash.get(setting, aval)
