@@ -26,7 +26,10 @@
             <q-toggle left-label v-model="isFullTime" label="FULL TIME" />
           </div>
         </q-card-section>
-        <q-markup-table dense flat bordered separator="cell" class="table-sticky-column">
+        <q-markup-table dense flat bordered separator="cell"
+          class="table-sticky-header table-sticky-column"
+          style="height: calc(100vh - 150px)"
+        >
           <thead>
             <tr class="head-column">
               <th class="text-left">
@@ -46,12 +49,16 @@
               </td>
               <template v-for="(cTime, iTime) in time24">
                 <td :key="iTime" :row-time-value="cTime" v-show="!HIDE_TIME[iTime]"
-                  :class="getMiniBoxClass(TASKS, cust, cTime)"
+                  :class="{
+                    'bg-grey-4': !isTriped(cust, cTime)
+                  }"
                   class="no-padding" align="center"
                 >
+                  <!-- :class="getMiniBoxClass(TASKS, cust, cTime)" -->
                   <div v-if="TASKS[cust.id] && TASKS[cust.id][cTime]">
                     <q-icon size="20px"
                       :name="getMiniBoxIcon(TASKS[cust.id], cTime)"
+                      :color="getMiniBoxColor(TASKS, cust, cTime)"
                     />
                   </div>
                 </td>
@@ -230,6 +237,13 @@ export default {
       if (trips.find(x => x.is_loaded)) return 'move_to_inbox'
       if (trips.length) return 'bookmark'
       return 'clear'
+    },
+    getMiniBoxColor (task, cust, time) {
+      if (!task[cust.id] || !task[cust.id][time]) return
+      const trips = task[cust.id][time]
+      if (trips.find(x => x.is_checkout)) return 'green-10'
+      if (trips.find(x => x.is_loaded)) return 'blue-8'
+      return 'blue-grey'
     },
     getMiniBoxClass (task, cust, time) {
       if (!task[cust.id] || !task[cust.id][time]) return ''
