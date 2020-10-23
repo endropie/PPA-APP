@@ -167,6 +167,7 @@
             </q-td>
             <q-td name="part">
               <ux-select dense outlined hide-bottom-space
+                class="field-native-top"
                 v-model="row.item"
                 filter clearable
                 :source="`/api/v1/common/items?mode=all&--limit=50&delivery_date=${rsForm.date}&customer_id=${rsForm.customer_id}`"
@@ -184,7 +185,12 @@
                   row.unit_rate = v ? 1 : null
                   row.unit = v ? { value: v.unit.id, label: v.unit.code, rate:1 } : null
                 }"
-              />
+              >
+                <small v-if="row.item" class="absolute-bottom text-blue-grey">
+                  [{{row.item.customer_code}}]
+                  {{row.item.part_subname}}
+                </small>
+              </ux-select>
             </q-td>
             <q-td name="quantity">
               <q-input type="number" dense outlined hide-bottom-space no-error-icon
@@ -405,3 +411,8 @@ export default {
   }
 }
 </script>
+<style lang="stylus">
+.field-native-top
+  .q-field__native
+    align-items flex-start
+</style>
