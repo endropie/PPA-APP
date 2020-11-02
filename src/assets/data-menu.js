@@ -272,9 +272,9 @@ const deliveries = [
     path: 'delivery-checkouts',
     lang: 'general.delivery_checkout',
     resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-tasks-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-tasks-create' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-tasks-read' } }
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-checkouts-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-checkouts-create' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-checkouts-read' } }
     ]
   },
   {
