@@ -139,7 +139,7 @@ export default {
         columns: [
           { name: 'prefix', label: '', align: 'left' },
           { name: 'date', label: this.$tc('label.date'), field: 'date', format: (v) => v ? this.$app.moment(v).format('DD/MM/YYYY') : '-', sortable: true, classes: 'text-uppercase', align: 'center', width: '50px' },
-          // { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left' },
+          { name: 'number', label: this.$tc('label.number'), field: 'fullnumber', format: (v) => `#${v}`, align: 'left' },
           { name: 'vehicle_id', label: this.$tc('general.vehicle'), field: 'vehicle_id', align: 'left', sortable: true, style: 'width:60%' },
           { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center' }
         ],
