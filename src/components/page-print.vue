@@ -1,5 +1,5 @@
 <template>
-  <div class="page-print shadow-2" >
+  <div class="page-print shadow-2" :class="{'bg-dark': $q.dark.isActive}">
     <div class="page-print-layout">
       <table style="width:100%">
         <thead>
@@ -19,7 +19,7 @@
                       </slot>
                     </div>
                     <div class="head-brand col-grow text-no-wrap ">
-                      <div  class="title text-weight-bolder uppercase ellipsis text-truncate" style="opacity:0.8">
+                      <div  class="title text-weight-bolder text-uppercase ellipsis text-truncate" style="opacity:0.8">
                         <slot name="header-title">
                           <span>{{ CorporateName || 'MY-CORPORATION' }}</span>
                         </slot>
