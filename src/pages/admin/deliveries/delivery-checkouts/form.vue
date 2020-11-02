@@ -125,7 +125,7 @@
       />
     </q-card-section>
     <q-separator />
-    <q-card-actions class="q-mx-lg">
+    <q-card-actions class="q-mx-sm" :vertical="$q.screen.lt.sm">
       <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()"></q-btn>
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
       <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()"></q-btn>

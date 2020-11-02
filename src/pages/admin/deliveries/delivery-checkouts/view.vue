@@ -43,26 +43,6 @@
               </tr>
             </tbody>
           </q-markup-table>
-          <!-- <q-markup-table dense bordered class="no-shadow no-highlight th-uppercase" separator="cell">
-            <thead>
-            <q-tr>
-              <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-              <q-th>{{ $app.setting('item.subname_label') }}</q-th>
-              <q-th>{{ $tc('label.unit') }}</q-th>
-              <q-th>{{ $tc('label.quantity') }}</q-th>
-              <q-th>{{ $tc('label.encasement') }}</q-th>
-            </q-tr>
-            </thead>
-            <tbody>
-            <q-tr v-for="(row, index) in rsView.delivery_task_items" :key="index">
-              <q-td>{{row.item.part_name}}</q-td>
-              <q-td>{{row.item.part_subname}}</q-td>
-              <q-td class="text-center">{{row.unit.code}}</q-td>
-              <q-td class="text-right">{{$app.number_format(row.quantity, $app.get(row, 'unit.decimal_in') || 0)}}</q-td>
-              <q-td>{{row.encasement || '-'}}</q-td>
-            </q-tr>
-            </tbody>
-          </q-markup-table> -->
         </div>
         <div class="col-12">
             <div class="q-mb-sm text-italic">{{$tc('label.description')}}:</div>
@@ -70,42 +50,28 @@
         </div>
         <div class="col-12 row q-gutter-xs print-hide " style="padding-top:50px">
           <q-btn :label="$tc('form.back')" icon="cancel"  color="dark" :to="`${VIEW.resource.uri}?return`" />
-          <q-btn :label="$tc('form.edit')" icon="edit" color="positive" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"  v-if="IS_EDITABLE && $app.can('delivery-tasks-update')" />
+          <!-- <q-btn :label="$tc('form.edit')" icon="edit" color="positive" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"  v-if="IS_EDITABLE && $app.can('delivery-checkouts-update')" /> -->
           <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="VIEW.print()" />
           <q-space />
           <ux-btn-dropdown color="blue-grey"
             :options="[
               { label: $tc('form.add_new'), color:'green', icon: 'add',
                 detail: $tc('messages.process_create'),
-                hidden: !$app.can('delivery-tasks-create'),
+                hidden: !$app.can('delivery-checkouts-create'),
                 actions: () => {
                   $router.push(`${VIEW.resource.uri}/create`)
                 }
               },
               { label: 'DELETE', color:'red', icon: 'delete',
                 detail: $tc('messages.process_delete'),
-                hidden: !IS_EDITABLE || !$app.can('delivery-tasks-delete'),
+                hidden: !IS_EDITABLE || !$app.can('delivery-checkouts-delete'),
                 actions: () => {
                   VIEW.delete()
                 }
               },
-              { label: $tc('form.revision').toUpperCase(), color:'orange', icon: 'edit',
-                detail: $tc('messages.process_revise'),
-                hidden: !IS_VOID || !$app.can('delivery-tasks-revision'),
-                actions: () => {
-                  $router.push(`${VIEW.resource.uri}/${ROUTE.params.id}/revision`)
-                }
-              },
-              { label: 'CLOSE', color:'red-10', icon: 'lock',
-                detail: $tc('messages.process_close'),
-                hidden: !IS_CLOSE || !$app.can('delivery-tasks-revision'),
-                actions: () => {
-                  setClose()
-                }
-              },
               { label: 'VOID', color:'red', icon: 'block',
                 detail: $tc('messages.process_void'),
-                hidden: !IS_VOID || !$app.can('delivery-tasks-void'),
+                hidden: !IS_VOID || !$app.can('delivery-checkouts-void'),
                 actions: () => {
                   VIEW.void(()=> init() )
                 }
