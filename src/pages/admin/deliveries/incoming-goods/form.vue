@@ -24,7 +24,7 @@
           v-validate="'required'"
           :dark="LAYOUT.isDark"
           :disable="Boolean(rsForm.id) || IssetItemDetails"
-          :options="CONFIG.options['transaction_mode'].concat({ 'label': 'SAMPLE', 'value': 'SAMPLE' })"
+          :options="CONFIG.options['transaction_mode'].concat({ 'label': 'SAMPLE', 'value': 'SAMPLE' }, { 'label': 'INTERNAL', 'value': 'INTERNAL' })"
           @input="(val) => setTransactionReference(val)"/>
 
       </q-field>

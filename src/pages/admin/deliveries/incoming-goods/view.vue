@@ -1,7 +1,7 @@
 <template>
-  <q-page padding class="column justify-start items-center" :dark="LAYOUT.isDark">
-    <page-print v-if="VIEW.show">
-      <span slot="header-subtitle">Warehouses - Incoming Good</span>
+  <q-page padding class="column justify-start items-center">
+    <page-print v-if="rsView">
+      <span slot="header-subtitle">WAREHOUSE - INCOMING GOOD</span>
       <div slot="header-tags" class="print-hide">
         <q-chip square outline icon='bookmark'
           color="blue-grey" text-color="white"
@@ -9,6 +9,9 @@
         <q-chip square outline icon='bookmark'
           color="blue-grey" text-color="white"
           label="SAMPLE" v-if="rsView.transaction === 'SAMPLE'" />
+        <q-chip square outline icon='bookmark'
+          color="blue-grey" text-color="white"
+          label="INTERNAL" v-if="rsView.transaction === 'INTERNAL'" />
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
 
         <q-btn dense flat round color="blue-grey" icon="settings" @click="$refs['config'].show()" />
@@ -18,10 +21,7 @@
         <div class="col-12">
           <div class="row justify-between q-gutter-sm" >
             <div class="items-end q-pt-lg">
-              <div class="text-h6">
-                INCOMING GOOD
-              </div>
-              <q-markup-table class="super-dense no-shadow" :dark="LAYOUT.isDark">
+              <q-markup-table class="super-dense no-shadow">
                 <tr>
                   <th class="text-left">{{$tc('general.customer')}}</th>
                   <td>{{ rsView.customer.name }}</td>
@@ -34,7 +34,7 @@
             </div>
             <div class="row items-start q-gutter-x-sm">
               <q-markup-table class="super-dense no-shadow no-highlight"
-                dense square bordered separator="cell" :dark="LAYOUT.isDark">
+                dense square bordered separator="cell">
                 <tbody>
                   <tr>
                     <td>{{$tc('warehouses.registration')}}</td>
@@ -57,7 +57,7 @@
                 </tbody>
               </q-markup-table>
               <q-markup-table class="super-dense no-shadow no-highlight"
-                dense square bordered separator="cell" :dark="LAYOUT.isDark">
+                dense square bordered separator="cell">
                 <tbody>
                   <tr>
                     <td>{{$tc('label.number')}}</td>
@@ -73,7 +73,7 @@
           </div>
         </div>
         <div class="col-12">
-          <q-markup-table dense bordered square separator="cell" class="table-print no-shadow no-highlight"  :dark="LAYOUT.isDark">
+          <q-markup-table dense bordered square separator="cell" class="table-print no-shadow no-highlight">
             <thead>
             <q-tr style="line-height:25px">
               <q-th width="15%" v-if="IS_LOTS">{{ $tc('label.lots') }}</q-th>
@@ -185,7 +185,7 @@ export default {
           params: '?mode=view'
         }
       },
-      rsView: {},
+      rsView: null,
       count: 0
     }
   },
