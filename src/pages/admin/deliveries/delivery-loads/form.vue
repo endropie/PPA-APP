@@ -32,7 +32,7 @@
             filter clearable
             source="api/v1/incomes/customers?mode=all&--with=customer_trips"
             :option-label="(item) => `[${item.code}] ${item.name}`"
-            :disable="Boolean(!rsForm.transaction || rsForm.delivery_load_items.find(i => i.item_id))"
+            :disable="Boolean(!rsForm.transaction) || Boolean(rsForm.trip_time) || Boolean(rsForm.delivery_load_items.find(i => i.item_id))"
             v-validate="'required'"
             name="customer_id" :data-vv-as="$tc('general.customer')"
             :error="errors.has('customer_id')"
@@ -43,6 +43,7 @@
               rsForm.customer_phone = v ? v.phone : null
               rsForm.customer_address = v ? v.address : null
               rsForm.order_mode = v ? v.order_mode : null
+              loadTrip()
             }"
           />
           <div class="row q-col-gutter-x-sm">
@@ -50,11 +51,12 @@
               class="col-12 col-sm-6"
               :label="$tc('label.date')" stack-label
               v-model="rsForm.date"
-              :disable="Boolean(!rsForm.transaction || rsForm.delivery_load_items.find(i => i.item_id))"
+              :disable="Boolean(!rsForm.transaction) || Boolean(rsForm.trip_time) || Boolean(rsForm.delivery_load_items.find(i => i.item_id))"
               v-validate="'required'"
               name="date"
               :error="errors.has('date')"
               :error-message="errors.first('date')"
+              @input="loadTrip"
             />
             <q-field borderless no-error-icon class="col-12 col-sm-6"
               :disable="!rsForm.customer || !rsForm.date"
@@ -72,14 +74,24 @@
               <q-btn slot="append" icon="arrow_drop_down" :disable="!rsForm.customer" flat dense  class="no-padding self-end">
                 <q-menu auto-close>
                   <q-list bordered v-if="rsForm.customer">
-                    <q-item clickable v-for="(ct, indexCT) in rsForm.customer.customer_trips || []" :key="indexCT"
-                      @click="rsForm.trip_time = ct.time"
+                    <q-item clickable v-for="(trip, indexCT) in TripOptions" :key="indexCT"
+                      @click="rsForm.trip_time = trip"
                     >
+                      <q-item-section>{{String(trip).substring(0,5)}}</q-item-section>
                       <q-item-section avatar>
                         <q-icon color="primary" name="timer" />
                       </q-item-section>
-                      <q-item-section>{{String(ct.time).substring(0,5)}}</q-item-section>
                     </q-item>
+                    <q-separator inset />
+                    <!-- <q-item clickable v-for="(ct, indexCT) in rsForm.customer.customer_trips.filter(x => x.intday === $app.moment(rsForm.date).day()) || []"
+                      :key="`ct-${indexCT}`"
+                      @click="rsForm.trip_time = trip"
+                    >
+                      <q-item-section>{{String(ct.time).substring(0,5)}}</q-item-section>
+                      <q-item-section avatar>
+                        <q-icon color="primary" name="timer" />
+                      </q-item-section>
+                    </q-item> -->
                   </q-list>
                 </q-menu>
               </q-btn>
@@ -245,7 +257,7 @@
       />
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
-    <q-card-actions class="q-mx-lg">
+    <q-card-actions class="q-mx-sm" :vertical="$q.screen.lt.sm">
       <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()"></q-btn>
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
       <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()"></q-btn>
@@ -273,6 +285,7 @@ export default {
           uri: '/admin/deliveries/delivery-loads'
         }
       },
+      dataTrips: [],
       rsForm: null,
       setDefault: () => {
         return {
@@ -325,6 +338,13 @@ export default {
         return result / (detail.unit_rate || 1)
       })
     },
+    TripOptions () {
+      let options = []
+      this.dataTrips.map(item => {
+        if (!options.find(x => x === item.trip_time)) options.push(item.trip_time)
+      })
+      return options
+    },
     UnitOptions () {
       return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
@@ -360,6 +380,19 @@ export default {
     },
     setForm (data) {
       this.rsForm = Object.assign({}, this.setDefault(), data)
+    },
+    loadTrip () {
+      if (this.rsForm.customer_id && this.rsForm.date) {
+        const apiUrl = `/api/v1/incomes/delivery-tasks?mode=all&date=${this.rsForm.date}&customer_id=${this.rsForm.customer_id}`
+        this.$axios.get(apiUrl, this.rsForm)
+          .then(response => {
+            this.dataTrips = JSON.parse(JSON.stringify(response.data))
+          }).catch(error => {
+            this.$app.response.error(error.response || error)
+          })
+      } else {
+        this.dataTrips = []
+      }
     },
     addNewDetail () {
       const newitem = Object.assign(this.setDefault().delivery_load_items[0], { _autofocus: true })
