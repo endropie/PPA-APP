@@ -67,6 +67,7 @@
         </div>
         <div class="column" style="min-height:11cm;height:auto">
           <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
+            <ux-qrcode :value="valQrCode(rsView)" :options="{ width: 64, height: 64, margin: 1 }" />
             <div class="" style="max-width:50%">
               <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
               <address class="text-normal" style="font-style: normal">{{rsView.customer_address}}</address>
@@ -372,6 +373,15 @@ export default {
       // return
       console.warn('LOT', row.number_lots)
     },
+    valQrCode (data) {
+      return `${window.location.origin}/#/admin/deliveries/delivery-orders/${data.id}`
+      // return {
+      //   model: '\\App\\Models\\Income\\DeliveryOrder',
+      //   id: data.id,
+      //   number: data.fullnumber,
+      //   url: `${window.location.origin}/#/admin/deliveries/delivery-loads/${data.id}`
+      // }
+    },
     valPCS (row) {
       if (row.unit_id === 1) {
         return Number(row.quantity)
@@ -414,7 +424,6 @@ export default {
     },
     setConfirmation () {
       const submit = (val) => {
-
         this.$q.loading.show()
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=confirmation&nodata=true`
         this.$axios.put(url, val)

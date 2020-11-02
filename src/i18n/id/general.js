@@ -36,6 +36,7 @@ export default {
   sj_delivery_items: 'Delivery (SJDO) Details | Detail Surat Jalan',
   sj_internal: 'Delivery (Intern) | Surat Jalan Sementara',
   delivery_calendar: 'Delivery (Jadwal) | Jadwal Delivery',
+  delivery_checkout: 'Delivery Checkout | Delivery Checkout',
   delivery_internal: 'Delivery (Intern) | Surat Jalan Sementara',
   delivery_outstanding: 'Delivery (Outstanding)  | Skema Pengirimam',
   delivery_task: 'Delivery (PDO) | PDO',

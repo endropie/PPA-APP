@@ -17,6 +17,8 @@ import UXBadgeStatus from '@/components/UXBadgeStatus'
 import UXChipStatus from '@/components/UXChipStatus'
 import UXBtnDropdown from '@/components/UXBtnDropdown'
 
+import VueQrcode from '@chenfengyuan/vue-qrcode'
+
 // leave the export, even if you don't use it
 export default async ({ app, store, router, Vue }) => {
   Vue.component('modal', Modal)
@@ -39,4 +41,6 @@ export default async ({ app, store, router, Vue }) => {
   Vue.component('ux-badge-status', UXBadgeStatus)
   Vue.component('ux-chip-status', UXChipStatus)
   Vue.component('ux-btn-dropdown', UXBtnDropdown)
+
+  Vue.component('ux-qrcode', VueQrcode)
 }

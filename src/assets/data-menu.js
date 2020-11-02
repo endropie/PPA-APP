@@ -267,6 +267,17 @@ const deliveries = [
     ]
   },
   {
+    name: 'Delivery Checkout',
+    icon: 'work',
+    path: 'delivery-checkouts',
+    lang: 'general.delivery_checkout',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-tasks-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-tasks-create' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-tasks-read' } }
+    ]
+  },
+  {
     name: 'DEPORTATIONS',
     icon: 'local_offer',
     path: 'deportation-goods',
