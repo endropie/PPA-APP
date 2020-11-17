@@ -31,41 +31,41 @@
 <script>
 
 export default {
-  name : 'ux-date',
-    props: {
-      dateOptions: Function,
-      labelFormat :{
-        type: String,
-        default: 'DD/MM/YYYY',
-      },
-      valueFormat :{
-        type: String,
-        default: 'YYYY-MM-DD',
-      }
+  name: 'ux-date',
+  props: {
+    dateOptions: Function,
+    labelFormat: {
+      type: String,
+      default: 'DD/MM/YYYY'
     },
-    data() {
-      return {
-        value: this.$attrs.value,
-        options: this.$attrs.dateOptions,
-      }
-    },
-    created() {
-      // console.log('DATE', this.valueFormat)
-    },
-    watch: {
-      '$attrs.value': 'setValue',
-      '$attrs.dateOptions': 'setDateOptions',
-    },
-    computed:{
-    },
-    methods: {
-      setValue(v) {
-          this.value = v
-      },
-      setDateOptions(v) {
-          this.options = v
-      }
+    valueFormat: {
+      type: String,
+      default: 'YYYY-MM-DD'
     }
+  },
+  data () {
+    return {
+      value: this.$attrs.value,
+      options: this.$attrs.dateOptions
+    }
+  },
+  created () {
+    // console.log('DATE', this.valueFormat)
+  },
+  watch: {
+    '$attrs.value': 'setValue',
+    '$attrs.dateOptions': 'setDateOptions'
+  },
+  computed: {
+  },
+  methods: {
+    setValue (v) {
+      this.value = v
+    },
+    setDateOptions (v) {
+      this.options = v
+    }
+  }
 }
 </script>
 
@@ -77,4 +77,3 @@ input.no-option-date[type="date"]::-webkit-calendar-picker-indicator {
     -webkit-appearance: none;
 }
 </style>
-
