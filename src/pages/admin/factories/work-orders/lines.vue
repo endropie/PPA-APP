@@ -108,15 +108,17 @@
               <span class="on-left text-small text-grey">
                 ({{$app.number_format(100 * TABLE.rowData.reduce((total, item) => total += (item.summary_production), 0) / TABLE.rowData.reduce((total, item) => total += (item.summary_amount), 0))}}%)
               </span>
-              {{ TABLE.rowData.reduce((total, item) => total += (item.summary_production), 0) }}
+              {{ $app.number_format(TABLE.rowData.reduce((total, item) => total += (item.summary_production), 0)) }}
             </q-td>
             <q-td key="summary_packing" class="text-right">
               <span class="on-left text-small text-grey">
                 ({{$app.number_format(100 * TABLE.rowData.reduce((total, item) => total += (item.summary_packing), 0) / TABLE.rowData.reduce((total, item) => total += (item.summary_amount), 0))}}%)
               </span>
-              {{ TABLE.rowData.reduce((total, item) => total += (item.summary_packing), 0) }}
+              {{ $app.number_format(TABLE.rowData.reduce((total, item) => total += (item.summary_packing), 0)) }}
             </q-td>
-            <q-td key="summary_amount" class="text-right">{{ TABLE.rowData.reduce((total, item) => total += (item.summary_amount), 0) }}</q-td>
+            <q-td key="summary_amount" class="text-right">{{
+              $app.number_format(TABLE.rowData.reduce((total, item) => total += (item.summary_amount), 0)) }}
+            </q-td>
           </q-tr>
         </template>
       </q-table>
