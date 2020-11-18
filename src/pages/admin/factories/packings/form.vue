@@ -70,7 +70,7 @@
         :error-message="errors.first('operator_id')"
       />
 
-      <ux-datetime class="col-6 col-md-3" name="begin_datetime" ref="begin_datetime"
+      <ux-datetime class="col-12 col-sm-6 col-md-3" name="begin_datetime" ref="begin_datetime"
         :label="$tc('label.begin')" stack-label
         v-model="rsForm.begin_datetime"
         v-validate="'required'"
@@ -78,7 +78,7 @@
         :error-message="errors.first('begin_datetime')"
       />
 
-      <ux-datetime class="col-6 col-md-3" name="until_datetime" ref="until_datetime"
+      <ux-datetime class="col-12 col-sm-6 col-md-3" name="until_datetime" ref="until_datetime"
         :label="$tc('label.until')" stack-label
         v-model="rsForm.until_datetime"
         v-validate="`required|after_datetime:${rsForm.begin_datetime}`"
