@@ -47,6 +47,7 @@ export default {
 
   work_order: 'SPK | Surat Perintah Kerja',
   work_order_items: 'SPK Part Detail | SPK Part Detail ',
+  work_order_lines: 'SPK Lines | SPK Lines ',
   work_process: 'SPK Konfirmasi | Konfirmasi Perintah Kerja',
   work_production: 'Input Produksi | Pengerjaan Produksi',
   packing: 'Input Packing | Inspeksi Packing',

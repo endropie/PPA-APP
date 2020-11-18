@@ -73,7 +73,6 @@
                   :dark="LAYOUT.isDark"
                   @input="FILTERABLE.submit"/>
 
-
               </div>
               <div class="row q-col-gutter-xs q-pb-xs">
                 <div class="col-12 col-md-6">
@@ -130,7 +129,6 @@
         <!-- slot name syntax: body-cell-<column_name> -->
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
 
-
         </q-td>
 
         <q-td slot="body-cell-date" slot-scope="rs" :props="rs">
@@ -181,7 +179,6 @@
       </q-table>
     </q-pull-to-refresh>
 
-
   </q-page>
 </template>
 
@@ -193,15 +190,15 @@ export default {
   data () {
     return {
       stockist_options: [
-        {value:'FM', label:'FRESH'},
-        {value:'NC', label:'NC-REPAIR'},
-        {value:'NCR', label:'NCR-REPAIR'}
+        { value: 'FM', label: 'FRESH' },
+        { value: 'NC', label: 'NC-REPAIR' },
+        { value: 'NCR', label: 'NCR-REPAIR' }
       ],
       SHEET: {
-        lines: {data:[], api:'/api/v1/references/lines?mode=all'},
-        shifts: {data:[], api:'/api/v1/references/shifts?mode=all'},
-        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
-        items: {data:[], api:'/api/v1/common/items?mode=all', autoload: false},
+        lines: { data: [], api: '/api/v1/references/lines?mode=all' },
+        shifts: { data: [], api: '/api/v1/references/shifts?mode=all' },
+        customers: { data: [], api: '/api/v1/incomes/customers?mode=all' },
+        items: { data: [], api: '/api/v1/common/items?mode=all', autoload: false }
       },
       FILTERABLE: {
         fill: {
@@ -244,62 +241,62 @@ export default {
             value: null,
             type: 'integer',
             transform: (value) => { return null }
-          },
+          }
         }
       },
-      TABLE:{
+      TABLE: {
         mode: 'index',
-        resource:{
+        resource: {
           api: '/api/v1/factories/work-orders/items',
-          uri: '/admin/factories/work-orders/items',
+          uri: '/admin/factories/work-orders/items'
         },
         columns: [
-          { name: 'prefix', label: '', align: 'left'},
-          { name: 'date', label: this.$tc('label.date'), field:(rs) => rs.work_order_item.work_order.date , align: 'center', sortable: true },
+          { name: 'prefix', label: '', align: 'left' },
+          { name: 'date', label: this.$tc('label.date'), field: (rs) => rs.work_order_item.work_order.date, align: 'center', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'item', label: this.$tc('items.part_name'), field: 'part_name', align: 'left'},
-          { name: 'quantity', label: this.$tc('label.quantity'), field: (rs)=> rs.work_order_item.quantity, align: 'right', sortable: true },
-          { name: 'unit', label: this.$tc('label.unit'), field: (rs)=> rs.work_order_item.unit.code , align: 'left'},
-          { name: 'line_id', label: 'Line Production', field: (rs)=> rs.line.name , align: 'left', sortable: true },
-          { name: 'shift_id', label: 'Shift', field: (rs)=> rs.work_order_item.work_order.shift.name , align: 'center', sortable: true },
-          { name: 'stockist', label:(rs)=> rs.work_order_item.work_order.stockist_from, align: 'left'},
+          { name: 'item', label: this.$tc('items.part_name'), field: 'part_name', align: 'left' },
+          { name: 'quantity', label: this.$tc('label.quantity'), field: (rs) => rs.work_order_item.quantity, align: 'right', sortable: true },
+          { name: 'unit', label: this.$tc('label.unit'), field: (rs) => rs.work_order_item.unit.code, align: 'left' },
+          { name: 'line_id', label: 'Line Production', field: (rs) => rs.line.name, align: 'left', sortable: true },
+          { name: 'shift_id', label: 'Shift', field: (rs) => rs.work_order_item.work_order.shift.name, align: 'center', sortable: true },
+          { name: 'stockist', label: (rs) => rs.work_order_item.work_order.stockist_from, align: 'left' }
         ]
-      },
+      }
     }
   },
   created () {
     this.INDEX.load()
   },
   computed: {
-    ShiftOptions() {
-      return (this.SHEET.shifts.data.map(line => ({label: line.name, value: line.id})) || [])
+    ShiftOptions () {
+      return (this.SHEET.shifts.data.map(line => ({ label: line.name, value: line.id })) || [])
     },
-    LineOptions() {
-      return (this.SHEET.lines.data.map(item => ({label: item.name, value: item.id})) || [])
+    LineOptions () {
+      return (this.SHEET.lines.data.map(item => ({ label: item.name, value: item.id })) || [])
     },
-    CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: item.code, value: item.id})) || [])
+    CustomerOptions () {
+      return (this.SHEET.customers.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
-    ItemOptions() {
+    ItemOptions () {
       return (this.SHEET.items.data.map(item => ({
         label: `${item.part_name}`,
-        sublabel:`[${item.customer_code}] ${item.part_subname || '--'}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id
       })) || [])
-    },
+    }
   },
   methods: {
-    isCanUpdate(row){
-      if (row.status != 'OPEN') return false
+    isCanUpdate (row) {
+      if (row.status !== 'OPEN') return false
       if (row.is_relationship) return false
       return this.$app.can('work-orders-update')
     },
-    isCanDelete(row){
-      if (row.status != 'OPEN') return false
+    isCanDelete (row) {
+      if (row.status !== 'OPEN') return false
       if (row.is_relationship) return false
       return this.$app.can('work-orders-delete')
-    },
-  },
+    }
+  }
 }
 </script>
 
