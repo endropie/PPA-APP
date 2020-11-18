@@ -65,7 +65,7 @@
         <div class="column" style="min-height:3.25in;height:auto">
 
           <div class="row q-gutter-x-sm q-pb-sm" >
-            <ux-qrcode :value="valQrCode(rsView)" :options="{ width: 64, height: 64, margin: 1 }" />
+            <ux-qrcode :value="valQrCode(rsView)" :options="{ width: 96, height: 96, margin: 1 }" />
             <div class="" style="max-width:50%">
               <q-markup-table dense separator="none" class="super-dense no-shadow no-highlight text-weight-medium">
                 <tbody>
@@ -220,7 +220,8 @@ export default {
       this.rsView = data
     },
     valQrCode (data) {
-      return `${window.location.origin}/#/admin/deliveries/delivery-loads/${data.id}`
+      return `/delivery-loads/${data.id}`
+      // return `${window.location.origin}/#/admin/deliveries/delivery-loads/${data.id}`
     },
     setVehicle () {
       console.warn('SET VEHICLE')

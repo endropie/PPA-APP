@@ -20,7 +20,7 @@
             </div>
             <div class="column" style="min-height:3.25in;height:auto">
               <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
-                <ux-qrcode :value="valQrCode(page.data)" :options="{ width: 64, height: 64, margin: 1 }" />
+                <ux-qrcode :value="valQrCode(page.data)" :options="{ width: 96, height: 96, margin: 1 }" />
                 <div class="" style="max-width:50%">
                   <div class="text-weight-medium uppercase">To: {{page.data.customer_name}}</div>
                   <address class="text-normal" style="font-style: normal">{{page.data.customer_address}}</address>
@@ -320,7 +320,8 @@ export default {
       return Math.round(row.unit_amount) !== Math.round(row.amount_reconcile)
     },
     valQrCode (data) {
-      return `${window.location.origin}/#/admin/deliveries/delivery-orders/${data.id}`
+      return `/delivery-orders/${data.id}`
+      // return `${window.location.origin}/#/admin/deliveries/delivery-orders/${data.id}`
     },
     valPCS (row) {
       if (row.unit_id === 1) {

@@ -67,7 +67,7 @@
         </div>
         <div class="column" style="min-height:11cm;height:auto">
           <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
-            <ux-qrcode :value="valQrCode(rsView)" :options="{ width: 64, height: 64, margin: 1 }" />
+            <ux-qrcode :value="valQrCode(rsView)" :options="{ width: 96, height: 96, margin: 1 }" />
             <div class="" style="max-width:50%">
               <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
               <address class="text-normal" style="font-style: normal">{{rsView.customer_address}}</address>
@@ -374,7 +374,8 @@ export default {
       console.warn('LOT', row.number_lots)
     },
     valQrCode (data) {
-      return `${window.location.origin}/#/admin/deliveries/delivery-orders/${data.id}`
+      return `/delivery-orders/${data.id}`
+      // return `${window.location.origin}/#/admin/deliveries/delivery-orders/${data.id}`
       // return {
       //   model: '\\App\\Models\\Income\\DeliveryOrder',
       //   id: data.id,
