@@ -386,7 +386,7 @@ const factories = [
       {
         name: 'Work Order Lines',
         icon: 'work',
-        // lang: 'general.work_order_lines',
+        lang: 'general.work_order_lines',
         path: 'work-orders/lines'
       }
     ]
