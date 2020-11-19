@@ -17,55 +17,47 @@
         <!-- Table Header -->
         <template v-slot:top>
           <table-header hide-search
-            :title="$tc('general.work_order_lines',2)"
+            :title="$tc('general.work_order_lines',2).toUpperCase()"
             :TABLE.sync="TABLE"
             :menus="[]">
 
             <div class="column" >
-              <div class="row q-col-gutter-xs q-pb-xs">
-                <ux-date class="col-12 col-sm-6 col-md-3" style="min-width:150px"
+              <div class="row q-gutter-xs q-pb-xs">
+                <ux-date class="" style="min-width:150px"
                   stack-label :label="$tc('label.date')"
                   v-model="FILTERABLE.fill.date.value" type="date"
                   dense hide-bottom-space
                   standout="bg-blue-grey-5 text-white"
-                  @change="FILTERABLE.submit"
                 />
 
-                <q-select class="col-12 col-sm-6 col-md-3" style="min-width:120px"
+                <q-select class="" style="min-width:150px"
+                  map-options emit-value
+                  v-model="FILTERABLE.fill.line_id.value" clearable
+                  :options="LineOptions"
+                  :label="$tc('general.line')"
+                  dense hide-bottom-space hide-dropdown-icon
+                  standout="bg-blue-grey-5 text-white"
+                />
+
+                <q-select class="" style="min-width:150px"
                   map-options emit-value
                   v-model="FILTERABLE.fill.shift_id.value" clearable
                   :options="ShiftOptions"
                   :label="$tc('label.shift')"
                   dense hide-bottom-space hide-dropdown-icon
                   standout="bg-blue-grey-5 text-white"
-                  @input="FILTERABLE.submit"
                 />
 
-                <q-select class="col-12 col-sm-4 col-md-2" style="min-width:100px"
+                <q-select style="min-width:100px"
                   label="Stockist"
                   v-model="FILTERABLE.fill.stockist_from.value" clearable
                   :options="stockist_options" map-options emit-value
                   dense hide-bottom-space hide-dropdown-icon
                   standout="bg-blue-grey-5 text-white"
-                  @input="FILTERABLE.submit"
                 />
 
-                <q-select class="col-12 col-sm-8 col-md-4" autocomplete="off"
-                  multiple use-chips use-input new-value-mode="add"
-                  dense hide-dropdown-icon
-                  v-model="FILTERABLE.search" emit-value
-                  :placeholder="`${$tc('form.search',2)}...`"
-                  standout="bg-blue-grey-5 text-white"
-                  @input="FILTERABLE.submit"
-                >
-
-                  <template slot="append">
-                    <q-btn flat dense icon="search" color="blue-grey-10" @click="FILTERABLE.submit"/>
-                  </template>
-                </q-select>
-
+                <q-btn icon="search" color="blue-grey-10" @click="FILTERABLE.submit"/>
               </div>
-
             </div>
           </table-header>
         </template>
@@ -80,7 +72,7 @@
         </q-td>
 
         <q-td slot="body-cell-packing" slot-scope="rs" :props="rs" style="width:35px">
-          <span class="on-left text-small text-grey">({{$app.number_format(100 * rs.row.summary_packing / (rs.row.summary_amount || 0))}}%)</span>
+          <span class="on-left text-small text-grey">({{$app.number_format(100 * rs.row.summary_packing / (rs.row.summary_production || 0))}}%)</span>
           {{rs.value}}
         </q-td>
 
@@ -112,7 +104,7 @@
             </q-td>
             <q-td key="summary_packing" class="text-right">
               <span class="on-left text-small text-grey">
-                ({{$app.number_format(100 * TABLE.rowData.reduce((total, item) => total += (item.summary_packing), 0) / TABLE.rowData.reduce((total, item) => total += (item.summary_amount), 0))}}%)
+                ({{$app.number_format(100 * TABLE.rowData.reduce((total, item) => total += (item.summary_packing), 0) / TABLE.rowData.reduce((total, item) => total += (item.summary_production), 0))}}%)
               </span>
               {{ $app.number_format(TABLE.rowData.reduce((total, item) => total += (item.summary_packing), 0)) }}
             </q-td>
@@ -152,24 +144,19 @@ export default {
             type: 'integer',
             transform: (value) => { return null }
           },
-          ismain: {
-            value: 1,
-            type: 'integer',
-            transform: (value) => { return null }
-          },
-          stockist_from: {
-            value: null,
-            type: 'string',
-            transform: (value) => { return null }
-          },
           date: {
-            value: this.$app.moment().format('YYYY-MM-DD'),
+            value: null, // this.$app.moment().format('YYYY-MM-DD'),
             type: 'date',
             transform: (value) => { return null }
           },
           shift_id: {
             value: null,
             type: 'integer',
+            transform: (value) => { return null }
+          },
+          stockist_from: {
+            value: null,
+            type: 'string',
             transform: (value) => { return null }
           }
         }
@@ -186,9 +173,9 @@ export default {
         columns: [
           { name: 'prefix', label: '', align: 'left' },
           { name: 'date', label: this.$tc('label.date'), field: (rs) => rs.date, align: 'center', sortable: true },
-          { name: 'shift_id', label: 'Shift', field: (rs) => rs.shift.name, align: 'center', sortable: true },
           { name: 'line_id', label: 'Line Production', field: (rs) => rs.line.name, align: 'left', sortable: true },
-          { name: 'stockist', label: (rs) => rs.stockist_from, align: 'left' },
+          { name: 'shift_id', label: 'Shift', field: (rs) => rs.shift.name, align: 'center', sortable: true },
+          { name: 'stockist', label: 'stockist', field: (rs) => rs.stockist_from, align: 'left' },
           { name: 'production', label: 'Production', field: (rs) => rs.summary_production, format: (v) => this.$app.number_format(v) },
           { name: 'packing', label: 'Packing', field: (rs) => rs.summary_packing, format: (v) => this.$app.number_format(v) },
           { name: 'amount', label: 'Amount', field: (rs) => rs.summary_amount, format: (v) => this.$app.number_format(v) }
@@ -197,7 +184,9 @@ export default {
     }
   },
   created () {
-    this.INDEX.load()
+    // this.INDEX.load()
+    this.SHEET.assign()
+    this.SHEET.request()
   },
   computed: {
     ShiftOptions () {
