@@ -200,7 +200,6 @@ export default {
       if (this.rsView.deleted_at) return false
       if (this.rsView.revise_id) return false
       if (this.rsView.status !== 'OPEN') return false
-      if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
       return true
     },
     IS_EDITABLE () {
