@@ -58,6 +58,7 @@
                 option-value="id"
                 option-label="part_name"
                 :option-sublabel="(item) => `[${item.customer_code}] ${item.part_subname}`"
+                @input="reset"
               />
 
               <div class="col-auto" :class="{'col text-right' : $q.screen.lt.md }" >
@@ -87,9 +88,7 @@
       <q-td slot="body-cell-saldo" slot-scope="rs" :props="rs" style="width:35px">
         <!-- {{rs.rowIndex}} -->
         <span v-if="FILTER.item">
-          {{
-            getRowSaldo(rs.rowIndex)
-          }}
+          {{ getRowSaldo(rs.rowIndex) }}
         </span>
       </q-td>
 
@@ -183,6 +182,10 @@ export default {
           this.TABLE.rowData.push(item)
         }
       })
+    },
+    reset () {
+      this.FILTER.unmore = false
+      this.TABLE.rowData = []
     },
     fetch (skip = 0) {
       if (!skip) this.FILTER.unmore = false
