@@ -324,6 +324,20 @@ const deliveries = [
     icon: 'list',
     lang: 'general.sj_delivery_items',
     meta: { permission: 'sj-delivery-orders-read' }
+  },
+  {
+    name: 'Report & Monitoring',
+    icon: 'verified_user',
+    menuicon: true,
+    path: 'reports',
+    children: [
+      {
+        name: 'Delivery Stockcard',
+        icon: 'work',
+        // lang: 'general.delivery_stockcard',
+        path: 'delivery-stockcard'
+      }
+    ]
   }
 ]
 
