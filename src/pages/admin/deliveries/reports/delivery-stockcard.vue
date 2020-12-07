@@ -3,7 +3,7 @@
     <q-table ref="table" inline class="table-index table-striped th-uppercase" color="primary"
       :data="TABLE.rowData"
       :columns="TABLE.columns"
-      row-key="id"
+      row-key="union_key"
       hide-pagination
       :rows-per-page-options="[0]"
     >
@@ -194,7 +194,6 @@ export default {
       this.$q.loading.show()
       this.$axios.get(url)
         .then((response) => {
-          console.warn(response.data)
           if (skip) this.more(response)
           else this.TABLE.rowData = response.data.data
 
@@ -217,8 +216,7 @@ export default {
     },
     getRowSaldo (rowIndex) {
       return this.TABLE.rowData.reduce((total, item, key) => {
-        console.warn(key, '<=', rowIndex)
-        return total += (key <= rowIndex ? item.unit_amount : 0)
+        return total += (key <= rowIndex ? (item.quantity_in - item.quantity_out) : 0)
       }, 0) + this.FILTER.item.begining
     }
   }
