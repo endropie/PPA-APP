@@ -147,7 +147,7 @@ export default {
         until_date: null,
         item: null,
         unmore: false,
-        take: 2,
+        take: 20,
         submit: () => {
           this.fetch()
         }
