@@ -262,10 +262,9 @@ export default {
     IS_EDITABLE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
-      // if (this.rsView.order_mode !== 'PO') return false
-      // if (Object.keys(this.rsView.has_relationship || {}).length > 0) {
-      //   if (!Boolean(this.rsView.is_estimate)) return false
-      // }
+      if (this.rsView.order_mode === 'ACCUMULATE') return false
+
+      if (this.rsView.order_mode === 'NONE' && !this.rsView.customer.order_manual_allowed) return false
 
       return true
     },
