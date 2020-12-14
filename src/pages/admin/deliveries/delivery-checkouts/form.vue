@@ -44,13 +44,8 @@
       <!-- COLUMN:: Part items lists -->
       <q-card flat bordered class="q-mb-sm" v-for="(row, rowIndex) in rsForm.delivery_checkout_loads" :key="rowIndex">
         <q-card-section>
-          <!-- <q-input v-model="row.delivery_load_id" type="text"
-            v-validate="`required|excluded:${row.delivery_load_id}`"
-            :name="`delivery_checkout_loads.${rowIndex}.delivery_load_id`"
-            :error="errors.has(`delivery_checkout_loads.${rowIndex}.delivery_load_id`)"
-            :error-message="errors.first(`delivery_checkout_loads.${rowIndex}.delivery_load_id`)"
-          /> -->
           <ux-select dense hide-bottom-space
+            input-style="margin-top:-4px"
             prefix="LOAD: "
             v-model="row.delivery_load"
             filter
@@ -64,7 +59,7 @@
             :name="`delivery_checkout_loads.${rowIndex}.delivery_load_id`"
             :error="errors.has(`delivery_checkout_loads.${rowIndex}.delivery_load_id`)"
             :error-message="errors.first(`delivery_checkout_loads.${rowIndex}.delivery_load_id`)"
-            :disable="row.delivery_orders.length > 0"
+            :disable="Boolean(row.delivery_orders.length > 0 || row.delivery_load)"
             @input="(v) => {
               row.delivery_load_id = v ? v.id : null
             }"
