@@ -24,8 +24,8 @@
                 detail: $tc('messages.form_new'),
                 icon: 'add',
                 shortcut: true,
-                hidden:!$app.can('sj-delivery-orders-create'),
-                to: `${TABLE.resource.uri}/create-sample`
+                hidden:!$app.can('delivery-internals-create'),
+                to: `${TABLE.resource.uri}/create`
               },
               { label: $tc('label.trash'),
                 detail:  $tc('messages.show_deleted'),
@@ -53,7 +53,7 @@
 
               <q-select class="col-12 col-sm-3 "
                 v-model="FILTERABLE.fill.status.value" clearable
-                :options="['OPEN', 'CONFIRMED','RECONCILIATION', 'RECONCILED']"
+                :options="['OPEN', 'CONFIRMED', 'VOID']"
                 :label=" $tc('label.state')"
                 dense hide-bottom-space hide-dropdown-icon
                 standout="bg-blue-grey-5 text-white"
@@ -88,7 +88,7 @@
           </table-header>
         </template>
 
-        <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:40px">
+        <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:40px" auto-width>
           <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" />
         </q-td>
 
@@ -101,30 +101,17 @@
         </q-td>
 
         <q-td slot="body-cell-number" slot-scope="rs" :props="rs">
-          <span v-if="rs.row.number" class="column text-weight-medium" :class="{'text-strike text-faded': rs.row.status == 'REVISED'}">
-            <span>{{ rs.row.fullnumber || rs.row.number }}</span>
-            <!-- <small  class="text-blue-grey" v-if="rs.row.reconcile_number"> -->
-              <!-- REC.{{rs.row.reconcile_number}} -->
-            <!-- </small> -->
-            <div>
-              <q-btn flat dense color="blue-grey" size="sm" class="text-caption" style="line-height:normal"
-                :label="`REC.${rs.row.reconcile_number}`"
-                :to="`${TABLE.resource.uri}/${rs.row.reconcile_id}`"
-                v-if="rs.row.reconcile_id"
-              />
-              <q-btn flat dense color="blue-grey" size="sm" class="text-caption" style="line-height:normal"
-                :label="`REV.${rs.row.fullnumber_revise}`"
-                :to="`${TABLE.resource.uri}/${rs.row.revise_id}`"
-                v-if="rs.row.revise_id"
-              />
-            </div>
-
-          </span>
-          <span v-else>- undifined -</span>
+          <span>{{ rs.row.fullnumber || rs.row.number }}</span>
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
           <ux-chip-status dense square :row="rs.row"/>
+          <!-- <q-chip dense square label="REVISED" color="red-10" text-color="white" v-if="rs.row.revised_number" class="q-my-none q-mr-none text-weight-medium"  /> -->
+        </q-td>
+
+        <q-td slot="body-cell-revised_number" slot-scope="rs" :props="rs" class="no-padding">
+          <q-chip square outline icon="info_outline" color="negative" label="UNREVISED" v-if="!rs.row.revised_number" />
+          <q-chip square outline icon="done_all" color="dark" :label="rs.row.revised_number" v-else />
         </q-td>
 
         <q-td slot="body-cell-persentase" slot-scope="rs" :props="rs" class="no-padding">
@@ -174,7 +161,7 @@ export default {
       },
       FILTERABLE: {
         fill: {
-          is_internal: { value: '0', type: 'boolean' },
+          is_internal: { value: '1', type: 'boolean' },
           customer_id: {
             value: null,
             type: 'integer',
@@ -195,22 +182,15 @@ export default {
         mode: 'index',
         resource: {
           api: '/api/v1/incomes/delivery-orders',
-          uri: '/admin/deliveries/delivery-orders'
+          uri: '/admin/deliveries/delivery-order-internals'
         },
         columns: [
           { name: 'prefix', label: '', align: 'left' },
-          { name: 'date',
-            label: this.$tc('label.date'),
-            field: 'date',
-            align: 'center',
-            sortable: true,
-            format: (v) => v ? this.$app.moment(v).format('DD/MM/YYYY') : '-',
-            classes: 'text-uppercase' },
+          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true, format: (v) => v ? this.$app.moment(v).format('DD/MM/YYYY') : '-', classes: 'text-uppercase' },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left' },
           { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
           { name: 'status', label: '', field: 'status', align: 'center' },
-          { name: 'persentase', label: '', align: 'center' },
-          { name: 'transaction', label: this.$tc('label.transaction'), field: 'transaction', align: 'center', sortable: true },
+          { name: 'revised_number', label: 'Revised', field: 'revised_number', align: 'left' },
           { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center' }
         ],
         rowData: [],
