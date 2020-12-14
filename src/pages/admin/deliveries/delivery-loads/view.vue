@@ -100,6 +100,10 @@
                     <td class="text-weight-medium">{{$tc('label.date')}}</td>
                     <td>{{$app.date_format(rsView.date)}}</td>
                   </tr>
+                  <tr v-if="rsView.checkout_number">
+                    <td class="text-weight-medium">CHECKOUT</td>
+                    <td>#{{rsView.checkout_number}}</td>
+                  </tr>
                 </tbody>
               </q-markup-table>
             </div>
