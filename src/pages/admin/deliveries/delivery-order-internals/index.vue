@@ -109,11 +109,6 @@
           <!-- <q-chip dense square label="REVISED" color="red-10" text-color="white" v-if="rs.row.revised_number" class="q-my-none q-mr-none text-weight-medium"  /> -->
         </q-td>
 
-        <q-td slot="body-cell-revised_number" slot-scope="rs" :props="rs" class="no-padding">
-          <q-chip square outline icon="info_outline" color="negative" label="UNREVISED" v-if="!rs.row.revised_number" />
-          <q-chip square outline icon="done_all" color="dark" :label="rs.row.revised_number" v-else />
-        </q-td>
-
         <q-td slot="body-cell-persentase" slot-scope="rs" :props="rs" class="no-padding">
           <q-chip dense square class="text-weight-medium" text-color="white"
             :color="Math.round(rs.row.summary_reconciles) == Math.round(rs.row.summary_items) ? 'red-10' : 'indigo-10'"
@@ -190,7 +185,6 @@ export default {
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left' },
           { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
           { name: 'status', label: '', field: 'status', align: 'center' },
-          { name: 'revised_number', label: 'Revised', field: 'revised_number', align: 'left' },
           { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center' }
         ],
         rowData: [],
