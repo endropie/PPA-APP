@@ -65,7 +65,7 @@
             }"
             @abort="() => false"
           >
-            <q-btn slot="after" dense flat color="blue-grey" icon="clear" @click="removeDetail(rowIndex)" tabindex="100" />
+            <q-btn slot="after" dense flat color="blue-grey" icon="clear" @click="removeLoadDetail(rowIndex)" tabindex="100" />
           </ux-select>
           <div class="row q-my-sm" v-if="row.delivery_load">
             <q-input type="hidden" class="hidden"
@@ -78,10 +78,10 @@
               v-for="(sjdo, indexSJDO) in row.delivery_orders" :key="indexSJDO"
               :label="sjdo.fullnumber"
               removable
-              @remove="removeDetailSJDO(rowIndex, indexSJDO)"
+              @remove="removeLoadDetailSJDO(rowIndex, indexSJDO)"
             />
             <div class="row q-gutter-sm q-pa-xs">
-              <q-btn dense outline icon="qr_code" color="blue-grey" @click="onScanning(rowIndex)" />
+              <q-btn dense outline icon="qr_code" color="blue-grey" @click="addLoadScanner(rowIndex)" />
               <q-btn dense outline slot="before" icon="add" color="blue-grey" >
                 <q-popup-edit v-model="row.__option.select" auto-save
                   anchor="top left" cover
@@ -108,10 +108,49 @@
           </div>
         </q-card-section>
       </q-card>
-      <div class="row q-gutter-sm q-mb-sm">
-        <q-btn outline class="" icon="add_circle" color="positive" :label="$tc('form.add', 2)" @click="addNewDetail" />
-        <q-btn outline class="" icon="qr_code" color="blue-grey" label="Scan" @click="onScanning()" />
-      </div>
+      <q-card flat bordered class="q-mb-sm" v-for="(row, rowIndex) in rsForm.delivery_checkout_internals" :key="`internal-${rowIndex}`">
+        <q-card-section>
+          <ux-select dense hide-bottom-space
+            input-style="margin-top:-4px"
+            prefix="INTERNAL: "
+            v-model="row.delivery_order"
+            filter
+            :source="`/api/v1/incomes/delivery-orders?mode=all&--limit=5&--with=customer&is_internal=1&has_checkout=0&vehicle_id=${rsForm.vehicle_id}&date=${rsForm.date}`"
+            :source-key="['number', 'description', 'customer']"
+            :option-disable="(opt) => opt"
+            option-label="fullnumber"
+            :option-sublabel="(opt) => `[${opt.customer.code}]`"
+            v-validate="`required`"
+            data-vv-as="Delivery Load"
+            :name="`delivery_checkout_internals.${rowIndex}.delivery_order_id`"
+            :error="errors.has(`delivery_checkout_internals.${rowIndex}.delivery_order_id`)"
+            :error-message="errors.first(`delivery_checkout_internals.${rowIndex}.delivery_order_id`)"
+            :disable="Boolean(row.delivery_order)"
+            @input="(v) => {
+              row.delivery_order_id = v ? v.id : null
+            }"
+            @abort="() => false"
+          >
+            <q-btn slot="after" dense flat color="blue-grey" icon="clear" @click="removeInternalDetail(rowIndex)" tabindex="100" />
+          </ux-select>
+        </q-card-section>
+        <q-card-actions :vertical="$q.screen.lt.sm" class="q-pt-none" v-if="false">
+          <q-btn outline class="" icon="add_circle" color="positive" :label="$tc('form.add', 2)" @click="addInternalDetail" />
+          <q-btn outline class="" icon="qr_code" color="blue-grey" label="Scan" @click="addInternalScanner()" />
+        </q-card-actions>
+      </q-card>
+      <q-card flat class="q-mb-md">
+        <q-card-section v-if="errors.has('delivery_checkout_loads')">
+          <div class="text-negative text-small">
+            {{errors.first('delivery_checkout_loads')}}
+          </div>
+        </q-card-section>
+        <q-card-actions :vertical="$q.screen.lt.sm" class="no-padding">
+          <q-btn outline class="" icon="add_circle" color="positive" label="LOADING" @click="addLoadDetail" />
+          <q-btn outline class="" icon="add_circle" color="positive" label="INTERNAL" @click="addInternalDetail" />
+          <q-btn outline class="" icon="qr_code" color="blue-grey" label="Scan" @click="addLoadScanner()" />
+        </q-card-actions>
+      </q-card>
 
       <q-input type="textarea" autogrow
         filled class="q-mb-sm" input-style="min-height:45px"
@@ -175,20 +214,24 @@ export default {
           operator: null,
           operator_id: null,
           description: null,
-          delivery_checkout_loads: [
-            {
-              delivery_load_id: null,
-              delivery_load: null,
-              delivery_orders: [],
-              __option: {
-                select: null,
-                input: null,
-                error: null
-              }
-            }
-          ]
+          delivery_checkout_loads: [],
+          delivery_checkout_internals: []
         }
-      }
+      },
+      setInternalDefault: () => ({
+        delivery_order_id: null,
+        delivery_order: null
+      }),
+      setLoadDefault: () => ({
+        delivery_load_id: null,
+        delivery_load: null,
+        delivery_orders: [],
+        __option: {
+          select: null,
+          input: null,
+          error: null
+        }
+      })
     }
   },
   created () {
@@ -233,7 +276,7 @@ export default {
     setForm (data) {
       this.rsForm = Object.assign({}, this.setDefault(), data)
     },
-    onScanning (index = null) {
+    addLoadScanner (index = null) {
       this.scanner.key = index
       this.$refs['dialogScanner'].show()
     },
@@ -244,6 +287,14 @@ export default {
       const model = n[n.length - 2]
 
       switch (model) {
+        case 'internals':
+          if (this.scanner.key !== null) {
+            this.scanner.key = null
+            return this.$q.notify({ message: `DELIVERY INTERNAL INVALID`, type: 'negative' })
+          }
+          this.scannedDeliveryInternal(id)
+          break
+
         case 'delivery-loads':
           if (this.scanner.key !== null) {
             this.scanner.key = null
@@ -264,13 +315,41 @@ export default {
           break
       }
     },
+    scannedDeliveryInternal (id) {
+      const added = (data) => {
+        const len = this.rsForm.delivery_checkout_internals.length
+        const newitem = Object.assign(this.setInternalDefault())
+        if (this.rsForm.delivery_checkout_internals[len - 1]) {
+          if (!this.rsForm.delivery_checkout_internals[len - 1].delivery_order_id) {
+            this.rsForm.delivery_checkout_internals.splice(len - 1, 1)
+          }
+        }
+        this.rsForm.delivery_checkout_internals.push({ ...newitem, delivery_order: data, delivery_order_id: data.id })
+      }
+
+      if (this.rsForm.delivery_checkout_internals.find(x => x.delivery_order_id === parseInt(id))) {
+        return this.$q.notify({ message: 'DELIVERY INTERNAL HAS ADDED!', type: 'warning' })
+      }
+
+      this.$axios.get(`/api/v1/incomes/delivery-orders?mode=all&--with=customer&has_checkout=0&vehicle_id=${this.rsForm.vehicle_id}&date=${this.rsForm.date}&id=${id}`)
+        .then(response => {
+          if (!response.data.length) this.$q.notify({ message: `DELIVERY INTERNAL [${id}] INVALID!`, type: 'warning' })
+          else added(response.data[0])
+        })
+        .catch(error => {
+          this.$q.notify(`DELIVERY INTERNAL FETCH ERROR ${String(error)}`)
+          console.warn(error.response || error)
+        })
+    },
     scannedDeliveryLoad (id) {
       const added = (data) => {
         // console.warn('ADDED', data);
         const len = this.rsForm.delivery_checkout_loads.length
-        const newitem = Object.assign(this.setDefault().delivery_checkout_loads[0])
-        if (!this.rsForm.delivery_checkout_loads[len - 1].delivery_load_id) {
-          this.rsForm.delivery_checkout_loads.splice(len - 1, 1)
+        const newitem = Object.assign(this.setLoadDefault())
+        if (this.rsForm.delivery_checkout_loads[len - 1]) {
+          if (!this.rsForm.delivery_checkout_loads[len - 1].delivery_load_id) {
+            this.rsForm.delivery_checkout_loads.splice(len - 1, 1)
+          }
         }
         this.rsForm.delivery_checkout_loads.push({ ...newitem, delivery_load: data, delivery_load_id: data.id })
       }
@@ -298,21 +377,6 @@ export default {
         this.$q.notify({ message: 'SJDO HAS ADDED!', type: 'warning' })
       }
     },
-    isCompleted (row) {
-      if (!row.delivery_load) return false
-      return row.delivery_load.delivery_orders.length === row.delivery_orders.length
-    },
-    filterInputSJDO (index) {
-      const newFilter = String(this.rsForm.delivery_checkout_loads[index].__option.input).toLowerCase()
-      const finder = this.rsForm.delivery_checkout_loads[index].delivery_load.delivery_orders.find(x => String(x.fullnumber).toLowerCase() === newFilter)
-      const checker = this.rsForm.delivery_checkout_loads[index].delivery_orders.find(x => x.id === (finder.id || null))
-      if (finder && !checker) {
-        this.rsForm.delivery_checkout_loads[index].__option.input = null
-        this.rsForm.delivery_checkout_loads[index].delivery_orders.push(finder)
-      } else {
-        this.$q.notify({ message: 'SJDO FAILED!', type: 'negative' })
-      }
-    },
     filterSelectSJDO (index) {
       const notifi = () => this.$q.notify({ message: 'SJDO FAILED!', type: 'negative' })
       const newItem = (this.rsForm.delivery_checkout_loads[index].__option.select)
@@ -322,16 +386,24 @@ export default {
       }
       this.rsForm.delivery_checkout_loads[index].delivery_orders.push(newItem)
     },
-    addNewDetail () {
-      const newitem = Object.assign(this.setDefault().delivery_checkout_loads[0])
+    addLoadDetail () {
+      const newitem = Object.assign(this.setLoadDefault())
       this.rsForm.delivery_checkout_loads.push(newitem)
     },
-    removeDetailSJDO (index, key) {
+    removeLoadDetailSJDO (index, key) {
       this.rsForm.delivery_checkout_loads[index].delivery_orders.splice(key, 1)
     },
-    removeDetail (index) {
+    removeLoadDetail (index) {
       this.rsForm.delivery_checkout_loads.splice(index, 1)
-      if (!this.rsForm.delivery_checkout_loads.length) this.addNewDetail()
+      // if (!this.rsForm.delivery_checkout_loads.length) this.addLoadDetail()
+    },
+    addInternalDetail () {
+      const newitem = Object.assign(this.setInternalDefault())
+      this.rsForm.delivery_checkout_internals.push(newitem)
+    },
+    removeInternalDetail (index) {
+      this.rsForm.delivery_checkout_internals.splice(index, 1)
+      // if (!this.rsForm.delivery_checkout_loads.length) this.addLoadDetail()
     },
     onSave () {
       const submit = () => {

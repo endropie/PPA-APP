@@ -1,54 +1,62 @@
 <template>
-  <q-page padding class="column justify-start">
-    <page-print v-if="VIEW.show">
+  <q-page padding class="column items-center justify-start">
+    <page-print v-if="rsView" :style="{'min-width': $q.screen.gt.sm ? '70%' : '100%'}">
       <div slot="header-title">DELIVERY CHECKOUT <span v-if="rsView">#{{rsView.fullnumber}}</span> </div>
       <div slot="header-tags" class="print-hide">
         <!-- <ux-chip-status :row="rsView" tag outline small square icon='bookmark' /> -->
       </div>
 
-      <div class="row justify-between q-col-gutter-y-sm" >
-        <div class="profile self-bottom">
-          <q-markup-table dense class="super-dense no-shadow no-highlight text-weight-medium">
-            <!-- <tbody></tbody> -->
-          </q-markup-table>
+      <div class="column" style="min-height:3.25in;height:auto">
+        <div class="row justify-between q-col-gutter-y-sm" >
+          <div class="profile self-bottom">
+            <q-markup-table dense class="super-dense no-shadow no-highlight text-weight-medium">
+              <!-- <tbody></tbody> -->
+            </q-markup-table>
+          </div>
+          <div class="info">
+            <q-markup-table dense square bordered class="super-dense no-shadow no-highlight" separator="cell">
+              <tbody>
+                <tr>
+                  <td class="text-weight-medium">{{$tc('label.date')}}</td>
+                  <td>{{$app.date_format(rsView.date)}}</td>
+                </tr>
+                <tr>
+                  <td class="text-weight-medium">{{$tc('general.vehicle')}}</td>
+                  <td><span v-if="rsView.vehicle"> {{rsView.vehicle.number}} </span></td>
+                </tr>
+              </tbody>
+            </q-markup-table>
+          </div>
+          <div class="col-12">
+            <q-markup-table dense bordered class="no-shadow no-highlight th-uppercase" separator="cell">
+              <thead>
+                <tr>
+                  <q-th>{{ $tc('general.customer') }}</q-th>
+                  <q-th>{{ $tc('general.delivery') }}</q-th>
+                  <q-th>{{ $tc('label.transaction') }}</q-th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, index) in rsView.delivery_loads" :key="`load-${index}`">
+                  <q-td>{{ row.customer ? row.customer.name : `#${row.customer_id}`  }}</q-td>
+                  <q-td>{{ row.fullnumber }}</q-td>
+                  <q-td align="center">{{ row.transaction }}</q-td>
+                </tr>
+                <tr v-for="(row, index) in rsView.delivery_order_internals" :key="`internal-${index}`">
+                  <q-td>{{ row.customer ? row.customer.name : `#${row.customer_id}`  }}</q-td>
+                  <q-td>{{ row.fullnumber }} <span class="text-weight-medium on-right">[INTERNAL]</span></q-td>
+                  <q-td align="center">{{ row.transaction }}</q-td>
+                </tr>
+              </tbody>
+            </q-markup-table>
+          </div>
+          <div class="col-12">
+              <div class="q-mb-sm text-italic">{{$tc('label.description')}}:</div>
+              <div class="q-mb-md text-weight-light" style="">{{ rsView.description }}</div>
+          </div>
         </div>
-        <div class="info">
-          <q-markup-table dense square bordered class="super-dense no-shadow no-highlight" separator="cell">
-            <tbody>
-              <tr>
-                <td class="text-weight-medium">{{$tc('label.date')}}</td>
-                <td>{{$app.date_format(rsView.date)}}</td>
-              </tr>
-              <tr>
-                <td class="text-weight-medium">{{$tc('general.vehicle')}}</td>
-                <td><span v-if="rsView.vehicle"> {{rsView.vehicle.number}} </span></td>
-              </tr>
-            </tbody>
-          </q-markup-table>
-        </div>
-        <div class="col-12">
-          <q-markup-table dense bordered class="no-shadow no-highlight th-uppercase" separator="cell">
-            <thead>
-              <tr>
-                <q-th>{{ $tc('general.customer') }}</q-th>
-                <q-th>{{ $tc('general.delivery_load') }}</q-th>
-                <q-th>{{ $tc('label.transaction') }}</q-th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, index) in rsView.delivery_loads" :key="index">
-                <q-td>{{ row.customer ? row.customer.name : `#${row.customer_id}`  }}</q-td>
-                <q-td>{{ row.fullnumber }}</q-td>
-                <q-td align="center">{{ row.transaction }}</q-td>
-              </tr>
-            </tbody>
-          </q-markup-table>
-        </div>
-        <div class="col-12">
-            <div class="q-mb-sm text-italic">{{$tc('label.description')}}:</div>
-            <div class="q-mb-md text-weight-light" style="">{{ rsView.description }}</div>
-        </div>
-        <div class="col-12 row q-gutter-xs print-hide " style="padding-top:50px">
+        <q-space />
+        <div class="row q-gutter-xs print-hide " style="padding-top:50px">
           <q-btn :label="$tc('form.back')" icon="cancel"  color="dark" :to="`${VIEW.resource.uri}?return`" />
           <!-- <q-btn :label="$tc('form.edit')" icon="edit" color="positive" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"  v-if="IS_EDITABLE && $app.can('delivery-checkouts-update')" /> -->
           <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="VIEW.print()" />
@@ -73,7 +81,7 @@
                 detail: $tc('messages.process_void'),
                 hidden: !IS_VOID || !$app.can('delivery-checkouts-void'),
                 actions: () => {
-                  VIEW.void(()=> init() )
+                  VIEW.void(()=> $router.replace(VIEW.resource.uri) )
                 }
               },
             ]"/>
