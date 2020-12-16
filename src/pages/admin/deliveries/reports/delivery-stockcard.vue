@@ -95,8 +95,8 @@
       <template v-slot:top-row v-if="FILTER.item && FILTER.item.hasOwnProperty('begining')">
         <q-tr class="bg-blue-grey-2 text-weight-medium">
           <q-td key="prefix"></q-td>
-          <q-td colspan="3">
-            SALDO AWAL
+          <q-td colspan="3" class="text-uppercase text-weight-medium">
+            {{$tc('items.stock_previous')}}
           </q-td>
           <q-td key="quantity_in" align="right"></q-td>
           <q-td key="quantity_out" align="right"></q-td>
@@ -142,8 +142,8 @@ export default {
   data () {
     return {
       FILTER: {
-        begin_date: null,
-        until_date: null,
+        begin_date: this.$app.moment().startOf('month').format('YYYY-MM-DD'),
+        until_date: this.$app.moment().endOf('month').format('YYYY-MM-DD'),
         item: null,
         unmore: false,
         take: 20,
@@ -164,8 +164,20 @@ export default {
           // { name: 'status', label: '', field: 'status', align: 'left' },
           // { name: 'quantity', label: this.$tc('label.quantity'), field: (rs) => rs.quantity, align: 'right', sortable: false },
           { name: 'spacer', label: '', style: 'width:30%' },
-          { name: 'quantity_in', label: this.$tc('label.incoming'), field: (rs) => rs.quantity_in, align: 'right', sortable: false },
-          { name: 'quantity_out', label: this.$tc('label.outgoing'), field: (rs) => rs.quantity_out, align: 'right', sortable: false },
+          {
+            name: 'quantity_in',
+            label: this.$tc('label.incoming'),
+            field: (rs) => rs.quantity_in,
+            format: (v) => v === 0 ? '' : this.$app.number_format(v),
+            sortable: false
+          },
+          {
+            name: 'quantity_out',
+            label: this.$tc('label.outgoing'),
+            field: (rs) => rs.quantity_out,
+            format: (v) => v === 0 ? '' : this.$app.number_format(v),
+            sortable: false
+          },
           { name: 'saldo', label: this.$tc('label.saldo'), sortable: false }
         ]
       }
