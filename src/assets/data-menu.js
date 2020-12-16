@@ -270,12 +270,12 @@ const deliveries = [
     name: 'Delivery (Intern)',
     icon: 'assignment',
     path: 'delivery-order-internals',
-    // lang: 'general.delivery_internal',
     resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-internals-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-internals-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'delivery-internals-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-internals-read' } }
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'sj-delivery-internals-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'sj-delivery-internals-create' } },
+      // { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'sj-delivery-internals-update' } },
+      { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'sj-delivery-internals-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'sj-delivery-internals-read' } }
     ]
   },
   {
