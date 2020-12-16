@@ -46,15 +46,33 @@
               rsForm.customer_address = v ? v.address : null
             }"
           />
-          <ux-date
-            name="date" type="date"
-            :label="$tc('label.date')"
-            v-model="rsForm.date"
-            :dark="LAYOUT.isDark"
-            v-validate="'required'"
-            :error="errors.has('date')"
-            :error-message="errors.first('date')"
-          />
+          <div class="row q-col-gutter-sm" :class="{ 'column': $q.screen.lt.sm }">
+            <ux-select class="col-6"
+              name="vehicle_id"
+              :label="$tc('general.vehicle')"  stack-label
+              v-model="rsForm.vehicle"
+              filter clearable
+              source="api/v1/references/vehicles?mode=all&type=DELIVERY"
+              :option-label="(item) => `${item.number}`"
+              option-value="id"
+              v-validate="'required'"
+              :error="errors.has('vehicle_id')"
+              :error-message="errors.first('vehicle_id')"
+              @input="(v) => {
+                rsForm.vehicle = v ? v : null
+                rsForm.vehicle_id = v ? v.id : null
+              }"
+            />
+            <ux-date class="col-6"
+              name="date" type="date"
+              :label="$tc('label.date')"
+              v-model="rsForm.date"
+              :dark="LAYOUT.isDark"
+              v-validate="'required'"
+              :error="errors.has('date')"
+              :error-message="errors.first('date')"
+            />
+          </div>
         </div>
         <div class="col-12 col-md-6" >
           <div class="row q-col-gutter-x-sm">

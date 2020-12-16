@@ -13,6 +13,7 @@
       </div>
       <div class="column" style="min-height:3.25in;height:auto">
         <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
+          <ux-qrcode :value="valQrCode(rsView)" :options="{ width: 96, height: 96, margin: 1 }" />
           <div class="" style="max-width:50%">
             <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
             <address class="text-normal" style="font-style: normal">{{rsView.customer_address}}</address>
@@ -183,9 +184,10 @@ export default {
       return true
     },
     IS_EDITABLE () {
-      if (this.rsView.deleted_at) return false
-      if (this.rsView.status !== 'OPEN') return false
-      return true
+      return false
+      // if (this.rsView.deleted_at) return false
+      // if (this.rsView.status !== 'OPEN') return false
+      // return true
     },
     IS_REVISE () {
       if (this.rsView.deleted_at) return false
@@ -208,6 +210,9 @@ export default {
 
       const config = this.$store.state.admin.CONFIG.sj_delivery['hide_view_columns'] || []
       return Boolean(config.some(v => val === v))
+    },
+    valQrCode (data) {
+      return `/internals/${data.id}`
     },
     setView (data) {
       this.rsView = data
