@@ -103,8 +103,9 @@
       <div class="row q-gutter-xs print-hide" style="padding-top:50px">
         <q-btn :label="$tc('form.back')" color="dark" icon="cancel" :to="`${VIEW.resource.uri}?return`" />
         <q-btn :label="$tc('form.print')" color="grey" icon="print" @click.native="print()" />
-        <q-btn :label="$tc('form.edit')" color="green" icon="edit" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"
-          v-if="IS_EDITABLE && $app.can('sj-delivery-internals-update')" />
+        <!-- <q-btn :label="$tc('form.edit')" color="green" icon="edit" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"
+          v-if="IS_EDITABLE && $app.can('sj-delivery-internals-update')"
+        /> -->
         <q-space />
         <ux-btn-dropdown color="blue-grey"
           :options="[
@@ -137,7 +138,7 @@
               }
             },
             { label: 'VOID', color:'red', icon: 'block',
-              hidden: !IS_VOID || !$app.can('sj-delivery-internals-delete'),
+              hidden: !IS_VOID || !$app.can('sj-delivery-internals-void'),
               detail: $tc('messages.process_void'),
               actions: () => {
                 VIEW.void(()=> init() )
@@ -189,10 +190,9 @@ export default {
       return true
     },
     IS_EDITABLE () {
-      return false
-      // if (this.rsView.deleted_at) return false
-      // if (this.rsView.status !== 'OPEN') return false
-      // return true
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'OPEN') return false
+      return true
     },
     IS_REVISE () {
       if (this.rsView.deleted_at) return false

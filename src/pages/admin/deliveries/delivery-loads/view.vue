@@ -135,7 +135,7 @@
             <div class="q-mb-md text-weight-light" style="">{{ rsView.description }}</div>
           </div>
           <div>
-            <div class="text-weight-medium">
+            <div class="text-black text-weight-medium">
               SJDO:
               <span v-for="(link, i) in rsView.delivery_orders" :key="i" @click="showDO(link.id)" class="cursor-pointer">
                 ({{i+1}}) {{link.fullnumber}}
