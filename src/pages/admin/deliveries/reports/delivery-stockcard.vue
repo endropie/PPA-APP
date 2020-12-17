@@ -85,7 +85,7 @@
         </div>
       </q-td>
 
-      <q-td slot="body-cell-saldo" slot-scope="rs" :props="rs" style="width:35px">
+      <q-td slot="body-cell-saldo" slot-scope="rs" :props="rs">
         <!-- {{rs.rowIndex}} -->
         <span v-if="FILTER.item">
           {{ getRowSaldo(rs.rowIndex) }}
@@ -161,12 +161,11 @@ export default {
           { name: 'prefix', label: '', align: 'left' },
           { name: 'date', label: this.$tc('label.date'), field: 'date', format: (v) => this.$app.moment(v).format('DD/MM/YYYY'), align: 'left' },
           { name: 'number', label: this.$tc('label.number'), field: (rs) => rs.fullnumber || rs.number, align: 'left', sortable: false },
-          // { name: 'status', label: '', field: 'status', align: 'left' },
-          // { name: 'quantity', label: this.$tc('label.quantity'), field: (rs) => rs.quantity, align: 'right', sortable: false },
-          { name: 'spacer', label: '', style: 'width:30%' },
+          { name: 'spacer', label: '' },
           {
             name: 'quantity_in',
             label: this.$tc('label.incoming'),
+            style: 'width:15%',
             field: (rs) => rs.quantity_in,
             format: (v) => v === 0 ? '' : this.$app.number_format(v),
             sortable: false
@@ -174,11 +173,12 @@ export default {
           {
             name: 'quantity_out',
             label: this.$tc('label.outgoing'),
+            style: 'width:15%',
             field: (rs) => rs.quantity_out,
             format: (v) => v === 0 ? '' : this.$app.number_format(v),
             sortable: false
           },
-          { name: 'saldo', label: this.$tc('label.saldo'), sortable: false }
+          { name: 'saldo', label: this.$tc('label.saldo'), style: 'width:15%', sortable: false }
         ]
       }
     }
