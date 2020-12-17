@@ -20,7 +20,13 @@
             <q-tab name="delivery_order"
               icon="unarchive"
               :label="$q.screen.lt.sm ? undefined : $tc('general.sj_delivery')"
-              v-if="$app.can()"/>
+              v-if="$app.can()"
+            />
+            <q-tab name="delivery_order_internal"
+              icon="unarchive"
+              :label="$q.screen.lt.sm ? undefined : $tc('general.sj_internal')"
+              v-if="$app.can()"
+            />
           </q-tabs>
         </template>
 
@@ -41,6 +47,9 @@
             <q-tab-panel name="delivery_order">
               <commponet :is="components[tab]" />
             </q-tab-panel>
+            <q-tab-panel name="delivery_order_internal">
+              <commponet :is="components[tab]" />
+            </q-tab-panel>
 
           </q-tab-panels>
         </template>
@@ -53,17 +62,19 @@
 <script>
 import FormGeneral from './general'
 import FormItem from './item'
-import FormIncomingGood from './incoming_good'
-import FormDeliveryOrder from './delivery_order'
+import FormIncomingGood from './incoming-good'
+import FormDeliveryOrder from './delivery-order'
+import FormDeliveryOrderInternal from './delivery-order-internal'
 
 export default {
   data () {
     return {
-      components : {
+      components: {
         general: FormGeneral,
         item: FormItem,
         incoming_good: FormIncomingGood,
         delivery_order: FormDeliveryOrder,
+        delivery_order_internal: FormDeliveryOrderInternal
       },
       tab: 'general',
       splitterModel: 20
