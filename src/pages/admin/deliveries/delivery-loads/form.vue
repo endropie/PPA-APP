@@ -160,6 +160,26 @@
     <q-separator inset />
     <!-- SINGLE-REVISION -->
     <q-card-section :class="$app.classDimmed(!Boolean(rsForm.customer_id && rsForm.date))" >
+      <!-- {{rsForm.customer}} -->
+      <div class="column q-mb-sm" v-if="rsForm.customer && rsForm.order_mode !== 'ACCUMULATE' && rsForm.customer.delivery_manual_allowed">
+        <ux-select outlined dense hide-bottom-space
+          class="self-end"
+          label="SJDO Manual"
+          v-model="rsForm.request_order"
+          :disable="Boolean(rsForm.delivery_load_items.find(x => x.item))"
+          filter clearable use-chips
+          :source="`/api/v1/incomes/request-orders?mode=all&--limit=20&status=open&customer_id=${rsForm.customer_id}`"
+          :source-key="['number', 'reference_number']"
+          option-label="fullnumber"
+          :option-sublabel="(opt) => `[${$app.moment(opt.date).format('DD/MM/YYYY')}] ${opt.reference_number}`"
+          v-validate="''"
+          :name="`request_order_id`"
+          :error-message="errors.first(`request_order_id`)"
+          @input="(v) => {
+            rsForm.request_order_id = v ? v.id : null
+          }"
+        />
+      </div>
       <!-- COLUMN:: Part items lists -->
       <q-markup-table bordered class="main-box no-shadow no-highlight q-mb-sm"
         dense separator="horizontal">
@@ -180,9 +200,35 @@
             <q-td name="part">
               <ux-select dense outlined hide-bottom-space
                 class="field-native-top"
+                v-if="rsForm.request_order"
+                v-model="row.request_order_item"
+                filter clearable
+                :source="`/api/v1/incomes/request-order-items?mode=all&--limit=50&--with=item;unit&delivery_date=${rsForm.date}&request_order_id=${rsForm.request_order_id}`"
+                :option-label="(opt) => `${opt.item.part_name}`"
+                :option-sublabel="(opt) => `${opt.item.part_subname} (${opt.quantity} ${opt.unit.code})`"
+                v-validate="'required'"
+                :name="`delivery_load_items.${rowIndex}.request_order_item_id`"
+                :error-message="errors.first(`delivery_load_items.${rowIndex}.request_order_item_id`)"
+                @input="(v) => {
+                  row.request_order_item_id = v ? v.id : null
+                  row.item_id = v ? v.item.id : null
+                  row.item = v ? v.item : null
+                  row.unit_rate = v ? 1 : null
+                  row.unit_id = v ? v.item.unit.id : null
+                  row.unit = v ? { value: v.item.unit.id, label: v.item.unit.code, rate:1 } : null
+                }"
+              >
+                <small v-if="row.item" class="absolute-bottom text-blue-grey">
+                  [{{row.item.customer_code}}]
+                  {{row.item.part_subname}}
+                </small>
+              </ux-select>
+              <ux-select dense outlined hide-bottom-space
+                class="field-native-top"
+                v-show="!rsForm.request_order"
                 v-model="row.item"
                 filter clearable
-                :source="`/api/v1/common/items?mode=all&--limit=50&delivery_date=${rsForm.date}&customer_id=${rsForm.customer_id}`"
+                :source="`/api/v1/common/items?mode=all&--limit=50&delivery_date=${rsForm.date}&customer_id=${rsForm.customer_id}${rsForm.request_order_id ? '&in_request_order_id='+rsForm.request_order_id : '' }`"
                 :source-key="['part_name', 'part_number', 'code']"
                 option-label="part_name"
                 :option-sublabel="(opt) => `[${opt.customer_code}] ${opt.part_number}`"
@@ -303,13 +349,19 @@ export default {
           vehicle: null,
           vehicle_id: null,
           customer_note: null,
-          delivery_load_items:
-          [{
-            name: null,
-            quantity: null,
-            unit: null,
-            notes: null
-          }],
+          request_order_id: null,
+          request_order: null,
+          delivery_load_items: [
+            {
+              request_order_item_id: null,
+              request_order_item: null,
+              item_id: null,
+              item: null,
+              quantity: null,
+              unit: null,
+              notes: null
+            }
+          ],
           description: null
         }
       }

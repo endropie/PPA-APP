@@ -54,6 +54,7 @@
         <div slot="header-title" class="text-uppercase">{{$tc('general.delivery_load')}}</div>
         <div slot="header-tags" class="print-hide">
           <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
+          <q-chip tag outline small square color="orange-10" icon='bookmark' label="MANUAL" v-if="rsView.is_manual" />
         </div>
         <div class="column" style="min-height:3.25in;height:auto">
 

@@ -308,6 +308,20 @@
         <div class="column">
           <q-field borderless hide-bottom-space >
             <div class="column">
+              <q-checkbox name="order_lots" class="text-faded"
+                label="Lots Order"
+                v-model="rsForm.order_lots"
+                :false-value="0"
+                :true-value="1"
+                v-show="rsForm.order_mode === 'NONE'"
+              />
+              <q-checkbox name="delivery_manual_allowed" class="text-faded"
+                label="SJDO Manual"
+                v-model="rsForm.delivery_manual_allowed"
+                :false-value="0"
+                :true-value="1"
+                v-show="rsForm.order_mode !== 'ACCUMULATE'"
+              />
               <q-checkbox name="order_manual_allowed" class="text-faded"
                 label="Tambah atau edit PO customer"
                 v-model="rsForm.order_manual_allowed"
@@ -320,19 +334,12 @@
                 :false-value="0"
                 :true-value="1"
               />
-              <q-checkbox name="order_lots" class="text-faded"
-                label="Lots Order"
-                v-model="rsForm.order_lots"
-                :false-value="0"
-                :true-value="1"
-                v-show="rsForm.order_mode == 'NONE'"
-              />
               <q-checkbox name="invoice_request_required" class="text-faded"
                 label="Invoice by Request Order"
                 v-model="rsForm.invoice_request_required"
                 :false-value="0"
                 :true-value="1"
-                v-show="rsForm.order_mode == 'NONE'"
+                v-show="rsForm.order_mode === 'NONE'"
               />
             </div>
           </q-field>
@@ -424,6 +431,7 @@ export default {
           customer_contacts: [ { id: null } ],
           customer_trips: [],
 
+          delivery_manual_allowed: 0,
           order_manual_allowed: 0,
           order_monthly_actived: 0,
           order_lots: 0
