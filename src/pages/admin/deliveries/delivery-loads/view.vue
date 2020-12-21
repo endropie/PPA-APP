@@ -40,13 +40,6 @@
                 $router.push(`${VIEW.resource.uri}/create`)
               }
             },
-            { label: `${$tc('form.edit')} [${$tc('general.vehicle')}]`, color:'blue-grey', icon: 'add',
-              detail: $tc('messages.process_update'),
-              hidden: !$app.can('delivery-loads-read'),
-              actions: () => {
-                $refs.dialogChangeVehicle.show()
-              }
-            },
             { label: 'VOID', color:'red', icon: 'block',
               detail: $tc('messages.process_void'),
               hidden: !IS_VOID || !$app.can('delivery-loads-void'),
@@ -146,27 +139,6 @@
       </page-print>
     </div>
     <ux-modal-view ref="modal"  fit icon="local_shipping" :title="$tc('general.sj_delivery')" />
-    <q-dialog ref="dialogChangeVehicle" persistent @show="rsForm = $app.clone({ vehicle: rsView.vehicle })">
-      <q-card v-if="rsForm">
-        <q-card-section class="row items-center">
-          <q-avatar icon="local_shipping" color="blue-grey" text-color="white" />
-          <span class="q-ml-sm">
-            <ux-select class="col-12 col-sm-6"
-              :label="$tc('general.vehicle')"
-              v-model="rsForm.vehicle"
-              source="api/v1/references/vehicles?mode=all&type=DELIVERY"
-              option-label="number"
-              option-value="id"
-              filter map-options
-            />
-          </span>
-        </q-card-section>
-        <q-card-actions align="right">
-          <q-btn flat color="blue-grey" :label="$tc('form.cancel')" v-close-popup />
-          <q-btn color="blue-grey" :label="$tc('form.save')" @click="setVehicle" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </q-page>
 </template>
 
@@ -225,21 +197,6 @@ export default {
     valQrCode (data) {
       return `/delivery-loads/${data.id}`
       // return `${window.location.origin}/#/admin/deliveries/delivery-loads/${data.id}`
-    },
-    setVehicle () {
-      console.warn('SET VEHICLE')
-      let url = `${this.VIEW.resource.api}/${this.rsView.id}/save-vehicle?nodata`
-      this.$q.loading.show()
-      this.$axios.put(url, this.rsForm)
-        .then((response) => {
-          this.$app.notify.success(`${this.$tc('general.vehicle')} Changed!`)
-          this.$refs.dialogChangeVehicle.hide()
-          this.init()
-        }).catch((error) => {
-          this.$app.response.error(error.response || error)
-        }).finally(() => {
-          this.$q.loading.hide()
-        })
     },
     showDO (id) {
       let mode = {
