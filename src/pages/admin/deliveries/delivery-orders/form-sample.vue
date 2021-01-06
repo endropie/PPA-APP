@@ -207,21 +207,21 @@ export default {
   mixins: [MixForm],
   data () {
     return {
-      SHEET:{
-        items: {autoload:false, api:'/api/v1/common/items?mode=all'},
-        customers: {api:'/api/v1/incomes/customers?mode=all'},
-        employees: {api:'/api/v1/common/employees?mode=all'},
-        vehicles: {api:'/api/v1/references/vehicles?mode=all'},
-        units: {api:'/api/v1/references/units?mode=all'},
+      SHEET: {
+        items: { autoload: false, api: '/api/v1/common/items?mode=all' },
+        customers: { api: '/api/v1/incomes/customers?mode=all' },
+        employees: { api: '/api/v1/common/employees?mode=all' },
+        vehicles: { api: '/api/v1/references/vehicles?mode=all' },
+        units: { api: '/api/v1/references/units?mode=all' }
       },
-      FORM:{
-        resource:{
+      FORM: {
+        resource: {
           api: '/api/v1/incomes/delivery-orders',
-          uri: '/admin/deliveries/delivery-orders',
+          uri: '/admin/deliveries/delivery-orders'
         }
       },
       rsForm: null,
-      setDefault:()=>{
+      setDefault: () => {
         return {
           number: null,
           transaction: 'SAMPLE',
@@ -236,179 +236,139 @@ export default {
           revise_number: null,
           description: null,
           delivery_order_items: [{
-            id:null,
-            item_id: null, item: null,
-            unit_id: null, unit: null,
+            id: null,
+            item_id: null,
+            item: null,
+            unit_id: null,
+            unit: null,
             quantity: null,
             unit_rate: 1
-          }],
+          }]
         }
       }
     }
   },
-  created() {
+  created () {
     // Component Page Created!
     this.init()
-
   },
   computed: {
-    IssetItemDetails() {
-        if (!this.rsForm.delivery_order_items) return false
-        return  Boolean(this.rsForm.delivery_order_items.find(x => x.item_id))
+    IssetItemDetails () {
+      if (!this.rsForm.delivery_order_items) return false
+      return Boolean(this.rsForm.delivery_order_items.find(x => x.item_id))
     },
-    IS_REVISE() {
+    IS_REVISE () {
       if (this.rsForm.deleted_at) return false
       if (this.rsForm.is_internal) return false
       if (this.rsForm.reconcile_id && this.rsForm.status !== 'OPEN') return false
       return true
     },
-    UnitOptions() {
-      return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
+    UnitOptions () {
+      return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
-    ItemUnitOptions() {
+    ItemUnitOptions () {
       let vars = []
       for (const i in this.rsForm.delivery_order_items) {
         if (this.rsForm.delivery_order_items.hasOwnProperty(i)) {
           let rsItem = this.rsForm.delivery_order_items[i]
-          vars[i] = ( this.UnitOptions || [])
-          vars[i] = vars[i].filter((unit)=> {
-            if(!rsItem.item_id) return false
-            if(rsItem.item) {
-              if(rsItem.item.unit_id === unit.value) return true
-              if(rsItem.item.item_units) {
-                let filtered = rsItem.item.item_units.filter((fill)=> fill.unit_id == unit.value)
-                if(filtered.length > 0) return true
+          vars[i] = (this.UnitOptions || [])
+          vars[i] = vars[i].filter((unit) => {
+            if (!rsItem.item_id) return false
+            if (rsItem.item) {
+              if (rsItem.item.unit_id === unit.value) return true
+              if (rsItem.item.item_units) {
+                let filtered = rsItem.item.item_units.filter((fill) => fill.unit_id === unit.value)
+                if (filtered.length > 0) return true
               }
             }
-            return false;
+            return false
           })
         }
       }
       return vars
     },
-    MAPINGKEY(){
+    MAPINGKEY () {
       let variables = {
         'units': {}
       }
       this.SHEET['units'].data.map(value => { variables['units'][value.id] = value })
-      return variables;
+      return variables
     }
   },
-  watch:{
-      '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
       })
     },
-    setItemReference(index, val) {
-      if (typeof partitionIndex !== 'undefined') {
-        if (!val) {
-          this.rsPartitions[partitionIndex].delivery_order_items[index].unit_id = null
-          this.rsPartitions[partitionIndex].delivery_order_items[index].unit = {}
-          this.rsPartitions[partitionIndex].delivery_order_items[index].item = {}
-        }
-        else {
-          this.rsPartitions[partitionIndex].delivery_order_items[index].item = this.MAPINGKEY['items'][val]
-          let baseUnitID = this.MAPINGKEY['items'][val].unit_id
-          this.rsPartitions[partitionIndex].delivery_order_items[index].unit_id = baseUnitID
-          this.rsPartitions[partitionIndex].delivery_order_items[index].unit_rate = 1
-          this.rsPartitions[partitionIndex].delivery_order_items[index].unit = this.MAPINGKEY['units'][baseUnitID]
-        }
-      }
-      else {
-        if (!val) {
-          this.rsForm.delivery_order_items[index].unit_id = null
-          this.rsForm.delivery_order_items[index].unit = {}
-          this.rsForm.delivery_order_items[index].item = {}
-        }
-        else {
-          this.rsForm.delivery_order_items[index].item = this.MAPINGKEY['items'][val]
-          let baseUnitID = this.MAPINGKEY['items'][val].unit_id
-          this.rsForm.delivery_order_items[index].unit_id = baseUnitID
-          this.rsForm.delivery_order_items[index].unit_rate = 1
-          this.rsForm.delivery_order_items[index].unit = this.MAPINGKEY['units'][baseUnitID]
-        }
-      }
-    },
     setUnitReference (index, val) {
-      if(!val) return;
-      if (typeof partitionIndex !== 'undefined') {
-        if (this.rsPartitions[partitionIndex].delivery_order_items[index].item.unit_id === val) {
-          this.rsPartitions[partitionIndex].delivery_order_items[index].unit_rate = 1
-        }
-        else {
-          if(this.rsPartitions[partitionIndex].delivery_order_items[index].item.item_units) {
-            this.rsPartitions[partitionIndex].delivery_order_items[index].item.item_units.map((itemUnit)=> {
-              if (itemUnit.unit_id == val) this.rsPartitions[partitionIndex].delivery_order_items[index].unit_rate = itemUnit.rate
-            })
-          }
-        }
-      }
-      else {
-        if (this.rsForm.delivery_order_items[index].item.unit_id === val) {
-          this.rsForm.delivery_order_items[index].unit_rate = 1
-        }
-        else {
-          if(this.rsForm.delivery_order_items[index].item.item_units) {
-            this.rsForm.delivery_order_items[index].item.item_units.map((itemUnit)=> {
-              if (itemUnit.unit_id == val) this.rsForm.delivery_order_items[index].unit_rate = itemUnit.rate
-            })
-          }
+      if (!val) return undefined
+
+      if (this.rsForm.delivery_order_items[index].item.unit_id === val) {
+        this.rsForm.delivery_order_items[index].unit_rate = 1
+      } else {
+        if (this.rsForm.delivery_order_items[index].item.item_units) {
+          this.rsForm.delivery_order_items[index].item.item_units.map((itemUnit) => {
+            if (itemUnit.unit_id === val) this.rsForm.delivery_order_items[index].unit_rate = itemUnit.rate
+          })
         }
       }
     },
     setForm (data) {
-      this.rsForm =  Object.assign({},this.setDefault(), data)
+      this.rsForm = Object.assign({}, this.setDefault(), data)
       this.SHEET.load('items', `customer_id=${this.rsForm.customer_id}`)
     },
 
-    addNewDetail(entri, partitionIndex) {
+    addNewDetail (entri, partitionIndex) {
       const newitem = this.setDefault().delivery_order_items[0]
       this.rsForm.delivery_order_items.push(newitem)
     },
-    removeDetail(index) {
+    removeDetail (index) {
       this.rsForm.delivery_order_items.splice(index, 1)
       if (!this.rsForm.delivery_order_items.length) this.addNewDetail()
     },
-    onSave() {
+    onSave () {
       const submit = () => {
         this.FORM.loading = true
         const { apiUrl, method } = this.FORM.meta()
         this.$axios.set(method, `${apiUrl}?mode=sample`, this.rsForm)
-        .then((response) => {
-          let message = response.data.number + ' - #' + response.data.id
-          this.FORM.response.success({ message: message})
-          this.FORM.toView(response.data.id)
-        })
-        .catch((error) => {
-          this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error, 'REVISION FAILED')
-        })
-        .finally(()=>{
-          this.FORM.loading = false
-        });
+          .then((response) => {
+            let message = response.data.number + ' - #' + response.data.id
+            this.FORM.response.success({ message: message })
+            this.FORM.toView(response.data.id)
+          })
+          .catch((error) => {
+            this.FORM.response.fields(error.response)
+            this.FORM.response.error(error.response || error, 'REVISION FAILED')
+          })
+          .finally(() => {
+            this.FORM.loading = false
+          })
       }
       this.$validator.validate().then(result => {
         if (!result) {
           return this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
           })
         }
 
         this.$q.dialog({
           title: this.$tc('form.confirm'),
-          message: this.$tc('messages.to_sure', 1, {v: this.$tc('form.save')}),
+          message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.save') }),
           cancel: true,
           persistent: true
         }).onOk(() => {
           submit()
         })
       })
-    },
-  },
+    }
+  }
 }
 </script>

@@ -93,6 +93,7 @@
               <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
               <q-th key="target">{{$tc('label.quantity')}}</q-th>
               <q-th key="ngratio">%NG</q-th>
+              <q-th key="hanger">Hanger</q-th>
               <q-th key="quantity">{{$tc('label.total')}}</q-th>
             </q-tr>
           </thead>
@@ -160,6 +161,15 @@
                   @input="() => { row.quantity = setQuantity(row) }"
                   />
               </q-td>
+              <q-td key="hanger"  width="15%">
+                <q-input style="min-width:80px"
+                  outlined dense hide-bottom-space no-error-icon
+                  color="blue-grey-4"
+                  input-style="text-align:right"
+                  :value="row.item && row.item.load_capacity ? Math.ceil(row.quantity / row.item.load_capacity) : '-'"
+                  readonly
+                />
+              </q-td>
               <q-td key="quantity"  width="25%">
                 <q-input style="min-width:150px"
                   :name="`work_order_items.${index}.quantity`" type="number"
@@ -185,7 +195,11 @@
               <q-td>
                 <q-btn dense outline :label="$tc('form.add')" icon="add_circle_outline" color="blue-grey" class="full-width" @click="addNewItem()" />
               </q-td>
-              <q-td colspan="100%"> </q-td>
+              <q-td colspan="100%" align="right">
+                <span class="text-weight-medium" v-if="TotalHanger">
+                  HANGER TOTAL {{ TotalHanger }}
+                </span>
+              </q-td>
             </q-tr>
           </tbody>
         </q-markup-table>
@@ -219,19 +233,18 @@ import MixForm from '@/mixins/mix-form.vue'
 export default {
   mixins: [MixForm],
   data () {
-
     return {
-      SHEET:{
-        customers: {api:'/api/v1/incomes/customers?mode=all'},
-        units: {api:'/api/v1/references/units?mode=all'},
-        items: {api:'/api/v1/common/items?mode=all', autoload:false},
-        lines: {api:'/api/v1/references/lines?mode=all'},
-        shifts: {api:'/api/v1/references/shifts?mode=all'}
+      SHEET: {
+        customers: { api: '/api/v1/incomes/customers?mode=all' },
+        units: { api: '/api/v1/references/units?mode=all' },
+        items: { api: '/api/v1/common/items?mode=all', autoload: false },
+        lines: { api: '/api/v1/references/lines?mode=all' },
+        shifts: { api: '/api/v1/references/shifts?mode=all' }
       },
       FORM: {
-        resource:{
+        resource: {
           uri: '/admin/factories/work-orders',
-          api: '/api/v1/factories/work-orders',
+          api: '/api/v1/factories/work-orders'
         }
       },
       rsForm: {},
@@ -247,17 +260,18 @@ export default {
           stockist_direct: null,
           work_order_items: [
             {
-              id:null,
+              id: null,
               item_id: null,
               quantity: null,
-              target:null,
+              target: null,
               unit_id: null,
               unit_rate: 1,
               ngratio: 0,
-              item: {}, unit: {},
+              item: {},
+              unit: {},
               work_order_item_lines: [{
-                  line_id: null,
-                  ismain: 0,
+                line_id: null,
+                ismain: 0
               }]
             }
           ]
@@ -265,29 +279,28 @@ export default {
       }
     }
   },
-  created(){
+  created () {
     // Component Page Mounted!
     this.init()
-
   },
   computed: {
-    IssetWorkOrderItems() {
+    IssetWorkOrderItems () {
       if (this.rsForm.work_order_items) {
         return this.rsForm.work_order_items.some((item) => item.item_id)
       }
       return false
     },
-    LineOptions() {
+    LineOptions () {
       let data = this.SHEET.lines.data || []
-      return data.map(line => ({label: line.name, value: line.id, row:line}))
+      return data.map(line => ({ label: line.name, value: line.id, row: line }))
     },
-    ShiftOptions() {
-      return (this.SHEET.shifts.data.map(line => ({label: line.name, value: line.id})) || [])
+    ShiftOptions () {
+      return (this.SHEET.shifts.data.map(line => ({ label: line.name, value: line.id })) || [])
     },
-    UnitOptions() {
-      return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
+    UnitOptions () {
+      return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
-    ItemOptions() {
+    ItemOptions () {
       if (this.SHEET.items.data.length <= 0) return []
       if (!this.rsForm.stockist_from) return []
 
@@ -297,53 +310,53 @@ export default {
       return this.SHEET.items.data.filter((item) => {
         if (!item.item_prelines || !item.item_prelines.length) return false
         if (item.item_prelines[0].line_id !== this.rsForm.line_id) return false
-        if (!OrKeys.find(x=> x === item.id)) {
-          const WOSTOCK = item.totals[stockist] - item.totals['WO'+stockist]
+        if (!OrKeys.find(x => x === item.id)) {
+          const WOSTOCK = item.totals[stockist] - item.totals['WO' + stockist]
           if (WOSTOCK <= 0) return false
         }
         if (this.rsForm.mode_line === 'SINGLE' && item.item_prelines.length > 1) return false
         if (this.rsForm.mode_line === 'MULTI' && item.item_prelines.length < 2) return false
         else return true
       })
-      .map(item => ({
-        label: item.part_name,
-        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
-        value: item.id,
-        disable: !item.enable,
-        row: item
-      }))
+        .map(item => ({
+          label: item.part_name,
+          sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
+          value: item.id,
+          disable: !item.enable,
+          row: item
+        }))
     },
-    ItemUnitOptions() {
+    ItemUnitOptions () {
       let vars = []
 
       for (const i in this.rsForm.work_order_items) {
         if (this.rsForm.work_order_items.hasOwnProperty(i)) {
           let rsItem = this.rsForm.work_order_items[i]
-          vars[i] = ( this.UnitOptions || [])
-          vars[i] = vars[i].filter((unit)=> {
-            if(!rsItem.item_id) return false
-            if(rsItem.item) {
-
-              if(rsItem.item.unit_id === unit.value) return true
-              if(rsItem.item.item_units) {
-                let filtered = rsItem.item.item_units.filter((fill)=> fill.unit_id === unit.value)
-                if(filtered.length > 0) return true
+          vars[i] = (this.UnitOptions || [])
+          vars[i] = vars[i].filter((unit) => {
+            if (!rsItem.item_id) return false
+            if (rsItem.item) {
+              if (rsItem.item.unit_id === unit.value) return true
+              if (rsItem.item.item_units) {
+                let filtered = rsItem.item.item_units.filter((fill) => fill.unit_id === unit.value)
+                if (filtered.length > 0) return true
               }
             }
-            return false;
+            return false
           })
         }
       }
       return vars
     },
-    MaxStock() {
+    MaxStock () {
       const stockist = this.rsForm.stockist_from
 
-      let stockItem =  JSON.parse(JSON.stringify(this.MAPINGKEY['items']))
+      let stockItem = JSON.parse(JSON.stringify(this.MAPINGKEY['items']))
       let moveItem = {
         set: function (id, val) {
-          if (!this.hasOwnProperty(id)) this[id] = 0
-            this[id] += Number(val)
+          let vf = this
+          if (!vf.hasOwnProperty(id)) vf[id] = 0
+          vf[id] += Number(val)
         },
         get: function (id) {
           return this.hasOwnProperty(id) ? this[id] : 0
@@ -359,7 +372,7 @@ export default {
       let data = {}
       this.rsForm.work_order_items.map((detail, index) => {
         if (stockItem[detail.item_id] && detail.item_id) {
-          const summary = Number(stockItem[detail.item_id].totals[stockist]) - Number(stockItem[detail.item_id].totals['WO'+stockist])
+          const summary = Number(stockItem[detail.item_id].totals[stockist]) - Number(stockItem[detail.item_id].totals['WO' + stockist])
           data[index] = summary - Number(moveItem.get(detail.item_id) || 0)
           moveItem.set(detail.item_id, detail.quantity * detail.unit_rate)
         }
@@ -367,36 +380,41 @@ export default {
 
       return data
     },
-    MAPINGKEY() {
+    TotalHanger () {
+      return this.rsForm.work_order_items.reduce((total, item) => {
+        return total += (item.item && item.item.load_capacity ? Math.ceil(item.quantity / item.item.load_capacity) : 0)
+      }, 0)
+    },
+    MAPINGKEY () {
       let variables = {
-        'customers' : {},
+        'customers': {},
         'units': {},
-        'items': {},
+        'items': {}
       }
 
       this.SHEET['customers'].data.map(value => { variables['customers'][value.id] = value })
       this.SHEET['units'].data.map(value => { variables['units'][value.id] = value })
       this.SHEET['items'].data.map(value => { variables['items'][value.id] = value })
 
-      return variables;
+      return variables
     }
   },
-  watch:{
-      '$route' : 'init'
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
       })
     },
-    setForm(data) {
-      this.rsForm =  JSON.parse(JSON.stringify(data))
-      if(data.id) this.loadItemOptions(data)
-      if(data.hasOwnProperty('has_relationship') && data['has_relationship'].length > 0) {
+    setForm (data) {
+      this.rsForm = JSON.parse(JSON.stringify(data))
+      if (data.id) this.loadItemOptions(data)
+      if (data.hasOwnProperty('has_relationship') && data['has_relationship'].length > 0) {
         this.FORM.has_relationship = data.has_relationship
 
-        let message = data['has_relationship'].join("-")
+        let message = data['has_relationship'].join('-')
         this.$q.dialog({
           title: 'Work Order has Related',
           message: message,
@@ -410,14 +428,14 @@ export default {
         })
       }
     },
-    stockFormat(row, val = 0) {
-      if(val < 0) return '(-)'
+    stockFormat (row, val = 0) {
+      if (val < 0) return '(-)'
       val = Math.ceil(val)
       return this.$app.number_format(Number(val || 0) / Number(row.unit_rate || 1))
     },
-    setQuantity(row) {
+    setQuantity (row) {
       const v = Number(row.target) + (Number(row.target) * Number(row.ngratio) / 100)
-      return Boolean(row.ngratio) ? Math.ceil(v) : v
+      return row.ngratio ? Math.ceil(v) : v
     },
     unitValueMax (index, row) {
       if (!row.unit_rate) return null
@@ -427,7 +445,7 @@ export default {
       }
       return value.toFixed(0)
     },
-    loadItemOptions(data = this.rsForm) {
+    loadItemOptions (data = this.rsForm) {
       let params = ['has_stocks=FM,NC,NCR']
 
       if (data.line_id) params.push(`main_line=${data.line_id}`)
@@ -439,22 +457,20 @@ export default {
 
       this.SHEET.load('items', params.join('&'))
     },
-    setItemReference(index, val) {
-
-       if(!val){
+    setItemReference (index, val) {
+      if (!val) {
         this.rsForm.work_order_items[index].unit_id = null
         this.rsForm.work_order_items[index].unit = {}
         this.rsForm.work_order_items[index].item = {}
-      }
-      else{
+      } else {
         this.rsForm.work_order_items[index].item = this.MAPINGKEY['items'][val]
-        if(this.rsForm.work_order_items[index].item.item_prelines.length > 0) {
+        if (this.rsForm.work_order_items[index].item.item_prelines.length > 0) {
           const prelines = this.rsForm.work_order_items[index].item.item_prelines
           this.rsForm.work_order_items[index].work_order_item_lines = []
 
           for (let i = 0; i < prelines.length; i++) {
             let ex = this.setDefault().work_order_items[0].work_order_item_lines[0]
-            ex.line_id = prelines[i].line_id;
+            ex.line_id = prelines[i].line_id
             this.rsForm.work_order_items[index].work_order_item_lines.push(ex)
           }
         }
@@ -464,18 +480,16 @@ export default {
         this.rsForm.work_order_items[index].unit = this.MAPINGKEY['units'][baseUnitID]
       }
     },
-    setUnitReference(index, val) {
-
-      if(!val) return
+    setUnitReference (index, val) {
+      if (!val) return
       this.rsForm.work_order_items[index].unit = this.MAPINGKEY['units'][val]
 
       if (this.rsForm.work_order_items[index].item.unit_id === val) {
         this.rsForm.work_order_items[index].unit_rate = 1
-      }
-      else {
-        if(this.rsForm.work_order_items[index].item.item_units) {
-          this.rsForm.work_order_items[index].item.item_units.find((unitItem)=> {
-            if (unitItem.unit_id == val) {
+      } else {
+        if (this.rsForm.work_order_items[index].item.item_units) {
+          this.rsForm.work_order_items[index].item.item_units.find((unitItem) => {
+            if (unitItem.unit_id === val) {
               this.rsForm.work_order_items[index].unit_rate = unitItem.rate
               return true
             }
@@ -483,55 +497,56 @@ export default {
         }
       }
     },
-    addNewItem() {
-      let newEntri = this.setDefault().work_order_items[0];
+    addNewItem () {
+      let newEntri = this.setDefault().work_order_items[0]
       newEntri.work_order_item_lines = []
 
       this.rsForm.work_order_items.push(newEntri)
     },
-    removeItem(itemIndex) {
-        this.rsForm.work_order_items.splice(itemIndex, 1)
-        if(this.rsForm.work_order_items.length < 1) this.addNewItem()
+    removeItem (itemIndex) {
+      this.rsForm.work_order_items.splice(itemIndex, 1)
+      if (this.rsForm.work_order_items.length < 1) this.addNewItem()
     },
-    addNewItemLine(itemIndex) {
-      let newEntri = this.setDefault().work_order_items[0].work_order_item_lines[0];
+    addNewItemLine (itemIndex) {
+      let newEntri = this.setDefault().work_order_items[0].work_order_item_lines[0]
 
       this.rsForm.work_order_items[itemIndex].work_order_item_lines.push(newEntri)
     },
-    removeItemLine(itemIndex, lineIndex) {
+    removeItemLine (itemIndex, lineIndex) {
       this.rsForm.work_order_items[itemIndex].work_order_item_lines.splice(lineIndex, 1)
-      if(this.rsForm.work_order_items[itemIndex].work_order_item_lines.length < 1) this.addNewItemLine(itemIndex)
+      if (this.rsForm.work_order_items[itemIndex].work_order_item_lines.length < 1) this.addNewItemLine(itemIndex)
     },
-    onSave() {
-
+    onSave () {
       this.$validator.validate().then(result => {
         if (!result) {
           this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
           })
           return
         }
 
         this.FORM.loading = true
-        let {method, mode, apiUrl} = this.FORM.meta();
+        let { method, apiUrl } = this.FORM.meta()
         this.$axios.set(method, apiUrl, this.rsForm)
-        .then((response) => {
-          let message = response.data.number + ' - #' + response.data.id
-          this.FORM.response.success({message:message})
-          this.FORM.toView(response.data.id)
-        })
-        .catch((error) => {
-          this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error, this.$tc('messages.fail', 1, {v:this.$tc('form.save')}).toUpperCase())
-        })
-        .finally(()=>{
-          this.FORM.loading = false
-        });
-
-      });
-    },
-  },
+          .then((response) => {
+            let message = response.data.number + ' - #' + response.data.id
+            this.FORM.response.success({ message: message })
+            this.FORM.toView(response.data.id)
+          })
+          .catch((error) => {
+            this.FORM.response.fields(error.response)
+            this.FORM.response.error(error.response || error, this.$tc('messages.fail', 1, { v: this.$tc('form.save') }).toUpperCase())
+          })
+          .finally(() => {
+            this.FORM.loading = false
+          })
+      })
+    }
+  }
 }
 </script>
 
@@ -558,4 +573,3 @@ export default {
   .absolute-bottom
     padding-bottom 2px
 </style>
-

@@ -5,7 +5,7 @@
         <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" >
         </form-header>
       </q-card-section>
-      <q-separator :dark="LAYOUT.isDark" />
+      <q-separator />
       <q-card-section class="row q-col-gutter-x-lg">
         <!-- COLUMN::1st customer Identitity -->
         <div class="col-12 col-sm-6">
@@ -17,7 +17,6 @@
               v-validate="'required'"
               :disable="IssetDetails"
               :options="LineOptions" clearable
-              :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
               :error="errors.has('line_id')"
               :error-message="errors.first('line_id')"
               @input="(val) => val ? loadItemOptions() : false" />
@@ -31,7 +30,6 @@
               v-model="rsForm.date"
               v-validate="`required|date_format:yyyy-MM-dd` + FORM.ifCreate(`|before:${$app.moment().add(2,'days').format('YYYY-MM-DD')}|after:${$app.moment().add(-2,'days').format('YYYY-MM-DD')}`,'')"
               :date-options="(date) => FORM.ifCreate(date < $app.moment().add(2, 'days').format('YYYY/MM/DD') && date > $app.moment().add(-2, 'days').format('YYYY/MM/DD'), true)"
-              :dark="LAYOUT.isDark"
               :error="errors.has('date')"
               :error-message="errors.first('date')"
               :disable="IssetDetails"
@@ -45,7 +43,6 @@
                 v-validate="'required'"
                 :disable="IssetDetails"
                 :options="ShiftOptions" map-options emit-value
-                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                 :error="errors.has('shift_id')"
                 @input="(val) => val ? loadItemOptions() : false"
               />
@@ -56,7 +53,7 @@
           <div class="main-box">
             <template v-for="(row, index) in rsForm.work_production_items" >
               <div class="q-pa-xs col-12 col-sm-12" :key="index">
-                <q-card class="main-box" :dark="LAYOUT.isDark">
+                <q-card class="main-box">
                   <q-card-section class="row items-center no-wrap q-py-xs">
                       <div class="col">
                         <div class="text-subtitle2">{{$tc('general.item')}}
@@ -79,7 +76,6 @@
                       :disable="!DetailRequired || Boolean(row.stockist)"
                       :options="ItemOptions" clearable
                       popup-content-class="options-striped"
-                      :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${index}.item_id`)"
                       :loading="SHEET['items'].loading || SHEET['work_order_item_lines'].loading"
                       @input="(val) => setItemReference(index, val)" />
@@ -93,7 +89,6 @@
                       no-error-icon hide-bottom-space hide-dropdown-icon
                       :disable="!DetailRequired"
                       :options="WorkOrderItemLineOptions.filter(x => x.item_id === row.item.id && x.stockist === row.stockist)" clearable
-                      :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${index}.work_order_item_line_id`)"
                       :loading="SHEET['work_order_item_lines'].loading">
                         <q-select slot="before" class="no-padding" style="min-width:120px"
@@ -103,7 +98,6 @@
                           v-model="row.stockist" emit-value map-options
                           v-validate="'required'"
                           :options="StockistOptions"
-                          :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                           :error="errors.has(`work_production_items.${index}.stockist`)"
                           @input="row.work_order_item_line_id = null"/>
                     </ux-select-filter>
@@ -112,12 +106,12 @@
                       :label="$app.setting('item.subname_label')" stack-label
                       :value="row.item ? row.item.part_subname : null"
                       outlined hide-bottom-space color="blue-grey-5"
-                      :dark="LAYOUT.isDark" />
+                    />
 
                     <q-input dense type="number" class="col-12 col-sm-8 col-md-4" style="min-width:120px"
                       :name="`work_production_items.${index}.quantity`"
                       :label="$tc('label.quantity')" stack-label
-                      :dark="LAYOUT.isDark" color="blue-grey-6"
+                      color="blue-grey-6"
                       v-model="row.quantity" min="0"
                       outlined hide-bottom-space no-error-icon align="right"
                       v-validate="`required|gt_value:0|max_value:${MaxStock[index] / (row.unit_rate||1)}`"
@@ -132,7 +126,6 @@
                       outlined hide-bottom-space color="blue-grey-4"
                       :options="ItemUnitOptions[index]"
                       map-options  emit-value
-                      :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                       :error="errors.has(`work_production_items.${index}.unit_id`)"
                       :disable="!DetailRequired || !row.item_id"
                       @input="(val) => setUnitReference(index, val)"
@@ -150,20 +143,19 @@
           <q-input name="description" type="textarea" rows="3"
             stack-label :label="$tc('label.description')"
             filled
-            :dark="LAYOUT.isDark"
-            v-model="rsForm.description"/>
+            v-model="rsForm.description"
+          />
           <q-field borderless dense v-if="ROUTE.meta.mode === 'create'"
-            :dark="LAYOUT.isDark"
             :error="errors.has('multiple')"
             :error-message="errors.first('multiple')">
-            <q-checkbox slot="prepend" v-model="rsForm.isMultiple" :dark="LAYOUT.isDark" />
-            <span slot="prepend" class="text-caption">Multiple Hanger / Barel</span>
+            <q-checkbox slot="prepend" v-model="rsForm.isMultiple" />
+            <span slot="prepend" class="text-subtitle2">Multiple Hanger / Barel</span>
             <template slot="prepend">
-              <q-input  type="number" class="q-mx-md"
+              <q-input type="number" dense outlined no-error-icon
+                class="q-mx-md no-padding"
                 input-style="width:60px;text-align:center"
                 name="multiple"
                 v-model="rsForm.multiple"
-                dense no-error-icon
                 v-validate="`required|gt_value:1|${ValidMultiple}`"
                 v-if="rsForm.isMultiple"
                 :error="errors.has('multiple')" />
@@ -495,7 +487,7 @@ export default {
     },
     onSave () {
       const submit = () => {
-        this.FORM.loading = true
+        this.$q.loading.show()
         let { method, apiUrl } = this.FORM.meta()
         this.$axios.set(method, apiUrl, this.rsForm)
           .then((response) => {
@@ -508,7 +500,7 @@ export default {
             this.FORM.response.error(error.response || error, this.$tc('messages.fail', 1, { v: this.$tc('form.save') }).toUpperCase())
           })
           .finally(() => {
-            this.FORM.loading = false
+            this.$q.loading.hide()
           })
       }
 

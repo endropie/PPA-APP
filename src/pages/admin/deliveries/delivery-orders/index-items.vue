@@ -77,14 +77,11 @@
           </table-header>
         </template>
 
-        <!-- slot name syntax: body-cell-<column_name> -->
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
           <!-- {{rs}} -->
         </q-td>
 
-
         <q-td slot="body-cell-item" slot-scope="rs" :props="rs" style="width:35px">
-          <!-- <code>({{Object.keys(rs.row)}})</code> -->
           <div class="column" v-if="rs.row.item">
             <span>{{rs.row.item.part_name}}</span>
             <span class="text-weight-light">[{{rs.row.item.customer_code}}] <font>{{rs.row.item.part_subname}}</font></span>
@@ -93,7 +90,7 @@
 
         <template v-slot:bottom-row>
           <q-tr class="bg-blue-grey-2 text-weight-medium">
-            <q-td key="prefix" colspan="4"></q-td>
+            <q-td key="prefix" colspan="2"></q-td>
             <q-td key="part_name" class="text-right">{{ $tc('label.grandtotal') }}</q-td>
             <q-td key="quantity" class="text-right">
               {{TABLE.rowData.reduce((total, item) => total += (item.quantity), 0) }}
@@ -105,8 +102,6 @@
         </template>
       </q-table>
     </q-pull-to-refresh>
-
-
   </q-page>
 </template>
 
@@ -118,13 +113,13 @@ export default {
   data () {
     return {
       stockist_options: [
-        {value:'FM', label:'FRESH'},
-        {value:'NC', label:'NC-REPAIR'},
-        {value:'NCR', label:'NCR-REPAIR'}
+        { value: 'FM', label: 'FRESH' },
+        { value: 'NC', label: 'NC-REPAIR' },
+        { value: 'NCR', label: 'NCR-REPAIR' }
       ],
       SHEET: {
-        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
-        items: {data:[], api:'/api/v1/common/items?mode=all', autoload: false},
+        customers: { data: [], api: '/api/v1/incomes/customers?mode=all' },
+        items: { data: [], api: '/api/v1/common/items?mode=all', autoload: false }
       },
       FILTERABLE: {
         fill: {
@@ -147,53 +142,53 @@ export default {
             value: null,
             type: 'integer',
             transform: (value) => { return null }
-          },
+          }
         }
       },
-      TABLE:{
+      TABLE: {
         mode: 'index',
-        resource:{
+        resource: {
           api: '/api/v1/incomes/delivery-orders/items',
-          uri: '/admin/deliveries/incoming-goods/items',
+          uri: '/admin/deliveries/delivery-orders/items'
         },
         columns: [
-          { name: 'prefix', label: '', align: 'left'},
-          { name: 'date', label: this.$tc('label.date'), field:(rs) => rs.delivery_order ? rs.delivery_order.date : '-', format:(v) => this.$app.moment(v).format('DD/MM/YYYY'), align: 'center', sortable: true },
-          { name: 'number', label: this.$tc('label.number'), field:(rs) => rs.delivery_order ? rs.delivery_order.fullnumber : '-', align: 'left', sortable: true },
-          { name: 'item', label: this.$tc('items.part_name'), field: 'part_name', align: 'left'},
-          { name: 'quantity', label: this.$tc('label.quantity'), field: (rs)=> rs.quantity, align: 'right', sortable: true },
-          { name: 'unit', label: this.$tc('label.unit'), field: (rs)=> rs.unit.code , align: 'left'}
+          { name: 'prefix', label: '', align: 'left' },
+          { name: 'date', label: this.$tc('label.date'), field: (rs) => rs.delivery_order ? rs.delivery_order.date : '-', format: (v) => this.$app.moment(v).format('DD/MM/YYYY'), align: 'center', sortable: true },
+          { name: 'number', label: this.$tc('label.number'), field: (rs) => rs.delivery_order ? rs.delivery_order.fullnumber : '-', align: 'left', sortable: true },
+          { name: 'item', label: this.$tc('items.part_name'), field: 'part_name', align: 'left' },
+          { name: 'quantity', label: this.$tc('label.quantity'), field: (rs) => rs.quantity, align: 'right', sortable: true },
+          { name: 'unit', label: this.$tc('label.unit'), field: (rs) => rs.unit.code, align: 'left' }
         ]
-      },
+      }
     }
   },
   created () {
     this.INDEX.load()
   },
   computed: {
-    CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: item.code, value: item.id})) || [])
+    CustomerOptions () {
+      return (this.SHEET.customers.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
-    ItemOptions() {
+    ItemOptions () {
       return (this.SHEET.items.data.map(item => ({
         label: `${item.part_name}`,
-        sublabel:`[${item.customer_code}] ${item.part_subname}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname}`,
         value: item.id
       })) || [])
-    },
+    }
   },
   methods: {
-    isCanUpdate(row){
-      if (row.status != 'OPEN') return false
+    isCanUpdate (row) {
+      if (row.status !== 'OPEN') return false
       if (row.is_relationship) return false
       return this.$app.can('work-orders-update')
     },
-    isCanDelete(row){
-      if (row.status != 'OPEN') return false
+    isCanDelete (row) {
+      if (row.status !== 'OPEN') return false
       if (row.is_relationship) return false
       return this.$app.can('work-orders-delete')
-    },
-  },
+    }
+  }
 }
 </script>
 

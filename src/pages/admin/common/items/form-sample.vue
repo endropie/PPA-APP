@@ -61,7 +61,7 @@
         <div class="row q-col-gutter-x-sm">
           <q-select  class="col-auto"
             :disable="Boolean(rsForm.id)"
-            data-vv-name="Jenis Project"
+            data-vv-as="Jenis Project"
             label="Jenis Project"
             :options="ProjectSampleOptions" map-options emit-value
             v-model="rsForm.project"

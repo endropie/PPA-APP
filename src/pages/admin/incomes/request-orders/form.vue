@@ -193,20 +193,20 @@ export default {
   data () {
     return {
       SHEET: {
-        customers: {api:'/api/v1/incomes/customers?mode=all'},
-        brands: {api:'/api/v1/references/brands?mode=all'},
-        units: {api:'/api/v1/references/units?mode=all'},
-        vehicles: {api:'/api/v1/references/vehicles?mode=all'},
-        items: {autoload:false, api:'/api/v1/common/items?mode=all'}
+        customers: { api: '/api/v1/incomes/customers?mode=all' },
+        brands: { api: '/api/v1/references/brands?mode=all' },
+        units: { api: '/api/v1/references/units?mode=all' },
+        vehicles: { api: '/api/v1/references/vehicles?mode=all' },
+        items: { autoload: false, api: '/api/v1/common/items?mode=all' }
       },
       FORM: {
         resource: {
           uri: '/admin/incomes/request-orders',
-          api: '/api/v1/incomes/request-orders',
+          api: '/api/v1/incomes/request-orders'
         }
       },
       rsForm: {},
-      setDefault:()=>{
+      setDefault: () => {
         return {
           number: null,
           customer_id: null,
@@ -217,9 +217,9 @@ export default {
           order_mode: null,
           description: null,
 
-          request_order_items:[
+          request_order_items: [
             {
-              id:null,
+              id: null,
               item_id: null,
               quantity: null,
               price: 0,
@@ -232,69 +232,71 @@ export default {
       }
     }
   },
-  created(){
+  created () {
     // Component Page Created!
     this.init()
   },
   computed: {
-    IS_EDITABLE() {
+    IS_EDITABLE () {
       if (this.rsForm.deleted_at) return false
+      if (this.rsForm.order_mode === 'NONE' && this.rsForm.customer) {
+        if (!this.rsForm.customer.order_manual_allowed) return false
+      }
       if (this.rsForm.is_relationship) return false
       return true
     },
-    IssetItemDetails() {
-        let items = this.rsForm.request_order_items
-        for (const i in items) {
-          if (items.hasOwnProperty(i)) {
-            if(items[i].item_id) return true
-          }
+    IssetItemDetails () {
+      let items = this.rsForm.request_order_items
+      for (const i in items) {
+        if (items.hasOwnProperty(i)) {
+          if (items[i].item_id) return true
         }
+      }
 
-        return false
+      return false
     },
-    IssetCustomerID() {
-      return (this.rsForm.customer_id ? true : false)
+    IssetCustomerID () {
+      return (!!this.rsForm.customer_id)
     },
-    CustomerOptions() {
-
+    CustomerOptions () {
       let data = this.SHEET.customers.data
-      if(this.ROUTE.meta.mode !== 'edit'){
+      if (this.ROUTE.meta.mode !== 'edit') {
         data = data.filter(item => item.order_mode === 'PO' || item.order_manual_allowed)
       }
 
-      return (data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
+      return (data.map(item => ({ label: [item.code, item.name].join(' - '), value: item.id })) || [])
     },
-    UnitOptions() {
-      return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
+    UnitOptions () {
+      return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
-    ItemOptions() {
+    ItemOptions () {
       let items = this.SHEET.items.data.filter((item) => item.customer_id === this.rsForm.customer_id)
-      return (items.map(item => ({label: item.part_name, sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`, value: item.id, disable: !item.enable})) || [])
+      return (items.map(item => ({ label: item.part_name, sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`, value: item.id, disable: !item.enable })) || [])
     },
-    ItemUnitOptions() {
+    ItemUnitOptions () {
       let vars = []
       for (const i in this.rsForm.request_order_items) {
         if (this.rsForm.request_order_items.hasOwnProperty(i)) {
           let rsItem = this.rsForm.request_order_items[i]
-          vars[i] = ( this.UnitOptions || [])
-          vars[i] = vars[i].filter((unit)=> {
-            if(!rsItem.item_id) return false
-            if(rsItem.item) {
-              if(rsItem.item.unit_id === unit.value) return true
-              if(rsItem.item.item_units) {
-                let filtered = rsItem.item.item_units.filter((fill)=> fill.unit_id == unit.value)
-                if(filtered.length > 0) return true
+          vars[i] = (this.UnitOptions || [])
+          vars[i] = vars[i].filter((unit) => {
+            if (!rsItem.item_id) return false
+            if (rsItem.item) {
+              if (rsItem.item.unit_id === unit.value) return true
+              if (rsItem.item.item_units) {
+                let filtered = rsItem.item.item_units.filter((fill) => fill.unit_id === unit.value)
+                if (filtered.length > 0) return true
               }
             }
-            return false;
+            return false
           })
         }
       }
       return vars
     },
-    MAPINGKEY() {
+    MAPINGKEY () {
       let variables = {
-        'customers' : {},
+        'customers': {},
         'units': {},
         'items': {}
       }
@@ -303,24 +305,24 @@ export default {
       this.SHEET['units'].data.map(value => { variables['units'][value.id] = value })
       this.SHEET['items'].data.map(value => { variables['items'][value.id] = value })
 
-      return variables;
+      return variables
     }
   },
-  watch:{
-      '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
       })
     },
-    setForm(data) {
+    setForm (data) {
       this.rsData = JSON.parse(JSON.stringify(data))
       this.rsForm = JSON.parse(JSON.stringify(data))
 
       // if(data.id && Object.keys(data['has_relationship']).length > 0) {
-      if(data.id && data.status !== 'OPEN') {
+      if (data.id && data.status !== 'OPEN') {
         this.FORM.response.relationship({
           title: 'Sale Orders has not OPEN state!',
           messages: data['has_relationship'],
@@ -332,31 +334,29 @@ export default {
         this.SHEET.load('items', `customer_id=${data.customer_id}`)
       }
     },
-    setCustomerReference(val) {
-      if(!val) {
-        this.rsForm.customer = {};
-        this.rsForm.order_mode = null;
-      }
-      else {
-        this.rsForm.customer = this.MAPINGKEY['customers'][val];
-        this.rsForm.order_mode = this.MAPINGKEY['customers'][val].order_mode;
+    setCustomerReference (val) {
+      if (!val) {
+        this.rsForm.customer = {}
+        this.rsForm.order_mode = null
+      } else {
+        this.rsForm.customer = this.MAPINGKEY['customers'][val]
+        this.rsForm.order_mode = this.MAPINGKEY['customers'][val].order_mode
 
         this.SHEET.load('items', `customer_id=${val}`)
 
-        if(this.rsForm.order_mode == 'PO') {
-          this.rsForm.begin_date == null
-          this.rsForm.until_date == null
+        if (this.rsForm.order_mode === 'PO') {
+          this.rsForm.begin_date = null
+          this.rsForm.until_date = null
         }
       }
     },
-    setItemReference(index, val) {
-      if(!val) {
+    setItemReference (index, val) {
+      if (!val) {
         this.rsForm.request_order_items[index].unit_id = null
         this.rsForm.request_order_items[index].price = null
         this.rsForm.request_order_items[index].unit = {}
         this.rsForm.request_order_items[index].item = {}
-      }
-      else {
+      } else {
         this.rsForm.request_order_items[index].item = this.MAPINGKEY['items'][val]
         this.rsForm.request_order_items[index].price = this.MAPINGKEY['items'][val].price
 
@@ -366,25 +366,22 @@ export default {
         this.rsForm.request_order_items[index].unit = this.MAPINGKEY['units'][baseUnitID]
       }
     },
-    setUnitReference(index, val) {
-
-      if(!val) return;
+    setUnitReference (index, val) {
+      if (!val) return undefined
       else if (this.rsForm.request_order_items[index].item.unit_id === val) {
         this.rsForm.request_order_items[index].unit_rate = 1
-      }
-      else {
-        if(this.rsForm.request_order_items[index].item.item_units) {
-          this.rsForm.request_order_items[index].item.item_units.map((unitItem)=> {
-            if (unitItem.unit_id == val) this.rsForm.request_order_items[index].unit_rate = unitItem.rate
+      } else {
+        if (this.rsForm.request_order_items[index].item.item_units) {
+          this.rsForm.request_order_items[index].item.item_units.map((unitItem) => {
+            if (unitItem.unit_id === val) this.rsForm.request_order_items[index].unit_rate = unitItem.rate
           })
         }
       }
     },
-    routing() {
-      if(this.ROUTE.meta.mode === 'edit') {
-
+    routing () {
+      if (this.ROUTE.meta.mode === 'edit') {
         this.FORM.loading = true
-        let url = this.FORM.resource.api +'/'+ this.ROUTE.params.id
+        let url = this.FORM.resource.api + '/' + this.ROUTE.params.id
         this.$axios.get(url)
           .then((response) => {
             const data = response.data
@@ -396,18 +393,16 @@ export default {
             console.warn('[FORM:routing]', error)
             this.$app.response.error(error.response, 'Load Form')
           })
-          .finally(()=>{
+          .finally(() => {
             this.FORM.show = true
             this.FORM.loading = false
-          });
-
-      }
-      else{
+          })
+      } else {
         this.rsForm = this.setDefault()
-        this.FORM.show = true;
+        this.FORM.show = true
       }
     },
-    getMinQuantity(index) {
+    getMinQuantity (index) {
       const row = this.rsForm.request_order_items[index]
       if (this.FORM.data.request_order_items.length) {
         const detail = this.FORM.data.request_order_items.find(x => x.id === row.id)
@@ -415,42 +410,46 @@ export default {
       }
       return 0
     },
-    addNewItem(autofocus = true){
+    addNewItem (autofocus = true) {
       let newEntri = this.setDefault().request_order_items[0] // {id:null, item_id: null, quantity: null};
 
       this.rsForm.request_order_items.push(newEntri)
     },
-    removeItem(index) {
-        this.rsForm.request_order_items.splice(index, 1)
-        if(this.rsForm.request_order_items.length < 1) this.addNewItem()
+    removeItem (index) {
+      this.rsForm.request_order_items.splice(index, 1)
+      if (this.rsForm.request_order_items.length < 1) this.addNewItem()
     },
-    onSave() {
+    onSave () {
       this.$validator.validate().then(result => {
-        if (!result) return this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
+        if (!result) {
+          return this.$q.notify({
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
           })
+        }
 
         this.FORM.loading = true
-        let {method, mode, apiUrl} = this.FORM.meta();
+        let { method, apiUrl } = this.FORM.meta()
 
         this.$axios.set(method, apiUrl, this.rsForm)
-        .then((response) => {
-          let message = response.data.number + ' - #' + response.data.id
-          this.FORM.response.success({message:message})
-          this.FORM.toView(response.data.id)
-        })
-        .catch((error) => {
-          this.FORM.response.error(error.response || error)
-          this.FORM.response.fields(error.response)
-        })
-        .finally(()=>{
-          this.FORM.loading = false
-        });
-
-      });
-    },
-  },
+          .then((response) => {
+            let message = response.data.number + ' - #' + response.data.id
+            this.FORM.response.success({ message: message })
+            this.FORM.toView(response.data.id)
+          })
+          .catch((error) => {
+            this.FORM.response.error(error.response || error)
+            this.FORM.response.fields(error.response)
+          })
+          .finally(() => {
+            this.FORM.loading = false
+          })
+      })
+    }
+  }
 }
 </script>
 <style lang="stylus">

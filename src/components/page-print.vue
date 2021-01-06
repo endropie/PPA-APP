@@ -1,5 +1,5 @@
 <template>
-  <div class="page-print shadow-2" >
+  <div class="page-print shadow-2" :class="{'bg-dark': $q.dark.isActive}">
     <div class="page-print-layout">
       <table style="width:100%">
         <thead>
@@ -7,7 +7,7 @@
             <td :class="{'header-line': true}">
               <div class="page-print-header header">
                 <slot name="header">
-                  <div class="row" >
+                  <div class="row items-center" >
                     <div class="head-icon self-center">
                       <slot name="'header-icon'">
                         <q-avatar color="transparent" text-color="primary" rounded class="q-mr-sm">
@@ -19,7 +19,7 @@
                       </slot>
                     </div>
                     <div class="head-brand col-grow text-no-wrap ">
-                      <div  class="title text-weight-bolder uppercase ellipsis text-truncate" style="opacity:0.8">
+                      <div  class="title text-weight-bolder text-uppercase ellipsis text-truncate" style="opacity:0.8">
                         <slot name="header-title">
                           <span>{{ CorporateName || 'MY-CORPORATION' }}</span>
                         </slot>
@@ -59,10 +59,9 @@
   </div>
 </template>
 
-
 <script>
 export default {
-  name :'page-print',
+  name: 'page-print',
   computed: {
     CorporateName () {
       if (!this.$store.state.admin.SETTING.general) return ''
@@ -79,16 +78,14 @@ export default {
 .page-print
   display block
   .page-print-layout
-    padding 10px
+    padding 0 10px
   .header-line
     border-bottom-width 1px
     border-bottom-style solid
     border-bottom-color rgba(0,0,0,0.12)
   .header
     .head-brand
-      // min-width calc(100% - 70px)
-      // width 100%
-      padding 5px 0px
+      padding 5px 0px 0px
 
       .title
         font-size 20px
@@ -100,7 +97,6 @@ export default {
         font-size 80%
         // line-height 0.12
         letter-spacing -0.02em
-
 
 .super-dense .q-table
   tbody
@@ -122,8 +118,9 @@ export default {
 
 @media print
   body
-    margin 0
+    margin 0 auto
   .q-layout, .q-page
+    padding 0
     height unset !important
     min-height unset !important
   .q-table__container
@@ -136,7 +133,7 @@ export default {
 
   .page-print
     padding 0 !important
-    margin 0 !important
+    // margin 0 !important
     box-shadow none
     -webkit-box-shadow none
 

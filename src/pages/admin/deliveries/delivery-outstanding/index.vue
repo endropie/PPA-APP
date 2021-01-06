@@ -2,10 +2,12 @@
   <q-page padding class="page-index">
     <q-pull-to-refresh @refresh="TABLE.refresh">
       <q-table ref="table"
-        class="table-index table-striped table-sticky-column th-uppercase"
+        class="table-index table-striped th-uppercase"
+        table-header-class="top-header"
         :dense="$q.screen.lt.md"
         :dark="LAYOUT.isDark"
         :title="TABLE.getTitle()"
+        separator="vertical"
         :data="TABLE.rowData"
         :columns="TABLE.columns"
         :visible-columns="COLUMNS"
@@ -16,7 +18,8 @@
         :rows-per-page-options="[10,25,50,100,200,500,0]"
         :pagination.sync="TABLE.pagination"
         @request="TABLE.compute"
-        :loading="TABLE.loading">
+        :loading="TABLE.loading"
+      >
 
         <template v-slot:top>
           <table-header
@@ -26,7 +29,7 @@
 
             <div class="row q-col-gutter-xs">
               <ux-date
-                v-model="FILTERABLE.fill.delivery_task_date.value"
+                v-model="FILTERABLE.fill.delivery_date.value"
                 dense hide-bottom-space hide-dropdown-icon
                 standout="bg-blue-grey-5 text-white"
                 @input="FILTERABLE.submit"
@@ -61,11 +64,43 @@
           </table-header>
         </template>
 
+        <q-tr slot="top-row" slot-scope="rs" :props="rs" class="top-row">
+          <q-th key="prefix"></q-th>
+          <q-th key="part" colspan="3"></q-th>
+          <q-th key="fg" colspan="1"></q-th>
+          <q-th key="task" colspan="2">Task</q-th>
+          <q-th key="verify" colspan="1"></q-th>
+          <q-th key="load" colspan="2">Loading</q-th>
+          <q-th key="balance" colspan="2">Balance</q-th>
+        </q-tr>
+
+        <q-td slot="body-cell-amount_delivery_task_reguler" slot-scope="rs" :props="rs">
+          {{getAmountDelivery("TASK.REG", rs.row.amount_delivery)}}
+        </q-td>
+        <q-td slot="body-cell-amount_delivery_task_return" slot-scope="rs" :props="rs">
+          {{getAmountDelivery("TASK.RET", rs.row.amount_delivery)}}
+        </q-td>
+        <q-td slot="body-cell-amount_delivery_load_reguler" slot-scope="rs" :props="rs">
+          {{getAmountDelivery("LOAD.REG", rs.row.amount_delivery)}}
+        </q-td>
+        <q-td slot="body-cell-amount_delivery_load_return" slot-scope="rs" :props="rs">
+          {{getAmountDelivery("LOAD.RET", rs.row.amount_delivery)}}
+        </q-td>
+        <q-td slot="body-cell-amount_delivery_verify" slot-scope="rs" :props="rs">
+          {{getAmountDelivery("VERIFY", rs.row.amount_delivery)}}
+        </q-td>
+        <q-td slot="body-cell-amount_delivery_fg" slot-scope="rs" :props="rs">
+          {{getAmountDelivery("FG", rs.row.amount_delivery)}}
+        </q-td>
         <q-td slot="body-cell-amount_delivery_balance_reguler" slot-scope="rs" :props="rs">
-          {{(rs.row.amount_delivery_task_reguler || 0) - (rs.row.amount_delivery_load_reguler || 0)}}
+          <span v-if="rs.row.amount_delivery">
+            {{(rs.row.amount_delivery['TASK.REG'] || 0) - (rs.row.amount_delivery['LOAD.REG'] || 0)}}
+          </span>
         </q-td>
         <q-td slot="body-cell-amount_delivery_balance_return" slot-scope="rs" :props="rs">
-          {{(rs.row.amount_delivery_task_return || 0) - (rs.row.amount_delivery_load_return || 0)}}
+          <span v-if="rs.row.amount_delivery">
+            {{(rs.row.amount_delivery['TASK.RET'] || 0) - (rs.row.amount_delivery['LOAD.RET'] || 0)}}
+          </span>
         </q-td>
       </q-table>
     </q-pull-to-refresh>
@@ -94,7 +129,7 @@ export default {
             type: 'integer',
             transform: (value) => { return null }
           },
-          delivery_task_date: {
+          delivery_date: {
             value: this.$app.moment().format('YYYY-MM-DD'),
             type: 'string',
             transform: (value) => { return '' }
@@ -110,16 +145,17 @@ export default {
         columns: [
           { name: 'prefix', label: '', align: 'left', required: true },
 
-          { name: 'customer_code', label: this.$tc('general.cust') + '.', field: 'customer_code', align: 'left', sortable: true },
+          { name: 'customer_code', label: this.$tc('general.cust') + '.', field: 'customer_code', align: 'center', sortable: true },
           { name: 'part_name', label: this.$tc('items.part_name'), field: 'part_name', align: 'left', sortable: true },
           { name: 'part_subname', label: this.$app.setting('item.subname_label'), field: 'part_subname', align: 'left', sortable: true },
-          { name: 'amount_delivery_task_reguler', label: `${this.$tc('general.delivery_task', 2)}(REG)`, field: 'amount_delivery_task_reguler' },
-          { name: 'amount_delivery_task_return', label: `${this.$tc('general.delivery_task', 2)}(RET)`, field: 'amount_delivery_task_return' },
-          { name: 'amount_delivery_verify', label: this.$tc('general.delivery_verify', 2), field: 'amount_delivery_verify' },
-          { name: 'amount_delivery_load_reguler', label: `${this.$tc('general.delivery_load', 2)}(REG)`, field: 'amount_delivery_load_reguler' },
-          { name: 'amount_delivery_load_return', label: `${this.$tc('general.delivery_load', 2)}(RET)`, field: 'amount_delivery_load_return' },
-          { name: 'amount_delivery_balance_reguler', label: 'Balance (REG)' },
-          { name: 'amount_delivery_balance_return', label: 'Balance (RET)' }
+          { name: 'amount_delivery_fg', label: `F G`, field: 'amount_delivery', align: 'center' },
+          { name: 'amount_delivery_task_reguler', label: `REGULER`, field: 'amount_delivery', align: 'center' },
+          { name: 'amount_delivery_task_return', label: `RETURN`, field: 'amount_delivery', align: 'center' },
+          { name: 'amount_delivery_verify', label: this.$tc('general.delivery_verify', 2), field: 'amount_delivery', align: 'center' },
+          { name: 'amount_delivery_load_reguler', label: `REGULER`, field: 'amount_delivery', align: 'center' },
+          { name: 'amount_delivery_load_return', label: `RETURN`, field: 'amount_delivery', align: 'center' },
+          { name: 'amount_delivery_balance_reguler', label: 'REGULER', align: 'center' },
+          { name: 'amount_delivery_balance_return', label: 'RETURN', align: 'center' }
         ],
         hideColumns: ['code']
       }
@@ -159,9 +195,10 @@ export default {
     }
   },
   methods: {
-    totalStock (id, label) {
-      if (!this.MAPINGKEY['itemstocks'][id]) return 0
-      return Number(this.MAPINGKEY['itemstocks'][id][label])
+    getAmountDelivery (code, data) {
+      if (!data) return '-'
+      if (!data.hasOwnProperty(code)) return '-'
+      return Math.round(data[code])
     },
     push (row) {
       let url = `${this.TABLE.resource.api}/${row.id}/accurate/push`
@@ -178,27 +215,16 @@ export default {
         }).finally(() => {
           this.$q.loading.hide()
         })
-    },
-    pushAll () {
-      let url = `${this.TABLE.resource.api}/all/accurate/push`
-      this.$q.loading.show()
-      this.$axios.post(url)
-        .then((response) => {
-          console.warn('OK', response.data.filter(x => x.s === true).length)
-          let arrMsg = []
-          if (response.data.filter(x => x.s === true).length) {
-            arrMsg.push(response.data.filter(x => x.s === true).length + ' success')
-          }
-          if (response.data.filter(x => x.s === false).length) {
-            arrMsg.push(response.data.filter(x => x.s === false).length + ' failed')
-          }
-          this.$app.notify.info('ACCURATE SYNC', String(arrMsg.join(',') + ' to customer sync.'))
-        }).catch((error) => {
-          this.$app.response.error(error.response || error)
-        }).finally(() => {
-          this.$q.loading.hide()
-        })
     }
   }
 }
 </script>
+<style lang="stylus">
+.table-index
+  tr.top-row, tr.top-header
+    height unset !important
+
+tr.top-row th
+  padding: 2px 5px
+  border-bottom-width: thin
+</style>

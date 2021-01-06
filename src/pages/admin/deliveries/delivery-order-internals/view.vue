@@ -13,6 +13,7 @@
       </div>
       <div class="column" style="min-height:3.25in;height:auto">
         <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
+          <ux-qrcode :value="valQrCode(rsView)" :options="{ width: 96, height: 96, margin: 1 }" />
           <div class="" style="max-width:50%">
             <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
             <address class="text-normal" style="font-style: normal">{{rsView.customer_address}}</address>
@@ -58,10 +59,10 @@
             </q-tr>
             </thead>
             <tbody>
-              <q-tr v-for="(row, index) in rsView.delivery_internal_items" :key="index">
+              <q-tr v-for="(row, index) in rsView.delivery_order_items" :key="index">
                 <q-td>{{index+1}}</q-td>
-                <q-td>{{row.name}} <q-icon name="fiber_new" style="font-size:20px" v-if="!row.item_id" /></q-td>
-                <q-td>{{row.subname}}</q-td>
+                <q-td>{{row.item.part_name}}</q-td>
+                <q-td>{{row.item.part_subname}}</q-td>
                 <q-td align="right">{{row.quantity}}</q-td>
                 <q-td align="center">{{row.unit.code}}</q-td>
                 <q-td>{{row.note}}</q-td>
@@ -102,41 +103,42 @@
       <div class="row q-gutter-xs print-hide" style="padding-top:50px">
         <q-btn :label="$tc('form.back')" color="dark" icon="cancel" :to="`${VIEW.resource.uri}?return`" />
         <q-btn :label="$tc('form.print')" color="grey" icon="print" @click.native="print()" />
-        <q-btn :label="$tc('form.edit')" color="green" icon="edit" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"
-          v-if="IS_EDITABLE && $app.can('delivery-internals-update')" />
+        <!-- <q-btn :label="$tc('form.edit')" color="green" icon="edit" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"
+          v-if="IS_EDITABLE && $app.can('sj-delivery-internals-update')"
+        /> -->
         <q-space />
         <ux-btn-dropdown color="blue-grey"
           :options="[
             { label: $tc('form.add_new'), color:'green', icon: 'add',
-              hidden: !$app.can('delivery-internals-create'),
+              hidden: !$app.can('sj-delivery-internals-create'),
               detail: $tc('messages.process_create'),
               actions: () => {
                 $router.push(`${VIEW.resource.uri}/create`)
               }
             },
             { label: 'CONFIRM', color:'positive', icon: 'done_all',
-              hidden: !IS_EDITABLE || !$app.can('delivery-internals-confirm'),
+              hidden: !IS_CONFIRM || !$app.can('sj-delivery-internals-confirm'),
               detail: $tc('messages.process_confirm'),
               actions: () => {
                 setConfirmation()
               }
             },
             { label: 'REVISION', color:'red-10', icon: 'forward',
-              hidden: !IS_REVISE || !$app.can('delivery-internals-revision'),
+              hidden: !IS_REVISE || !$app.can('sj-delivery-internals-revision'),
               detail: $tc('messages.process_revise'),
               actions: () => {
-                setRevision()
+                $router.push(`${VIEW.resource.uri}/${rsView.id}/revision`)
               }
             },
             { label: 'DELETE', color:'red', icon: 'delete',
-              hidden: !IS_EDITABLE || !$app.can('delivery-internals-delete'),
+              hidden: !IS_EDITABLE || !$app.can('sj-delivery-internals-delete'),
               detail: $tc('messages.process_delete'),
               actions: () => {
                 VIEW.delete()
               }
             },
             { label: 'VOID', color:'red', icon: 'block',
-              hidden: !IS_VOID || !$app.can('delivery-internals-delete'),
+              hidden: !IS_VOID || !$app.can('sj-delivery-internals-void'),
               detail: $tc('messages.process_void'),
               actions: () => {
                 VIEW.void(()=> init() )
@@ -163,8 +165,8 @@ export default {
     return {
       VIEW: {
         resource: {
-          api: '/api/v1/incomes/delivery-internals',
-          uri: '/admin/deliveries/delivery-internals',
+          api: '/api/v1/incomes/delivery-order-internals',
+          uri: '/admin/deliveries/delivery-order-internals',
           params: '?mode=view'
         }
       },
@@ -180,6 +182,11 @@ export default {
     IS_VOID () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status === 'OPEN') return false
+      return true
+    },
+    IS_CONFIRM () {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'OPEN') return false
       return true
     },
     IS_EDITABLE () {
@@ -208,6 +215,9 @@ export default {
 
       const config = this.$store.state.admin.CONFIG.sj_delivery['hide_view_columns'] || []
       return Boolean(config.some(v => val === v))
+    },
+    valQrCode (data) {
+      return `/internals/${data.id}`
     },
     setView (data) {
       this.rsView = data
@@ -259,25 +269,13 @@ export default {
           })
       }
 
-      this.$validator.validate().then(result => {
-        if (!result) {
-          return this.$q.notify({
-            color: 'negative',
-            icon: 'error',
-            position: 'top-right',
-            timeout: 3000,
-            message: this.$tc('messages.to_complete_form')
-          })
-        }
-
-        this.$q.dialog({
-          title: this.$tc('form.confirm'),
-          message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.close') }),
-          cancel: true,
-          persistent: true
-        }).onOk(() => {
-          submit()
-        })
+      this.$q.dialog({
+        title: this.$tc('form.confirm'),
+        message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.confirm') }),
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        submit()
       })
     }
   }

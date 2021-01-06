@@ -49,7 +49,7 @@
                   </span>
                 </td>
               </tr>
-              <q-tr v-for="(row, index) in delivery.delivery_order_items" :key="index" :request-order-item-id="row.id">
+              <q-tr v-for="(row, index) in delivery.delivery_order_items" :key="index" :delivery-order-item-id="row.id">
                 <q-td>{{row.item.part_name}}</q-td>
                 <q-td>{{row.item.part_subname}}</q-td>
                 <q-td class="text-center">{{row.unit.code}}</q-td>
@@ -62,10 +62,48 @@
       </div>
       <div class="row q-gutter-xs print-hide " style="padding-top:50px">
         <q-btn :label="$tc('form.back')" icon="cancel" color="dark" :class="{'full-width': $q.screen.lt.sm}" v-go-back.single />
+        <q-btn :label="$tc('form.edit')" icon="edit" color="positive" :class="{'full-width': $q.screen.lt.sm}" @click="$router.push(`${VIEW.resource.uri}/${ROUTE.params.id}/edit`)"  v-if="IS_EDITABLE" />
         <q-btn :label="$tc('form.print')" icon="print" color="grey" :class="{'full-width': $q.screen.lt.sm}" @click.native="print()" />
         <q-space />
-        <q-btn :label="$tc('form.confirm')" icon="done_all" color="positive" :class="{'full-width': $q.screen.lt.sm}" @click="setConfirmed()" v-if="rsView.status == 'OPEN'" />
-        <q-btn :label="$tc('form.delete')" icon="delete" color="negative" :class="{'full-width': $q.screen.lt.sm}" @click="VIEW.delete" />
+        <ux-btn-dropdown  color="blue-grey" :class="{'full-width': $q.screen.lt.sm}"
+          :options="[
+           { label: $tc('form.add_new'), color:'green', icon: 'add',
+              hidden: !$app.can('acc-invoices-create'),
+              detail: $tc('messages.process_create'),
+              actions: () => {
+                $router.push(`${VIEW.resource.uri}/create`)
+              }
+            },
+            { label: 'CONFIRM', color:'positive', icon: 'done_all',
+              hidden: !IS_CONFIRM || !$app.can('acc-invoices-confirm'),
+              detail: $tc('form.confirm'),
+              actions: () => {
+                setConfirmed()
+              }
+            },
+            { label: 'RE-OPEN', color:'blue', icon: 'refresh',
+              hidden: !IS_REOPEN || !$app.can('acc-invoices-confirm'),
+              detail: $tc('form.reopen'),
+              actions: () => {
+                setReopen()
+              }
+            },
+            { label: 'SYNCRONIZE', color:'blue', icon: 'sync_alt',
+              hidden: !IS_REOPEN || !$app.can('acc-invoices-update'),
+              detail: $tc('form.sync', 1, {v: 'Invoices'}),
+              actions: () => {
+                setSync()
+              }
+            },
+            { label: 'DELETE', color:'red', icon: 'delete',
+              hidden: !IS_EDITABLE || !$app.can('acc-invoices-delete'),
+              detail: $tc('messages.process_delete'),
+              actions: () => {
+                VIEW.delete()
+              }
+            }
+          ]">
+        </ux-btn-dropdown>
       </div>
     </page-print>
     <q-inner-loading :showing="VIEW.loading">
@@ -102,20 +140,19 @@ export default {
     '$route': 'init'
   },
   computed: {
-    IS_CLOSE () {
+    IS_REOPEN () {
       if (this.rsView.deleted_at) return false
-      if (this.rsView.status !== 'OPEN') return false
+      if (this.rsView.status !== 'INVOICED') return false
       return true
     },
-    IS_VOID () {
-      if (this.IS_EDITABLE) return false
-      if (['VOID'].find(x => x === this.rsView.status)) return false
+    IS_CONFIRM () {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'OPEN') return false
       return true
     },
     IS_EDITABLE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
-
       return true
     },
     SUM_ITEMS () {
@@ -166,6 +203,52 @@ export default {
             let msg = response.data.message[0] || ''
             if (response.data.success) this.$app.notify.success('[ACCURATE]', msg)
             else this.$app.notify.warning('[ACCURATE]', msg)
+
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response || error)
+          })
+          .finally(() => {
+            this.$q.loading.hide()
+          })
+      }
+
+      submit()
+    },
+    setReopen () {
+      const submit = () => {
+        this.$q.loading.show()
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/reopened`
+
+        this.$axios.post(url)
+          .then((response) => {
+            let msg = response.data.message[0] || ''
+            if (response.data.success) this.$app.notify.success('[ACCURATE]', msg)
+            else this.$app.notify.warning('[REOPEN]', msg)
+
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response || error)
+          })
+          .finally(() => {
+            this.$q.loading.hide()
+          })
+      }
+
+      submit()
+    },
+    setSync () {
+      const submit = () => {
+        this.$q.loading.show()
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/syncronized`
+
+        this.$axios.post(url)
+          .then((response) => {
+            let msg = response.data.message[0] || ''
+            if (response.data.success) this.$app.notify.success('[ACCURATE-SYNC]', msg)
+            else this.$app.notify.warning('[ACCURATE-REOPEN]', msg)
 
             this.init()
           })

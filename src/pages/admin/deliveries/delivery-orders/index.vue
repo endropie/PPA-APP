@@ -127,7 +127,6 @@
           <ux-chip-status dense square :row="rs.row"/>
         </q-td>
 
-
         <q-td slot="body-cell-persentase" slot-scope="rs" :props="rs" class="no-padding">
           <q-chip dense square class="text-weight-medium" text-color="white"
             :color="Math.round(rs.row.summary_reconciles) == Math.round(rs.row.summary_items) ? 'red-10' : 'indigo-10'"
@@ -160,7 +159,6 @@
       </q-table>
     </q-pull-to-refresh>
 
-
   </q-page>
 </template>
 
@@ -172,12 +170,11 @@ export default {
   data () {
     return {
       SHEET: {
-        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'}
+        customers: { data: [], api: '/api/v1/incomes/customers?mode=all' }
       },
       FILTERABLE: {
         fill: {
-          // reconcile_id: { value: null, type: 'integer' },
-          // revise_id: { value: null, type: 'integer' },
+          is_internal: { value: '0', type: 'boolean' },
           customer_id: {
             value: null,
             type: 'integer',
@@ -196,24 +193,29 @@ export default {
       },
       TABLE: {
         mode: 'index',
-        resource:{
+        resource: {
           api: '/api/v1/incomes/delivery-orders',
-          uri: '/admin/deliveries/delivery-orders',
+          uri: '/admin/deliveries/delivery-orders'
         },
         columns: [
-          { name: 'prefix', label: '', align: 'left'},
-          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true,
-            format:(v)=> v ? this.$app.moment(v).format('DD/MM/YYYY') : '-', classes: 'text-uppercase'},
+          { name: 'prefix', label: '', align: 'left' },
+          { name: 'date',
+            label: this.$tc('label.date'),
+            field: 'date',
+            align: 'center',
+            sortable: true,
+            format: (v) => v ? this.$app.moment(v).format('DD/MM/YYYY') : '-',
+            classes: 'text-uppercase' },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left' },
           { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
-          { name: 'status', label: '', field: 'status', align: 'center', },
-          { name: 'persentase', label: '', align: 'center', },
+          { name: 'status', label: '', field: 'status', align: 'center' },
+          { name: 'persentase', label: '', align: 'center' },
           { name: 'transaction', label: this.$tc('label.transaction'), field: 'transaction', align: 'center', sortable: true },
-          { name: 'created_at', label: this.$tc('form.create',2), field:'created_at', align: 'center' },
+          { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center' }
         ],
-        rowData:[],
-        resData:[],
-        pagination : {
+        rowData: [],
+        resData: [],
+        pagination: {
           page: 1,
           rowsPerPage: 10,
           rowsNumber: 10 // specifying this determines pagination is server-side,
@@ -222,24 +224,24 @@ export default {
         selected: [
           // initial selection => { id: 5 }
         ],
-        loading: false,
-      },
+        loading: false
+      }
     }
   },
   created () {
     this.INDEX.load()
   },
   computed: {
-    CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
-    },
-  },
-  methods: {
-    isEditable(row) {
-      if(row.status !== 'OPEN') return false
-      if(row.is_relationship) return false
-      return true
+    CustomerOptions () {
+      return (this.SHEET.customers.data.map(item => ({ label: [item.code, item.name].join(' - '), value: item.id })) || [])
     }
   },
+  methods: {
+    isEditable (row) {
+      if (row.status !== 'OPEN') return false
+      if (row.is_relationship) return false
+      return true
+    }
+  }
 }
 </script>

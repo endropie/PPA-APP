@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="justify justify-center">
-    <q-card :dark="LAYOUT.isDark" v-if="VIEW.show" class="fit">
+    <q-card v-if="rsView" class="fit">
       <q-card-section horizontal class="bg-grey-1 q-py-sm q-px-md">
         <div class="text-truncate ellipsis">
           <span class="text-h6">{{ rsView.part_name }}</span>
@@ -210,11 +210,11 @@
                     <div class="text-weight-light text-grey">{{$tc('items.preline')}}</div>
                   </q-card-section>
                   <!-- <q-separator inset /> -->
-                  <q-card-section class="q-py-sm column-reverse">
+                  <q-card-section class="q-py-sm column reverse">
                     <div v-for="(preline, i) in rsView.item_prelines" :key="i">
-                      <q-chip dense square :label="i+1" color="primary" text-color="white" />
-                      {{ preline.line ? preline.line.name : 'no - line' }}
-                      <q-chip dense square label="MAIN" color="primary" text-color="white" />
+                      <q-chip outline square :label="rsView.item_prelines.length - i" color="blue-grey" />
+                      {{ preline.line ? preline.line.name : '-' }}
+                      <q-chip dense square label="MAIN" color="primary" text-color="white" v-if="preline.ismain" />
                     </div>
                   </q-card-section>
                 </q-card>
@@ -385,63 +385,61 @@ import StockTimeline from './stock-timeline.vue'
 
 export default {
   mixins: [MixView],
-  components: {
-    StockTimeline
-  },
+  components: { StockTimeline },
   data () {
     return {
       tab: 'info',
       VIEW: {
         data: {},
-        resource:{
+        resource: {
           api: '/api/v1/common/items',
-          uri: '/admin/common/items',
+          uri: '/admin/common/items'
         }
       },
-      rsView: {},
+      rsView: null
     }
   },
-  created() {
+  created () {
     this.init()
   },
   computed: {
-    IS_VOID() {
+    IS_VOID () {
       if (this.IS_EDITABLE) return false
       if (this.rsView.deleted_at) return false
       if (['VOID'].find(x => x === this.rsView.status)) return false
       return true
     },
-    IS_EDITABLE() {
+    IS_EDITABLE () {
       if (this.rsView.revise_id) return false
       if (this.rsView.deleted_at) return false
       if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
       return true
     },
-    IS_SAMPLE_VALIDATE() {
+    IS_SAMPLE_VALIDATE () {
       if (!this.rsView.sample) return false
       if (this.rsView.deleted_at) return false
       if (this.rsView.sample_validated_at) return false
       return this.rsView.sample_enginered_at && this.rsView.sample_priced_at
     },
-    price_area() {
-      if(!Number(this.rsView.price) || !Number(this.rsView.sa_dm)) return null
+    price_area () {
+      if (!Number(this.rsView.price) || !Number(this.rsView.sa_dm)) return null
       return Number(this.rsView.price) / Number(this.rsView.sa_dm)
     },
-    price_loaded() {
-      if(!Number(this.rsView.price) || !Number(this.rsView.sa_dm)) return null
+    price_loaded () {
+      if (!Number(this.rsView.price) || !Number(this.rsView.sa_dm)) return null
       return Number(this.rsView.load_capacity || 0) * Number(this.rsView.price || 0)
     }
   },
   methods: {
-    init() {
+    init () {
       this.VIEW.load((data) => {
         this.setView(data || {})
       })
     },
-    setView(data) {
-      this.rsView =  data
+    setView (data) {
+      this.rsView = data
     },
-    sampleValidate ()  {
+    sampleValidate () {
       let url = `${this.VIEW.resource.api}/${this.rsView.id}/sample-validation`
       this.$q.loading.show()
       this.$axios.post(url)
@@ -454,7 +452,7 @@ export default {
           this.$q.loading.hide()
         })
     },
-    openFile(v) {
+    openFile (v) {
       openURL(this.$axios.serverURL(v))
     },
     push (row) {

@@ -68,7 +68,6 @@
                 :dark="LAYOUT.isDark"
                 @input="FILTERABLE.submit"/>
 
-
               <q-select class="col-12" autocomplete="off"
                 multiple use-chips use-input new-value-mode="add"
                 dense hide-dropdown-icon
@@ -156,7 +155,7 @@ export default {
   data () {
     return {
       SHEET: {
-        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'}
+        customers: { data: [], api: '/api/v1/incomes/customers?mode=all' }
       },
       FILTERABLE: {
         fill: {
@@ -177,63 +176,68 @@ export default {
           }
         }
       },
-      TABLE:{
+      TABLE: {
         mode: 'index',
-        resource:{
+        resource: {
           api: '/api/v1/incomes/request-orders',
-          uri: '/admin/incomes/request-orders',
+          uri: '/admin/incomes/request-orders'
         },
         columns: [
-          { name: 'prefix', label: '', align: 'left'},
+          { name: 'prefix', label: '', align: 'left' },
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'status', label: '', align: 'left', field: 'status'},
-          { name: 'customer_id', label: this.$tc('general.customer'), align: 'left', field: (row) => row.customer.name , sortable: true },
-          { name: 'counter_delivered', label: 'Delivery', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.delivered : '-', sortable: true},
-          { name: 'counter_confirmed', label: 'Confirm', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.confirmed : '-', sortable: true},
-          { name: 'counter_invoiced', label: 'Invoiced', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.invoiced : '-', sortable: true},
+          { name: 'status', label: '', align: 'left', field: 'status' },
+          { name: 'customer_id', label: this.$tc('general.customer'), align: 'left', field: (row) => row.customer.name, sortable: true },
+          { name: 'counter_delivered', label: 'Delivery', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.delivered : '-', sortable: true },
+          { name: 'counter_confirmed', label: 'Confirm', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.confirmed : '-', sortable: true },
+          { name: 'counter_invoiced', label: 'Invoiced', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.invoiced : '-', sortable: true },
           // { name: 'reference_number', label: 'No. Reference', field: 'reference_number', align: 'left', sortable: true },
-          { name: 'actived_date', label: this.$tc('label.expired'), field: 'actived_date', align: 'center', sortable: true,
-            format:(v)=> v ? this.$app.moment(v).format('ll') : '-', classes: 'text-uppercase'},
-          { name: 'created_at', label: this.$tc('form.create',2), align: 'center', sortable: true, field: 'created_at'},
+          { name: 'actived_date',
+            label: this.$tc('label.expired'),
+            field: 'actived_date',
+            align: 'center',
+            sortable: true,
+            format: (v) => v ? this.$app.moment(v).format('ll') : '-',
+            classes: 'text-uppercase' },
+          { name: 'created_at', label: this.$tc('form.create', 2), align: 'center', sortable: true, field: 'created_at' }
         ]
-      },
+      }
     }
   },
   created () {
     this.INDEX.load()
   },
   computed: {
-    isCanUpdate(){
+    isCanUpdate () {
       return this.$app.can('request-orders-update')
     },
-    isCanDelete(){
+    isCanDelete () {
       return this.$app.can('request-orders-delete')
     },
-    CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
-    },
+    CustomerOptions () {
+      return (this.SHEET.customers.data.map(item => ({ label: [item.code, item.name].join(' - '), value: item.id })) || [])
+    }
   },
   methods: {
-    isEditable(row) {
-      if(row.deleted_at) return false
+    isEditable (row) {
+      if (row.deleted_at) return false
       if (row.order_mode !== 'PO') return false
       if (row.status !== 'OPEN') return false
       if (row.hasOwnProperty('is_relationship') && row.is_relationship) return false
       return true
     },
     isEditRef (row) {
-      if(row.deleted_at) return false
-      if(row.order_mode === 'PO') return false
-      if(row.status === 'CLOSED') return false
+      if (row.deleted_at) return false
+      if (row.order_mode === 'PO') return false
+      if (row.status === 'CLOSED') return false
       return true
     },
     isEditRefExpired (row) {
-      if(row.deleted_at) return false
-      if(row.order_mode !== 'PO') return false
-      if(row.status === 'CLOSED') return false
+      if (row.deleted_at) return false
+      if (row.order_mode !== 'PO') return false
+      if (row.status === 'CLOSED') return false
       return row.is_relationship
-    },
+    }
   }
 }
 </script>

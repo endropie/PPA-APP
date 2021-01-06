@@ -24,6 +24,7 @@ export default {
   specification: 'Spesifikasi',
   stock_init: 'Saldo Awal',
   stock_final: 'Saldo Akhir',
+  stock_previous: 'Saldo Sebelumnya',
   stockist: 'Stokist',
   thick: 'Ketebalan',
   white_spray: 'White Spray',

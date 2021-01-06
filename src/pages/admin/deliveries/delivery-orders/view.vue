@@ -62,12 +62,12 @@
             <!-- <q-chip tag outline small square color="orange-10" class="text-uppercase" :label="$tc('form.temporary')" v-if="rsView.is_internal" /> -->
           </div>
           <div class="text-subtitle2 text-weight-bold text-uppercase text-center on-right">
-            <span v-if="rsView.is_internal">{{$tc('general.sj_internal',2)}}</span>
-            <span v-else>{{$tc('general.sj_delivery',2)}} {{rsView.transaction}}</span>
+            <span>{{$tc('general.sj_delivery',2)}} {{rsView.transaction}}</span>
           </div>
         </div>
         <div class="column" style="min-height:11cm;height:auto">
           <div class="row q-gutter-x-sm q-pb-sm" :class="{'no-wrap': $q.screen.gt.xs}">
+            <ux-qrcode :value="valQrCode(rsView)" :options="{ width: 96, height: 96, margin: 1 }" />
             <div class="" style="max-width:50%">
               <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
               <address class="text-normal" style="font-style: normal">{{rsView.customer_address}}</address>
@@ -144,47 +144,43 @@
               <thead>
               <q-tr>
                 <q-th v-if="IS_LOTS">LOTS</q-th>
-                <q-th v-if="!isHideColumn('part_name')" class="text-left">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-                <q-th v-if="!isHideColumn('part_subname')" class="text-left">{{ $app.setting('item.subname_label') }}</q-th>
-                <q-th v-if="isDoubleUnit & !isHideColumn('quantity')" key="PCS" class="text-right" >Unit (PCS)</q-th>
-                <q-th v-if="isDoubleUnit & !isHideColumn('quantity')" key="KG" class="text-right" >Unit (KG)</q-th>
-                <q-th v-if="!isDoubleUnit & !isHideColumn('quantity')" class="text-right" >{{ $tc('label.quantity') }}</q-th>
-                <q-th v-if="!isDoubleUnit & !isHideColumn('unit')" class="text-left" width="10%" >{{ $tc('label.unit') }}</q-th>
-                <q-th v-if="rsView.is_internal && !remain_only && !isDoubleUnit" class="print-hide">Reconcile</q-th>
-                <q-th v-if="!isHideColumn('encasement')">{{ $tc('label.encasement') }}</q-th>
+                <q-th class="text-left">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
+                <q-th class="text-left">{{ $app.setting('item.subname_label') }}</q-th>
+                <q-th v-if="isDoubleUnit" key="PCS" class="text-right" >Unit (PCS)</q-th>
+                <q-th v-if="isDoubleUnit" key="KG" class="text-right" >Unit (KG)</q-th>
+                <q-th v-if="!isDoubleUnit" class="text-right" >{{ $tc('label.quantity') }}</q-th>
+                <q-th v-if="!isDoubleUnit" class="text-left" width="10%" >{{ $tc('label.unit') }}</q-th>
+                <q-th>{{ $tc('label.encasement') }}</q-th>
               </q-tr>
               </thead>
               <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
                 <q-tr :delivery-order-item-id="row.id"
                   v-show="isRowMain(row)" >
                   <q-td v-if="IS_LOTS"> {{row.number_lots}} </q-td>
-                  <q-td v-if="!isHideColumn('part_name')">
+                  <q-td key="part_name">
                     <span class="text-weight-medium" v-if="Boolean(mode)">{{mode}}:&nbsp;</span>
                     <span class="text-weight-medium" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">Material:&nbsp;</span>
                     <span v-if="row.item"> {{row.item.part_name}} </span>
                   </q-td>
-                  <q-td v-if="!isHideColumn('part_subname')" key="part_subname">
+                  <q-td key="part_subname">
                     <span v-if="row.item"> {{row.item.part_subname}} </span>
                   </q-td>
-                  <q-td v-if="!isHideColumn('quantity') && isDoubleUnit" key="PCS" class="text-right">
+                  <q-td v-if="isDoubleUnit" key="PCS" class="text-right">
                     {{!valPCS(row) ? '' : $app.number_format(valPCS(row), row.unit.decimal_in) + ' PCS'}}
                   </q-td>
-                  <q-td v-if="!isHideColumn('quantity') && isDoubleUnit" key="KG" class="text-right">
+                  <q-td v-if="isDoubleUnit" key="KG" class="text-right">
                     {{!valKG(row) ? '' : $app.number_format(valKG(row), row.unit.decimal_in) + ' KG'}}
                   </q-td>
-                  <q-td  v-if="!isHideColumn('quantity') && !isDoubleUnit" key="quantity" class="text-right">
+                  <q-td  v-if="!isDoubleUnit" key="quantity" class="text-right">
                     <span v-if="rsView.is_internal && remain_only">
                       {{$app.number_format(Number(row.quantity) - (row.amount_reconcile / (row.unit_rate||1)), row.unit.decimal_in)}}
                     </span>
                     <span v-else>{{$app.number_format(row.quantity, row.unit.decimal_in)}}</span>
                   </q-td>
-                  <q-td v-if="!isHideColumn('unit') && !isDoubleUnit" key="unit"  class="text-left">
+                  <q-td v-if="!isDoubleUnit" key="unit"  class="text-left">
                     {{row.unit.code}}
                   </q-td>
-                  <q-td v-if="rsView.is_internal && !remain_only && !isDoubleUnit" class="print-hide text-right">
-                    {{$app.number_format(row.amount_reconcile, row.unit.decimal_in)}}
-                  </q-td>
-                  <q-td v-if="!isHideColumn('encasement')">
+                  <q-td>
                     <div class="row cursor-pointer">
                       <span>{{row.encasement}}</span>
                       <template v-if="String(mode).toUpperCase() !== 'JASA' && rsView.status === 'OPEN'">
@@ -212,25 +208,24 @@
                   v-show="isRowMain(row)"
                   v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
                   <q-td v-if="IS_LOTS"> {{row.number_lots}} </q-td>
-                  <q-td v-if="!isHideColumn('part_name')">
+                  <q-td>
                     <span class="text-weight-medium">Jasa:&nbsp;</span>
                     <span v-if="row.item"> {{row.item.part_name}} </span>
                   </q-td>
-                  <q-td v-if="!isHideColumn('part_subname')">
+                  <q-td>
                     <span v-if="row.item"> {{row.item.part_subname}} </span>
                   </q-td>
-                  <q-td  v-if="!isHideColumn('quantity') && isDoubleUnit" key="PCS" class="text-right">
+                  <q-td  v-if="isDoubleUnit" key="PCS" class="text-right">
                     {{!valPCS(row) ? '' : $app.number_format(valPCS(row), row.unit.decimal_in) + ' PCS'}}
                   </q-td>
-                  <q-td v-if="!isHideColumn('quantity') && isDoubleUnit" key="KG" class="text-right">
+                  <q-td v-if="isDoubleUnit" key="KG" class="text-right">
                     {{!valKG(row) ? '' : $app.number_format(valKG(row), row.unit.decimal_in) + ' KG'}}
                   </q-td>
-                  <q-td v-if="!isHideColumn('quantity') && !isDoubleUnit" class="text-right">
+                  <q-td v-if="!isDoubleUnit" class="text-right">
                     {{$app.number_format(row.quantity, row.unit.decimal_in)}}
                   </q-td>
-                  <q-td v-if="!isHideColumn('unit') && !isDoubleUnit" class="text-left">{{row.unit.code}}</q-td>
-                  <q-td v-if="rsView.is_internal && !remain_only && !isDoubleUnit" class="print-hide text-right"></q-td>
-                  <q-td v-if="!isHideColumn('encasement')"></q-td>
+                  <q-td v-if="!isDoubleUnit" class="text-left">{{row.unit.code}}</q-td>
+                  <q-td></q-td>
                 </q-tr>
               </tbody>
               <tbody >
@@ -378,6 +373,16 @@ export default {
       // return
       console.warn('LOT', row.number_lots)
     },
+    valQrCode (data) {
+      return `/delivery-orders/${data.id}`
+      // return `${window.location.origin}/#/admin/deliveries/delivery-orders/${data.id}`
+      // return {
+      //   model: '\\App\\Models\\Income\\DeliveryOrder',
+      //   id: data.id,
+      //   number: data.fullnumber,
+      //   url: `${window.location.origin}/#/admin/deliveries/delivery-loads/${data.id}`
+      // }
+    },
     valPCS (row) {
       if (row.unit_id === 1) {
         return Number(row.quantity)
@@ -419,22 +424,20 @@ export default {
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/reconcile`)
     },
     setConfirmation () {
-      const submit = () => {
-        this.VIEW.show = false
-        this.VIEW.loading = true
+      const submit = (val) => {
+        this.$q.loading.show()
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=confirmation&nodata=true`
-        this.$axios.put(url)
+        this.$axios.put(url, val)
           .then((response) => {
             const data = response.data
             this.setView(data)
           })
           .catch(error => {
-            this.$app.response.error(error.response, 'FORM REVISION')
+            this.$app.response.error(error.response, 'CONFIRMED FAILED')
           })
           .finally(() => {
-            this.VIEW.show = true
             setTimeout(() => {
-              this.VIEW.loading = false
+              this.$q.loading.hide()
             }, 1000)
           })
       }
@@ -452,11 +455,16 @@ export default {
 
         this.$q.dialog({
           title: this.$tc('form.confirm'),
-          message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.validation') }),
+          message: 'Input Confirmed number',
+          prompt: {
+            model: '',
+            // isValid: val => val.length > 0,
+            type: 'text' // optional
+          },
           cancel: true,
           persistent: true
-        }).onOk(() => {
-          submit()
+        }).onOk((data) => {
+          submit({ confirmed_number: data })
         })
       })
     },

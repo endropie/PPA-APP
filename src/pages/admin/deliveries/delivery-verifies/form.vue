@@ -36,7 +36,7 @@
             :error-message="errors.first('date')"
           />
           <q-space/>
-          <q-select dense outlined no-error-icon
+          <!-- <q-select dense outlined no-error-icon
             style="min-width: 100px"
             name="rit"
             v-model="rsForm.rit"
@@ -45,7 +45,7 @@
             v-validate="'required'"
             :error="errors.has('rit')"
             :error-message="errors.first('rit')"
-          />
+          /> -->
         </div>
       </div>
     </q-card-section>
@@ -56,7 +56,7 @@
         :label="$tc('label.part')"
         v-model="rsForm.item"
         filter clearable
-        :source="`/api/v1/common/items?mode=all&--limit=50&enable=1&delivery_task_date=${rsForm.date}&customer_id=${rsForm.customer_id}`"
+        :source="`/api/v1/common/items?mode=all&--limit=50&enable=1&delivery_date=${rsForm.date}&customer_id=${rsForm.customer_id}`"
         :source-key="['part_name', 'part_number', 'code']"
         option-label="part_name"
         :option-sublabel="(opt) => `[${opt.customer_code}] ${opt.part_number}`"

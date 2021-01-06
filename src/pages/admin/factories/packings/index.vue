@@ -107,9 +107,9 @@
           <div v-else>- undefined -</div>
         </q-td>
         <q-td slot="body-cell-item" slot-scope="rs" :props="rs">
-          <div class="column" v-if="rs.row.packing_items.item">
+          <div class="column" v-if="rs.row.packing_items && rs.row.packing_items.item">
             <span>{{ rs.row.packing_items.item.part_name }}</span>
-            <span class="text-weight-light">[{{rs.row.packing_items.item.customer_code}}] {{ rs.row.packing_items.item.part_subname || '--' }}</span>
+            <span class="text-weight-light">{{ rs.row.packing_items.item.part_subname || '--' }}</span>
           </div>
         </q-td>
         <q-td slot="body-cell-item_number" slot-scope="rs" :props="rs">
@@ -122,9 +122,6 @@
             {{ rs.row.packing_items.item.part_name }}
           </div>
         </q-td>
-        <!-- <q-td slot="body-cell-work_order_id" slot-scope="rs" :props="rs">
-          {{rs.row.packing_items.work_order_number || '-'}}
-        </q-td> -->
         <q-td slot="body-cell-shift_id" slot-scope="rs" :props="rs">
           <div v-if="rs.row.shift"> {{ rs.row.shift.name }}</div>
           <div v-else class="text-center">-</div>
@@ -153,6 +150,7 @@
 
       </q-table>
     </q-pull-to-refresh>
+    <!-- <code> {{TABLE.rowData}}</code> -->
   </q-page>
 </template>
 
@@ -164,8 +162,8 @@ export default {
   data () {
     return {
       SHEET: {
-        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
-        items: {data:[], api:'/api/v1/common/items?mode=all', autoload: false},
+        customers: { data: [], api: '/api/v1/incomes/customers?mode=all' },
+        items: { data: [], api: '/api/v1/common/items?mode=all', autoload: false }
       },
       FILTERABLE: {
         fill: {
@@ -183,61 +181,61 @@ export default {
             value: null,
             type: 'string',
             transform: (value) => { return null }
-          },
+          }
         }
       },
-      TABLE:{
+      TABLE: {
         mode: 'index',
-        resource:{
+        resource: {
           api: '/api/v1/factories/packings',
-          uri: '/admin/factories/packings',
+          uri: '/admin/factories/packings'
         },
         columns: [
-          { name: 'prefix', label: '', align: 'left',},
+          { name: 'prefix', label: '', align: 'left' },
 
-          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'left', sortable: true},
+          { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'left', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'customer_id', label: this.$tc('general.cust'), align: 'left'},
-          { name: 'item', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left' },
-          { name: 'shift_id', label: 'Shift', field: 'shift_id', align: 'left'},
+          { name: 'customer_id', label: this.$tc('general.cust'), align: 'left' },
+          { name: 'item', label: this.$tc('label.name', 1, { v: this.$tc('label.part') }), align: 'left' },
+          { name: 'shift_id', label: 'Shift', field: 'shift_id', align: 'left' },
           { name: 'worktime', label: 'Worktime', field: 'worktime', align: 'left', sortable: true },
-          { name: 'created_at', label: this.$tc('form.create',2), field: 'created_at', align: 'center'},
+          { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center' }
         ]
-      },
+      }
     }
   },
   created () {
     this.INDEX.load()
   },
   computed: {
-    isCanUpdate(){
+    isCanUpdate () {
       return this.$app.can('packings-update')
     },
-    isCanDelete(){
+    isCanDelete () {
       return this.$app.can('packings-delete')
     },
-    CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
+    CustomerOptions () {
+      return (this.SHEET.customers.data.map(item => ({ label: [item.code, item.name].join(' - '), value: item.id })) || [])
     },
-    ItemOptions() {
+    ItemOptions () {
       return (this.SHEET.items.data.map(item => ({
         label: item.part_name,
-        sublabel:`[${item.customer_code}] ${item.part_subname || '--'}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id
       })) || [])
-    },
+    }
   },
   methods: {
-    initItemOptions(val, update, abort) {
-      if(String(val).length > 2) {
-        this.SHEET.load('items', 'search='+val)
+    initItemOptions (val, update, abort) {
+      if (String(val).length > 2) {
+        this.SHEET.load('items', 'search=' + val)
       }
     },
-    isEditable(row) {
+    isEditable (row) {
       if (row.deleted_at) return false
       if (row.is_relationship) return false
       return true
-    },
-  },
+    }
+  }
 }
 </script>

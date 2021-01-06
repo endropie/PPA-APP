@@ -78,14 +78,14 @@ export default {
   name: 'ux-select',
   inheritAttrs: false,
   props: {
-    source: {type: String, default:null},
-    sourceKeys: {type: Array, default: () => []},
-    filter: {type: Boolean, default: false },
-    filterMin: {default:0},
-    useInput: {type: Boolean },
-    fillInput: {type: Boolean },
-    hideSelected: {type: Boolean },
-    inputDebounce: {type: Number, default: 600 }
+    source: { type: String, default: null },
+    sourceKeys: { type: Array, default: () => [] },
+    filter: { type: Boolean, default: false },
+    filterMin: { default: 0 },
+    useInput: { type: Boolean },
+    fillInput: { type: Boolean },
+    hideSelected: { type: Boolean },
+    inputDebounce: { type: Number, default: 600 }
   },
   data () {
     return {
@@ -94,22 +94,22 @@ export default {
       isFilterSkip: false
     }
   },
-  created() {
+  created () {
 
   },
-  watch:{
+  watch: {
     '$attrs.value': 'setValue',
     '$attrs.options': 'setOptions',
     '$props.source': function () {
       this.options = []
-    },
+    }
   },
   computed: {
     PROP () {
       let def = {
         'use-input': this.filter,
         'fill-input': this.filter,
-        'hide-selected': this.filter,
+        'hide-selected': this.filter
       }
 
       if (this.$attrs['multiple'] !== undefined) {
@@ -120,45 +120,44 @@ export default {
       return {
         useInput: def['use-input'],
         fillInput: def['fill-input'],
-        hideSelected: def['hide-selected'],
+        hideSelected: def['hide-selected']
       }
     },
-    QSelect() {
+    QSelect () {
       return this.$refs.QSelect || null
     },
     opt () {
-      if (!this.filter) return this.$attrs.options
+      if (!this.filter && this.$attrs.options) return this.$attrs.options
       return this.options
     }
   },
   methods: {
-    setValue(v) {
+    setValue (v) {
       this.value = v
     },
-    setOptions(v) {
+    setOptions (v) {
       this.options = v
     },
-    getOptionDisable(option) {
-      if (!Boolean(this.$attrs['option-disable'])) return option.disable
+    getOptionDisable (option) {
+      if (!this.$attrs['option-disable']) return option.disable
 
       if (typeof this.$attrs['option-disable'] === 'function') {
         return this.$attrs['option-disable'](option)
       }
       return option[this.$attrs['option-disable']]
     },
-    getOptionLabel(option) {
+    getOptionLabel (option) {
       if (typeof option === 'string') {
         return option
-      }
-      else if (typeof this.$attrs['option-label'] === 'function') {
+      } else if (typeof this.$attrs['option-label'] === 'function') {
         return this.$attrs['option-label'](option)
       }
 
       const label = this.$attrs['option-label'] || 'label'
       return option[label]
     },
-    getOptionSublabel(option) {
-      if (!Boolean(this.$attrs['option-sublabel'])) return option.sublabel
+    getOptionSublabel (option) {
+      if (!this.$attrs['option-sublabel']) return option.sublabel
 
       if (typeof this.$attrs['option-sublabel'] === 'function') {
         return this.$attrs['option-sublabel'](option)
@@ -192,7 +191,7 @@ export default {
           ? `search=${val}&search-keys=${fields.join(',')}`
           : `search=${val}`
         const apiUrl = this.source + separator + search
-        console.info(`[PLAY] Source GET: ${apiUrl}`);
+        console.info(`[PLAY] Source GET: ${apiUrl}`)
         return this.$axios.get(apiUrl)
           .then(response => {
             this.options = response.data
@@ -208,7 +207,6 @@ export default {
       update(() => {
         const needle = val.toLowerCase()
         this.options = this.$attrs.options.filter(v => {
-
           let needles = String(needle).split(' ')
           for (let i = 0; i < needles.length; i++) {
             if (needles[i] && !String(v.label + v.sublabel).toLowerCase().includes(needles[i])) return false
@@ -222,7 +220,7 @@ export default {
         ? this.$emit('filter', v, u, a)
         : this.filterFn(v, u)
     },
-    inputFunction(v) {
+    inputFunction (v) {
       this.$nextTick(() => {
         let innerValue = v
         if (this.QSelect) {
@@ -253,6 +251,5 @@ export default {
   .q-field__counter:not(:empty)
     min-height: 12px
     margin-top: 4px
-
 
 </style>

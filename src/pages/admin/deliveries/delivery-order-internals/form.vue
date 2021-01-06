@@ -11,12 +11,25 @@
     <q-separator />
     <q-card-section>
       <div class="row q-col-gutter-x-md">
+
+      <q-field class="col-12"
+        borderless stack-label hide-bottom-space
+        :label="$tc('label.mode',1, {v:$tc('label.transaction')})"
+        :error="errors.has('transaction')">
+
+        <q-option-group slot="control"
+          name="transaction" type="radio" inline
+          v-model="rsForm.transaction"
+          v-validate="'required'"
+          :options="CONFIG.options['transaction_mode']"
+        />
+      </q-field>
         <div class="col-12 col-md-6">
           <ux-select
             name="customer_id"
             :label="$tc('general.customer')"  stack-label
             v-model="rsForm.customer"
-            :disable="Boolean(rsForm.delivery_internal_items.find(detail => detail.item_id))"
+            :disable="Boolean(rsForm.delivery_order_items.find(detail => detail.item_id))"
             filter clearable
             source="api/v1/incomes/customers?mode=all"
             :option-label="(item) => `[${item.code}] ${item.name}`"
@@ -33,15 +46,33 @@
               rsForm.customer_address = v ? v.address : null
             }"
           />
-          <ux-date
-            name="date" type="date"
-            :label="$tc('label.date')"
-            v-model="rsForm.date"
-            :dark="LAYOUT.isDark"
-            v-validate="'required'"
-            :error="errors.has('date')"
-            :error-message="errors.first('date')"
-          />
+          <div class="row q-col-gutter-sm" :class="{ 'column': $q.screen.lt.sm }">
+            <ux-select class="col-6"
+              name="vehicle_id"
+              :label="$tc('general.vehicle')"  stack-label
+              v-model="rsForm.vehicle"
+              filter clearable
+              source="api/v1/references/vehicles?mode=all&type=DELIVERY"
+              :option-label="(item) => `${item.number}`"
+              option-value="id"
+              v-validate="'required'"
+              :error="errors.has('vehicle_id')"
+              :error-message="errors.first('vehicle_id')"
+              @input="(v) => {
+                rsForm.vehicle = v ? v : null
+                rsForm.vehicle_id = v ? v.id : null
+              }"
+            />
+            <ux-date class="col-6"
+              name="date" type="date"
+              :label="$tc('label.date')"
+              v-model="rsForm.date"
+              :dark="LAYOUT.isDark"
+              v-validate="'required'"
+              :error="errors.has('date')"
+              :error-message="errors.first('date')"
+            />
+          </div>
         </div>
         <div class="col-12 col-md-6" >
           <div class="row q-col-gutter-x-sm">
@@ -78,20 +109,20 @@
         <thead>
           <q-tr class="text-uppercase" style="line-height:30px">
             <q-th key="prefix" width="50px"></q-th>
-            <q-th key="name" width="30%">{{$tc('items.part_name')}}</q-th>
-            <q-th key="subname" width="30%">{{$app.setting('item.subname_label')}}</q-th>
+            <q-th key="name" width="25%">{{$tc('items.part_name')}}</q-th>
+            <q-th key="subname" width="25%">{{$app.setting('item.subname_label')}}</q-th>
             <q-th key="quantity" width="10%">{{$tc('label.quantity')}}</q-th>
             <q-th key="unit" width="10%">{{$tc('label.unit')}}</q-th>
-            <q-th key="note" width="40%">{{$tc('label.note')}}</q-th>
+            <q-th key="note" width="35%">{{$tc('label.note')}}</q-th>
           </q-tr>
         </thead>
         <tbody>
-          <q-tr v-for="(row, rowIndex) in rsForm.delivery_internal_items" :key="rowIndex">
+          <q-tr v-for="(row, rowIndex) in rsForm.delivery_order_items" :key="rowIndex">
             <q-td name="prefix">
               <q-btn dense flat outline tabindex="1000" color="negative" icon="clear" @click="removeDetail(rowIndex)" />
             </q-td>
             <q-td name="name">
-              <ux-select v-if="Boolean(row._registered === true)" dense outlined hide-bottom-space
+              <ux-select dense outlined hide-bottom-space
                 style="min-width:250px"
                 v-model="row.item" emit-value
                 filter clearable
@@ -100,43 +131,24 @@
                 option-label="part_name"
                 :option-sublabel="(opt) => `[${opt.customer_code}] ${opt.part_number}`"
                 v-validate="'required'"
-                :name="`delivery_internal_items.${rowIndex}.item_id`"
-                :error="errors.has(`delivery_internal_items.${rowIndex}.item_id`)"
+                :name="`delivery_order_items.${rowIndex}.item_id`"
+                :error="errors.has(`delivery_order_items.${rowIndex}.item_id`)"
                 @input="(v) => {
                   row.item = v ? v : null
-                  row.unit = v ? v.unit : null
                   row.item_id = v ? v.id : null
+                  row.unit = v ? { value: v.unit.id, label: v.unit.code } : null
                   row.unit_id = v ? v.unit_id : null
-                  row.name = v ? v.part_name : null
-                  row.subname = v ? v.part_number : null
+                  row.unit_rate = v ? v.unit_rate : 1
                 }"
-              >
-                <q-btn slot="after" dense icon="add" color="blue-grey"
-                  @click="unsetRowItem(rowIndex)"
-                />
-              </ux-select>
-              <q-input v-else type="text" dense outlined hide-bottom-space
-                style="min-width:250px"
-                v-model="row.name" :readonly="Boolean(row.item)"
-                v-validate="'required'"
-                :name="`delivery_internal_items.${rowIndex}.name`"
-                :error="errors.has(`delivery_internal_items.${rowIndex}.name`)"
-                :autofocus="rowIndex !== 0"
-              >
-
-                <q-btn slot="append" flat dense icon="clear" color="blue-grey" tabindex="100"
-                  @click="setRowItem(rowIndex)"
-                />
-              </q-input>
-
+              />
             </q-td>
             <q-td name="subname">
               <q-input type="text" dense outlined hide-bottom-space
                 input-style="min-width:150px"
-                v-model="row.subname" :readonly="Boolean(row.item)"
+                :value="row.item ? row.item.part_subname : ''" readonly disable
                 v-validate="'required'"
-                :name="`delivery_internal_items.${rowIndex}.subname`"
-                :error="errors.has(`delivery_internal_items.${rowIndex}.subname`)"
+                :name="`delivery_order_items.${rowIndex}.subname`"
+                :error="errors.has(`delivery_order_items.${rowIndex}.subname`)"
               />
             </q-td>
             <q-td name="quantity">
@@ -144,8 +156,8 @@
                 input-style="min-width:75px"
                 v-model="row.quantity"
                 v-validate="'required'"
-                :name="`delivery_internal_items.${rowIndex}.quantity`"
-                :error="errors.has(`delivery_internal_items.${rowIndex}.quantity`)"
+                :name="`delivery_order_items.${rowIndex}.quantity`"
+                :error="errors.has(`delivery_order_items.${rowIndex}.quantity`)"
               />
             </q-td>
             <q-td name="unit">
@@ -153,15 +165,14 @@
                 input-style="min-width:75px"
                 v-model="row.unit"
                 clearable
-                :source="`/api/v1/references/units?mode=all&--limit=50`"
-                :source-key="['name', 'code']"
-                option-label="code"
+                :options="ItemUnitOptions[rowIndex]"
                 v-validate="'required'"
-                :name="`delivery_internal_items.${rowIndex}.unit_id`"
-                :error="errors.has(`delivery_internal_items.${rowIndex}.unit_id`)"
+                :name="`delivery_order_items.${rowIndex}.unit_id`"
+                :error="errors.has(`delivery_order_items.${rowIndex}.unit_id`)"
                 @input="(v) => {
                   row.unit = v ? v : null
-                  row.unit_id = v ? v.id : null
+                  row.unit_id = v ? v.value : null
+                  row.unit_rate = v ? v.rate : null
                 }"
               />
             </q-td>
@@ -169,8 +180,8 @@
               <q-input type="text" dense outlined hide-bottom-space no-error-icon
                 input-style="min-width:150px"
                 v-model="row.note"
-                :name="`delivery_internal_items.${rowIndex}.note`"
-                :error="errors.has(`delivery_internal_items.${rowIndex}.note`)"
+                :name="`delivery_order_items.${rowIndex}.note`"
+                :error="errors.has(`delivery_order_items.${rowIndex}.note`)"
               />
             </q-td>
           </q-tr>
@@ -182,31 +193,29 @@
           </q-tr>
         </tbody>
       </q-markup-table>
-      <div class="row q-col-gutter-sm">
-        <div class="col-12 col-md-6">
-          <q-input type="textarea" autogrow
-            filled class="q-mb-sm self-start" input-style="min-height:95px"
+      <div>
+          <q-input type="textarea" autogrow rows="1"
+            filled class="q-mb-sm self-start"
             v-model="rsForm.description"
             :label="$tc('label.description')" stack-label
           />
-        </div>
-        <div class="col-12 col-md-6">
-          <q-select type="text" autogrow
-            filled class="q-mb-sm"
-            emit-value map-options
-            v-model="rsForm.reason_id"
-            :options="ReasonOptions"
-            :label="$tc('label.reason')"
-          />
-          <q-input type="text" autogrow
-            name="reason_description"
-            filled class="q-mb-sm"
-            v-model="rsForm.reason_description"
-            :label="$tc('label.reason') + ' Internal'"
-            v-validate="Boolean(rsForm.reason_id) ? '' : 'required'"
-            :error="errors.has('reason_description')"
-          />
-        </div>
+      </div>
+      <div class="row q-col-gutter-sm q-mb-sm">
+        <q-select class="self-start col-12 col-md-auto" type="text" hide-bottom-space
+          filled style="min-width:150px"
+          emit-value map-options
+          v-model="rsForm.internal_reason_id"
+          :options="ReasonOptions"
+          :label="$tc('label.reason')"
+        />
+        <q-input class="col-12 col-md" type="text" autogrow hide-bottom-space
+          name="internal_reason_description"
+          filled
+          v-model="rsForm.internal_reason_description"
+          :label="$tc('label.reason') + ' Internal'"
+          v-validate="Boolean(rsForm.internal_reason_id) ? '' : 'required'"
+          :error="errors.has('internal_reason_description')"
+        />
       </div>
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
@@ -230,12 +239,13 @@ export default {
   data () {
     return {
       SHEET: {
+        units: { api: '/api/v1/references/units?mode=all' },
         reasons: { api: '/api/v1/references/reasons?mode=all&type=DELIVERY_INTERNAL' }
       },
       FORM: {
         resource: {
-          api: '/api/v1/incomes/delivery-internals',
-          uri: '/admin/deliveries/delivery-internals'
+          api: '/api/v1/incomes/delivery-order-internals',
+          uri: '/admin/deliveries/delivery-order-internals'
         }
       },
       rsForm: null,
@@ -243,22 +253,22 @@ export default {
         return {
           number: null,
           date: this.$app.moment().format('YYYY-MM-DD'),
+          transaction: null,
           customer: null,
           customer_id: null,
           customer_name: null,
           customer_phone: null,
           customer_address: null,
           description: null,
-          reason_id: null,
-          reason_description: null,
-          delivery_internal_items: [
+          internal_reason_id: null,
+          internal_reason_description: null,
+          is_internal: 1,
+          delivery_order_items: [
             {
-              _registered: true,
-              name: null,
-              subname: null,
-              quantity: null,
               item_id: null,
+              quantity: null,
               unit_id: null,
+              unit_rate: 1,
               item: null,
               unit: null,
               note: null
@@ -273,6 +283,29 @@ export default {
     this.init()
   },
   computed: {
+    UnitOptions () {
+      return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
+    },
+    ItemUnitOptions () {
+      // return varItemUnits
+      return this.rsForm.delivery_order_items.map((rsItem, key) => {
+        return this.UnitOptions
+          .filter((unit) => {
+            if (!rsItem.item) return
+            if (rsItem.item.unit_id === unit.value) return true
+
+            const find = rsItem.item.item_units.find((fill) => fill.unit_id === unit.value)
+            if (rsItem.item.item_units && find) return true
+          })
+          .map(unit => {
+            if (rsItem.item.unit_id === unit.value) return { ...unit, rate: 1 }
+            const find = rsItem.item.item_units.find((fill) => fill.unit_id === unit.value)
+            if (rsItem.item.item_units && find) {
+              return { ...unit, rate: find.rate }
+            }
+          })
+      })
+    },
     ReasonOptions () {
       return (this.SHEET.reasons.data
         .filter(item => item.enable)
@@ -286,7 +319,6 @@ export default {
   methods: {
     init () {
       this.FORM.load((data) => {
-        data.delivery_internal_items = data.delivery_internal_items.map(rd => ({ ...rd, _registered: Boolean(rd.item || rd._registered) }))
         this.setForm(data || this.setDefault())
       })
     },
@@ -295,24 +327,12 @@ export default {
     },
 
     addNewDetail () {
-      const newitem = Object.assign(this.setDefault().delivery_internal_items[0])
-      this.rsForm.delivery_internal_items.push(newitem)
-    },
-    setRowItem (index) {
-      this.rsForm.delivery_internal_items[index]._registered = true
-    },
-    unsetRowItem (index) {
-      this.rsForm.delivery_internal_items[index]._registered = false
-      this.rsForm.delivery_internal_items[index].item = null
-      this.rsForm.delivery_internal_items[index].item_id = null
-      this.rsForm.delivery_internal_items[index].unit = null
-      this.rsForm.delivery_internal_items[index].unit_id = null
-      this.rsForm.delivery_internal_items[index].name = null
-      this.rsForm.delivery_internal_items[index].subname = null
+      const newitem = Object.assign(this.setDefault().delivery_order_items[0])
+      this.rsForm.delivery_order_items.push(newitem)
     },
     removeDetail (index) {
-      this.rsForm.delivery_internal_items.splice(index, 1)
-      if (!this.rsForm.delivery_internal_items.length) this.addNewDetail()
+      this.rsForm.delivery_order_items.splice(index, 1)
+      if (!this.rsForm.delivery_order_items.length) this.addNewDetail()
     },
     onSave () {
       const submit = () => {

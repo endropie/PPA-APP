@@ -18,6 +18,15 @@ VeeValidate.Validator.extend('gt_value', (value, [paramValue]) => {
   return Number(value) > Number(paramValue)
 }, { hasTarget: true, computesRequired: true })
 
+VeeValidate.Validator.extend('after_datetime', (value, [paramValue]) => {
+  const dValue = new Date(value)
+  const dParam = new Date(paramValue)
+  if (dValue.getDate() === dParam.getDate() && dValue.getMonth() === dParam.getMonth() && dValue.getFullYear() === dParam.getFullYear()) {
+    return dValue.getTime() > dParam.getTime()
+  }
+  return dValue > dParam
+}, { hasTarget: true, computesRequired: true })
+
 VeeValidate.Validator.localize('id')
 
 // leave the export, even if you don't use it

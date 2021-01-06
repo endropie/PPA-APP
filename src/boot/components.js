@@ -11,11 +11,14 @@ import UXSelect from '@/components/UXSelect'
 import UXBtnSelect from '@/components/UXBtnSelect'
 import UXNumeric from '@/components/UXNumeric'
 import UXDate from '@/components/UXDate'
+import UXDatetime from '@/components/UXDatetime'
 import UXRecurring from '@/components/UXRecurring'
 
 import UXBadgeStatus from '@/components/UXBadgeStatus'
 import UXChipStatus from '@/components/UXChipStatus'
 import UXBtnDropdown from '@/components/UXBtnDropdown'
+
+import VueQrcode from '@chenfengyuan/vue-qrcode'
 
 // leave the export, even if you don't use it
 export default async ({ app, store, router, Vue }) => {
@@ -34,9 +37,12 @@ export default async ({ app, store, router, Vue }) => {
   Vue.component('ux-btn-select', UXBtnSelect)
   Vue.component('ux-numeric', UXNumeric)
   Vue.component('ux-date', UXDate)
+  Vue.component('ux-datetime', UXDatetime)
   Vue.component('ux-recurring', UXRecurring)
 
   Vue.component('ux-badge-status', UXBadgeStatus)
   Vue.component('ux-chip-status', UXChipStatus)
   Vue.component('ux-btn-dropdown', UXBtnDropdown)
+
+  Vue.component('ux-qrcode', VueQrcode)
 }

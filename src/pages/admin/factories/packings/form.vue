@@ -1,49 +1,32 @@
 <template>
 <q-page padding class="form-page">
-  <q-card inline class="main-box q-ma-sm " :dark="LAYOUT.isDark" v-if="FORM.show">
+  <q-card inline class="main-box q-ma-sm " v-if="FORM.show">
     <q-card-section>
       <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" >
       </form-header>
     </q-card-section>
-    <q-separator :dark="LAYOUT.isDark"/>
+    <q-separator />
     <q-card-section class="row q-col-gutter-x-md">
       <!-- COLUMN::1st Packing Identitity -->
       <div class="col-12 row">
         <q-field dense borderless class="col-12 col-sm-grow"
-          :dark="LAYOUT.isDark"
-          prefix="Work Time Process"
+          prefix="WorkTime"
           :error="errors.has('worktime')"
           :error-message="errors.first('worktime')">
           <q-option-group slot="control"
             name="worktime" type="radio" inline
             v-model="rsForm.worktime"
             v-validate="'required'"
-            :dark="LAYOUT.isDark"
             :options="CONFIG.options['worktime']"
           />
         </q-field>
-        <ux-select class="col-12 col-sm-auto" style="min-width:250px"
-          name="operator_id"
-          label="Operator"
-          v-model="rsForm.operator"
-          dense filled
-          filter clearable
-          :source-keys="['name']"
-          source="/api/v1/common/employees?mode=all&limit=15&sort=name"
-          :option-sublabel="(ol) => ol ? `NP: ${ol.code}`  : undefined" option-label="name" option-value="id"
-          @selected="(ol) => rsForm.operator_id = (ol ? ol.id : null)"
-          :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-          v-validate="'required'" data-vv-as="Operator"
-          :error="errors.has('operator_id')" da-vv-as="Operator"
-          :error-message="errors.first('operator_id')"/>
       </div>
 
-      <ux-select-filter class="col-12 col-sm-6"
+      <ux-select-filter class="col-12 col-md-6"
         name="customer_id"
         v-model="rsForm.customer_id"
         :label="$tc('general.customer')"
         :disable="IssetItemID"
-        :dark="LAYOUT.isDark"
         v-validate="'required'"
         :options="CustomerOptions" clearable
         @input="setCustomerReference"
@@ -51,14 +34,14 @@
         :error-message="errors.first('customer_id')"
         :loading="SHEET['customers'].loading" />
 
-      <ux-date class="col-12 col-sm-6" name="date"
+      <ux-date class="col-12 col-md-6" name="date"
         :label="$tc('label.date')"
         no-error-icon
         v-model="rsForm.date" type="date"
-        :dark="LAYOUT.isDark"
         v-validate="'required'"
         :error="errors.has('date')"
-        :error-message="errors.first('date')">
+        :error-message="errors.first('date')"
+      >
 
         <q-select slot="after" class="no-padding" style="min-width:100px"
           name="shift_id"
@@ -71,8 +54,37 @@
           :error="errors.has('shift_id')"
         />
 
-        </ux-date>
+      </ux-date>
 
+      <ux-select class="col-12 col-sm-12 col-md-6" style="min-width:250px"
+        name="operator_id"
+        label="Operator"
+        v-model="rsForm.operator"
+        filter clearable
+        :source-keys="['name']"
+        source="/api/v1/common/employees?mode=all&limit=15&sort=name"
+        :option-sublabel="(ol) => ol ? `NP: ${ol.code}`  : undefined" option-label="name" option-value="id"
+        @selected="(ol) => rsForm.operator_id = (ol ? ol.id : null)"
+        v-validate="'required'" data-vv-as="Operator"
+        :error="errors.has('operator_id')" da-vv-as="Operator"
+        :error-message="errors.first('operator_id')"
+      />
+
+      <ux-datetime class="col-12 col-sm-6 col-md-3" name="begin_datetime" ref="begin_datetime"
+        :label="$tc('label.begin')" stack-label
+        v-model="rsForm.begin_datetime"
+        v-validate="'required'"
+        :error="errors.has('begin_datetime')"
+        :error-message="errors.first('begin_datetime')"
+      />
+
+      <ux-datetime class="col-12 col-sm-6 col-md-3" name="until_datetime" ref="until_datetime"
+        :label="$tc('label.until')" stack-label
+        v-model="rsForm.until_datetime"
+        v-validate="`required|after_datetime:${rsForm.begin_datetime}`"
+        :error="errors.has('until_datetime')"
+        :error-message="errors.first('until_datetime')"
+      />
     </q-card-section>
     <q-card-section>
       <div class="q-pa-md bordered">
@@ -87,7 +99,6 @@
             popup-content-class="options-striped"
             filter emit-value map-options
             :options="ItemOptions"
-            :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
             :error="errors.has('packing_items.item_id')"
             :error-message="errors.first('packing_items.item_id')"
             :loading="SHEET['items'].loading || SHEET['work_order_items'].loading"
@@ -98,7 +109,6 @@
             :label="$tc('label.quantity')" stack-label
             :data-vv-as="$tc('label.quantity')"
             v-model="rsForm.packing_items.quantity" type="number" :min="0"
-            :dark="LAYOUT.isDark"
             v-validate="`required|${MinValidate}|max_value:${MaxUnit}`"
             :suffix="rsForm.packing_items.item_id ? `/ ${$app.number_format(MaxUnit)}` : ''"
             :error="errors.has(`packing_items.quantity`)"
@@ -108,7 +118,6 @@
               name="packing_items.unit_id"
               :label="$tc('label.unit')" stack-label
               :data-vv-as="$tc('label.unit')"
-              :dark="LAYOUT.isDark"
               no-error-icon
               v-model="rsForm.packing_items.unit_id"
               :options="ItemUnitOptions"
@@ -126,7 +135,6 @@
           <q-select name="type_fault_id"
             label="Type of Faulty"
             v-model="rsForm.packing_items.type_fault_id"
-            :dark="LAYOUT.isDark"
             v-validate="''"
             :options="TypeFaultOptions" clearable
             map-options emit-value
@@ -136,7 +144,6 @@
 
           <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
             dense separator="horizontal"
-            :dark="LAYOUT.isDark"
             v-show="rsForm.packing_items.type_fault_id">
             <q-tr>
               <q-th key="prefix" width="50px"></q-th>
@@ -152,7 +159,6 @@
                   :name="`packing_items.packing_item_faults.${index}.quantity`"
                   type="number" min="0" align="center"
                   outlined dense hide-bottom-space no-error-icon color="blue-grey"
-                  :dark="LAYOUT.isDark"
                   v-model="row.quantity"
                   v-validate="row.fault_id ? 'required|gt_value:0' : ''"
                   :data-vv-as="$tc('label.quantity')"
@@ -164,7 +170,6 @@
                   :name="`packing_items.packing_item_faults.${index}.fault_id`"
                   outlined style="min-width:150px"
                   dense hide-bottom-space no-error-icon color="blue-grey"
-                  :dark="LAYOUT.isDark"
                   v-model="row.fault_id"
                   :options="FaultOptions" clearable
                   :disable="!row.quantity"
@@ -185,7 +190,6 @@
         </div>
       </div>
 
-
     </q-card-section>
      <q-card-section class="row q-col-gutter-x-md">
       <!-- COLUMN::4th Description -->
@@ -194,19 +198,21 @@
           stack-label :label="$tc('label.description')"
           filled
           v-model="rsForm.description"
-          :dark="LAYOUT.isDark"/>
+        />
       </div>
 
     </q-card-section>
-    <q-separator :dark="LAYOUT.isDark" />
-    <q-card-actions class="q-mx-lg">
+    <q-separator />
+    <q-card-actions :vertical="$q.screen.lt.sm">
       <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()" />
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)" />
-      <q-space />
-      <q-btn :label="$tc('form.list')" icon="list" color="dark" class="on-right" :to="`${FORM.resource.uri}?return`"/>
+      <q-space v-if="!$q.screen.lt.sm" />
+      <q-btn :label="$tc('form.list')" icon="list" color="dark" :to="`${FORM.resource.uri}?return`"/>
     </q-card-actions>
   </q-card>
-  <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
+  <q-inner-loading :showing="FORM.loading">
+    <q-spinner-dots size="70px" color="primary" />
+  </q-inner-loading>
 </q-page>
 </template>
 
@@ -216,41 +222,42 @@ import MixForm from '@/mixins/mix-form.vue'
 export default {
   mixins: [MixForm],
   data () {
-
     return {
-      SHEET:{
-        units: {api:'/api/v1/references/units?mode=all'},
-        shifts: {api:'/api/v1/references/shifts?mode=all'},
-        faults: {api:'/api/v1/references/faults?mode=all'},
-        type_faults: {api:'/api/v1/references/type-faults?mode=all'},
-        customers: {api:'/api/v1/incomes/customers?mode=all'},
-        employees: {api:'/api/v1/common/employees?mode=all', autoload: false},
-        items: {autoload:false, api:'/api/v1/common/items?mode=all&enable=true'},
+      SHEET: {
+        units: { api: '/api/v1/references/units?mode=all' },
+        shifts: { api: '/api/v1/references/shifts?mode=all' },
+        faults: { api: '/api/v1/references/faults?mode=all' },
+        type_faults: { api: '/api/v1/references/type-faults?mode=all' },
+        customers: { api: '/api/v1/incomes/customers?mode=all' },
+        employees: { api: '/api/v1/common/employees?mode=all', autoload: false },
+        items: { autoload: false, api: '/api/v1/common/items?mode=all&enable=true' },
         // work_orders: {autoload:false, api:'/api/v1/factories/work-orders?mode=all&has_amount_packing=true'},
-        work_order_items: {autoload:false, api:'/api/v1/factories/work-orders?mode=items&has_amount_packing=true'},
+        work_order_items: { autoload: false, api: '/api/v1/factories/work-orders?mode=items&has_amount_packing=true' }
       },
-      FORM:{
-        resource:{
+      FORM: {
+        resource: {
           uri: '/admin/factories/packings',
-          api: '/api/v1/factories/packings',
-        },
+          api: '/api/v1/factories/packings'
+        }
       },
       rsForm: {
-        packing_items:{}
+        packing_items: {}
       },
       rsData: {},
-      setDefault:()=>{
+      setDefault: () => {
         return {
           number: null,
           customer_id: null,
 
           date: this.$app.moment().format('YYYY-MM-DD'),
+          begin_datetime: this.$app.moment().format('YYYY-MM-DD 00:00'),
+          until_datetime: this.$app.moment().format('YYYY-MM-DD 00:00'),
           shift_id: null,
           worktime: 'REGULER',
           description: null,
           operator_id: null,
 
-          packing_items : {
+          packing_items: {
             item_id: null,
             unit_id: null,
             unit_rate: 1,
@@ -259,11 +266,11 @@ export default {
             quantity: null,
             work_order_item_id: null,
             type_fault_id: null,
-            packing_item_faults:[
+            packing_item_faults: [
               {
-                id:null,
+                id: null,
                 fault_id: null,
-                quantity: null,
+                quantity: null
               }
             ]
           }
@@ -271,27 +278,27 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     this.init()
   },
   computed: {
-    MinValidate() {
+    MinValidate () {
       if (this.rsForm.packing_items.packing_item_faults.some(x => Boolean(x.fault_id))) {
         return 'min:0'
       }
       return 'gt_value:0'
     },
-    IssetItemID() {
-      if(!this.rsForm.hasOwnProperty('packing_items')) return false;
+    IssetItemID () {
+      if (!this.rsForm.hasOwnProperty('packing_items')) return false
 
-      return (this.rsForm.packing_items.item_id ? true : false)
+      return (!!this.rsForm.packing_items.item_id)
     },
-    WorkOrderItemOptions() {
+    WorkOrderItemOptions () {
       if (!this.rsForm.customer_id) return []
       if (!this.SHEET.work_order_items.data.length) return []
 
       const hasold = (id) => (this.FORM.data.packing_items && this.FORM.data.packing_items.work_order_item_id === id)
-          ? Number(this.FORM.data.packing_items.unit_total) : 0
+        ? Number(this.FORM.data.packing_items.unit_total) : 0
 
       let data = this.SHEET.work_order_items.data.filter(item => {
         if ((item.amount_process) <= (item.amount_packing - hasold(item.id))) return false
@@ -311,27 +318,27 @@ export default {
         })
       })
     },
-  TypeFaultOptions() {
-      return (this.SHEET.type_faults.data.map(item => ({label: item.name, value: item.id})) || [])
+    TypeFaultOptions () {
+      return (this.SHEET.type_faults.data.map(item => ({ label: item.name, value: item.id })) || [])
     },
-    FaultOptions() {
+    FaultOptions () {
       if (!this.rsForm.packing_items.type_fault_id) return []
 
       let data = this.SHEET.faults.data
       data = data.filter(x => x.type_fault_id === this.rsForm.packing_items.type_fault_id)
 
-      return (data.map(item => ({label: item.name, value: item.id})) || [])
+      return (data.map(item => ({ label: item.name, value: item.id })) || [])
     },
-    ShiftOptions() {
-      return (this.SHEET.shifts.data.map(item => ({...item, label: item.name, value: item.id})) || [])
+    ShiftOptions () {
+      return (this.SHEET.shifts.data.map(item => ({ ...item, label: item.name, value: item.id })) || [])
     },
-    CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
+    CustomerOptions () {
+      return (this.SHEET.customers.data.map(item => ({ label: [item.code, item.name].join(' - '), value: item.id })) || [])
     },
-    UnitOptions() {
-      return (this.SHEET.units.data.map(item => ({...item, label: item.code, value: item.id})) || [])
+    UnitOptions () {
+      return (this.SHEET.units.data.map(item => ({ ...item, label: item.code, value: item.id })) || [])
     },
-    ItemOptions() {
+    ItemOptions () {
       if (!this.WorkOrderItemOptions.length) return []
 
       const hasItems = this.WorkOrderItemOptions.map(x => ({
@@ -345,7 +352,7 @@ export default {
           UnitRate = this.rsForm.packing_items.unit_rate || 1
         }
 
-        return hasItems.reduce((calc, item ) => {
+        return hasItems.reduce((calc, item) => {
           const add = item.id === id ? Number(item.total) : 0
           return Number(calc) + add
         }, 0) / UnitRate
@@ -354,39 +361,39 @@ export default {
       let Items = this.SHEET.items.data.filter((item) => {
         if (!hasItems.find(x => item.id === x.id)) return false
 
-        return item.customer_id == this.rsForm.customer_id
-      } )
+        return item.customer_id === this.rsForm.customer_id
+      })
       return (Items.map(item => ({
         label: item.part_name,
         sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id,
         stamp: this.$app.number_format(total(item.id)),
         disable: !item.enable,
-        rowdata:item
+        rowdata: item
       })) || [])
     },
-    ItemUnitOptions() {
+    ItemUnitOptions () {
       let vars = []
 
       let rsItem = this.rsForm.packing_items
-      vars = ( this.UnitOptions || [])
-      vars = vars.filter((unit)=> {
-        if(!rsItem.item_id) return false
-        if(rsItem.item) {
-          if(rsItem.item.unit_id === unit.value) return true
-          if(rsItem.item.item_units) {
-            let filters = rsItem.item.item_units.filter((fill)=> fill.unit_id === unit.value)
-            if(filters.length > 0) return true
+      vars = (this.UnitOptions || [])
+      vars = vars.filter((unit) => {
+        if (!rsItem.item_id) return false
+        if (rsItem.item) {
+          if (rsItem.item.unit_id === unit.value) return true
+          if (rsItem.item.item_units) {
+            let filters = rsItem.item.item_units.filter((fill) => fill.unit_id === unit.value)
+            if (filters.length > 0) return true
           }
         }
-        return false;
+        return false
       })
       return vars
     },
-    MaxUnit() {
+    MaxUnit () {
       let rsItem = this.rsForm.packing_items
-      if(!rsItem.item_id) return 0
-      if(this.WorkOrderItemOptions.length == 0) return 0
+      if (!rsItem.item_id) return 0
+      if (this.WorkOrderItemOptions.length === 0) return 0
 
       const UnitRate = this.rsForm.packing_items.unit_rate || 1
 
@@ -396,24 +403,23 @@ export default {
           : total += (Number(opt.rowdata.amount_process) - Number(opt.rowdata.amount_packing)) / UnitRate
       }, 0)
 
-      if (Boolean(this.FORM.data.packing_items.unit_total)) {
+      if (this.FORM.data.packing_items.unit_total) {
         total += Number(this.FORM.data.packing_items.unit_total)
       }
 
       let faults = 0
-      if(this.rsForm.packing_items && this.rsForm.packing_items.packing_item_faults) {
-        faults = this.rsForm.packing_items.packing_item_faults.reduce( (calc, item ) => {
+      if (this.rsForm.packing_items && this.rsForm.packing_items.packing_item_faults) {
+        faults = this.rsForm.packing_items.packing_item_faults.reduce((calc, item) => {
           return Number(calc) + Number(item.quantity)
-        }, 0 )
-
+        }, 0)
       }
 
       total -= faults
       return total
     },
-    MAPINGKEY() {
+    MAPINGKEY () {
       let variables = {
-        'customers' : {},
+        'customers': {},
         'units': {},
         'items': {}
       }
@@ -422,63 +428,60 @@ export default {
       this.SHEET['units'].data.map(value => { variables['units'][value.id] = value })
       this.SHEET['items'].data.map(value => { variables['items'][value.id] = value })
 
-      return variables;
+      return variables
     }
   },
-  watch:{
-    '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
       })
     },
-    setForm(data) {
-      this.rsForm =  JSON.parse(JSON.stringify(data))
+    setForm (data) {
+      this.rsForm = JSON.parse(JSON.stringify(data))
 
-      if(data.customer_id) {
-        this.SHEET.load('items', 'customer_id='+ data.customer_id)
+      if (data.customer_id) {
+        this.SHEET.load('items', 'customer_id=' + data.customer_id)
 
         const params = [
-          `customer_id=${data.customer_id}`,
+          `customer_id=${data.customer_id}`
           // FOR EDIT ONLY
           // `or_detail_ids=${data.packing_items.work_order_item_id}`,
         ]
-        this.SHEET.load('work_order_items', params.join('&') )
+        this.SHEET.load('work_order_items', params.join('&'))
       }
 
-      if(data.hasOwnProperty('has_relationship') && data['has_relationship'].length > 0) {
+      if (data.hasOwnProperty('has_relationship') && data['has_relationship'].length > 0) {
         this.FORM.has_relationship = data.has_relationship
         this.FORM.onRelationship({
           title: 'Packing Good has relation!',
-          message: data['has_relationship'].join("-"),
+          message: data['has_relationship'].join('-'),
           then: () => this.$router.push(`${this.FORM.resource.uri}/${data.id}/view`)
         })
       }
-
     },
-    setCustomerReference(val) {
-      if(!val) {
+    setCustomerReference (val) {
+      if (!val) {
         this.rsForm.packing_items.item_id = null
-      }
-      else {
-        this.SHEET.load('items', 'customer_id='+val)
+      } else {
+        this.SHEET.load('items', 'customer_id=' + val)
         const params = [`customer_id=${val}`]
-        if(this.FORM.data.packing_items && this.FORM.data.packing_items.work_order_item_id) {
+        if (this.FORM.data.packing_items && this.FORM.data.packing_items.work_order_item_id) {
           params.push(`or_detail_ids=${this.FORM.data.packing_items.work_order_item_id}`)
         }
-        this.SHEET.load('work_order_items', params.join('&') )
+        this.SHEET.load('work_order_items', params.join('&'))
       }
     },
-    setItemReference(val) {
-      if(!val) {
+    setItemReference (val) {
+      if (!val) {
         this.rsForm.packing_items.unit_id = null
         this.rsForm.packing_items.work_order_item_id = null
         this.rsForm.packing_items.unit = {}
         this.rsForm.packing_items.item = {}
-      }
-      else{
+      } else {
         let baseUnitID = this.MAPINGKEY['items'][val].unit_id
         this.rsForm.packing_items.unit_id = baseUnitID
         this.rsForm.packing_items.unit_rate = 1
@@ -489,41 +492,42 @@ export default {
         this.rsForm.packing_items.work_order_item_id = null
       }
     },
-    setUnitReference(val) {
-      if(!val) return;
+    setUnitReference (val) {
+      if (!val) return undefined
       else if (this.rsForm.packing_items.item.unit_id === val) {
         this.rsForm.packing_items.unit_rate = 1
-      }
-      else {
-        if(this.rsForm.packing_items.item.item_units) {
-          this.rsForm.packing_items.item.item_units.map((unitItem)=> {
-            if (unitItem.unit_id == val) this.rsForm.packing_items.unit_rate = unitItem.rate
+      } else {
+        if (this.rsForm.packing_items.item.item_units) {
+          this.rsForm.packing_items.item.item_units.map((unitItem) => {
+            if (unitItem.unit_id === val) this.rsForm.packing_items.unit_rate = unitItem.rate
           })
         }
       }
     },
 
-    addNewItemFault(autofocus = true){
-      let newEntri =  this.setDefault().packing_items.packing_item_faults[0];
+    addNewItemFault (autofocus = true) {
+      let newEntri = this.setDefault().packing_items.packing_item_faults[0]
 
       this.rsForm.packing_items.packing_item_faults.push(newEntri)
     },
-    removeItemFault(index) {
-        this.rsForm.packing_items.packing_item_faults.splice(index, 1)
-        if(this.rsForm.packing_items.packing_item_faults.length < 1) this.addNewItemFault()
+    removeItemFault (index) {
+      this.rsForm.packing_items.packing_item_faults.splice(index, 1)
+      if (this.rsForm.packing_items.packing_item_faults.length < 1) this.addNewItemFault()
     },
 
-    onSave() {
-
+    onSave () {
       this.$validator.validate().then(result => {
         if (!result) {
           return this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
             message: this.$tc('messages.to_complete_form')
           })
         }
         this.FORM.loading = true
-        let {method, mode, apiUrl} = this.FORM.meta()
+        let { method, apiUrl } = this.FORM.meta()
         // apiUrl += '?mode=multicreate'
         this.$axios.set(method, apiUrl, this.rsForm)
           .then((response) => {
@@ -536,19 +540,18 @@ export default {
             // this.FORM.toView(packings.map(x => x.id).join(','))
 
             let message = response.data.number + ' - #' + response.data.id
-            this.FORM.response.success({message:message})
+            this.FORM.response.success({ message: message })
             this.FORM.toView(response.data.id)
           })
           .catch((error) => {
             this.FORM.response.fields(error.response)
             this.FORM.response.error(error.response || error, 'Submit')
           })
-          .finally(()=>{
+          .finally(() => {
             this.FORM.loading = false
-          });
-
-      });
-    },
-  },
+          })
+      })
+    }
+  }
 }
 </script>

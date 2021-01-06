@@ -1,7 +1,7 @@
 <template>
     <q-card highlight class="main-box no-margin no-shadow" :dark="LAYOUT.isDark">
       <q-card-section>
-        <span class="text-h4 text-uppercase text-blue-grey" header>{{$tc('general.incoming_good')}}</span>
+        <span class="text-h4 text-uppercase text-blue-grey" header>{{$tc('general.sj_delivery')}}</span>
       </q-card-section>
       <q-separator inset/>
       <q-card-section class="row q-col-gutter-xs" v-if="FORM.show">
@@ -19,8 +19,8 @@
           v-validate="'required|max:10'"
           :dark="LAYOUT.isDark"
           :error="errors.has('number_prefix')"
-          :error-message="errors.first('number_prefix')" />
-
+          :error-message="errors.first('number_prefix')"
+        />
 
         <q-select class="col-12 col-sm-4"
           name="number_interval"
@@ -29,60 +29,21 @@
           :options="CONFIG.options['prefix_intervals']"
           emit-value map-options
           v-validate="''"
-          :dark="LAYOUT.isDark"
           :error="errors.has('number_interval')"
-          :error-message="errors.first('number_interval')" />
+          :error-message="errors.first('number_interval')"
+        />
 
         <q-input class="col-12 col-sm-4"
           name="number_digit"
           :label="$tc('label.quantity', 1, {v: 'Digit'})"
           v-model="rsForm.number_digit"
           v-validate="'max:191'"
-          :dark="LAYOUT.isDark"
           :error="errors.has('number_digit')"
-          :error-message="errors.first('number_digit')" />
-
-        <div class="col-12 self-center">
-          <q-chip outline square color="primary" >
-            <q-badge :label="'CUST INDEXED'" class="on-left"></q-badge>
-            {{INDEXED_EXAMP}}
-          </q-chip>
-        </div>
-
-        <q-select class="col-12 col-sm-6"
-          name="indexed_number_interval"
-          label="Cust. indexed Prefix"
-          v-model="rsForm.indexed_number_interval"
-          :options="CONFIG.options['prefix_intervals']"
-          emit-value map-options
-          v-validate="''"
-          :dark="LAYOUT.isDark"
-          :error="errors.has('indexed_number_interval')"
-          :error-message="errors.first('indexed_number_interval')" />
-
-        <q-input class="col-12 col-sm-6"
-          name="indexed_number_digit"
-          :label="$tc('label.quantity', 1, {v: 'Digit'})"
-          v-model="rsForm.indexed_number_digit"
-          v-validate="'max:191'"
-          :dark="LAYOUT.isDark"
-          :error="errors.has('indexed_number_digit')"
-          :error-message="errors.first('indexed_number_digit')" />
+          :error-message="errors.first('number_digit')"
+        />
 
       </q-card-section>
       <q-separator inset />
-      <q-card-section class="row">
-        <q-select class="col-12"
-          name="show"
-          label="Hide View Columns"
-          v-model="rsForm.hide_view_columns"
-          :options="['part_name', 'part_subname', 'quantity', 'unit', 'note']"
-          multiple use-chips
-          :dark="LAYOUT.isDark"
-          :error="errors.has('hide_view_columns')"
-          :error-message="errors.first('hide_view_columns')" />
-
-      </q-card-section>
       <q-card-actions class="q-gutter-sm" align="right">
           <q-btn dense color="positive"  @click="onSave()">Save</q-btn>
       </q-card-actions>
@@ -102,27 +63,27 @@ export default {
     return {
       FORM: {
         show: false,
-        resource:{
-          name: 'incoming_good',
-          api: '/api/v1/setting',
-        },
+        resource: {
+          name: 'sj_internal',
+          api: '/api/v1/setting'
+        }
       },
       rsForm: {
         number_prefix: null,
         number_interval: null,
-        number_digit: null,
-      },
+        number_digit: null
+      }
     }
   },
-  created() {
+  created () {
     // Component Page Created!
     this.init()
   },
-  watch:{
-      '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
-  computed:{
-    EXAMP() {
+  computed: {
+    EXAMP () {
       const separator = this.SETTING.general.prefix_separator
       let example = ''
       if (this.rsForm.number_prefix) example += this.rsForm.number_prefix + separator
@@ -136,7 +97,7 @@ export default {
       return example + String(1).padStart(this.rsForm.number_digit || 5, '0')
     },
 
-    INDEXED_EXAMP() {
+    INDEXED_EXAMP () {
       const separator = this.SETTING.general.prefix_separator
       let example = '[CODE CUST]' + separator
 
@@ -151,7 +112,7 @@ export default {
     }
   },
   methods: {
-    init() {
+    init () {
       this.FORM.loading = true
       this.FORM.show = false
       const resource = JSON.parse(JSON.stringify(this.$store.state.admin.SETTING[this.FORM.resource.name]))
@@ -160,24 +121,25 @@ export default {
       setTimeout(() => {
         this.FORM.loading = false
         this.FORM.show = true
-
       }, 500)
     },
-    onSave() {
-
+    onSave () {
       this.$validator.validateAll().then(result => {
         if (!result) {
           this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
-          });
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
+          })
 
-          return;
+          return
         }
         this.FORM.loading = true
         this.$axios.set('POST', `${this.FORM.resource.api}/${this.FORM.resource.name}`, this.rsForm)
           .then((response) => {
-            this.FORM.response.success({ mode:'edit', label:'Setting'})
+            this.FORM.response.success({ mode: 'edit', label: 'Setting' })
             this.$store.commit('admin/setSetting', response.data)
             this.$nextTick(() => this.$validator.reset())
           })
@@ -185,11 +147,11 @@ export default {
             this.FORM.response.fields(error.response)
             this.FORM.response.error(error.response || error, 'Setting')
           })
-          .finally(()=>{
+          .finally(() => {
             this.FORM.loading = false
-          });
-      });
-    },
-  },
+          })
+      })
+    }
+  }
 }
 </script>

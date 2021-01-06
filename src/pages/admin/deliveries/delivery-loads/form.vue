@@ -27,58 +27,91 @@
       <div class="row q-col-gutter-x-md">
         <div class="col-12 col-md-6">
           <ux-select
-            name="customer_id"
             :label="$tc('general.customer')"  stack-label
             v-model="rsForm.customer"
             filter clearable
-            source="api/v1/incomes/customers?mode=all"
+            source="api/v1/incomes/customers?mode=all&--with=customer_trips"
             :option-label="(item) => `[${item.code}] ${item.name}`"
-            option-value="id"
-            :disable="Boolean(!rsForm.transaction || rsForm.delivery_load_items.find(i => i.item_id))"
+            :disable="Boolean(!rsForm.transaction) || Boolean(rsForm.trip_time) || Boolean(rsForm.delivery_load_items.find(i => i.item_id))"
+            v-validate="'required'"
+            name="customer_id" :data-vv-as="$tc('general.customer')"
             :error="errors.has('customer_id')"
             :error-message="errors.first('customer_id')"
             @input="(v) => {
-              rsForm.customer = v ? v : null
               rsForm.customer_id = v ? v.id : null
               rsForm.customer_name = v ? v.name : null
               rsForm.customer_phone = v ? v.phone : null
               rsForm.customer_address = v ? v.address : null
               rsForm.order_mode = v ? v.order_mode : null
+              loadTrip()
             }"
           />
-          <div class="row">
-            <ux-date dense
-              name="date" type="date"
+          <div class="row q-col-gutter-x-sm">
+            <ux-date type="date" no-error-icon
+              class="col-12 col-sm-6"
+              :label="$tc('label.date')" stack-label
               v-model="rsForm.date"
-              :disable="Boolean(!rsForm.transaction || rsForm.delivery_load_items.find(i => i.item_id))"
+              :disable="Boolean(!rsForm.transaction) || Boolean(rsForm.trip_time) || Boolean(rsForm.delivery_load_items.find(i => i.item_id))"
               v-validate="'required'"
+              name="date"
               :error="errors.has('date')"
               :error-message="errors.first('date')"
+              @input="loadTrip"
             />
-            <q-space />
-            <q-select dense outlined
-              style="min-width: 80px"
-              name="rit"
-              v-model="rsForm.rit"
-              :options="[1,2,3,4,5,6,7,8,9,10]"
-              prefix="RIT"
-              v-validate="'required'"
-              :error="errors.has('rit')"
-              :error-message="errors.first('rit')"
-            />
+            <q-field borderless no-error-icon class="col-12 col-sm-6"
+              :disable="!rsForm.customer || !rsForm.date"
+              :error="errors.has('trip_time')"
+              :error-message="errors.first('trip_time')"
+            >
+              <q-input slot="control" type="time" step="1800" no-error-icon
+                name="trip_time" :data-vv-as="$tc('label.time')"
+                class="no-padding no-margin"
+                :label="$tc('label.time')" stack-label
+                :disable="Boolean(!rsForm.customer_id || rsForm.is_untriped)"
+                v-model="rsForm.trip_time"
+                v-validate="Boolean(rsForm.is_untriped) ? '' : 'required'"
+              >
+              <q-btn slot="append" icon="arrow_drop_down" :disable="!rsForm.customer" flat dense  class="no-padding self-end">
+                <q-menu auto-close>
+                  <q-list bordered v-if="rsForm.customer">
+                    <q-item clickable v-for="(trip, indexCT) in TripOptions" :key="indexCT"
+                      @click="rsForm.trip_time = trip"
+                    >
+                      <q-item-section>{{String(trip).substring(0,5)}}</q-item-section>
+                      <q-item-section avatar>
+                        <q-icon color="primary" name="timer" />
+                      </q-item-section>
+                    </q-item>
+                    <q-separator inset />
+                    <!-- <q-item clickable v-for="(ct, indexCT) in rsForm.customer.customer_trips.filter(x => x.intday === $app.moment(rsForm.date).day()) || []"
+                      :key="`ct-${indexCT}`"
+                      @click="rsForm.trip_time = trip"
+                    >
+                      <q-item-section>{{String(ct.time).substring(0,5)}}</q-item-section>
+                      <q-item-section avatar>
+                        <q-icon color="primary" name="timer" />
+                      </q-item-section>
+                    </q-item> -->
+                  </q-list>
+                </q-menu>
+              </q-btn>
+            </q-input>
+            <q-checkbox slot="append" class="self-end text-subtitle2"
+                v-model="rsForm.is_untriped"
+                label="NO TRIP" left-label
+                :true-value="1" :false-value="0"
+                @input="() => {
+                  if (rsForm.is_untriped) rsForm.trip_time = null
+                }"
+              />
+            </q-field>
           </div>
           <div class="row q-col-gutter-x-sm">
-            <q-input type="text"
-              :label="$tc('label.delivery_note')"
-              class="col"
-              v-model="rsForm.customer_note"
-              hint=" "
-            />
-            <ux-select class="col"
+            <ux-select class="col-12 col-sm-6"
               name="vehicle_id"
               :label="$tc('general.vehicle')"
               v-model="rsForm.vehicle"
-              source="api/v1/references/vehicles?mode=all"
+              source="api/v1/references/vehicles?mode=all&type=DELIVERY"
               :option-label="(item) => `${item.number}`"
               option-value="id"
               filter clearable
@@ -88,6 +121,13 @@
                 rsForm.vehicle = v ? v : null
                 rsForm.vehicle_id = v ? v.id : null
               }"
+            />
+            <q-input type="text" class="col-12 col-sm-6"
+              :label="$tc('label.delivery_note')"
+              v-model="rsForm.customer_note"
+              hint=" "
+              :error="errors.has('delivery_note')"
+              :error-message="errors.first('delivery_note')"
             />
           </div>
         </div>
@@ -120,6 +160,26 @@
     <q-separator inset />
     <!-- SINGLE-REVISION -->
     <q-card-section :class="$app.classDimmed(!Boolean(rsForm.customer_id && rsForm.date))" >
+      <!-- {{rsForm.customer}} -->
+      <div class="column q-mb-sm" v-if="rsForm.customer && rsForm.order_mode !== 'ACCUMULATE' && rsForm.customer.delivery_manual_allowed">
+        <ux-select outlined dense hide-bottom-space
+          class="self-end"
+          label="SJDO Manual"
+          v-model="rsForm.request_order"
+          :disable="Boolean(rsForm.delivery_load_items.find(x => x.item))"
+          filter clearable use-chips
+          :source="`/api/v1/incomes/request-orders?mode=all&--limit=20&status=open&customer_id=${rsForm.customer_id}`"
+          :source-key="['number', 'reference_number']"
+          option-label="fullnumber"
+          :option-sublabel="(opt) => `[${$app.moment(opt.date).format('DD/MM/YYYY')}] ${opt.reference_number}`"
+          v-validate="''"
+          :name="`request_order_id`"
+          :error-message="errors.first(`request_order_id`)"
+          @input="(v) => {
+            rsForm.request_order_id = v ? v.id : null
+          }"
+        />
+      </div>
       <!-- COLUMN:: Part items lists -->
       <q-markup-table bordered class="main-box no-shadow no-highlight q-mb-sm"
         dense separator="horizontal">
@@ -139,9 +199,36 @@
             </q-td>
             <q-td name="part">
               <ux-select dense outlined hide-bottom-space
+                class="field-native-top"
+                v-if="rsForm.request_order"
+                v-model="row.request_order_item"
+                filter clearable
+                :source="`/api/v1/incomes/request-order-items?mode=all&--limit=50&--with=item;unit&delivery_date=${rsForm.date}&request_order_id=${rsForm.request_order_id}`"
+                :option-label="(opt) => `${opt.item.part_name}`"
+                :option-sublabel="(opt) => `${opt.item.part_subname} (${opt.quantity} ${opt.unit.code})`"
+                v-validate="'required'"
+                :name="`delivery_load_items.${rowIndex}.request_order_item_id`"
+                :error-message="errors.first(`delivery_load_items.${rowIndex}.request_order_item_id`)"
+                @input="(v) => {
+                  row.request_order_item_id = v ? v.id : null
+                  row.item_id = v ? v.item.id : null
+                  row.item = v ? v.item : null
+                  row.unit_rate = v ? 1 : null
+                  row.unit_id = v ? v.item.unit.id : null
+                  row.unit = v ? { value: v.item.unit.id, label: v.item.unit.code, rate:1 } : null
+                }"
+              >
+                <small v-if="row.item" class="absolute-bottom text-blue-grey">
+                  [{{row.item.customer_code}}]
+                  {{row.item.part_subname}}
+                </small>
+              </ux-select>
+              <ux-select dense outlined hide-bottom-space
+                class="field-native-top"
+                v-show="!rsForm.request_order"
                 v-model="row.item"
                 filter clearable
-                :source="`/api/v1/common/items?mode=all&--limit=50&delivery_verify_date=${rsForm.date}&customer_id=${rsForm.customer_id}`"
+                :source="`/api/v1/common/items?mode=all&--limit=50&delivery_date=${rsForm.date}&customer_id=${rsForm.customer_id}${rsForm.request_order_id ? '&in_request_order_id='+rsForm.request_order_id : '' }`"
                 :source-key="['part_name', 'part_number', 'code']"
                 option-label="part_name"
                 :option-sublabel="(opt) => `[${opt.customer_code}] ${opt.part_number}`"
@@ -156,18 +243,30 @@
                   row.unit_rate = v ? 1 : null
                   row.unit = v ? { value: v.unit.id, label: v.unit.code, rate:1 } : null
                 }"
-              />
+              >
+                <small v-if="row.item" class="absolute-bottom text-blue-grey">
+                  [{{row.item.customer_code}}]
+                  {{row.item.part_subname}}
+                </small>
+              </ux-select>
             </q-td>
             <q-td name="quantity">
-              <q-input type="number" dense outlined hide-bottom-space
+              <q-input type="number" dense outlined hide-bottom-space no-error-icon
                 v-model="row.quantity"
-                v-validate="'required|gt_value:0'"
+                v-validate="`required|gt_value:0|max_value:${UnitMax[rowIndex]}`"
                 :name="`delivery_load_items.${rowIndex}.quantity`"
+                :data-vv-as="$tc('label.quantity')"
                 :error="errors.has(`delivery_load_items.${rowIndex}.quantity`)"
-              />
+                :error-message="errors.first(`delivery_load_items.${rowIndex}.quantity`)"
+              >
+                <span slot="append" class="text-subtitle2" >
+                  <span v-if="UnitMax[rowIndex] > 0">/ {{$app.number_format(UnitMax[rowIndex])}}</span>
+                  <span v-else>[~]</span>
+                </span>
+              </q-input>
             </q-td>
             <q-td name="satuan">
-              <q-select type="text" dense outlined hide-bottom-space
+              <q-select type="text" dense outlined hide-bottom-space no-error-icon
                 v-model="row.unit"
                 :options="ItemUnitOptions[rowIndex]"
                 :option-label="opt => opt.code || opt.label"
@@ -204,7 +303,7 @@
       />
     </q-card-section>
     <q-separator :dark="LAYOUT.isDark" />
-    <q-card-actions class="q-mx-lg">
+    <q-card-actions class="q-mx-sm" :vertical="$q.screen.lt.sm">
       <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()"></q-btn>
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
       <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()"></q-btn>
@@ -232,6 +331,7 @@ export default {
           uri: '/admin/deliveries/delivery-loads'
         }
       },
+      dataTrips: [],
       rsForm: null,
       setDefault: () => {
         return {
@@ -239,7 +339,8 @@ export default {
           transaction: null,
           order_mode: null,
           date: this.$app.moment().format('YYYY-MM-DD'),
-          rit: null,
+          trip_time: null,
+          is_untriped: 0,
           customer: null,
           customer_id: null,
           customer_name: null,
@@ -248,13 +349,19 @@ export default {
           vehicle: null,
           vehicle_id: null,
           customer_note: null,
-          delivery_load_items:
-          [{
-            name: null,
-            quantity: null,
-            unit: null,
-            notes: null
-          }],
+          request_order_id: null,
+          request_order: null,
+          delivery_load_items: [
+            {
+              request_order_item_id: null,
+              request_order_item: null,
+              item_id: null,
+              item: null,
+              quantity: null,
+              unit: null,
+              notes: null
+            }
+          ],
           description: null
         }
       }
@@ -265,6 +372,31 @@ export default {
     this.init()
   },
   computed: {
+    UnitMax () {
+      let maximum = Object.assign({
+        total: {},
+        add: function (id, v) {
+          if (!maximum.total[id]) maximum.total[id] = 0
+          maximum.total[id] += v
+        }
+      })
+      return this.rsForm.delivery_load_items.map((detail, i) => {
+        if (!detail.item) return 0
+        const amount = detail.item.amount_delivery
+        let available = (amount['VERIFY'] - amount['LOAD.REG'] + amount['LOAD.RET'])
+        if (!maximum.total[detail.item.id]) maximum.total[detail.item.id] = 0
+        const result = available - maximum.total[detail.item.id]
+        maximum.add(detail.item.id, detail.quantity * detail.unit_rate)
+        return result / (detail.unit_rate || 1)
+      })
+    },
+    TripOptions () {
+      let options = []
+      this.dataTrips.map(item => {
+        if (!options.find(x => x === item.trip_time)) options.push(item.trip_time)
+      })
+      return options
+    },
     UnitOptions () {
       return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
@@ -300,6 +432,19 @@ export default {
     },
     setForm (data) {
       this.rsForm = Object.assign({}, this.setDefault(), data)
+    },
+    loadTrip () {
+      if (this.rsForm.customer_id && this.rsForm.date) {
+        const apiUrl = `/api/v1/incomes/delivery-tasks?mode=all&date=${this.rsForm.date}&customer_id=${this.rsForm.customer_id}`
+        this.$axios.get(apiUrl, this.rsForm)
+          .then(response => {
+            this.dataTrips = JSON.parse(JSON.stringify(response.data))
+          }).catch(error => {
+            this.$app.response.error(error.response || error)
+          })
+      } else {
+        this.dataTrips = []
+      }
     },
     addNewDetail () {
       const newitem = Object.assign(this.setDefault().delivery_load_items[0], { _autofocus: true })
@@ -351,3 +496,8 @@ export default {
   }
 }
 </script>
+<style lang="stylus">
+.field-native-top
+  .q-field__native
+    align-items flex-start
+</style>

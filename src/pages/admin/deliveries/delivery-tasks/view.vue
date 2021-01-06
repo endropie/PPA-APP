@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="column justify-start">
     <page-print v-if="VIEW.show">
-      <div slot="header-title">Delivery (Schema) </div>
+      <div slot="header-title">PRE - DELVERY</div>
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
@@ -32,6 +32,10 @@
               <tr>
                 <td class="text-weight-medium">{{$tc('label.date')}}</td>
                 <td>{{$app.date_format(rsView.date)}}</td>
+              </tr>
+              <tr>
+                <td class="text-weight-medium">RIT</td>
+                <td>{{$app.date_format(rsView.date +' '+ rsView.trip_time, 'HH:mm')}}</td>
               </tr>
             </tbody>
           </q-markup-table>

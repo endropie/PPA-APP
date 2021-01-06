@@ -12,6 +12,7 @@ export default async ({ app, store, router, Vue }) => {
     description: process.env.APP_DESCRIPTION,
     get: _lodash.get,
     set: _lodash.set,
+    clone: (v) => JSON.parse(JSON.stringify(v)),
     setting: (aval) => {
       const setting = Object.assign({}, store.getters['admin/SETTING'])
       return _lodash.get(setting, aval)
@@ -94,6 +95,9 @@ export default async ({ app, store, router, Vue }) => {
             case 422:
               mode.message = 'The fields was not failed!'
               mode.detail = (ErrRes.data.message || ErrRes.statusText)
+              if (ErrRes.data.errors && ErrRes.data.errors) {
+                mode.detail = ErrRes.data.errors[Object.keys(ErrRes.data.errors)[0]][0]
+              }
               break
             case 501:
               mode.message = (title || 'PROCESS NOT ALLOWED!')
