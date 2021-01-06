@@ -516,28 +516,12 @@ export default {
     },
 
     onSave () {
-      this.$validator.validate().then(result => {
-        if (!result) {
-          return this.$q.notify({
-            color: 'negative',
-            icon: 'error',
-            position: 'top-right',
-            timeout: 3000,
-            message: this.$tc('messages.to_complete_form')
-          })
-        }
-        this.FORM.loading = true
+      const submit = () => {
+        this.$q.loading.show()
         let { method, apiUrl } = this.FORM.meta()
-        // apiUrl += '?mode=multicreate'
         this.$axios.set(method, apiUrl, this.rsForm)
-          .then((response) => {
-            // const packings = response.data || []
-            // let message = packings.map(packing => {
-            //   return packing.number + ' - #' + packing.id
-            // }).join(',')
-
-            // this.FORM.response.success({message:message})
-            // this.FORM.toView(packings.map(x => x.id).join(','))
+          .then(response => {
+            console.warn('response', response)
 
             let message = response.data.number + ' - #' + response.data.id
             this.FORM.response.success({ message: message })
@@ -545,11 +529,24 @@ export default {
           })
           .catch((error) => {
             this.FORM.response.fields(error.response)
-            this.FORM.response.error(error.response || error, 'Submit')
+            this.FORM.response.error(error.response || error, 'SAVE FAILED')
           })
           .finally(() => {
-            this.FORM.loading = false
+            this.$q.loading.hide()
           })
+      }
+
+      this.$validator.validate().then(result => {
+        if (!result) return this.$q.notify({ color: 'negative', icon: 'error', position: 'top-right', timeout: 3000, message: this.$tc('messages.to_complete_form') })
+
+        this.$q.dialog({
+          title: this.$tc('form.confirm'),
+          message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.save') }),
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          submit()
+        })
       })
     }
   }

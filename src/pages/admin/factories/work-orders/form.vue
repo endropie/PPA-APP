@@ -268,11 +268,7 @@ export default {
               unit_rate: 1,
               ngratio: 0,
               item: {},
-              unit: {},
-              work_order_item_lines: [{
-                line_id: null,
-                ismain: 0
-              }]
+              unit: {}
             }
           ]
         }
@@ -464,16 +460,6 @@ export default {
         this.rsForm.work_order_items[index].item = {}
       } else {
         this.rsForm.work_order_items[index].item = this.MAPINGKEY['items'][val]
-        if (this.rsForm.work_order_items[index].item.item_prelines.length > 0) {
-          const prelines = this.rsForm.work_order_items[index].item.item_prelines
-          this.rsForm.work_order_items[index].work_order_item_lines = []
-
-          for (let i = 0; i < prelines.length; i++) {
-            let ex = this.setDefault().work_order_items[0].work_order_item_lines[0]
-            ex.line_id = prelines[i].line_id
-            this.rsForm.work_order_items[index].work_order_item_lines.push(ex)
-          }
-        }
         let baseUnitID = this.MAPINGKEY['items'][val].unit_id
         this.rsForm.work_order_items[index].unit_id = baseUnitID
         this.rsForm.work_order_items[index].unit_rate = 1
@@ -499,22 +485,12 @@ export default {
     },
     addNewItem () {
       let newEntri = this.setDefault().work_order_items[0]
-      newEntri.work_order_item_lines = []
 
       this.rsForm.work_order_items.push(newEntri)
     },
     removeItem (itemIndex) {
       this.rsForm.work_order_items.splice(itemIndex, 1)
       if (this.rsForm.work_order_items.length < 1) this.addNewItem()
-    },
-    addNewItemLine (itemIndex) {
-      let newEntri = this.setDefault().work_order_items[0].work_order_item_lines[0]
-
-      this.rsForm.work_order_items[itemIndex].work_order_item_lines.push(newEntri)
-    },
-    removeItemLine (itemIndex, lineIndex) {
-      this.rsForm.work_order_items[itemIndex].work_order_item_lines.splice(lineIndex, 1)
-      if (this.rsForm.work_order_items[itemIndex].work_order_item_lines.length < 1) this.addNewItemLine(itemIndex)
     },
     onSave () {
       this.$validator.validate().then(result => {

@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="page-index" >
     <q-pull-to-refresh @refresh="TABLE.refresh" inline>
-      <q-table ref="table" inline class="table-index table-striped th-uppercase" color="primary" :dark="LAYOUT.isDark"
+      <q-table ref="table" inline class="table-index table-striped th-uppercase" color="primary"
         :data="TABLE.rowData"
         :columns="TABLE.columns"
         selection="none"
@@ -46,8 +46,7 @@
                   :placeholder="$tc('form.select', 1, {v:$tc('items.preline')})"
                   dense hide-bottom-space hide-dropdown-icon
                   standout="bg-blue-grey-5 text-white"
-                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                  :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
                   :options="LineOptions"
                   @input="FILTERABLE.submit" />
 
@@ -57,8 +56,7 @@
                   :options="stockist_options" map-options emit-value
                   dense hide-bottom-space hide-dropdown-icon
                   standout="bg-blue-grey-5 text-white"
-                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                  :dark="LAYOUT.isDark"
+                  :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
                   @input="FILTERABLE.submit" />
 
                 <q-select class="col" style="min-width:120px"
@@ -67,18 +65,18 @@
                   :label=" $tc('label.state')"
                   dense hide-bottom-space hide-dropdown-icon
                   standout="bg-blue-grey-5 text-white"
-                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                  :dark="LAYOUT.isDark"
-                  @input="FILTERABLE.submit" />
+                  :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
+                  @input="FILTERABLE.submit"
+                />
 
                 <ux-date class="col" style="min-width:150px"
                   stack-label :label="$tc('label.date')"
                   v-model="FILTERABLE.fill.date.value" type="date"  clearable
                   dense hide-bottom-space
                   standout="bg-blue-grey-5 text-white"
-                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                  :dark="LAYOUT.isDark"
-                  @input="FILTERABLE.submit"/>
+                  :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
+                  @input="FILTERABLE.submit"
+                />
 
                 <q-select class="col" style="min-width:120px"
                   map-options emit-value
@@ -87,10 +85,8 @@
                   :label="$tc('label.shift')"
                   dense hide-bottom-space hide-dropdown-icon
                   standout="bg-blue-grey-5 text-white"
-                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                  :dark="LAYOUT.isDark"
+                  :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
                   @input="FILTERABLE.submit"/>
-
 
               </div>
 
@@ -103,8 +99,7 @@
                     :placeholder="$tc('form.select', 1, {v:$tc('general.customer')})"
                     dense hide-bottom-space hide-dropdown-icon
                     standout="bg-blue-grey-5 text-white"
-                    :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                    :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                    :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
                     :options="CustomerOptions"
                     filter emit-value map-options
                     @input="[
@@ -119,8 +114,7 @@
                     :placeholder="$tc('form.select', 1, {v:$tc('general.item')})"
                     dense hide-bottom-space hide-dropdown-icon
                     standout="bg-blue-grey-5 text-white"
-                    :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                    :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                    :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
                     :options="ItemOptions"
                     @input="FILTERABLE.submit"
                     :loading="SHEET['items'].loading"/>
@@ -132,8 +126,7 @@
                 v-model="FILTERABLE.search" emit-value
                 :placeholder="`${$tc('form.search',2)}...`"
                 standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark"
+                :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
                 @input="FILTERABLE.submit">
 
                 <template slot="append">
@@ -180,7 +173,7 @@
                 </div>
               </q-linear-progress>
             </div>
-            <div class="row no-wrap items-center text-left">
+            <div class="row no-wrap items-center text-left" v-show="!rs.row.main_id">
               <q-chip dense square color="lime-8" text-color="white" class="q-my-none" style="width:50px">PAK</q-chip>
               <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.summary_productions) ? (rs.row.summary_packings/rs.row.summary_productions) : 0">
                 <div class="absolute-full flex flex-center">
@@ -220,7 +213,6 @@
       </q-table>
     </q-pull-to-refresh>
 
-
   </q-page>
 </template>
 
@@ -232,15 +224,15 @@ export default {
   data () {
     return {
       stockist_options: [
-        {value:'FM', label:'FRESH'},
-        {value:'NC', label:'NC-REPAIR'},
-        {value:'NCR', label:'NCR-REPAIR'}
+        { value: 'FM', label: 'FRESH' },
+        { value: 'NC', label: 'NC-REPAIR' },
+        { value: 'NCR', label: 'NCR-REPAIR' }
       ],
       SHEET: {
-        lines: {data:[], api:'/api/v1/references/lines?mode=all'},
-        shifts: {data:[], api:'/api/v1/references/shifts?mode=all'},
-        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
-        items: {data:[], api:'/api/v1/common/items?mode=all', autoload: false},
+        lines: { data: [], api: '/api/v1/references/lines?mode=all' },
+        shifts: { data: [], api: '/api/v1/references/shifts?mode=all' },
+        customers: { data: [], api: '/api/v1/incomes/customers?mode=all' },
+        items: { data: [], api: '/api/v1/common/items?mode=all', autoload: false }
       },
       FILTERABLE: {
         fill: {
@@ -278,62 +270,62 @@ export default {
             value: null,
             type: 'integer',
             transform: (value) => { return null }
-          },
+          }
         }
       },
-      TABLE:{
+      TABLE: {
         mode: 'index',
-        resource:{
+        resource: {
           api: '/api/v1/factories/work-orders',
-          uri: '/admin/factories/work-orders',
+          uri: '/admin/factories/work-orders'
         },
         columns: [
-          { name: 'prefix', label: '', align: 'left'},
+          { name: 'prefix', label: '', align: 'left' },
 
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', label: '', align: 'center' },
           { name: 'persentase', label: '(%)', align: 'center' },
-          { name: 'line_id', label: 'Line', field: (rs)=> rs.line.name , align: 'left', sortable: true },
-          { name: 'shift_id', label: 'Shift', field: (rs)=> rs.shift.name , align: 'center', sortable: true },
-          { name: 'stockist', label: 'Stockist', align: 'left'},
-          { name: 'created_at', label: this.$tc('form.create',2), field: 'created_at', align: 'center'},
+          { name: 'line_id', label: 'Line', field: (rs) => rs.line.name, align: 'left', sortable: true },
+          { name: 'shift_id', label: 'Shift', field: (rs) => rs.shift.name, align: 'center', sortable: true },
+          { name: 'stockist', label: 'Stockist', align: 'left' },
+          { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center' }
         ]
-      },
+      }
     }
   },
   created () {
     this.INDEX.load()
   },
   computed: {
-    ShiftOptions() {
-      return (this.SHEET.shifts.data.map(line => ({label: line.name, value: line.id})) || [])
+    ShiftOptions () {
+      return (this.SHEET.shifts.data.map(line => ({ label: line.name, value: line.id })) || [])
     },
-    LineOptions() {
-      return (this.SHEET.lines.data.map(item => ({label: item.name, value: item.id})) || [])
+    LineOptions () {
+      return (this.SHEET.lines.data.map(item => ({ label: item.name, value: item.id })) || [])
     },
-    CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: item.code, value: item.id})) || [])
+    CustomerOptions () {
+      return (this.SHEET.customers.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
-    ItemOptions() {
+    ItemOptions () {
       return (this.SHEET.items.data.map(item => ({
         // item: item,
         label: `${item.part_name}`,
-        sublabel:`[${item.customer_code}] ${item.part_subname || '--'}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id
       })) || [])
-    },
+    }
   },
   methods: {
-    isCanUpdate(row){
+    isCanUpdate (row) {
       if (row.deleted_at) return false
-      if (row.status != 'OPEN') return false
+      if (row.status !== 'OPEN') return false
       if (row.is_relationship) return false
       return this.$app.can('work-orders-update')
     },
-    isCanDelete(row){
+    isCanDelete (row) {
       if (row.deleted_at) return false
-      if (row.status != 'OPEN') return false
+      if (row.status !== 'OPEN') return false
       if (row.is_relationship) return false
       return this.$app.can('work-orders-delete')
     },
@@ -342,7 +334,7 @@ export default {
       // if (rs.row.summary_packings <= 0) return false
       return ['OPEN', 'PRODUCTED', 'PACKED', 'CLOSED'].find(x => x === rs.row.status)
     }
-  },
+  }
 }
 </script>
 

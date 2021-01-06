@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="column items-center" :dark="LAYOUT.isDark">
+  <q-page padding class="column items-center">
     <page-print v-if="VIEW.show" class="q-ma-md shadow-2" >
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
@@ -12,19 +12,21 @@
             <div class="col-auto self-end">
               <span class="text-h6 text-uppercase">{{$tc('general.work_order', 2)}}</span>
 
-              <q-markup-table bordered dense square class="no-shadow transparent" :dark="LAYOUT.isDark">
+              <q-markup-table bordered dense square class="no-shadow transparent">
                 <tbody>
                   <tr>
-                    <td class="text-left">{{$tc('general.line')}}</td><td>{{ rsView.line ? rsView.line.name : '-' }}</td>
+                    <td class="text-left text-weight-medium">{{ rsView.main_id ? 'SUBLINE' : 'MAINLINE' }}</td>
+                    <td>{{ rsView.line ? rsView.line.name : '-' }}</td>
                   </tr>
                   <tr>
-                    <td class="text-left">Material of</td><td>{{ getStockistFrom(rsView.stockist_from) }}</td>
+                    <td class="text-left text-weight-medium">MATERIAL</td>
+                    <td>{{ getStockistFrom(rsView.stockist_from) }}</td>
                   </tr>
                 </tbody>
               </q-markup-table>
             </div>
             <div class="col-auto">
-              <q-markup-table bordered dense square class="super-dense no-shadow transparent" separator="cell" :dark="LAYOUT.isDark">
+              <q-markup-table bordered dense square class="super-dense no-shadow transparent" separator="cell">
                 <tr>
                   <th>{{$tc('label.number')}}</th>
                   <td>
@@ -53,12 +55,7 @@
           </div>
         </div>
         <div class="col-12">
-        </div>
-        <div class="row">
-
-        </div>
-        <div class="col-12">
-          <q-markup-table bordered dense square class="table-print no-highlight no-shadow transparent" separator="cell" :dark="LAYOUT.isDark" >
+          <q-markup-table bordered dense square class="table-print no-highlight no-shadow transparent" separator="cell">
             <thead>
               <tr>
                 <th>{{$tc('general.cust')}}</th>
@@ -97,25 +94,26 @@
               <q-tr v-if="!rsView.stockist_direct && show_preline">
                 <q-td colspan="100%" style="padding:2px">
                   <div class="row q-col-gutter-sm">
-                    <div class="col"  v-for="(itemLine, index) in row.work_order_item_lines" :key="index">
-                      <q-expansion-item dense expand-separator default-opened :dark="LAYOUT.isDark"
-                        :class="LAYOUT.isDark ? `bg-grey-9` : `bg-grey-2`"
-                        :header-class="LAYOUT.isDark ? `bg-blue-grey-10` : `bg-blue-grey-1`"
-                        :work-order-item-line-id="itemLine.line_id"
-                        >
+                    <div class="col">
+                      <q-expansion-item dense expand-separator default-opened
+                        :work-order-line-id="rsView.line_id"
+                        :class="$q.dark.isActive ? `bg-grey-9` : `bg-grey-2`"
+                        :header-class="$q.dark.isActive ? `bg-blue-grey-10` : `bg-blue-grey-1`"
+                      >
                         <div slot="header" class="q-item__section column q-item__section--main justify-center">
-                          <span v-if="MAPINGKEY['lines']" >
-                            {{MAPINGKEY['lines'][itemLine.line_id].name}}
-                            <q-badge v-if="itemLine.work_production_items"
-                              :label="`${$app.number_format(itemLine.amount_line / (row.unit_rate||1), row.unit.decimal_in)} / ${$app.number_format(itemLine.unit_amount / (row.unit_rate||1), row.unit.decimal_in)}`"
-                              :color="rsView.has_producted ? 'red-10' : 'primary'"/>
+                          <span v-if="rsView" >
+                            {{rsView.line.name}}
+                            <q-badge
+                              :label="`${$app.number_format(row.amount_process / (row.unit_rate||1), row.unit.decimal_in)} / ${$app.number_format(row.unit_amount / (row.unit_rate||1), row.unit.decimal_in)}`"
+                              :color="rsView.has_producted ? 'red-10' : 'primary'
+                            "/>
                           </span>
                           <span v-else>
-                            {{itemLine.line_id}}
+                            {{rsView.line_id}}
                           </span>
                         </div>
-                        <q-list dense separator v-if="itemLine.work_production_items">
-                          <q-item v-for="(itemProduction, key) in itemLine.work_production_items" :key="key">
+                        <q-list dense separator v-if="row.work_production_items.length">
+                          <q-item v-for="(itemProduction, key) in row.work_production_items" :key="key">
                             <q-item-section>
                               <span v-if="itemProduction.work_production">
                                 {{itemProduction.work_production.number}}
@@ -129,20 +127,22 @@
                               </span>
                             </q-item-section>
                           </q-item>
-                          <q-item-label header v-if="!Boolean(itemLine.work_production_items.length)" class="q-pa-sm text-italic text-center">No data</q-item-label>
+                          <q-item-label header v-if="!Boolean(row.work_production_items.length)" class="q-pa-sm text-italic text-center">No data</q-item-label>
                         </q-list>
                       </q-expansion-item>
                     </div>
                     <div class="col" v-if="Boolean(row.item_id)">
-                      <q-expansion-item dense expand-separator default-opened :dark="LAYOUT.isDark"
-                        :class="LAYOUT.isDark ? `bg-grey-9` : `bg-grey-2`"
-                        :header-class="LAYOUT.isDark ? `bg-blue-grey-10` : `bg-blue-grey-1`">
+                      <q-expansion-item dense expand-separator default-opened
+                        :class="$q.dark.isActive ? `bg-grey-9` : `bg-grey-2`"
+                        :header-class="$q.dark.isActive ? `bg-blue-grey-10` : `bg-blue-grey-1`"
+                      >
                         <div slot="header" class="q-item__section column q-item__section--main justify-center">
                           <span>
                             {{$tc('general.packing')}}
                             <q-badge
                               :label="`${$app.number_format(row.amount_packing / (row.unit_rate||1),0)} / ${$app.number_format(row.amount_process / (row.unit_rate||1),0)}`"
-                              :color="rsView.has_packed ? 'red-10' : 'primary'"/>
+                              :color="rsView.has_packed ? 'red-10' : 'primary'"
+                            />
                           </span>
                         </div>
                         <q-list dense separator>
@@ -180,7 +180,7 @@
         <div class="col-12 q-gutter-xs print-hide " style="padding-top:50px">
           <q-btn :label="$tc('form.back')" icon="cancel" color="dark" :to="`${VIEW.resource.uri}?return`"></q-btn>
           <q-btn :label="$tc('form.edit')" icon="edit" color="green" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`" v-if="IS_EDITABLE"></q-btn>
-          <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="$router.push(`${VIEW.resource.uri}/${ROUTE.params.id}/prelines`)" ></q-btn>
+          <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="VIEW.print" ></q-btn>
           <ux-btn-dropdown color="blue-grey" no-caps class="float-right"
             :options="[
               {
@@ -253,123 +253,119 @@
 
 import MixView from '@/mixins/mix-view.vue'
 import PagePrint from '@/components/page-print'
-import PagePrintBreak from '@/components/page-print-break'
 
 export default {
   mixins: [MixView],
-  components: { PagePrint, PagePrintBreak },
+  components: { PagePrint },
   data () {
     return {
       show_preline: false,
       SHEET: {
-        lines: {api:'/api/v1/references/lines?mode=all'},
-        units: {api:'/api/v1/references/units?mode=all'},
+        lines: { api: '/api/v1/references/lines?mode=all' },
+        units: { api: '/api/v1/references/units?mode=all' }
       },
       VIEW: {
-        resource:{
+        resource: {
           api: '/api/v1/factories/work-orders',
           uri: '/admin/factories/work-orders',
           params: '?mode=view'
         }
       },
       rsView: {},
-      count: 0,
+      count: 0
     }
   },
-  created() {
+  created () {
     this.init()
   },
   computed: {
-    IS_REOPEN() {
+    IS_REOPEN () {
       if (this.rsView.deleted_at) return false
+      if (this.rsView.main_id) return false
       if (!['PRODUCTED', 'PACKED'].find(x => x === this.rsView.status)) return false
       return true
     },
-    IS_DIRECTED() {
+    IS_DIRECTED () {
       if (this.rsView.deleted_at) return false
-      if (this.rsView.status != 'OPEN') return false
+      if (this.rsView.status !== 'OPEN') return false
       return Boolean(this.rsView.stockist_direct)
     },
-    IS_PRODUCTED() {
+    IS_PRODUCTED () {
       if (this.rsView.deleted_at) return false
+      if (this.rsView.main_id) return false
       if (this.rsView.status !== 'OPEN') return false
       if (this.IS_DIRECTED) return false
       return true
     },
-    IS_PACKED() {
+    IS_PACKED () {
       if (this.rsView.deleted_at) return false
+      if (this.rsView.main_id) return false
       if (this.rsView.status !== 'PRODUCTED') return false
       if (this.IS_DIRECTED) return false
       return true
     },
-    IS_CLOSE() {
+    IS_CLOSE () {
       if (this.rsView.deleted_at) return false
       if (['CLOSED'].find(x => x === this.rsView.status)) return false
       if (this.IS_DIRECTED) return false
       return true
     },
-    IS_VOID() {
+    IS_VOID () {
       if (this.IS_EDITABLE) return false
+      if (this.rsView.main_id) return false
       if (this.rsView.deleted_at) return false
       if (['VOID'].find(x => x === this.rsView.status)) return false
       return true
     },
-    IS_REVISE() {
+    IS_REVISE () {
       if (this.IS_EDITABLE) return false
+      if (this.rsView.main_id) return false
       if (this.rsView.deleted_at) return false
-      if (['VOID','REVISED'].find(x => x === this.rsView.status)) return false
+      if (['VOID', 'REVISED'].find(x => x === this.rsView.status)) return false
       return true
     },
-    IS_EDITABLE() {
+    IS_EDITABLE () {
       if (this.rsView.deleted_at) return false
+      if (this.rsView.main_id) return false
       if (this.rsView.status !== 'OPEN') return false
       if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
       return true
     },
 
-    MAPINGKEY() {
+    MAPINGKEY () {
       let variables = {
-        'lines': {},
-        'units': {},
+        'units': {}
       }
-
-      this.SHEET['lines'].data.map(value => { variables['lines'][value.id] = value })
       this.SHEET['units'].data.map(value => { variables['units'][value.id] = value })
 
-      return variables;
+      return variables
     }
   },
   methods: {
-    init() {
+    init () {
       this.VIEW.load((data) => {
         this.setView(data || {})
       })
     },
-    getStockistFrom(val) {
+    getStockistFrom (val) {
       const stockist = [
-        {value: 'FM', label: 'FRESH MATERIAL'},
-        {value: 'NC', label: 'NOT GOOD',  color: 'warning' },
-        {value: 'NCR', label: 'REPAIR',  color: 'orange-8' },
+        { value: 'FM', label: 'FRESH MATERIAL' },
+        { value: 'NC', label: 'NOT GOOD', color: 'warning' },
+        { value: 'NCR', label: 'REPAIR', color: 'orange-8' }
       ]
       const v = stockist.find(x => x.value === val)
       return v ? v.label : 'N/A'
-
     },
-    setValidation() {
+    setValidation () {
       this.$router.push(`/admin/factories/work-process/${this.ROUTE.params.id}/edit`)
     },
     setRevision () {
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/revision`)
     },
-    setView(data) {
-      this.rsView =  data
+    setView (data) {
+      this.rsView = data
     },
-
-    totalLine (itemLine, detail) {
-      const total = itemLine.work_production_items.reduce((total, item) => total += item.unit_amount, 0)
-      return this.$app.number_abbreviate(Math.round(total))
-    },
-    totalProduction(detail) {
+    totalProduction (detail) {
       return Math.round(detail.amount_process)
     },
     totalPacking (detail) {
@@ -387,28 +383,27 @@ export default {
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=reopen&nodata=true`
         this.$axios.put(url)
           .then((response) => {
-            const data = response.data
             this.init()
           })
           .catch(error => {
             this.$app.response.error(error.response, 'FORM REOPEN')
           })
-          .finally(()=>{
+          .finally(() => {
             this.VIEW.show = true
             setTimeout(() => {
               this.VIEW.loading = false
-            }, 1000);
+            }, 1000)
           })
       }
 
       this.$q.dialog({
-          title: this.$tc('form.confirm', 1, {v:'RE-OPEN'}),
-          message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_reopen')}),
-          cancel: true,
-          persistent: true
-        }).onOk(() => {
-          submit()
-        })
+        title: this.$tc('form.confirm', 1, { v: 'RE-OPEN' }),
+        message: this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_reopen') }),
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        submit()
+      })
     },
 
     setProducted () {
@@ -418,28 +413,27 @@ export default {
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=producted&nodata=true`
         this.$axios.put(url)
           .then((response) => {
-            const data = response.data
             this.init()
           })
           .catch(error => {
             this.$app.response.error(error.response, 'FORM PRODUCTED')
           })
-          .finally(()=>{
+          .finally(() => {
             this.VIEW.show = true
             setTimeout(() => {
               this.VIEW.loading = false
-            }, 1000);
+            }, 1000)
           })
       }
 
       this.$q.dialog({
-          title: this.$tc('form.confirm', 1, {v:'PRODUCTED'}),
-          message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_producted')}),
-          cancel: true,
-          persistent: true
-        }).onOk(() => {
-          submit()
-        })
+        title: this.$tc('form.confirm', 1, { v: 'PRODUCTED' }),
+        message: this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_producted') }),
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        submit()
+      })
     },
 
     setPacked () {
@@ -449,28 +443,27 @@ export default {
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=packed&nodata=true`
         this.$axios.put(url)
           .then((response) => {
-            const data = response.data
             this.init()
           })
           .catch(error => {
             this.$app.response.error(error.response, 'FORM PACKED')
           })
-          .finally(()=>{
+          .finally(() => {
             this.VIEW.show = true
             setTimeout(() => {
               this.VIEW.loading = false
-            }, 1000);
+            }, 1000)
           })
       }
 
       this.$q.dialog({
-          title: this.$tc('form.confirm', 1, {v:'PACKED'}),
-          message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_packed')}),
-          cancel: true,
-          persistent: true
-        }).onOk(() => {
-          submit()
-        })
+        title: this.$tc('form.confirm', 1, { v: 'PACKED' }),
+        message: this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_packed') }),
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        submit()
+      })
     },
 
     setClosed () {
@@ -480,28 +473,27 @@ export default {
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=closed&nodata=true`
         this.$axios.put(url)
           .then((response) => {
-            const data = response.data
             this.init()
           })
           .catch(error => {
             this.$app.response.error(error.response, 'FORM CLOSED')
           })
-          .finally(()=>{
+          .finally(() => {
             this.VIEW.show = true
             setTimeout(() => {
               this.VIEW.loading = false
-            }, 1000);
+            }, 1000)
           })
       }
 
       this.$q.dialog({
-          title: this.$tc('form.confirm', 1, {v:'CLOSE'}),
-          message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_close')}),
-          cancel: true,
-          persistent: true
-        }).onOk(() => {
-          submit()
-        })
+        title: this.$tc('form.confirm', 1, { v: 'CLOSE' }),
+        message: this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_close') }),
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        submit()
+      })
     },
 
     setDirectValidated () {
@@ -511,7 +503,6 @@ export default {
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=directed&nodata=true`
         this.$axios.put(url)
           .then((response) => {
-            const data = response.data
             this.$app.notify.success('DIRECT VALIDATED', `WO [${response.data.fullnumber || response.data.number}] validate sucess!`)
             this.init()
           })
@@ -519,22 +510,22 @@ export default {
             console.error(error.response || error)
             this.$app.response.error(error.response, 'DIRECT VALIDATED')
           })
-          .finally(()=>{
+          .finally(() => {
             this.VIEW.show = true
             setTimeout(() => {
               this.VIEW.loading = false
-            }, 1000);
+            }, 1000)
           })
       }
 
       this.$q.dialog({
-          title: this.$tc('form.confirm', 1, {v:'DIRECT-VALIDATED'}),
-          message: this.$tc('messages.to_sure', 1, {v: this.$tc('messages.process_validation')}),
-          cancel: true,
-          persistent: true
-        }).onOk(() => {
-          submit()
-        })
+        title: this.$tc('form.confirm', 1, { v: 'DIRECT-VALIDATED' }),
+        message: this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_validation') }),
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        submit()
+      })
     }
   }
 }
