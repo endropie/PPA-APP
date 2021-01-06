@@ -228,35 +228,39 @@
                 </div>
 
                 <q-list dense class="col-12 ">
-                  <q-item-label header class="text-subtitle2 no-padding" >Preline Production</q-item-label>
-                  <q-item v-for="(item, index) in rsForm.item_prelines" :key="index" class="no-padding">
+                  <q-item class="no-padding q-mt-md">
                     <q-item-section>
-                      <ux-select-filter
-                        :ref="`pre-line`"
-                        :name="`pre-line-${index}`"
-                        v-model="rsForm.item_prelines[index].line_id"
-                        :dark="LAYOUT.isDark"
-                        inverted dense
-                        color="primary"
-                        :prefix="`${index+1}. `"
-                        :options="LineOptions"
-                        :inject-filter="(line) => { if(index === 0 && !line.ismain) return false}"
-                        v-validate="isEnginered(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
-                        :error="errors.has(`pre-line-${index}`)"
-                        :error-message="errors.first(`pre-line-${index}`)"
-                      >
-                        <q-badge slot="append" color="teal" label="main" v-if="index === 0"/>
-                      </ux-select-filter>
+                      <q-item-label header class="text-subtitle2 no-padding" >Preline Production</q-item-label>
                     </q-item-section>
-                    <q-item-section side class="no-padding">
-                      <q-btn :class="{'invisible':!index}" dense flat round icon="clear" color="red-5" @click="removeProduction(index)"/>
+                    <q-item-section side>
+                      <q-btn dense color="primary" label="ADD SUBLINE" @click="addNewProduction()" />
                     </q-item-section>
                   </q-item>
-                  <q-item class="no-padding">
-                    <q-item-section>
-                      <q-btn dense outline color="primary" :label="$tc('form.add',2)" @click="addNewProduction()" />
-                    </q-item-section>
-                  </q-item>
+                  <q-list dense class="column reverse">
+                    <q-item v-for="(item, index) in rsForm.item_prelines" :key="index" class="no-padding">
+                      <q-item-section>
+                        <ux-select-filter
+                          :ref="`pre-line`"
+                          :name="`pre-line-${index}`"
+                          v-model="rsForm.item_prelines[index].line_id"
+                          :dark="LAYOUT.isDark"
+                          inverted dense
+                          color="primary"
+                          :prefix="`${rsForm.item_prelines.length - index}. `"
+                          :options="LineOptions"
+                          :inject-filter="(line) => { if(index === 0 && !line.ismain) return false}"
+                          v-validate="isEnginered(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
+                          :error="errors.has(`pre-line-${index}`)"
+                          :error-message="errors.first(`pre-line-${index}`)"
+                        >
+                          <q-badge slot="append" color="teal" label="main" v-if="index === 0"/>
+                        </ux-select-filter>
+                      </q-item-section>
+                      <q-item-section side class="no-padding">
+                        <q-btn :class="{'invisible':!index}" dense flat round icon="clear" color="red-5" @click="removeProduction(index)"/>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
                 </q-list>
 
               </div>
@@ -427,34 +431,34 @@ export default {
   data () {
     return {
       SHEET: {
-        colors: {data:[], api:'/api/v1/references/colors?mode=all'},
-        type_items: {data:[], api:'/api/v1/references/type-items?mode=all'},
-        category_items: {data:[], api:'/api/v1/references/category-items?mode=all'},
-        sizes: {data:[], api:'/api/v1/references/sizes?mode=all'},
-        units: {data:[], api:'/api/v1/references/units?mode=all'},
-        brands: {data:[], api:'/api/v1/references/brands?mode=all'},
-        specifications: {data:[], api:'/api/v1/references/specifications?mode=all'},
-        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
-        lines: {data:[], api:'/api/v1/references/lines?mode=all'},
+        colors: { data: [], api: '/api/v1/references/colors?mode=all' },
+        type_items: { data: [], api: '/api/v1/references/type-items?mode=all' },
+        category_items: { data: [], api: '/api/v1/references/category-items?mode=all' },
+        sizes: { data: [], api: '/api/v1/references/sizes?mode=all' },
+        units: { data: [], api: '/api/v1/references/units?mode=all' },
+        brands: { data: [], api: '/api/v1/references/brands?mode=all' },
+        specifications: { data: [], api: '/api/v1/references/specifications?mode=all' },
+        customers: { data: [], api: '/api/v1/incomes/customers?mode=all' },
+        lines: { data: [], api: '/api/v1/references/lines?mode=all' }
 
       },
       FORM: {
-        resource:{
+        resource: {
           uri: '/admin/common/items',
-          api: '/api/v1/common/items',
-        },
+          api: '/api/v1/common/items'
+        }
       },
-      rsForm:{},
-      setDefault:()=>{
+      rsForm: {},
+      setDefault: () => {
         return {
-          code:null,
-          customer_id:null,
-          brand_id:null,
-          specification_id:null,
+          code: null,
+          customer_id: null,
+          brand_id: null,
+          specification_id: null,
 
-          part_name:null,
-          part_alias:null,
-          part_number:null,
+          part_name: null,
+          part_alias: null,
+          part_number: null,
 
           load_type: null,
           load_capacity: null,
@@ -468,7 +472,7 @@ export default {
           unit_id: null,
 
           price: 0,
-          item_prelines: [{ id:null, line_id: null, note: null }],
+          item_prelines: [{ id: null, line_id: null, note: null }],
           item_units: [],
           estimate_price: null,
           estimate_sadm: null,
@@ -476,72 +480,70 @@ export default {
           estimate_begin_date: null,
           enable: 1,
           sample: 0,
-          description:null,
+          description: null,
 
           sample_priced_at: null,
           sample_enginered_at: null,
-          sample_priced_at: null,
           sample_validated_at: null
         }
       }
     }
   },
-  created() {
+  created () {
     // Component Page Mounted!
     this.init()
-
   },
   computed: {
-    LineOptions() {
-      return (this.SHEET.lines.data.map(item => ({...item, label: item.name, value: item.id})) || [])
+    LineOptions () {
+      return (this.SHEET.lines.data.map(item => ({ ...item, label: item.name, value: item.id })) || [])
     },
-    CategoryOptions() {
-      return (this.SHEET.category_items.data.map(item => ({label: item.name, value: item.id})) || [])
+    CategoryOptions () {
+      return (this.SHEET.category_items.data.map(item => ({ label: item.name, value: item.id })) || [])
     },
-    TypeOptions() {
-      return (this.SHEET.type_items.data.map(item => ({label: item.name, value: item.id})) || [])
+    TypeOptions () {
+      return (this.SHEET.type_items.data.map(item => ({ label: item.name, value: item.id })) || [])
     },
-    CustomerOptions() {
+    CustomerOptions () {
       return (this.SHEET.customers.data.map(item => ({
         label: [item.code, item.name].join(' - '),
         value: item.id
       })) || [])
     },
-    BrandOptions() {
+    BrandOptions () {
       return (this.SHEET.brands.data.map(item => ({
         label: [item.code, item.name].join(' - '),
         value: item.id
       })) || [])
     },
-    SpecificationOptions() {
+    SpecificationOptions () {
       return (this.SHEET.specifications.data.map(item => ({
         label: [item.code, item.name].join(' - '),
-        sublabel: item.hasOwnProperty('color') ? `Color: ${item.color.name}` : undefined ,
+        sublabel: item.hasOwnProperty('color') ? `Color: ${item.color.name}` : undefined,
         value: item.id
       })) || [])
     },
-    SizeOptions() {
+    SizeOptions () {
       return (this.SHEET.sizes.data.map(item => ({
         label: item.name,
         value: item.id
       })) || [])
     },
-    UnitOptions() {
+    UnitOptions () {
       return (this.SHEET.units.data.map(item => ({
         label: String(item.code).toUpperCase(),
         value: item.id
       })) || [])
     },
-    price_area() {
-      if(!Number(this.rsForm.price) || !Number(this.rsForm.sa_dm)) return 0
+    price_area () {
+      if (!Number(this.rsForm.price) || !Number(this.rsForm.sa_dm)) return 0
       return Number(this.rsForm.price) / Number(this.rsForm.sa_dm)
     },
-    price_loaded() {
-      return Number(this.rsForm.load_capacity|| 0) * Number(this.rsForm.price || 0)
+    price_loaded () {
+      return Number(this.rsForm.load_capacity || 0) * Number(this.rsForm.price || 0)
     },
-    MAPINGKEY(){
+    MAPINGKEY () {
       let variables = {
-        'brands' : {},
+        'brands': {},
         'customers': {},
         'specifications': {}
       }
@@ -549,14 +551,14 @@ export default {
       this.SHEET['customers'].data.map(item => { variables['customers'][item.id] = item })
       this.SHEET['specifications'].data.map(item => { variables['specifications'][item.id] = item })
 
-      return variables;
+      return variables
     }
   },
-  watch:{
-      '$route' : 'init'
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
         this.$nextTick(() => {
@@ -564,16 +566,12 @@ export default {
         })
       })
     },
-    setForm(data) {
+    setForm (data) {
       this.rsForm = JSON.parse(JSON.stringify(data))
     },
 
-    setCode() {
-      let brand_id = this.rsForm.brand_id,
-        customer_id = this.rsForm.customer_id,
-        specification_id = this.rsForm.specification_id;
-
-      if (!brand_id || !customer_id || !specification_id) {
+    setCode () {
+      if (!this.rsForm.brand_id || !this.rsForm.customer_id || !this.rsForm.specification_id) {
         this.rsForm['code'] = this.rsForm['id'] || null
         return
       }
@@ -586,86 +584,88 @@ export default {
       this.rsForm['code'] = [CUST.code, BRAND.code, SPEC.code].join('-')
     },
 
-    isEnginered(v) {
-      return !Boolean(this.rsForm.sample && this.rsForm.sample_enginered_at) ? '' : v
+    isEnginered (v) {
+      return !(this.rsForm.sample && this.rsForm.sample_enginered_at) ? '' : v
     },
 
-    isNotSample(v) {
+    isNotSample (v) {
       return this.rsForm.sample ? '' : v
     },
-    isFromSample(v) {
+    isFromSample (v) {
       return !(!this.rsForm.sample && this.FORM.data.sample) ? '' : v
     },
 
     addNewProduction (autofocus = true) {
-      var newEntri =this.setDefault().item_prelines[0];
+      var newEntri = this.setDefault().item_prelines[0]
 
       this.rsForm.item_prelines.push(newEntri)
     },
 
     removeProduction (index) {
-        this.rsForm.item_prelines.splice(index, 1)
-        if(this.rsForm.item_prelines.length < 1) this.addNewProduction()
+      this.rsForm.item_prelines.splice(index, 1)
+      if (this.rsForm.item_prelines.length < 1) this.addNewProduction()
     },
 
     addNewUnit (autofocus = true) {
-      const newEntri = Object.assign({ id:null, unit_id:null, rate:null })
+      const newEntri = Object.assign({ id: null, unit_id: null, rate: null })
       this.rsForm.item_units.push(newEntri)
     },
 
     removeUnit (index) {
-        this.rsForm.item_units.splice(index, 1)
+      this.rsForm.item_units.splice(index, 1)
     },
 
     onSave () {
       const submit = () => {
         this.$q.loading.show()
-        let {method, mode, apiUrl} = this.FORM.meta();
+        let { method, apiUrl } = this.FORM.meta()
         this.$axios.set(method, apiUrl, this.rsForm)
-        .then((response) => {
-          let message = response.data.code + ' - #' + response.data.id
-          this.FORM.response.success({message:message})
-          this.$router.go(-1)
-        })
-        .catch((error) => {
-          console.warn(error)
-          this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error, 'ITEM UPDATE')
-        })
-        .finally(()=>{
-          this.$q.loading.hide()
-        });
+          .then((response) => {
+            let message = response.data.code + ' - #' + response.data.id
+            this.FORM.response.success({ message: message })
+            this.$router.go(-1)
+          })
+          .catch((error) => {
+            console.warn(error)
+            this.FORM.response.fields(error.response)
+            this.FORM.response.error(error.response || error, 'ITEM UPDATE')
+          })
+          .finally(() => {
+            this.$q.loading.hide()
+          })
       }
-
 
       this.$validator.validate().then(result => {
         if (!result) {
           return this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
-          });
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
+          })
         }
 
-        this.$q.dialog({ message: 'Are sure to submit?', title: 'CONFIRM'})
+        this.$q.dialog({ message: 'Are sure to submit?', title: 'CONFIRM' })
           .onOk(() => {
-            if (this.rsForm.price == this.FORM.data.price) return submit()
+            if (this.rsForm.price === this.FORM.data.price) return submit()
             this.$q.dialog({
-                title: 'PASSWORD CONFIRM',
-                message: 'Price has changed. Enter password is required!',
-                prompt: { type: 'password', model: ''}
-              })
+              title: 'PASSWORD CONFIRM',
+              message: 'Price has changed. Enter password is required!',
+              prompt: { type: 'password', model: '' }
+            })
               .onOk(model => {
                 this.$axios.post('/api/v1/auth/confirm-password', { password: model }).then((response) => {
                   if (response.data.status) submit()
                 })
-              .catch((error) => {
-                this.$app.response.error(error.response || error)
+                  .catch((error) => {
+                    this.$app.response.error(error.response || error)
+                  })
               })
-            })
           })
       })
-    },
-  },
+    }
+  }
 }
 </script>
 <!-- style lang="stylus">
