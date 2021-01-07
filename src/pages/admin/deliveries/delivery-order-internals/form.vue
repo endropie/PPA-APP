@@ -33,7 +33,7 @@
             source="api/v1/incomes/customers?mode=all"
             :option-label="(item) => `[${item.code}] ${item.name}`"
             option-value="id"
-            new-value-mode="add"
+            :option-disable="(c) => !c.enable || c.order_mode === 'ACCUMULATE'"
             v-validate="'required'"
             :error="errors.has('customer_id')"
             :error-message="errors.first('customer_id')"
