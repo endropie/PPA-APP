@@ -11,11 +11,10 @@
     <q-separator />
     <q-card-section>
       <div class="row q-col-gutter-x-md">
-
-      <q-field class="col-12"
-        borderless stack-label hide-bottom-space
-        :label="$tc('label.mode',1, {v:$tc('label.transaction')})"
-        :error="errors.has('transaction')">
+        <q-field class="col-12"
+          borderless stack-label hide-bottom-space
+          :label="$tc('label.mode',1, {v:$tc('label.transaction')})"
+          :error="errors.has('transaction')">
 
         <q-option-group slot="control"
           name="transaction" type="radio" inline
@@ -100,7 +99,6 @@
       </div>
     </q-card-section>
     <q-separator inset />
-    <!-- SINGLE-REVISION -->
     <q-card-section :class="$app.classDimmed(!rsForm.customer_id) ">
       <!-- COLUMN:: Part items lists -->
       <q-markup-table bordered class="main-box no-shadow no-highlight q-mb-sm"
@@ -137,8 +135,8 @@
                   row.item = v ? v : null
                   row.item_id = v ? v.id : null
                   row.unit = v ? { value: v.unit.id, label: v.unit.code } : null
-                  row.unit_id = v ? v.unit_id : null
-                  row.unit_rate = v ? v.unit_rate : 1
+                  row.unit_id = v ? v.unit.id : null
+                  row.unit_rate = 1
                 }"
               />
             </q-td>
