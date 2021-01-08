@@ -85,7 +85,8 @@
         </template>
 
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:40px" auto-width>
-          <q-btn dense flat color="light" icon="delete" @click="TABLE.delete(rs.row)"  v-if="isEditable(rs.row)"/>
+          <q-btn dense flat color="light" icon="delete" @click="TABLE.delete(rs.row)" v-if="isEditable(rs.row)" />
+          <q-btn dense flat color="light" icon="clear" disable v-if="rs.row.deleted_at" />
         </q-td>
 
         <q-td slot="body-cell-customer_id" slot-scope="rs" :props="rs">
@@ -195,6 +196,7 @@ export default {
   },
   methods: {
     isEditable (row) {
+      if (row.deleted_at) return false
       if (row.loaded_at) return false
       return true
     }
