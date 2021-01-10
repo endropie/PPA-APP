@@ -145,26 +145,27 @@
         </q-td>
 
         <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
-          <div class="column text-body">
-            <span class="text-uppercase text-grey-8">
-              {{rs.row.created_user ? rs.row.created_user.name : 'undefined'}}
-            </span>
-            <small v-if="rs.row.created_at" class="text-grey">
-              <q-icon name="mdi-earth"></q-icon>
-              {{ $app.moment(rs.row.created_at).fromNow() }}
-            </small>
-          </div>
+          <q-btn dense flat no-caps @click="onCommentable(rs.row)" >
+            <div class="column text-body" style="line-height:normal">
+              <span class="text-uppercase text-grey-8">
+                {{rs.row.created_user ? rs.row.created_user.name : 'undefined'}}
+              </span>
+              <small v-if="rs.row.created_at" class="text-grey">
+                <q-icon name="mdi-earth"></q-icon>
+                {{ $app.moment(rs.row.created_at).fromNow() }}
+              </small>
+            </div>
+          </q-btn>
         </q-td>
 
       </q-table>
     </q-pull-to-refresh>
-
   </q-page>
 </template>
 
 <script>
 import MixIndex from '@/mixins/mix-index.vue'
-
+import CommentableDialog from '@/components/CommentableDialog.vue'
 export default {
   mixins: [MixIndex],
   data () {
@@ -241,6 +242,15 @@ export default {
       if (row.status !== 'OPEN') return false
       if (row.is_relationship) return false
       return true
+    },
+    onCommentable (row) {
+      this.$q.dialog({
+        ok: true,
+        component: CommentableDialog,
+        title: `SJ Delivery [${row.fullnumber}] - LOG`,
+        model: 'App\\Models\\Income\\DeliveryOrder',
+        id: row.id
+      })
     }
   }
 }
