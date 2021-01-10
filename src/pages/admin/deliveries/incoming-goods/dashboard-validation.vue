@@ -1,6 +1,5 @@
 <template>
-<div>
-  <q-card dense class="main-box" :dark="LAYOUT.isDark" style="min-width:200px">
+  <q-card dense>
     <q-card-section class="bg-primary text-white q-py-sm" style="opacity: 0.85">
       <q-btn dense flat round
         class="float-right relative-position" style="top:-5px"
@@ -43,19 +42,17 @@
       </q-table>
     </q-card-section>
   </q-card>
-
-</div>
 </template>
 
 <script>
 import MixPage from '@/mixins/mix-page.vue'
 export default {
-  mixins:[MixPage],
+  mixins: [MixPage],
   data () {
     return {
       resource: {
         api: '/api/v1/warehouses/incoming-goods',
-        uri: '/admin/deliveries/incoming-goods',
+        uri: '/admin/deliveries/incoming-goods'
       },
       show: true,
       loading: false,
@@ -71,56 +68,56 @@ export default {
         {
           name: 'date',
           align: 'center',
-          label: '', //this.$tc('label.date'),
+          label: '', // this.$tc('label.date'),
           field: 'date',
-          format: val => this.$app.moment(val || undefined).format('D MMMM'),
-        },
+          format: val => this.$app.moment(val || undefined).format('D MMMM')
+        }
       ],
       data: [],
       rowData: [],
-      isLoadError: false,
+      isLoadError: false
     }
   },
-  created() {
+  created () {
     this.init()
   },
   computed: {
-    TEXT_BOTTOM() {
-      if(this.textLoadError) return this.isLoadError
+    TEXT_BOTTOM () {
+      if (this.textLoadError) return this.isLoadError
 
-      if(this.rowData.length > 0) return "Terdapat ("+ this.rowData.length +") Data untuk Validasi"
+      if (this.rowData.length > 0) return 'Terdapat (' + this.rowData.length + ') Data untuk Validasi'
 
-      return "Good Job!. Tidak terdapat Data untuk Validasi"
+      return 'Good Job!. Tidak terdapat Data untuk Validasi'
     }
   },
   methods: {
-    reload() {
+    reload () {
       this.loading = true
       setTimeout(() => {
         this.init()
-      }, 500);
+      }, 500)
     },
-    init() {
+    init () {
       this.loading = true
       let params = ['mode=all', '--with=customer;created_user', 'status=OPEN']
       this.$axios.get(`${this.resource.api}?${params.join('&')}`)
-      .then((response) => {
-        this.data = JSON.parse(JSON.stringify(response.data))
-        let rows = JSON.parse(JSON.stringify(response.data))
-        this.rowData =  rows.slice(0)
+        .then((response) => {
+          this.data = JSON.parse(JSON.stringify(response.data))
+          let rows = JSON.parse(JSON.stringify(response.data))
+          this.rowData = rows.slice(0)
 
-        this.isLoadError = false
-        this.textLoadError = null
-      })
-      .catch((error) => {
-        this.isLoadError = true
-        this.textLoadError = error.response ? error.response.statusText : error
-      })
-      .finally(() => {
-        setTimeout(() => {
-          this.loading = false
-        }, 500);
-      })
+          this.isLoadError = false
+          this.textLoadError = null
+        })
+        .catch((error) => {
+          this.isLoadError = true
+          this.textLoadError = error.response ? error.response.statusText : error
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 500)
+        })
     }
   }
 }
