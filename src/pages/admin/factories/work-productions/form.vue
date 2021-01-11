@@ -304,7 +304,9 @@ export default {
       if (this.SHEET.items.data.length <= 0) return []
 
       return this.SHEET.items.data.map(item => ({
-        ...item
+        ...item,
+        label: item.part_name,
+        sublabel: `[${item.customer_code}] ${item.part_subname}`
       }))
     },
     ItemUnitOptions () {
