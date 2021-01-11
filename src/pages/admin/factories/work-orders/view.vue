@@ -131,7 +131,7 @@
                         </q-list>
                       </q-expansion-item>
                     </div>
-                    <div class="col" v-if="Boolean(row.item_id)">
+                    <div class="col" v-if="!Boolean(rsView.main_id)">
                       <q-expansion-item dense expand-separator default-opened
                         :class="$q.dark.isActive ? `bg-grey-9` : `bg-grey-2`"
                         :header-class="$q.dark.isActive ? `bg-blue-grey-10` : `bg-blue-grey-1`"
