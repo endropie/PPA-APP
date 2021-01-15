@@ -169,24 +169,6 @@
         }"
       />
 
-      <!-- <ux-select dense hide-bottom-space
-        input-style="margin-top:-4px"
-        label="RUTE: "
-        v-model="rsForm.rute" clearable
-        :source="`/api/v1/common/rutes?mode=all&customers=${RuteCustomers}`"
-        option-label="name"
-        v-validate="''"
-        data-vv-as="Rute"
-        :name="`rute_id`"
-        :error="errors.has(`rute_id`)"
-        :error-message="errors.first(`rute_id`)"
-        :disable="!Boolean(RuteCustomers.length)"
-        @input="(v) => {
-          rsForm.rute_id = v ? v.id : null
-          rsForm.rute_amount = v ? v.cost : null
-        }"
-      /> -->
-
       <q-input type="textarea" autogrow
         filled class="q-mb-sm" input-style="min-height:45px"
         v-model="rsForm.description"
