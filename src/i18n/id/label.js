@@ -12,6 +12,7 @@ export default {
   code: 'Kode {v}',
   code_intern: 'Internal Code',
   continue: 'Lanjutkan',
+  cost: 'Biaya',
   category: 'Kategori {v}',
   color: 'Warna',
   delivery_note: 'Delivery note',

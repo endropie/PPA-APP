@@ -54,6 +54,17 @@ const common = [
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'vehicles-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'vehicles-update' } }
     ]
+  },
+  {
+    name: 'Rute',
+    icon: 'mdi-car-multiple',
+    path: 'rutes',
+    lang: 'general.rute',
+    resources: [
+      { page: 'index', path: '', meta: { permission: '' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: '' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: '' } }
+    ]
   }
 ]
 

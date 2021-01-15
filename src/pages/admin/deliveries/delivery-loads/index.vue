@@ -121,7 +121,8 @@
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">
-          <ux-chip-status dense square :row="rs.row"/>
+          <q-chip v-if="rs.row.delivery_checkout_id && !rs.row.deleted_at" dense square class="text-weight-medium" color="positive" text-color="white" label="CHECKOUT" />
+          <ux-chip-status v-else dense square :row="rs.row"/>
         </q-td>
 
         <q-td slot="body-cell-persentase" slot-scope="rs" :props="rs" class="no-padding">

@@ -466,7 +466,7 @@ export default {
           })
           .catch((error) => {
             this.FORM.response.fields(error.response)
-            this.FORM.response.error(error.response || error, 'REVISION FAILED')
+            this.FORM.response.error(error.response || error, 'SUBMIT LOAD FAILED')
           })
           .finally(() => {
             this.FORM.loading = false

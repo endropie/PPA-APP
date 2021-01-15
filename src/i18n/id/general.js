@@ -57,6 +57,7 @@ export default {
   request_order: 'Sales Order | Pemesanan Penjualan',
   acc_invoice: 'Invoice Collect | Rekap Faktur',
 
+  rute: 'Rute',
   operator: 'Operator',
   brand: 'Brand',
   specification: 'Spesifikasi',
