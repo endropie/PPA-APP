@@ -28,20 +28,10 @@
                   dense hide-bottom-space hide-dropdown-icon
                   standout="bg-blue-grey-5 text-white"
                   :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                   filter emit-value map-options
                   :options="LineOptions"
-                  @input="FILTERABLE.submit" >
-                <q-checkbox slot="prepend"
-                  class="text-caption"
-                  left-label label="MAIN"
-                  v-model="FILTERABLE.fill.ismain.value"
-                  :true-value="1"
-                  :false-value="0"
                   @input="FILTERABLE.submit"
                 />
-
-                </ux-select>
 
                 <q-select class="col" style="min-width:150px"
                   label="Stockist"
@@ -127,49 +117,42 @@
         </template>
 
         <!-- slot name syntax: body-cell-<column_name> -->
-        <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
+        <q-td slot="body-cell-prefix" :work-order_item-id="rs.row.id" slot-scope="rs" :props="rs" style="width:35px">
 
         </q-td>
 
         <q-td slot="body-cell-date" slot-scope="rs" :props="rs">
-          <span v-if="rs.row.work_order_item.work_order.date"> {{ $app.moment(rs.row.work_order_item.work_order.date).format('DD/MM/YY') }}</span>
+          <span v-if="rs.row.work_order"> {{ $app.moment(rs.row.work_order.date).format('DD/MM/YY') }}</span>
         </q-td>
 
         <q-td slot="body-cell-number" slot-scope="rs" :props="rs" style="width:35px">
-          <span v-if="!Boolean(rs.row.work_order_item.work_order)" v-text="'-'" />
-          <q-btn v-else dense unelevated type="a" :to="`/admin/factories/work-orders/${rs.row.work_order_item.work_order.id}`">
-            <div :class="{'text-strike': Boolean(rs.row.work_order_item.work_order.revise_id)}">
-              {{ rs.row.work_order_item.work_order.fullnumber || rs.row.work_order_item.work_order.number }}
+          <span v-if="!Boolean(rs.row.work_order)" v-text="'-'" />
+          <q-btn v-else dense unelevated type="a" :to="`/admin/factories/work-orders/${rs.row.work_order.id}`">
+            <div :class="{'text-strike': Boolean(rs.row.work_order.revise_id)}">
+              {{ rs.row.work_order.fullnumber || rs.row.work_order.number }}
             </div>
           </q-btn>
         </q-td>
 
         <q-td slot="body-cell-item" slot-scope="rs" :props="rs" style="width:35px">
-          <!-- <code>({{Object.keys(rs.row)}})</code> -->
-          <div class="column" v-if="rs.row.work_order_item.item">
-            <span>{{rs.row.work_order_item.item.part_name}}</span>
-            <span class="text-weight-light">[{{rs.row.work_order_item.item.customer_code}}] <font>{{rs.row.work_order_item.item.part_subname || '--'}}</font></span>
+          <div class="column" v-if="rs.row.item">
+            <span>{{rs.row.item.part_name}}</span>
+            <span class="text-weight-light">[{{rs.row.item.customer_code}}] <font>{{rs.row.item.part_subname || '--'}}</font></span>
           </div>
         </q-td>
 
         <q-td slot="body-cell-stockist" slot-scope="rs" :props="rs" style="width:35px">
-          <span v-if="rs.row.work_order_item.work_order.stockist_from">
-            {{Object.assign({}, stockist_options.find(x => x.value === rs.row.work_order_item.work_order.stockist_from)).label || '-'}}
-          </span>
-        </q-td>
-
-        <q-td slot="body-cell-line_id" slot-scope="rs" :props="rs" style="width:35px">
-          <span v-if="rs">
-            {{rs.value}} <q-badge v-if="!rs.row.ismain" color="blue-grey" label="Subline" />
+          <span v-if="rs.row.work_order">
+            {{Object.assign({}, stockist_options.find(x => x.value === rs.row.work_order.stockist_from)).label || '-'}}
           </span>
         </q-td>
 
         <template v-slot:bottom-row>
           <q-tr class="bg-blue-grey-2 text-weight-medium">
-            <q-td key="prefix" colspan="3"></q-td>
+            <q-td key="prefix" colspan="2"></q-td>
             <q-td key="part_name" class="text-right">{{ $tc('label.grandtotal') }}</q-td>
             <q-td key="quantity" class="text-right">
-              {{TABLE.rowData.reduce((total, item) => total += (item.work_order_item.quantity), 0) }}
+              {{TABLE.rowData.reduce((total, item) => total += (item.quantity), 0) }}
             </q-td>
             <q-td key="unit">{{ $tc('label.unit') }}</q-td>
             <q-td colspan="100%">
@@ -204,11 +187,6 @@ export default {
         fill: {
           line_id: {
             value: null,
-            type: 'integer',
-            transform: (value) => { return null }
-          },
-          ismain: {
-            value: 1,
             type: 'integer',
             transform: (value) => { return null }
           },
@@ -248,18 +226,18 @@ export default {
         mode: 'index',
         resource: {
           api: '/api/v1/factories/work-orders/items',
-          uri: '/admin/factories/work-orders/items'
+          uri: '/admin/factories/work-orders/items',
+          params: ['--with=work_order']
         },
         columns: [
           { name: 'prefix', label: '', align: 'left' },
-          { name: 'date', label: this.$tc('label.date'), field: (rs) => rs.work_order_item.work_order.date, align: 'center', sortable: true },
-          { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'item', label: this.$tc('items.part_name'), field: 'part_name', align: 'left' },
-          { name: 'quantity', label: this.$tc('label.quantity'), field: (rs) => rs.work_order_item.quantity, align: 'right', sortable: true },
-          { name: 'unit', label: this.$tc('label.unit'), field: (rs) => rs.work_order_item.unit.code, align: 'left' },
-          { name: 'line_id', label: 'Line Production', field: (rs) => rs.line.name, align: 'left', sortable: true },
-          { name: 'shift_id', label: 'Shift', field: (rs) => rs.work_order_item.work_order.shift.name, align: 'center', sortable: true },
-          { name: 'stockist', label: (rs) => rs.work_order_item.work_order.stockist_from, align: 'left' }
+          { name: 'date', label: this.$tc('label.date'), align: 'center', sortable: true },
+          { name: 'number', label: this.$tc('label.number'), align: 'left', sortable: true },
+          { name: 'item', label: this.$tc('items.part_name'), align: 'left' },
+          { name: 'quantity', label: this.$tc('label.quantity'), field: (row) => row.quantity, align: 'right', sortable: true },
+          { name: 'unit', label: this.$tc('label.unit'), field: (row) => row.unit ? row.unit.code : '', align: 'left' },
+          { name: 'shift_id', label: 'Shift', field: (row) => row.work_order && row.work_order.shift ? row.work_order.shift.name : '', align: 'center', sortable: true },
+          { name: 'stockist', xlabel: (row) => row.work_order.stockist_from, align: 'left' }
         ]
       }
     }
