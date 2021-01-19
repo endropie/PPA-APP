@@ -46,22 +46,22 @@
         </q-card-section>
       </q-card>
       <div class="row q-col-gutter-sm">
-        <q-input class="col-12 col-sm-6"
-          v-model="rsForm.name" readonly
+        <q-input class="col-12"
+          v-model="rsForm.name"
           v-validate="'required'"
           :label="$tc('label.name')" stack-label
           :name="`name`"
           :error="errors.has(`name`)"
           :error-message="errors.first(`name`)"
         />
-        <ux-numeric class="col-12 col-sm-6"
+        <!-- <ux-numeric class="col-12 col-sm-6"
           v-model="rsForm.cost"
-          v-validate="'required'"
+          v-validate="''"
           :label="$tc('label.cost')" stack-label
           :name="`cost`"
           :error="errors.has(`cost`)"
           :error-message="errors.first(`cost`)"
-        />
+        /> -->
       </div>
       <q-input filled
         v-model="rsForm.description"
