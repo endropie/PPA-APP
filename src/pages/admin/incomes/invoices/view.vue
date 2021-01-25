@@ -74,6 +74,12 @@
                 $router.push(`${VIEW.resource.uri}/create`)
               }
             },
+            { label: 'STOCKCARD', color:'blue', icon: 'widgets',
+              hidden: !$app.can('acc-invoices-update'),
+              actions: () => {
+                $router.push(`${VIEW.resource.uri}/${ROUTE.params.id}/stockcards`)
+              }
+            },
             { label: 'CONFIRM', color:'positive', icon: 'done_all',
               hidden: !IS_CONFIRM || !$app.can('acc-invoices-confirm'),
               detail: $tc('form.confirm'),
