@@ -67,6 +67,7 @@ export default {
   size: 'Ukuran',
   item_type: 'Tipe Part',
   item_category: 'Kategori Part',
+  category_item_price: 'Kategori Barang (Price)',
   fault: 'Fault',
   type_fault: 'Tipe Fault',
   department: 'Depertemen',

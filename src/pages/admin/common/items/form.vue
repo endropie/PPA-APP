@@ -1,6 +1,6 @@
 <template>
 <q-page padding class="form-page row justify-center">
-  <q-card inline class="main-box self-start" v-if="FORM.show" :dark="LAYOUT.isDark" :class="{ 'bg-grey-9': LAYOUT.isDark}">
+  <q-card inline class=" self-start" v-if="FORM.show" >
     <q-card-section class="q-pa-sm">
       <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" >
         <q-chip slot="optional" square outline icon="bookmark" color="warning" label="SAMPLE" v-if="rsForm.sample" />
@@ -9,7 +9,7 @@
         </template>
       </form-header>
     </q-card-section>
-    <q-separator :dark="LAYOUT.isDark"/>
+    <q-separator />
     <!-- ROW::1st Part Identity -->
     <q-card-section class="row q-col-gutter-sm">
       <div class="col-12 col-sm-6" >
@@ -45,7 +45,6 @@
             :label="$tc('items.specification')"
             class="col-12 col-sm-6"
             v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
             :options="SpecificationOptions"
             :error="errors.has('specification_id')"
             :error-message="errors.first('specification_id')" />
@@ -57,7 +56,6 @@
             v-validate="isNotSample(`required`)"
             class="col-6"
             icon="table_chart"
-            :dark="LAYOUT.isDark"
             :options="CategoryOptions"
             :error="errors.has('category_item_id')"
             :error-message="errors.first('category_item_id')" />
@@ -68,7 +66,6 @@
             icon="dehaze"
             v-model="rsForm.type_item_id"
             v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
             :options="TypeOptions"
             :error="errors.has('type_item_id')"
             :error-message="errors.first('type_item_id')" />
@@ -79,7 +76,6 @@
             class="col-6"
             icon="web_asset"
             v-validate="'required'"
-            :dark="LAYOUT.isDark"
             :options="UnitOptions"
             :error="errors.has('unit_id')"
             :error-message="errors.first('unit_id')" />
@@ -88,7 +84,6 @@
             v-model="rsForm.size_id"
             label="Size"
             v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
             :options="SizeOptions"
             class="col-6"
             icon="format_size"
@@ -102,7 +97,6 @@
             name="code"
             :placeholder="FORM.ifCreate('[Auto Generate]','')"
             :label="$tc('label.code_intern')"
-            :dark="LAYOUT.isDark"
             v-model="rsForm.code"
             v-validate="FORM.ifCreate('','required')"
             :error="errors.has('code')"
@@ -124,26 +118,25 @@
             v-validate="'required'"
             :error="errors.has('part_number')"
             :error-message="errors.first('part_number')"
-            :dark="LAYOUT.isDark"
           />
           <q-input
               name="part_name"
               label="Part name"
               v-model="rsForm.part_name"
               v-validate="'required'"
-              :dark="LAYOUT.isDark"
               class="col-12"
               icon="label"
               :error="errors.has('part_name')"
               :error-message="errors.first('part_name')"
           />
-          <q-input
+          <q-input class="col-12"
             name="part_alias"
             label="Part alias Finished"
             v-model="rsForm.part_alias"
             v-validate="''"
-            :dark="LAYOUT.isDark"
-              class="col-12" icon="beenhere" :error="errors.has('part_alias')" :error-message="errors.first('part_alias')"
+            icon="beenhere"
+            :error="errors.has('part_alias')"
+            :error-message="errors.first('part_alias')"
           />
         </div>
       </div>
@@ -200,7 +193,6 @@
                   v-model="rsForm.load_type"
                   :options="['HANGER', 'BAREL']"
                   v-validate="isEnginered(`required`)"
-                  :dark="LAYOUT.isDark"
                   :error="errors.has('load_type')"
                   :error-message="errors.first('load_type')"/>
 
@@ -243,7 +235,6 @@
                           :ref="`pre-line`"
                           :name="`pre-line-${index}`"
                           v-model="rsForm.item_prelines[index].line_id"
-                          :dark="LAYOUT.isDark"
                           inverted dense
                           color="primary"
                           :prefix="`${rsForm.item_prelines.length - index}. `"
@@ -285,7 +276,6 @@
                       v-model="rsForm.item_units[index].rate"
                       v-validate="isNotSample(`required|gt_value:0`)"
                       dense no-error-icon
-                      :dark="LAYOUT.isDark"
                       :error="errors.has(`unit-${index}`)"
                       :error-message="errors.first(`unit-${index}`)">
                       <template slot="prepend">
@@ -298,7 +288,6 @@
                           dense borderless style="width:110px"
                           map-options emit-value
                           :options="UnitOptions.filter(x => x.value !== rsForm.unit_id)"
-                          :dark="LAYOUT.isDark"
                           :error="errors.has(`unit-${index}`)"
                           :error-message="errors.first(`unit-${index}`)"
                       />
@@ -343,7 +332,6 @@
                   label="Estimate S.A (dm)"
                   v-model="rsForm.estimate_sadm"
                   v-validate="isFromSample(`required`)"
-                  :dark="LAYOUT.isDark"
                   :error="errors.has('estimate_sadm')"
                   :error-message="errors.first('estimate_sadm')"
                 />
@@ -353,7 +341,6 @@
                   :label="$tc('label.total', 1, {v: 'Estimasi'})"
                   v-model="rsForm.estimate_monthly_amount"
                   v-validate="isFromSample(`required`)"
-                  :dark="LAYOUT.isDark"
                   :error="errors.has('estimate_monthly_amount')"
                   :error-message="errors.first('estimate_monthly_amount')"
                 />
@@ -363,10 +350,30 @@
       </div>
 
     </q-card-section>
-    <!-- ROW::3th Price & Description -->
-    <q-card-section>
+    <!-- ROW::4th Price & Description -->
+    <q-card-section class="q-gutter-y-md">
       <div class="row q-col-gutter-sm" v-if="$app.can('items-price')">
-        <ux-numeric class="col-12 col-sm-4"
+        <ux-select filled class="col-12 col-sm-6"
+          name="vehicle_id"
+          :label="$tc('general.category_item_price')"
+          v-model="rsForm.category_item_price"
+          :disable="!rsForm.customer_id"
+          filter clearable
+          :source="`/api/v1/common/category-item-prices?mode=all&customer_id=${rsForm.customer_id}`"
+          option-label="name"
+          option-value="id"
+          :option-stamp="rs => $app.number_format(rs.price)"
+          @input="(v) => {
+            rsForm.category_item_price_id = v ? v.id : null
+          }"
+        />
+        <q-input filled class="col-12 col-sm-6"
+          label="Kategori Price" readonly
+          :value="rsForm.category_item_price ? $app.number_format(rsForm.category_item_price.price) : null"
+        />
+      </div>
+      <div class="row q-col-gutter-sm" v-if="$app.can('items-price')">
+        <ux-numeric hide-bottom-space class="col-12 col-sm-4"
           name="price"
           label="Normal Price"
           type="number"
@@ -379,7 +386,7 @@
           :error="errors.has('price')"
           :error-message="errors.first('price')"
         />
-        <ux-numeric class="col-12 col-sm-4"
+        <ux-numeric hide-bottom-space class="col-12 col-sm-4"
           name="price_area" type="number" readonly
           label="Price in DM"
           :value="price_area"
@@ -390,7 +397,7 @@
           :error="errors.has('price_area')"
           :error-message="errors.first('price_area')"
         />
-        <ux-numeric class="col-12 col-sm-4"
+        <ux-numeric hide-bottom-space class="col-12 col-sm-4"
           name="price_loaded"
           label="Price in BRL"
           type="number" readonly
@@ -403,23 +410,20 @@
           :error-message="errors.first('price_loaded')"
         />
       </div>
-      <div class="row q-col-gutter-sm">
-        <q-input class="col-12" type="textarea" autogrow rows="3"
-          :label="$tc('label.description')" stack-label
-          v-model="rsForm.description"
-          filled
-          :dark="LAYOUT.isDark"
-        />
-      </div>
+      <q-input type="textarea" autogrow rows="3"
+        :label="$tc('label.description')" stack-label
+        v-model="rsForm.description"
+        filled
+      />
     </q-card-section>
-    <q-separator :dark="LAYOUT.isDark" spaced />
+    <q-separator spaced />
     <q-card-actions class="group float-right">
       <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()" />
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)" />
       <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()" />
     </q-card-actions>
   </q-card>
-  <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
+  <q-inner-loading :showing="FORM.loading"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
 </q-page>
 </template>
 
@@ -466,7 +470,8 @@ export default {
           sa_dm: null,
           weight: null,
 
-          category_item_id: null,
+          category_item_price_id: null,
+          category_item_price: null,
           type_item_id: null,
           size_id: null,
           unit_id: null,

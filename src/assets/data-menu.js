@@ -33,6 +33,17 @@ const common = [
     icon: 'style'
   },
   {
+    name: 'Category Price',
+    icon: 'widgets',
+    path: 'category-item-prices',
+    lang: 'general.category_item_price',
+    resources: [
+      { page: 'index', path: '', meta: { permission: 'items-prices;items-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'items-prices;items-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'items-prices;items-update' } }
+    ]
+  },
+  {
     name: 'Employee',
     path: 'employees',
     icon: 'style',
