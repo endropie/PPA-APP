@@ -33,7 +33,7 @@
           </q-item-section>
           <slot name="option-append" :option="{...scope}">
             <q-item-section side v-if="scope.opt.stamp || $attrs['option-stamp']">
-              <q-badge :label="scope.opt.stamp || $attrs['option-stamp']" />
+              <q-badge :label="scope.opt.stamp || getOptionStamp(scope.opt)" />
             </q-item-section>
             <q-item-section side v-if="scope.opt.disable">
               <q-icon name="block" color="red"/>
@@ -138,6 +138,10 @@ export default {
     setOptions (v) {
       this.options = v
     },
+    getOptionStamp (opt) {
+      const stamp = this.$attrs['option-stamp']
+      return (typeof stamp === 'function' ? stamp(opt) : opt[stamp])
+    },
     getOptionDisable (option) {
       if (!this.$attrs['option-disable']) return option.disable
 
@@ -197,7 +201,7 @@ export default {
             this.options = response.data
           })
           .catch(error => {
-            console.error(error || error.response)
+            console.error(error.response || error)
           })
           .finally(() => {
             return update()
