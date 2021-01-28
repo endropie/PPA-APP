@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="column justify-start items-center"  v-if="VIEW.show">
-    <div class="column q-gutter-y-sm" style="min-width:75%" v-if="VIEW.show">
+    <div class="content" style="min-width:75%" v-if="VIEW.show">
 
       <q-card :dark="LAYOUT.isDark"
         class="no-shadow no-margin print-hide modal-hide q-pt-sm"
