@@ -25,17 +25,6 @@
                 shortcut: true,
                 hidden:!$app.can('request-orders-create'),
                 to: `${TABLE.resource.uri}/create`
-              },
-              { label: $tc('label.trash'),
-                detail:  $tc('messages.show_deleted'),
-                shortcut: true,
-                icon: Boolean(FILTERABLE.fill.withTrashed.value)? 'mdi-cup' : 'mdi-cup-off',
-                closePopup: false,
-                outline: true,
-                actions:() => {
-                  FILTERABLE.toggleTrash()
-                  FILTERABLE.submit()
-                }
               }
             ]">
 
