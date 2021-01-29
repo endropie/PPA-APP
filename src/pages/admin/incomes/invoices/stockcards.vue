@@ -45,7 +45,7 @@
             :label="$tc('general.request_order')"
             v-model="FILTER.request_order" clearable
             filter
-            :source="`/api/v1/incomes/request-orders?mode=all&acc_invoice_id=${ROUTE.params.id}&--limit=20`"
+            :source="`/api/v1/incomes/request-orders?mode=all&delivery_invoice_id=${ROUTE.params.id}&--limit=20`"
             :source-keys="['number', 'description']"
             option-value="id"
             option-label="fullnumber"
@@ -175,22 +175,18 @@ export default {
         this.stockcard = null
         return false
       }
-      const submit = () => {
-        let url = `/api/v1/common/items/invoice-cards?item_id=${item.id}&request_order_id=${this.FILTER.request_order ? this.FILTER.request_order.id : ''}&invoice_id=${this.ROUTE.params.id}`
-        this.$q.loading.show()
-        this.$axios.get(url)
-          .then((response) => {
-            this.stockcard = response.data
-          })
-          .catch(error => {
-            this.$app.response.error(error.response || error)
-          })
-          .finally(() => {
-            this.$q.loading.hide()
-          })
-      }
-
-      submit()
+      let url = `/api/v1/common/items/invoice-cards?item_id=${item.id}&request_order_id=${this.FILTER.request_order ? this.FILTER.request_order.id : ''}&invoice_id=${this.ROUTE.params.id}`
+      this.$q.loading.show()
+      this.$axios.get(url)
+        .then((response) => {
+          this.stockcard = response.data
+        })
+        .catch(error => {
+          this.$app.response.error(error.response || error)
+        })
+        .finally(() => {
+          this.$q.loading.hide()
+        })
     }
   }
 }
