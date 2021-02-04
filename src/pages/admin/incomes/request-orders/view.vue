@@ -127,7 +127,7 @@
         </div>
         <div class="col-12">
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
-            <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
+            <div class="q-my-xs text-weight-light" style="min-height:30px;white-space:pre-line">{{ rsView.description }}</div>
         </div>
         <div class="col-12" v-if="false">
           <q-btn dense flat color="secondary" class="print-hide float-right"
