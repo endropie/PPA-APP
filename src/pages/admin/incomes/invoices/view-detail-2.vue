@@ -6,8 +6,10 @@
       <!-- HEADER -->
       <thead :key="`thead-${indexCols}`">
         <q-tr class="text-uppercase" style="line-height:25px; page-break-after: always;">
-          <q-th rowspan="2" width="10%">{{ $tc('label.date') }}</q-th>
-          <q-th rowspan="2" width="10%">{{ $tc('label.number') }}</q-th>
+          <q-th rowspan="3" width="10%">{{ $tc('label.date') }}</q-th>
+          <q-th rowspan="3" width="10%">{{ $tc('label.number') }}</q-th>
+          <q-th rowspan="3" width="10%">{{ $tc('label.reference') }}</q-th>
+          <q-th rowspan="3" width="10%">LPB</q-th>
           <q-th v-for="(col, indexCol) in cols" :key="indexCol" width="10%">
             {{ITEMS[col].item.part_name}}
           </q-th>
@@ -15,8 +17,14 @@
         </q-tr>
 
         <q-tr style="line-height:25px" class="text-uppercase">
-          <q-th v-for="(col, indexCol) in cols" :key="indexCol" width="10%">
+          <q-th v-for="(col, indexCol) in cols" :key="indexCol" width="10%" style="padding:2px 6px;">
             {{ITEMS[col].item.part_subname === ITEMS[col].item.part_name ? ITEMS[col].item.code : ITEMS[col].item.part_subname }}
+          </q-th>
+          <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
+        </q-tr>
+        <q-tr style="line-height:25px" class="text-uppercase">
+          <q-th v-for="(col, indexCol) in cols" :key="indexCol" width="10%" style="padding:2px 6px;">
+            {{ITEMS[col].item.code }}
           </q-th>
           <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
         </q-tr>
@@ -24,8 +32,12 @@
 
       <!-- LINE -->
       <q-tr>
-        <q-td colspan="2" style="height:0px; padding:0;"> </q-td>
+        <q-td style="height:0px; padding:0;"> </q-td>
+        <q-td style="height:0px; padding:0;"> </q-td>
+        <q-td style="height:0px; padding:0;"> </q-td>
+        <q-td style="height:0px; padding:0;"> </q-td>
         <q-td v-for="(col, indexCol) in cols" :key="indexCol" style="height:2px; padding:0;" width="10%"></q-td>
+        <q-td style="border-top:none;border-bottom:none;"></q-td>
       </q-tr>
 
         <!-- BODY -->
@@ -37,6 +49,17 @@
               <div v-if="row.delivery_order">
                 {{row.delivery_order.fullnumber}}
                 <div class="text-small text-grey-7" style="line-height:normal;margin-top: -4px">{{row.delivery_order.indexed_number}}</div>
+              </div>
+            </q-td>
+            <q-td>
+              <div v-if="row.delivery_order">
+                {{row.delivery_order.request_reference_number || '-'}}
+                <!-- <div class="text-small text-grey-7" style="line-height:normal;margin-top: -4px">LPB: {{row.delivery_order.confirmed_number}}</div> -->
+              </div>
+            </q-td>
+            <q-td>
+              <div v-if="row.delivery_order">
+                {{row.delivery_order.confirmed_number || '-'}}
               </div>
             </q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
@@ -51,9 +74,16 @@
         <!-- FOOTER -->
         <tbody :key="`tfoot-${indexCols}`">
           <q-tr>
-            <q-td colspan="2" class="text-right"> Jumlah</q-td>
+            <q-td colspan="4" class="text-right"> Jumlah</q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
               <span class="text-medium">{{$app.number_format(ITEMS[col].data.reduce((t, rs) => { return t + rs.quantity }, 0),0)}}</span>
+            </q-td>
+            <q-td auto-width class="no-padding" style="border-top:none"></q-td>
+          </q-tr>
+          <q-tr>
+            <q-td colspan="4" class="text-right"> {{ $tc('label.price') }}</q-td>
+            <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
+              <span class="text-medium" v-if="ITEMS[col].item">{{ $app.number_format(ITEMS[col].item.price) }}</span>
             </q-td>
             <q-td auto-width class="no-padding" style="border-top:none"></q-td>
           </q-tr>
