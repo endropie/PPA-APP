@@ -4,28 +4,28 @@
     <q-markup-table bordered dense square separator="cell" class="table-print no-shadow no-highlight">
 
       <!-- HEADER -->
-      <thead :key="`thead-${indexCols}`">
-        <q-tr class="text-uppercase" style="line-height:25px; page-break-after: always;">
-          <q-th rowspan="3" width="10%">{{ $tc('label.date') }}</q-th>
-          <q-th rowspan="3" width="10%">{{ $tc('label.number') }}</q-th>
-          <q-th rowspan="3" width="10%">{{ $tc('label.reference') }}</q-th>
-          <q-th rowspan="3" width="10%">LPB</q-th>
-          <q-th v-for="(col, indexCol) in cols" :key="indexCol" width="10%">
+      <thead :key="`thead-${indexCols}`" class="text-uppercase text-center font-weight-medium">
+        <q-tr class="" style="line-height:25px; page-break-after: always;">
+          <q-td rowspan="3" width="10%">{{ $tc('label.date') }}</q-td>
+          <q-td rowspan="3" width="10%">{{ $tc('label.number') }}</q-td>
+          <q-td rowspan="3" width="10%">{{ $tc('label.reference') }}</q-td>
+          <q-td rowspan="3" width="10%">LPB</q-td>
+          <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%">
             {{ITEMS[col].item.part_name}}
-          </q-th>
+          </q-td>
           <q-td auto-width class="no-padding" style="border-bottom:none;"></q-td>
         </q-tr>
 
         <q-tr style="line-height:25px" class="text-uppercase">
-          <q-th v-for="(col, indexCol) in cols" :key="indexCol" width="10%" style="padding:2px 6px;">
+          <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" style="padding:2px 6px;">
             {{ITEMS[col].item.part_subname === ITEMS[col].item.part_name ? ITEMS[col].item.code : ITEMS[col].item.part_subname }}
-          </q-th>
+          </q-td>
           <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
         </q-tr>
         <q-tr style="line-height:25px" class="text-uppercase">
-          <q-th v-for="(col, indexCol) in cols" :key="indexCol" width="10%" style="padding:2px 6px;">
+          <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" style="padding:2px 6px;">
             {{ITEMS[col].item.code }}
-          </q-th>
+          </q-td>
           <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
         </q-tr>
       </thead>

@@ -1,15 +1,14 @@
 <template>
 <div>
   <q-markup-table dense bordered square separator="cell" class="table-print no-shadow no-highlight">
-    <thead>
+    <thead class="text-uppercase text-center font-weight-medium">
       <q-tr style="line-height:25px" class="text-uppercase">
-        <q-th width="10%">{{ $tc('label.date') }}</q-th>
-        <q-th width="10%">{{ $tc('label.number') }}</q-th>
-        <q-th width="30%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
-        <!-- <q-th width="30%">{{ $app.setting('item.subname_label') }}</q-th> -->
-        <q-th width="10%">{{ $tc('label.unit') }}</q-th>
-        <q-th width="10%">{{ $tc('label.quantity') }}</q-th>
-        <q-th width="30%">{{ $tc('label.encasement') }}</q-th>
+        <q-td width="10%">{{ $tc('label.date') }}</q-td>
+        <q-td width="10%">{{ $tc('label.number') }}</q-td>
+        <q-td width="30%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-td>
+        <q-td width="10%">{{ $tc('label.unit') }}</q-td>
+        <q-td width="10%">{{ $tc('label.quantity') }}</q-td>
+        <q-td width="30%">{{ $tc('label.encasement') }}</q-td>
       </q-tr>
     </thead>
     <tbody>

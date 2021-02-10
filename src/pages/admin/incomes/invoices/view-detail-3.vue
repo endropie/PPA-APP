@@ -3,43 +3,43 @@
   <div v-for="(cols, indexCols) in COLUMNS" :key="indexCols">
     <q-markup-table  dense bordered square separator="cell" class="table-print no-shadow no-highlight">
       <!-- <template v-for="(cols, indexCols) in COLUMNS"> -->
-        <thead :key="`thead-${indexCols}`">
+        <thead :key="`thead-${indexCols}`" class="text-uppercase text-center font-weight-medium">
           <q-tr class="text-uppercase" style="line-height:15px; page-break-after: always;">
-            <q-th width="10%" align="center" rowspan="3" colspan="4" class="no-padding">{{$tc('label.name', 0, {v:$tc('label.part')}) }}</q-th>
-            <q-th v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id" style="padding:2px 6px;">
+            <q-td width="10%" align="center" rowspan="3" colspan="4" class="no-padding">{{$tc('label.name', 0, {v:$tc('label.part')}) }}</q-td>
+            <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id" style="padding:2px 6px;">
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> {{DELIVERY_ORDERS[col].delivery_order.fullnumber}} </span>
-            </q-th>
-            <q-th width="50%" class="no-padding" style="border-bottom:none;"></q-th>
+            </q-td>
+            <q-td width="50%" class="no-padding" style="border-bottom:none;"></q-td>
           </q-tr>
 
           <q-tr class="text-uppercase" style="line-height:15px">
-            <q-th v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id" class="no-padding" >
+            <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id" class="no-padding" >
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> PO: {{ DELIVERY_ORDERS[col].delivery_order.request_reference_number || -'' }} </span>
-            </q-th>
-            <q-th auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-th>
+            </q-td>
+            <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
           <q-tr class="text-uppercase" style="line-height:15px">
-            <q-th v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id">
+            <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id">
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> LPB: {{ DELIVERY_ORDERS[col].delivery_order.confirmed_number || '-' }} </span>
-            </q-th>
-            <q-th auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-th>
+            </q-td>
+            <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
           <q-tr class="text-uppercase" style="line-height:15px">
-            <q-th>CODE</q-th>
-            <q-th>{{ $tc('label.part') }}</q-th>
-            <q-th>{{ $tc('label.no', 1, {v:$tc('label.part')}) }}</q-th>
-            <q-th>{{ $tc('label.price') }}</q-th>
-            <q-th v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id">
+            <q-td>CODE</q-td>
+            <q-td>{{ $tc('label.part') }}</q-td>
+            <q-td>{{ $tc('label.no', 1, {v:$tc('label.part')}) }}</q-td>
+            <q-td>{{ $tc('label.price') }}</q-td>
+            <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id">
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> {{$app.moment(DELIVERY_ORDERS[col].delivery_order.date).format('L')}} </span>
-            </q-th>
-            <q-th auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-th>
+            </q-td>
+            <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
         </thead>
 
         <!-- LINE -->
         <q-tr>
-          <q-th colspan="2" style="height:0px; padding:0;"> </q-th>
-          <q-th  style="height:2px; padding:0;" v-for="(col, indexCol) in cols" :key="indexCol" width="10%"></q-th>
+          <q-td colspan="2" style="height:0px; padding:0;"> </q-td>
+          <q-td  style="height:2px; padding:0;" v-for="(col, indexCol) in cols" :key="indexCol" width="10%"></q-td>
         </q-tr>
 
         <!-- <tbody v-for="(loop, ii) in [1,2,3,4,5,6,7,8,9,10]" :key="`tbody-${ii}-${indexCols}`"> -->
@@ -68,7 +68,7 @@
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
               <span v-if="getDataCell (row.data, col)">{{ $app.number_format(getDataCell (row.data, col)) }}</span>
             </q-td>
-            <q-th auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-th>
+            <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
         </tbody>
 
@@ -78,7 +78,7 @@
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
               <span class="text-medium">{{$app.number_format(DELIVERY_ORDERS[col].data.reduce((t, rs) => { return t + rs.quantity }, 0),0)}}</span>
             </q-td>
-            <q-th auto-width class="no-padding" style="border-top:none"></q-th>
+            <q-td auto-width class="no-padding" style="border-top:none"></q-td>
           </q-tr>
         </tbody>
         <q-tr>
