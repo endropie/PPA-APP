@@ -5,20 +5,23 @@
       <!-- <template v-for="(cols, indexCols) in COLUMNS"> -->
         <thead :key="`thead-${indexCols}`" class="text-uppercase text-center font-weight-medium">
           <q-tr class="text-uppercase" style="line-height:15px; page-break-after: always;">
-            <q-td width="10%" align="center" rowspan="3" colspan="4" class="no-padding">{{$tc('label.name', 0, {v:$tc('label.part')}) }}</q-td>
+            <q-td width="10%" align="center" :rowspan="TOPROW" colspan="3" class="no-padding">{{$tc('label.name', 0, {v:$tc('label.part')}) }}</q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id" style="padding:2px 6px;">
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> {{DELIVERY_ORDERS[col].delivery_order.fullnumber}} </span>
             </q-td>
+
+            <q-td  :rowspan="TOPROW" v-if="COLUMNS.length === indexCols+1"  colspan="2"></q-td>
+
             <q-td width="50%" class="no-padding" style="border-bottom:none;"></q-td>
           </q-tr>
 
-          <q-tr class="text-uppercase" style="line-height:15px">
+          <q-tr class="text-uppercase" style="line-height:15px" v-if="setting.shows.reference_number">
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id" class="no-padding" >
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> PO: {{ DELIVERY_ORDERS[col].delivery_order.request_reference_number || -'' }} </span>
             </q-td>
             <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
-          <q-tr class="text-uppercase" style="line-height:15px">
+          <q-tr class="text-uppercase" style="line-height:15px" v-if="setting.shows.confirmed_number">
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id">
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> LPB: {{ DELIVERY_ORDERS[col].delivery_order.confirmed_number || '-' }} </span>
             </q-td>
@@ -28,10 +31,13 @@
             <q-td>CODE</q-td>
             <q-td>{{ $tc('label.part') }}</q-td>
             <q-td>{{ $tc('label.no', 1, {v:$tc('label.part')}) }}</q-td>
-            <q-td>{{ $tc('label.price') }}</q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id">
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> {{$app.moment(DELIVERY_ORDERS[col].delivery_order.date).format('L')}} </span>
             </q-td>
+
+            <q-td  v-if="COLUMNS.length === indexCols+1">{{$tc('label.total')}}</q-td>
+            <q-td  v-if="COLUMNS.length === indexCols+1">{{$tc('label.price')}}</q-td>
+
             <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
         </thead>
@@ -60,13 +66,16 @@
                 <span>[{{row.item.part_subname}}]</span>
               </div>
             </q-td>
-            <q-td>
-              <div v-if="row.item">
-                <span>{{$app.number_format(row.item.price)}}</span>
-              </div>
-            </q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
               <span v-if="getDataCell (row.data, col)">{{ $app.number_format(getDataCell (row.data, col)) }}</span>
+            </q-td>
+
+            <q-td v-if="COLUMNS.length === indexCols+1" class="text-right">
+              <!-- [summary ({{COLUMNS.length}}) => ({{indexCols}})] -->
+              <span v-if="row.item">{{ $app.number_format(row.data.reduce((t, rs) => t + rs.unit_amount, 0)) }}</span>
+            </q-td>
+            <q-td v-if="COLUMNS.length === indexCols+1" class="text-right">
+              <span v-if="row.item">{{$app.number_format(row.item.price)}}</span>
             </q-td>
             <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
@@ -76,7 +85,7 @@
           <q-tr>
             <q-td colspan="3" class="text-right"> Jumlah</q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
-              <span class="text-medium">{{$app.number_format(DELIVERY_ORDERS[col].data.reduce((t, rs) => { return t + rs.quantity }, 0),0)}}</span>
+              <span class="text-medium">{{$app.number_format(DELIVERY_ORDERS[col].data.reduce((t, rs) => { return t + rs.unit_amount }, 0),0)}}</span>
             </q-td>
             <q-td auto-width class="no-padding" style="border-top:none"></q-td>
           </q-tr>
@@ -96,6 +105,7 @@ export default {
   name: 'ViewDetail2',
   props: {
     rsView: Object,
+    setting: Object,
     colx: { type: Number, required: true }
   },
   data () {
@@ -104,6 +114,16 @@ export default {
     }
   },
   computed: {
+    TOPROW () {
+      let length = 1
+      if (this.setting.shows.reference_number === true) length++
+      if (this.setting.shows.confirmed_number === true) length++
+      return String(length)
+    },
+    SUMMARY () {
+      if (!this.ROWS.length) return []
+      return this.ROWS
+    },
     ROWS () {
       if (!this.rsView.acc_invoice_items.length) return []
       return this.rsView.acc_invoice_items.reduce((vr, x) => {
@@ -118,8 +138,14 @@ export default {
       if (!columns.length) return []
 
       const page = this.colx > 0 ? this.colx : columns.length
+
       return columns.slice()
-        .sort((a, b) => new Date(this.DELIVERY_ORDERS[a].delivery_order.date) - new Date(this.DELIVERY_ORDERS[b].delivery_order.date))
+        .sort((a, b) => {
+          if (this.setting.sortBy === 'confirmed_number') {
+            return String(this.DELIVERY_ORDERS[a].delivery_order.confirmed_number) - String(this.DELIVERY_ORDERS[a].delivery_order.confirmed_number)
+          }
+          return new Date(this.DELIVERY_ORDERS[a].delivery_order.date) - new Date(this.DELIVERY_ORDERS[b].delivery_order.date)
+        })
         .reduce((rv, x, i) => {
           (rv[Math.floor((i) / page)] = rv[Math.floor((i) / page)] || []).push(x)
           return rv
@@ -138,7 +164,7 @@ export default {
   },
   methods: {
     getDataCell (data, col) {
-      return data.filter(x => x.delivery_order_id === Number(col)).reduce((t, rs) => { return t + rs.quantity }, 0)
+      return data.filter(x => x.delivery_order_id === Number(col)).reduce((t, rs) => { return t + rs.unit_amount }, 0)
     }
   }
 }

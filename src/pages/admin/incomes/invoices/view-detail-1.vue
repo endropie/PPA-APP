@@ -41,7 +41,8 @@
 export default {
   name: 'ViewDetail1',
   props: {
-    rsView: Object
+    rsView: Object,
+    setting: Object
   },
   data () {
     return {

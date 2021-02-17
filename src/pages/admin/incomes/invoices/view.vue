@@ -33,7 +33,7 @@
             </div>
           </div>
           <div class="column">
-            <div class="self-start q-pb-sm print-hide">
+            <div class="row justify-start q-pb-sm print-hide">
               <q-select dense filled map-options emit-value
                 label="MODE" stack-label
                 v-model="viewDetail"
@@ -50,10 +50,41 @@
                   </q-input>
                 </div>
               </q-select>
+              <q-space />
+              <q-btn-dropdown
+                unelevated color="grey-3" text-color="dark"
+                label="Konfigurasi"
+              >
+                <div class="column q-px-sm q-my-sm" style="min-width:200px">
+                  <q-list bordered >
+                    <!-- SORTING -->
+                    <q-select dense square borderless
+                      class="q-px-md"
+                      label="URUTAN KOLOM"
+                      v-model="viewSetting.sortBy"
+                      :options="viewSetting.sortOptions"
+                      emit-value map-options
+                    />
+                    <q-separator  />
+                    <!-- SHOW/HIDE -->
+                    <q-item label style="min-height: auto;">TAMPILKAN KOLOM</q-item>
+                    <q-item clickable>
+                      <q-item-section>
+                        <q-toggle dense v-model="viewSetting.shows.reference_number" label="REFERENCE" class="q-pl-none" />
+                      </q-item-section>
+                    </q-item>
+                    <q-item clickable>
+                      <q-item-section>
+                        <q-toggle dense v-model="viewSetting.shows.confirmed_number" label="LPB" class="q-pl-none" />
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </div>
+              </q-btn-dropdown>
             </div>
-            <view-detail-1 :rsView="rsView" v-if="viewDetail === 'ViewDetail1'" />
-            <view-detail-2 :rsView="rsView" :colx="Number(viewDetailX)" v-if="viewDetail === 'ViewDetail2'" />
-            <view-detail-3 :rsView="rsView" :colx="Number(viewDetailX)" v-if="viewDetail === 'ViewDetail3'" />
+            <view-detail-1 :rsView="rsView" :setting="viewSetting" v-if="viewDetail === 'ViewDetail1'" />
+            <view-detail-2 :rsView="rsView" :setting="viewSetting" :colx="Number(viewDetailX)" v-if="viewDetail === 'ViewDetail2'" />
+            <view-detail-3 :rsView="rsView" :setting="viewSetting" :colx="Number(viewDetailX)" v-if="viewDetail === 'ViewDetail3'" />
           </div>
         </div>
         <div class="row q-gutter-xs print-hide " style="padding-top:50px">
@@ -128,6 +159,17 @@ export default {
   components: { PagePrint, ViewDetail1, ViewDetail2, ViewDetail3 },
   data () {
     return {
+      viewSetting: {
+        shows: {
+          reference_number: true,
+          confirmed_number: true
+        },
+        sortBy: 'date',
+        sortOptions: [
+          { value: 'date', label: 'Date' },
+          { value: 'confirmed_number', label: 'LPB' }
+        ]
+      },
       viewDetail: 'ViewDetail1',
       viewDetailX: null,
       viewDetailOptions: [

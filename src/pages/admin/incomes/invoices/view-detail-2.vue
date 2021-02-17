@@ -8,8 +8,8 @@
         <q-tr class="" style="line-height:25px; page-break-after: always;">
           <q-td rowspan="3" width="10%">{{ $tc('label.date') }}</q-td>
           <q-td rowspan="3" width="10%">{{ $tc('label.number') }}</q-td>
-          <q-td rowspan="3" width="10%">{{ $tc('label.reference') }}</q-td>
-          <q-td rowspan="3" width="10%">LPB</q-td>
+          <q-td rowspan="3" width="10%" v-if="setting.shows.reference_number">{{ $tc('label.reference') }}</q-td>
+          <q-td rowspan="3" width="10%" v-if="setting.shows.confirmed_number">LPB</q-td>
           <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%">
             {{ITEMS[col].item.part_name}}
           </q-td>
@@ -32,10 +32,10 @@
 
       <!-- LINE -->
       <q-tr>
+        <!-- <q-td style="height:0px; padding:0;"> </q-td>
         <q-td style="height:0px; padding:0;"> </q-td>
-        <q-td style="height:0px; padding:0;"> </q-td>
-        <q-td style="height:0px; padding:0;"> </q-td>
-        <q-td style="height:0px; padding:0;"> </q-td>
+        <q-td style="height:0px; padding:0;"> </q-td> -->
+        <q-td :colspan="LEFTCOL" style="height:0px; padding:0;"> </q-td>
         <q-td v-for="(col, indexCol) in cols" :key="indexCol" style="height:2px; padding:0;" width="10%"></q-td>
         <q-td style="border-top:none;border-bottom:none;"></q-td>
       </q-tr>
@@ -51,13 +51,13 @@
                 <div class="text-small text-grey-7" style="line-height:normal;margin-top: -4px">{{row.delivery_order.indexed_number}}</div>
               </div>
             </q-td>
-            <q-td>
+            <q-td v-if="setting.shows.reference_number">
               <div v-if="row.delivery_order">
                 {{row.delivery_order.request_reference_number || '-'}}
                 <!-- <div class="text-small text-grey-7" style="line-height:normal;margin-top: -4px">LPB: {{row.delivery_order.confirmed_number}}</div> -->
               </div>
             </q-td>
-            <q-td>
+            <q-td v-if="setting.shows.confirmed_number">
               <div v-if="row.delivery_order">
                 {{row.delivery_order.confirmed_number || '-'}}
               </div>
@@ -66,7 +66,7 @@
               <div v-if="getDataCell(row.data, col)">
                 {{$app.number_format(getDataCell(row.data, col), 0)}}
               </div>
-              <span v-if="Number(row.item_id) === Number(col)">{{$app.number_format(row.quantity,0)}}</span>
+              <span v-if="Number(row.item_id) === Number(col)">{{$app.number_format(row.unit_amount,0)}}</span>
             </q-td>
             <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
@@ -74,18 +74,18 @@
         <!-- FOOTER -->
         <tbody :key="`tfoot-${indexCols}`">
           <q-tr>
-            <q-td colspan="4" class="text-right"> Jumlah</q-td>
+            <q-td :colspan="LEFTCOL" class="text-right">Jumlah</q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
-              <span class="text-medium">{{$app.number_format(ITEMS[col].data.reduce((t, rs) => { return t + rs.quantity }, 0),0)}}</span>
+              <span class="text-medium">{{$app.number_format(ITEMS[col].data.reduce((t, rs) => { return t + rs.unit_amount }, 0),0)}}</span>
             </q-td>
-            <q-td auto-width class="no-padding" style="border-top:none"></q-td>
+            <q-td auto-width class="no-padding" style="border-top:none; border-bottom:none"></q-td>
           </q-tr>
           <q-tr>
-            <q-td colspan="4" class="text-right"> {{ $tc('label.price') }}</q-td>
+            <q-td :colspan="LEFTCOL" class="text-right"> {{ $tc('label.price') }}</q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
               <span class="text-medium" v-if="ITEMS[col].item">{{ $app.number_format(ITEMS[col].item.price) }}</span>
             </q-td>
-            <q-td auto-width class="no-padding" style="border-top:none"></q-td>
+            <q-td auto-width class="no-padding" style="border-top:none;"></q-td>
           </q-tr>
         </tbody>
       <!-- </template> -->
@@ -100,6 +100,7 @@ export default {
   name: 'ViewDetail2',
   props: {
     rsView: Object,
+    setting: Object,
     colx: { type: Number, required: true }
   },
   data () {
@@ -108,6 +109,12 @@ export default {
     }
   },
   computed: {
+    LEFTCOL () {
+      let length = 2
+      if (this.setting.shows.reference_number === true) length++
+      if (this.setting.shows.confirmed_number === true) length++
+      return String(length)
+    },
     COLUMNS () {
       // const columns = Object.keys(this.ITEMS).concat(Object.keys(this.ITEMS), Object.keys(this.ITEMS), Object.keys(this.ITEMS), Object.keys(this.ITEMS))
       const columns = Object.keys(this.ITEMS)
@@ -127,6 +134,9 @@ export default {
           return vr
         }, {})
 
+      if (this.setting.sortBy === 'confirmed_number') {
+        return Object.values(rows).sort((a, b) => String(a.delivery_order.confirmed_number) - String(b.delivery_order.confirmed_number))
+      }
       return Object.values(rows).sort((a, b) => new Date(a.delivery_order.date) - new Date(b.delivery_order.date))
     },
     ITEMS () {
@@ -140,7 +150,7 @@ export default {
   },
   methods: {
     getDataCell (data, col) {
-      return data.filter(x => x.item_id === Number(col)).reduce((t, rs) => { return t + rs.quantity }, 0)
+      return data.filter(x => x.item_id === Number(col)).reduce((t, rs) => { return t + rs.unit_amount }, 0)
     }
   }
 }
