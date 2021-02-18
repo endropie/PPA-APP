@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div v-for="(cols, indexCols) in COLUMNS" :key="indexCols">
+  <div v-for="(cols, indexCols) in COLUMNS" :key="indexCols">
     <q-markup-table bordered dense square separator="cell" class="table-print no-shadow no-highlight">
 
       <!-- HEADER -->
@@ -13,20 +13,20 @@
           <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%">
             {{ITEMS[col].item.part_name}}
           </q-td>
-          <q-td auto-width class="no-padding" style="border-bottom:none;"></q-td>
+          <q-td auto-width class="no-padding bg-transparent" style="border-bottom:none;"></q-td>
         </q-tr>
 
         <q-tr style="line-height:25px" class="text-uppercase">
           <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" style="padding:2px 6px;">
             {{ITEMS[col].item.part_subname === ITEMS[col].item.part_name ? ITEMS[col].item.code : ITEMS[col].item.part_subname }}
           </q-td>
-          <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
+          <q-td auto-width class="no-padding bg-transparent" style="border-bottom:none; border-top:none"></q-td>
         </q-tr>
         <q-tr style="line-height:25px" class="text-uppercase">
           <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" style="padding:2px 6px;">
             {{ITEMS[col].item.code }}
           </q-td>
-          <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
+          <q-td auto-width class="no-padding bg-transparent" style="border-bottom:none; border-top:none"></q-td>
         </q-tr>
       </thead>
 
@@ -68,28 +68,72 @@
               </div>
               <span v-if="Number(row.item_id) === Number(col)">{{$app.number_format(row.unit_amount,0)}}</span>
             </q-td>
-            <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
+            <q-td auto-width class="no-padding bg-transparent" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
         </tbody>
         <!-- FOOTER -->
-        <tbody :key="`tfoot-${indexCols}`">
+        <tbody :key="`tfoot-${indexCols}`" class="t-foot">
           <q-tr>
             <q-td :colspan="LEFTCOL" class="text-right">Jumlah</q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
-              <span class="text-medium">{{$app.number_format(ITEMS[col].data.reduce((t, rs) => { return t + rs.unit_amount }, 0),0)}}</span>
+              <span class="text-medium">{{ $app.number_format(getItemSum(col),0) }}</span>
             </q-td>
-            <q-td auto-width class="no-padding" style="border-top:none; border-bottom:none"></q-td>
+            <q-td auto-width class="no-padding bg-transparent" style="border-top:none; border-bottom:none"></q-td>
           </q-tr>
           <q-tr>
             <q-td :colspan="LEFTCOL" class="text-right"> {{ $tc('label.price') }}</q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
               <span class="text-medium" v-if="ITEMS[col].item">{{ $app.number_format(ITEMS[col].item.price) }}</span>
             </q-td>
-            <q-td auto-width class="no-padding" style="border-top:none;"></q-td>
+            <q-td auto-width class="no-padding bg-transparent" style="border-top:none;border-bottom:none"></q-td>
           </q-tr>
+          <template v-if="rsView.customer && rsView.customer.invoice_mode == 'JOIN'">
+            <q-tr>
+              <q-td :colspan="LEFTCOL" class="text-right"> Subtotal </q-td>
+              <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
+                <span class="text-medium" v-if="ITEMS[col].item">{{ $app.number_format(getItemSubtotal(col)) }}</span>
+              </q-td>
+              <q-td auto-width class="no-padding bg-transparent" style="border-top:none;"></q-td>
+            </q-tr>
+          </template>
+          <template v-else>
+            <q-tr>
+              <q-td :colspan="LEFTCOL" class="text-right"> Subtotal (Material)</q-td>
+              <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
+                <span class="text-medium" v-if="ITEMS[col].item">{{ $app.number_format(getItemSubMaterial(col)) }}</span>
+              </q-td>
+              <q-td auto-width class="no-padding bg-transparent" style="border-top:none;border-bottom:none"></q-td>
+            </q-tr>
+            <q-tr>
+              <q-td :colspan="LEFTCOL" class="text-right"> Subtotal (Jasa)</q-td>
+              <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
+                <span class="text-medium" v-if="ITEMS[col].item">{{ $app.number_format(getItemSubJasa(col)) }}</span>
+              </q-td>
+              <q-td auto-width class="no-padding bg-transparent" style="border-top:none;"></q-td>
+            </q-tr>
+          </template>
         </tbody>
       <!-- </template> -->
     </q-markup-table>
+
+    <template v-if="COLUMNS.length === indexCols+1 && rsView.customer">
+      <q-markup-table bordered dense square separator="cell" class="q-mt-lg table-print no-shadow no-highlight">
+        <tbody>
+          <q-tr class="text-bold" v-if="rsView.customer.invoice_mode !== 'JOIN'">
+            <q-td style="width:90%" class="text-right">Grandtotal (Material)</q-td>
+            <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrandMaterial())}} </q-td>
+          </q-tr>
+          <q-tr class="text-bold" v-if="rsView.customer.invoice_mode !== 'JOIN'">
+            <q-td style="width:90%" class="text-right">Grandtotal (Jasa)</q-td>
+            <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrandJasa())}} </q-td>
+          </q-tr>
+          <q-tr class="text-bold" v-if="rsView.customer.invoice_mode !== 'SEPARATE'">
+            <q-td style="width:90%" class="text-right">Grandtotal</q-td>
+            <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrand())}} </q-td>
+          </q-tr>
+        </tbody>
+      </q-markup-table>
+    </template>
     <div class="q-mb-md" style="page-break-after: always;"></div>
   </div>
 </div>
@@ -151,7 +195,63 @@ export default {
   methods: {
     getDataCell (data, col) {
       return data.filter(x => x.item_id === Number(col)).reduce((t, rs) => { return t + rs.unit_amount }, 0)
+    },
+    getItemSum (col) {
+      if (!this.ITEMS[col]) return 0
+      return this.ITEMS[col].data.reduce((t, rs) => { return t + rs.unit_amount }, 0)
+    },
+    getItemSubtotal (col) {
+      if (!this.ITEMS[col]) return 0
+      return this.getItemSum(col) * this.ITEMS[col].item.price
+    },
+    getItemSubMaterial (col) {
+      if (!this.ITEMS[col]) return 0
+      const sen = (this.rsView.customer ? this.rsView.customer.sen_service : 10) / 100
+
+      return (1 - sen) * (this.getItemSum(col) * this.ITEMS[col].item.price)
+    },
+    getItemSubJasa (col) {
+      if (!this.ITEMS[col]) return 0
+      const sen = (this.rsView.customer ? this.rsView.customer.sen_service : 10) / 100
+      return sen * (this.getItemSum(col) * this.ITEMS[col].item.price)
+    },
+    getItemGrand () {
+      if (!Object.keys(this.ITEMS).length) return 0
+
+      return Object.keys(this.ITEMS).reduce((gt, code) => {
+        if (!this.ITEMS[code]) return gt + 0
+        return gt + (this.ITEMS[code].item.price * this.ITEMS[code].data.reduce((t, rs) => {
+          return t + rs.unit_amount
+        }, 0))
+      }, 0)
+    },
+    getItemGrandMaterial () {
+      if (!Object.keys(this.ITEMS).length) return 0
+
+      return Object.keys(this.ITEMS).reduce((gt, code) => {
+        if (!this.ITEMS[code]) return gt + 0
+        const sen = (this.ITEMS[code].item.sen_service || 10) / 100
+        return gt + ((1 - sen) * this.ITEMS[code].item.price * this.ITEMS[code].data.reduce((t, rs) => {
+          return t + rs.unit_amount
+        }, 0))
+      }, 0)
+    },
+    getItemGrandJasa () {
+      if (!Object.keys(this.ITEMS).length) return 0
+      return Object.keys(this.ITEMS).reduce((gt, code) => {
+        if (!this.ITEMS[code]) return gt + 0
+        const sen = (this.ITEMS[code].item.sen_service || 10) / 100
+        return gt + (sen * this.ITEMS[code].item.price * this.ITEMS[code].data.reduce((t, rs) => {
+          return t + rs.unit_amount
+        }, 0))
+      }, 0)
     }
   }
 }
 </script>
+<style>
+.t-foot td {
+  color: #232323 !important;
+  font-weight: bold;
+}
+</style>

@@ -10,8 +10,7 @@
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> {{DELIVERY_ORDERS[col].delivery_order.fullnumber}} </span>
             </q-td>
 
-            <q-td  :rowspan="TOPROW" v-if="COLUMNS.length === indexCols+1"  colspan="2"></q-td>
-
+            <q-td :rowspan="TOPROW" v-if="COLUMNS.length === indexCols+1" colspan="4"></q-td>
             <q-td width="50%" class="no-padding" style="border-bottom:none;"></q-td>
           </q-tr>
 
@@ -25,6 +24,7 @@
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id">
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> LPB: {{ DELIVERY_ORDERS[col].delivery_order.confirmed_number || '-' }} </span>
             </q-td>
+
             <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
           <q-tr class="text-uppercase" style="line-height:15px">
@@ -35,8 +35,11 @@
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> {{$app.moment(DELIVERY_ORDERS[col].delivery_order.date).format('L')}} </span>
             </q-td>
 
-            <q-td  v-if="COLUMNS.length === indexCols+1">{{$tc('label.total')}}</q-td>
-            <q-td  v-if="COLUMNS.length === indexCols+1">{{$tc('label.price')}}</q-td>
+            <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold">{{$tc('label.total')}}</q-td>
+            <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold">{{$tc('label.price')}}</q-td>
+
+            <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold"> MATERIAL </q-td>
+            <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold"> JASA </q-td>
 
             <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
@@ -70,24 +73,19 @@
               <span v-if="getDataCell (row.data, col)">{{ $app.number_format(getDataCell (row.data, col)) }}</span>
             </q-td>
 
-            <q-td v-if="COLUMNS.length === indexCols+1" class="text-right">
-              <!-- [summary ({{COLUMNS.length}}) => ({{indexCols}})] -->
+            <q-td v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
               <span v-if="row.item">{{ $app.number_format(row.data.reduce((t, rs) => t + rs.unit_amount, 0)) }}</span>
             </q-td>
-            <q-td v-if="COLUMNS.length === indexCols+1" class="text-right">
+            <q-td v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
               <span v-if="row.item">{{$app.number_format(row.item.price)}}</span>
             </q-td>
-            <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
-          </q-tr>
-        </tbody>
-
-        <tbody v-if="false" :key="`tfoot-${indexCols}`">
-          <q-tr>
-            <q-td colspan="3" class="text-right"> Jumlah</q-td>
-            <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
-              <span class="text-medium">{{$app.number_format(DELIVERY_ORDERS[col].data.reduce((t, rs) => { return t + rs.unit_amount }, 0),0)}}</span>
+            <q-td v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
+              <span v-if="row.item">{{$app.number_format( getItemSubMaterial(rowIndex) )}}</span>
             </q-td>
-            <q-td auto-width class="no-padding" style="border-top:none"></q-td>
+            <q-td v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
+              <span v-if="row.item">{{$app.number_format( getItemSubJasa(rowIndex) )}}</span>
+            </q-td>
+            <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
         </tbody>
         <q-tr>
@@ -95,6 +93,24 @@
         </q-tr>
       <!-- </template> -->
     </q-markup-table>
+    <template v-if="COLUMNS.length === indexCols+1 && rsView.customer">
+      <q-markup-table bordered dense square separator="cell" class="q-mt-lg table-print no-shadow no-highlight">
+        <tbody>
+          <q-tr class="text-bold" v-if="rsView.customer.invoice_mode !== 'JOIN'">
+            <q-td style="width:90%" class="text-right">Grandtotal (Material)</q-td>
+            <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrandMaterial())}} </q-td>
+          </q-tr>
+          <q-tr class="text-bold" v-if="rsView.customer.invoice_mode !== 'JOIN'">
+            <q-td style="width:90%" class="text-right">Grandtotal (Jasa)</q-td>
+            <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrandJasa())}} </q-td>
+          </q-tr>
+          <q-tr class="text-bold" v-if="rsView.customer.invoice_mode !== 'SEPARATE'">
+            <q-td style="width:90%" class="text-right">Grandtotal</q-td>
+            <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrand())}} </q-td>
+          </q-tr>
+        </tbody>
+      </q-markup-table>
+    </template>
     <div class="q-mb-md" style="page-break-after: always;"></div>
   </div>
 </div>
@@ -165,6 +181,56 @@ export default {
   methods: {
     getDataCell (data, col) {
       return data.filter(x => x.delivery_order_id === Number(col)).reduce((t, rs) => { return t + rs.unit_amount }, 0)
+    },
+    getItemSum (col) {
+      if (!this.ROWS[col]) return 0
+      return this.ROWS[col].data.reduce((t, rs) => { return t + rs.unit_amount }, 0)
+    },
+    getItemSubtotal (col) {
+      if (!this.ROWS[col]) return 0
+      return this.getItemSum(col) * this.ROWS[col].item.price
+    },
+    getItemSubMaterial (col) {
+      if (!this.ROWS[col]) return 0
+      const sen = (this.rsView.customer ? this.rsView.customer.sen_service : 10) / 100
+
+      return (1 - sen) * (this.getItemSum(col) * this.ROWS[col].item.price)
+    },
+    getItemSubJasa (col) {
+      if (!this.ROWS[col]) return 0
+      const sen = (this.rsView.customer ? this.rsView.customer.sen_service : 10) / 100
+      return sen * (this.getItemSum(col) * this.ROWS[col].item.price)
+    },
+    getItemGrand () {
+      if (!Object.keys(this.ROWS).length) return 0
+
+      return Object.keys(this.ROWS).reduce((gt, code) => {
+        if (!this.ROWS[code]) return gt + 0
+        return gt + (this.ROWS[code].item.price * this.ROWS[code].data.reduce((t, rs) => {
+          return t + rs.unit_amount
+        }, 0))
+      }, 0)
+    },
+    getItemGrandMaterial () {
+      if (!Object.keys(this.ROWS).length) return 0
+
+      return Object.keys(this.ROWS).reduce((gt, code) => {
+        if (!this.ROWS[code]) return gt + 0
+        const sen = (this.ROWS[code].item.sen_service || 10) / 100
+        return gt + ((1 - sen) * this.ROWS[code].item.price * this.ROWS[code].data.reduce((t, rs) => {
+          return t + rs.unit_amount
+        }, 0))
+      }, 0)
+    },
+    getItemGrandJasa () {
+      if (!Object.keys(this.ROWS).length) return 0
+      return Object.keys(this.ROWS).reduce((gt, code) => {
+        if (!this.ROWS[code]) return gt + 0
+        const sen = (this.ROWS[code].item.sen_service || 10) / 100
+        return gt + (sen * this.ROWS[code].item.price * this.ROWS[code].data.reduce((t, rs) => {
+          return t + rs.unit_amount
+        }, 0))
+      }, 0)
     }
   }
 }
