@@ -48,7 +48,6 @@
             <q-td>
               <div v-if="row.delivery_order">
                 {{row.delivery_order.fullnumber}}
-                <div class="text-small text-grey-7" style="line-height:normal;margin-top: -4px">{{row.delivery_order.indexed_number}}</div>
               </div>
             </q-td>
             <q-td v-if="setting.shows.reference_number">
