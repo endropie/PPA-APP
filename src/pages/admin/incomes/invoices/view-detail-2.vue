@@ -18,7 +18,7 @@
 
         <q-tr style="line-height:25px" class="text-uppercase">
           <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" style="padding:2px 6px;">
-            {{ITEMS[col].item.part_subname === ITEMS[col].item.part_name ? ITEMS[col].item.code : ITEMS[col].item.part_subname }}
+            {{ITEMS[col].item.part_subname}}
           </q-td>
           <q-td auto-width class="no-padding bg-transparent" style="border-bottom:none; border-top:none"></q-td>
         </q-tr>
