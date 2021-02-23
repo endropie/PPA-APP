@@ -330,21 +330,22 @@ export default {
 </script>
 
 <style lang="sass">
-#invoice
-  .q-table thead tr,
-  .q-table tbody tr,
-  .q-table tbody td
-    height: auto
+@media print
+  #invoice
+    .q-table thead tr,
+    .q-table tbody tr,
+    .q-table tbody td
+      height: auto
 
-#invoice .q-table thead td,
-#invoice .q-table thead th
-  padding: 2px 4px
-  font-size: 9pt
-  line-height: normal
+    .q-table thead td,
+    .q-table thead th
+      padding: 2px 4px
+      font-size: 9pt
+      line-height: normal
 
-#invoice .q-table tbody td
-  padding: 2px 4px
-  font-size: 9pt
-  height: auto
+    .q-table tbody td
+      padding: 2px 4px
+      font-size: 9pt
+      height: auto
 
 </style>
