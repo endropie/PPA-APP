@@ -2,12 +2,18 @@
   <q-page padding class="column justify-start items-center" >
     <div class="content" style="min-width:75%" v-if="VIEW.show">
       <page-print v-if="VIEW.show">
-        <div slot="header-tags" class="print-hide">
-          <!-- header-tags -->
-          <ux-chip-status :row="rsView" tag outline small square icon='bookmark' :color-options="{INVOICED:'green'}" />
+        <div slot="header" class="row no-wrap q-py-sm" v-if="rsView">
+          <span v-if="rsView.customer" class="text-lg text-bold ">
+            {{rsView.customer.name}} [{{rsView.customer.code}}]
+          </span>
+          <q-space />
+          <span v-if="rsView.date" class="cursor-pointer" @click="viewSetting.isPeriod = !viewSetting.isPeriod">
+            <div v-if="viewSetting.isPeriod">{{$tc('label.period')}}: {{ $app.moment(rsView.date).format('MMM YYYY') }}</div>
+            <div v-else>{{$tc('label.date')}}: {{ $app.moment(rsView.date).format('DD/MM/YYYY') }}</div>
+          </span>
         </div>
         <div class="content justify-around q-gutter-y-sm" >
-          <div class="row justify justify-between q-gutter-sm" >
+          <div class="row justify justify-between q-gutter-sm" v-if="false">
             <div class="q-px-xs">
               <div class="q-pt-md text-h6" style="line-height:normal">
                   REKAP INVOICE
@@ -32,7 +38,7 @@
               </div>
             </div>
           </div>
-          <div class="column">
+          <div class="column" id="invoice">
             <div class="row justify-start q-pb-sm print-hide">
               <q-select dense filled map-options emit-value
                 label="MODE" stack-label
@@ -160,6 +166,7 @@ export default {
   data () {
     return {
       viewSetting: {
+        isPeriod: true,
         shows: {
           reference_number: true,
           confirmed_number: true
@@ -321,3 +328,23 @@ export default {
   }
 }
 </script>
+
+<style lang="sass">
+#invoice
+  .q-table thead tr,
+  .q-table tbody tr,
+  .q-table tbody td
+    height: auto
+
+#invoice .q-table thead td,
+#invoice .q-table thead th
+  padding: 2px 4px
+  font-size: 9pt
+  line-height: normal
+
+#invoice .q-table tbody td
+  padding: 2px 4px
+  font-size: 9pt
+  height: auto
+
+</style>

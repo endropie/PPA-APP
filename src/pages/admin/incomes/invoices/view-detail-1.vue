@@ -15,14 +15,16 @@
       <q-tr v-for="(row, index) in  rsView.acc_invoice_items" :key="index" :delivery-order-item-id="row.id">
         <q-td>{{row.delivery_order ? $app.moment(row.delivery_order.date).format('L') : '-'}}</q-td>
         <q-td>
-          <div v-if="row.delivery_order">
-            {{row.delivery_order.fullnumber}}
-            <div class="text-small text-grey-7" style="line-height:normal;margin-top: -4px">{{row.delivery_order.indexed_number}}</div>
+          <div v-if="row.delivery_order" class="column">
+            <span>{{row.delivery_order.fullnumber}}</span>
+            <small class="text-grey-7" style="line-height:normal;margin-top: -4px">{{row.delivery_order.indexed_number}}</small>
           </div>
         </q-td>
         <q-td>
-          {{row.item.part_name}}
-          <div class="text-small text-grey-7" style="line-height:normal;margin-top: -4px">{{row.item.part_subname}}</div>
+          <div v-if="row.item" class="column">
+            <div>{{row.item.part_name}}</div>
+            <small class="text-grey-7" style="line-height:normal;margin-top: -4px">{{row.item.part_subname}}</small>
+          </div>
         </q-td>
         <!-- <q-td>{{row.item.part_subname}}</q-td> -->
         <q-td class="text-center">{{row.unit.code}}</q-td>

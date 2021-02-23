@@ -17,13 +17,13 @@
         </q-tr>
 
         <q-tr style="line-height:25px" class="text-uppercase">
-          <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" style="padding:2px 6px;">
+          <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%"></q-td>
             {{ITEMS[col].item.part_subname}}
           </q-td>
           <q-td auto-width class="no-padding bg-transparent" style="border-bottom:none; border-top:none"></q-td>
         </q-tr>
         <q-tr style="line-height:25px" class="text-uppercase">
-          <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" style="padding:2px 6px;">
+          <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%">
             {{ITEMS[col].item.code }}
           </q-td>
           <q-td auto-width class="no-padding bg-transparent" style="border-bottom:none; border-top:none"></q-td>

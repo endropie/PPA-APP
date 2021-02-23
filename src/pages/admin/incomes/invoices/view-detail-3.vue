@@ -6,7 +6,7 @@
         <thead :key="`thead-${indexCols}`" class="text-uppercase text-center font-weight-medium">
           <q-tr class="text-uppercase" style="line-height:15px; page-break-after: always;">
             <q-td width="10%" align="center" :rowspan="TOPROW" colspan="3" class="no-padding">{{$tc('label.name', 0, {v:$tc('label.part')}) }}</q-td>
-            <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id" style="padding:2px 6px;">
+            <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id">
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> {{DELIVERY_ORDERS[col].delivery_order.fullnumber}} </span>
             </q-td>
 
