@@ -1,6 +1,6 @@
 <template>
 <div>
-  <div v-for="(cols, indexCols) in COLUMNS" :key="indexCols">
+  <div v-for="(cols, indexCols) in COLUMNS" :key="indexCols" class="q-mb-md">
     <q-markup-table bordered dense square separator="cell" class="table-print no-shadow no-highlight">
 
       <!-- HEADER -->
@@ -75,7 +75,7 @@
           <q-tr>
             <q-td :colspan="LEFTCOL" class="text-right">Jumlah</q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
-              <span class="text-medium">{{ $app.number_format(getItemSum(col),0) }}</span>
+              <span class="text-medium text-bold">{{ $app.number_format(getItemSum(col),0) }}</span>
             </q-td>
             <q-td auto-width class="no-padding bg-transparent" style="border-top:none; border-bottom:none"></q-td>
           </q-tr>
@@ -86,7 +86,7 @@
             </q-td>
             <q-td auto-width class="no-padding bg-transparent" style="border-top:none;border-bottom:none"></q-td>
           </q-tr>
-          <template v-if="rsView.customer && rsView.customer.invoice_mode == 'JOIN'">
+          <template v-if="setting.isTotalOnly || rsView.invoice_mode === 'JOIN'">
             <q-tr>
               <q-td :colspan="LEFTCOL" class="text-right"> Subtotal </q-td>
               <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
@@ -118,11 +118,11 @@
     <template v-if="COLUMNS.length === indexCols+1 && rsView.customer">
       <q-markup-table bordered dense square separator="cell" class="q-mt-lg table-print no-shadow no-highlight">
         <tbody>
-          <q-tr class="text-bold" v-if="rsView.customer.invoice_mode !== 'JOIN'">
+          <q-tr class="text-bold" v-if="!setting.isTotalOnly && rsView.customer.invoice_mode !== 'JOIN'">
             <q-td style="width:90%" class="text-right">Grandtotal (Material)</q-td>
             <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrandMaterial())}} </q-td>
           </q-tr>
-          <q-tr class="text-bold" v-if="rsView.customer.invoice_mode !== 'JOIN'">
+          <q-tr class="text-bold" v-if="!setting.isTotalOnly && rsView.customer.invoice_mode !== 'JOIN'">
             <q-td style="width:90%" class="text-right">Grandtotal (Jasa)</q-td>
             <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrandJasa())}} </q-td>
           </q-tr>
@@ -133,7 +133,7 @@
         </tbody>
       </q-markup-table>
     </template>
-    <div class="q-mb-md" style="page-break-after: always;"></div>
+    <div class="hidden" style="page-break-after: always;"></div>
   </div>
 </div>
 </template>
