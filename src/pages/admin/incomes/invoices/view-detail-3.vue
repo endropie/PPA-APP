@@ -1,6 +1,6 @@
 <template>
 <div>
-  <div v-for="(cols, indexCols) in COLUMNS" :key="indexCols">
+  <div v-for="(cols, indexCols) in COLUMNS" :key="indexCols" class="q-mb-md">
     <q-markup-table  dense bordered square separator="cell" class="table-print no-shadow no-highlight">
       <!-- <template v-for="(cols, indexCols) in COLUMNS"> -->
         <thead :key="`thead-${indexCols}`" class="text-uppercase text-center font-weight-medium">
@@ -34,13 +34,15 @@
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id">
               <span v-if="DELIVERY_ORDERS[col].delivery_order"> {{$app.moment(DELIVERY_ORDERS[col].delivery_order.date).format('L')}} </span>
             </q-td>
-
             <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold">{{$tc('label.total')}}</q-td>
             <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold">{{$tc('label.price')}}</q-td>
-
-            <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold"> MATERIAL </q-td>
-            <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold"> JASA </q-td>
-
+            <template v-if="setting.isTotalOnly || rsView.invoice_mode === 'JOIN'">
+              <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold"> Subtotal </q-td>
+            </template>
+            <template v-else>
+              <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold"> MATERIAL </q-td>
+              <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold"> JASA </q-td>
+            </template>
             <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
         </thead>
@@ -49,9 +51,9 @@
         <q-tr>
           <q-td colspan="2" style="height:0px; padding:0;"> </q-td>
           <q-td  style="height:2px; padding:0;" v-for="(col, indexCol) in cols" :key="indexCol" width="10%"></q-td>
+          <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
         </q-tr>
 
-        <!-- <tbody v-for="(loop, ii) in [1,2,3,4,5,6,7,8,9,10]" :key="`tbody-${ii}-${indexCols}`"> -->
         <tbody :key="`tbody-${indexCols}`">
           <q-tr v-for="(row, rowIndex) in ROWS" :key="rowIndex">
             <q-td>
@@ -74,44 +76,51 @@
             </q-td>
 
             <q-td v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
-              <span v-if="row.item">{{ $app.number_format(row.data.reduce((t, rs) => t + rs.unit_amount, 0)) }}</span>
+              <span v-if="row.item" class="text-bold text-right">{{ $app.number_format(row.data.reduce((t, rs) => t + rs.unit_amount, 0)) }}</span>
             </q-td>
             <q-td v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
-              <span v-if="row.item">{{$app.number_format(row.item.price)}}</span>
+              <span v-if="row.item" class="text-bold text-right">{{$app.number_format(row.item.price)}}</span>
             </q-td>
-            <q-td v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
-              <span v-if="row.item">{{$app.number_format( getItemSubMaterial(rowIndex) )}}</span>
-            </q-td>
-            <q-td v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
-              <span v-if="row.item">{{$app.number_format( getItemSubJasa(rowIndex) )}}</span>
-            </q-td>
-            <q-td auto-width class="no-padding" style="border-bottom:none; border-top:none"></q-td>
+            <template v-if="setting.isTotalOnly || rsView.invoice_mode === 'JOIN'">
+              <q-td class="text-bold text-right">
+                <span v-if="row.item">{{$app.number_format( getItemSubtotal(rowIndex) )}}</span>
+              </q-td>
+            </template>
+            <template v-else>
+              <q-td v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
+                <span v-if="row.item">{{$app.number_format( getItemSubMaterial(rowIndex) )}}</span>
+              </q-td>
+              <q-td v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
+                <span v-if="row.item">{{$app.number_format( getItemSubJasa(rowIndex) )}}</span>
+              </q-td>
+            </template>
+            <q-td colspan="100%" class="no-padding" style="border-bottom:none; border-top:none"></q-td>
           </q-tr>
         </tbody>
+        <!-- LINE  -->
         <q-tr>
-          <q-td colspan="100%" style="height:0px; padding:0; border-bottom:0;"> </q-td>
+          <q-td colspan="100%" style="height:0px; padding:0; border-bottom:0;border-left:1px"> </q-td>
         </q-tr>
-      <!-- </template> -->
     </q-markup-table>
     <template v-if="COLUMNS.length === indexCols+1 && rsView.customer">
       <q-markup-table bordered dense square separator="cell" class="q-mt-lg table-print no-shadow no-highlight">
         <tbody>
-          <q-tr class="text-bold" v-if="rsView.customer.invoice_mode !== 'JOIN'">
+          <q-tr class="text-bold" v-if="!setting.isTotalOnly && rsView.customer.invoice_mode !== 'JOIN'">
             <q-td style="width:90%" class="text-right">Grandtotal (Material)</q-td>
             <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrandMaterial())}} </q-td>
           </q-tr>
-          <q-tr class="text-bold" v-if="rsView.customer.invoice_mode !== 'JOIN'">
+          <q-tr class="text-bold" v-if="!setting.isTotalOnly && rsView.customer.invoice_mode !== 'JOIN'">
             <q-td style="width:90%" class="text-right">Grandtotal (Jasa)</q-td>
             <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrandJasa())}} </q-td>
           </q-tr>
-          <q-tr class="text-bold" v-if="rsView.customer.invoice_mode !== 'SEPARATE'">
+          <q-tr class="text-bold" v-if="setting.isTotalOnly || rsView.customer.invoice_mode !== 'SEPARATE'">
             <q-td style="width:90%" class="text-right">Grandtotal</q-td>
             <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrand())}} </q-td>
           </q-tr>
         </tbody>
       </q-markup-table>
     </template>
-    <div class="q-mb-md" style="page-break-after: always;"></div>
+    <div class="hidden" style="page-break-after: always;"></div>
   </div>
 </div>
 </template>

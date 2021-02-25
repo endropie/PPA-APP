@@ -2,11 +2,10 @@
   <q-page padding class="column justify-start items-center" >
     <div class="content" style="min-width:75%" v-if="VIEW.show">
       <page-print v-if="VIEW.show">
-        <div slot="header" class="row no-wrap q-py-sm" v-if="rsView">
+        <div slot="header" class="column no-wrap q-py-sm" v-if="rsView">
           <span v-if="rsView.customer" class="text-lg text-bold ">
             {{rsView.customer.name}} [{{rsView.customer.code}}]
           </span>
-          <q-space />
           <span v-if="rsView.date" class="cursor-pointer" @click="viewSetting.isPeriod = !viewSetting.isPeriod">
             <div v-if="viewSetting.isPeriod">{{$tc('label.period')}}: {{ $app.moment(rsView.date).format('MMM YYYY') }}</div>
             <div v-else>{{$tc('label.date')}}: {{ $app.moment(rsView.date).format('DD/MM/YYYY') }}</div>
@@ -82,6 +81,11 @@
                     <q-item clickable>
                       <q-item-section>
                         <q-toggle dense v-model="viewSetting.shows.confirmed_number" label="LPB" class="q-pl-none" />
+                      </q-item-section>
+                    </q-item>
+                    <q-item clickable>
+                      <q-item-section>
+                        <q-toggle dense v-model="viewSetting.isTotalOnly" label="TOTAL ONLY" class="q-pl-none" />
                       </q-item-section>
                     </q-item>
                   </q-list>
@@ -167,6 +171,7 @@ export default {
     return {
       viewSetting: {
         isPeriod: true,
+        isTotalOnly: false,
         shows: {
           reference_number: true,
           confirmed_number: true
