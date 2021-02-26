@@ -82,7 +82,7 @@
               <span v-if="row.item" class="text-bold text-right">{{$app.number_format(row.item.price)}}</span>
             </q-td>
             <template v-if="setting.isTotalOnly || rsView.invoice_mode === 'JOIN'">
-              <q-td class="text-bold text-right">
+              <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
                 <span v-if="row.item">{{$app.number_format( getItemSubtotal(rowIndex) )}}</span>
               </q-td>
             </template>
@@ -127,7 +127,7 @@
 
 <script>
 export default {
-  name: 'ViewDetail2',
+  name: 'ViewDetail3',
   props: {
     rsView: Object,
     setting: Object,
