@@ -45,7 +45,7 @@
         </div>
       </div>
       <div class="col-12 row q-col-gutter-x-sm">
-        <div class="col-12 col-sm-auto  column q-pb-sm">
+        <div class="col-12 col-sm-auto column q-pb-sm">
           <span class="text-small text-grey">Stockist Material</span>
           <q-btn-toggle spread class="no-shadow text-no-wrap" style="border:1px solid #027be3"
             v-model="rsForm.stockist_from"
@@ -68,7 +68,7 @@
           />
         </div>
         <q-space />
-        <div class="col-12 col-sm-auto q-pb-sm column items-center">
+        <div class="items-center col-12 col-sm-auto q-pb-sm column">
           <q-checkbox class="self-center"
             label="FG Direct"
             v-model="rsForm.stockist_direct"
@@ -104,7 +104,7 @@
                   v-model="row.item"
                   v-validate="'required'"
                   filter map-options clearable
-                  source="/api/v1/common/items?mode=all&--limit=20&has_stocks=FM,NC,NCR&appends=total_work_order&main_line=1"
+                  :source="`/api/v1/common/items?mode=all&--limit=20&has_stocks=FM,NC,NCR&appends=total_work_order&main_line=${rsForm.line_id}`"
                   option-value="id"
                   option-label="part_name"
                   :option-sublabel="item => `[${item.customer_code}] ${item.part_subname}`"
