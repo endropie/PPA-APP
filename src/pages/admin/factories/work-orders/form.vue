@@ -17,8 +17,7 @@
         :options="LineOptions.filter(x => x.row.ismain)" clearable
         v-validate="'required'"
         :error="errors.has('line_id')"
-        :error-message="errors.first('line_id')"
-        @input="(val) => val ? loadItemOptions() : false">
+        :error-message="errors.first('line_id')">
         <q-tooltip v-if="Boolean(IssetWorkOrderItems)" :offset="[0, 10]">To change, Please delete Work-Order items first!</q-tooltip>
       </ux-select-filter>
 
@@ -102,16 +101,19 @@
                   :name="`work_order_items.${index}.item_id`"
                   :disable="!rsForm.line_id"
                   outlined dense hide-bottom-space color="blue-grey-4"
-                  v-model="row.item_id"
+                  v-model="row.item"
                   v-validate="'required'"
-                  filter emit-value map-options
-                  :options="ItemOptions" clearable
+                  filter map-options clearable
+                  source="/api/v1/common/items?mode=all&--limit=20&has_stocks=FM,NC,NCR&appends=total_work_order&main_line=1"
+                  option-value="id"
+                  option-label="part_name"
+                  :option-sublabel="item => `[${item.customer_code}] ${item.part_subname}`"
                   popup-content-class="options-striped"
                   :error="errors.has(`work_order_items.${index}.item_id`)"
                   :loading="SHEET.items.loading"
                   @input="(val) => setItemReference(index, val)">
                   <q-tooltip v-if="!rsForm.line_id" :offset="[0, 10]">Select a Pre-Line , first! </q-tooltip>
-                  <small class="absolute-bottom text-weight-light" v-if="row.item_id">
+                  <small class="absolute-bottom text-weight-light" v-if="row.item">
                     [{{row.item.customer_code}}] {{row.item.part_subname || '--'}}
                   </small>
                 </ux-select>
@@ -236,7 +238,8 @@ export default {
       FORM: {
         resource: {
           uri: '/admin/factories/work-orders',
-          api: '/api/v1/factories/work-orders'
+          api: '/api/v1/factories/work-orders',
+          params: '?appends=total_work_order'
         }
       },
       rsForm: {},
@@ -259,8 +262,8 @@ export default {
               unit_id: null,
               unit_rate: 1,
               ngratio: 0,
-              item: {},
-              unit: {}
+              item: null,
+              unit: null
             }
           ]
         }
@@ -294,7 +297,6 @@ export default {
 
       const stockist = this.rsForm.stockist_from
       let OrKeys = this.FORM.data.work_order_items.map(x => x.item_id, [])
-      console.warn(this.SHEET.items.data)
 
       return this.SHEET.items.data.filter((item) => {
         if (!item.item_prelines || !item.item_prelines.length) return false
@@ -340,7 +342,12 @@ export default {
     MaxStock () {
       const stockist = this.rsForm.stockist_from
 
-      let stockItem = JSON.parse(JSON.stringify(this.MAPINGKEY['items']))
+      let stockItem = []
+
+      this.rsForm.work_order_items.map(detail => {
+        if (detail.item && !stockItem[detail.item.id]) stockItem[detail.item.id] = detail.item
+      })
+
       let moveItem = {
         set: function (id, val) {
           let vf = this
@@ -361,7 +368,7 @@ export default {
       let data = {}
       this.rsForm.work_order_items.map((detail, index) => {
         if (stockItem[detail.item_id] && detail.item_id) {
-          const summary = Number(stockItem[detail.item_id].totals[stockist]) - Number(stockItem[detail.item_id].total_work_order[stockist] || 0)
+          const summary = Number(stockItem[detail.item_id].totals[stockist] || 0) - Number(stockItem[detail.item_id].total_work_order[stockist] || 0)
           data[index] = summary - Number(moveItem.get(detail.item_id) || 0)
           moveItem.set(detail.item_id, detail.quantity * detail.unit_rate)
         }
@@ -399,7 +406,7 @@ export default {
     },
     setForm (data) {
       this.rsForm = JSON.parse(JSON.stringify(data))
-      if (data.id) this.loadItemOptions(data)
+      // if (data.id) this.loadItemOptions(data)
       if (data.hasOwnProperty('has_relationship') && data['has_relationship'].length > 0) {
         this.FORM.has_relationship = data.has_relationship
 
@@ -449,11 +456,11 @@ export default {
     setItemReference (index, val) {
       if (!val) {
         this.rsForm.work_order_items[index].unit_id = null
-        this.rsForm.work_order_items[index].unit = {}
-        this.rsForm.work_order_items[index].item = {}
+        this.rsForm.work_order_items[index].unit = null
+        this.rsForm.work_order_items[index].item = null
       } else {
-        this.rsForm.work_order_items[index].item = this.MAPINGKEY['items'][val]
-        let baseUnitID = this.MAPINGKEY['items'][val].unit_id
+        this.rsForm.work_order_items[index].item_id = val.id
+        let baseUnitID = val.unit_id
         this.rsForm.work_order_items[index].unit_id = baseUnitID
         this.rsForm.work_order_items[index].unit_rate = 1
         this.rsForm.work_order_items[index].unit = this.MAPINGKEY['units'][baseUnitID]
