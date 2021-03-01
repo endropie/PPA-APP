@@ -3,7 +3,7 @@
   <div v-for="(cols, indexCols) in COLUMNS" :key="indexCols" class="q-mb-md">
     <q-markup-table  dense bordered square separator="cell" class="table-print no-shadow no-highlight">
       <!-- <template v-for="(cols, indexCols) in COLUMNS"> -->
-        <thead :key="`thead-${indexCols}`" class="text-uppercase text-center font-weight-medium">
+        <thead :key="`thead-${indexCols}`" class="text-uppercase text-center font-weight-medium" style="page-break-inside: auto">
           <q-tr class="text-uppercase" style="line-height:15px; page-break-after: always;">
             <q-td width="10%" align="center" :rowspan="TOPROW" colspan="3" class="no-padding">{{$tc('label.name', 0, {v:$tc('label.part')}) }}</q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" width="10%" :delivery-order-id="DELIVERY_ORDERS[col].id">

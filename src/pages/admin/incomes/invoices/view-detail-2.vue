@@ -4,7 +4,7 @@
     <q-markup-table bordered dense square separator="cell" class="table-print no-shadow no-highlight">
 
       <!-- HEADER -->
-      <thead :key="`thead-${indexCols}`" class="text-uppercase text-center font-weight-medium">
+      <thead :key="`thead-${indexCols}`" class="text-uppercase text-center font-weight-medium" style="page-break-inside: auto">
         <q-tr class="" style="line-height:25px; page-break-after: always;">
           <q-td rowspan="3" width="10%">{{ $tc('label.date') }}</q-td>
           <q-td rowspan="3" width="10%">{{ $tc('label.number') }}</q-td>
@@ -41,7 +41,7 @@
       </q-tr>
 
         <!-- BODY -->
-        <!-- <tbody v-for="(loop, ii) in [1,2,3,4,5,6,7,8,9,10]" :key="`tbody-${ii}-${indexCols}`"> -->
+        <!-- <tbody v-for="(loop, ii) in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]" :key="`tbody-${ii}-${indexCols}`"> -->
         <tbody :key="`tbody-${indexCols}`">
           <q-tr v-for="(row, index) in ROWS" :key="index" :delivery-order-item-id="row.id">
             <q-td>{{row.delivery_order ? $app.moment(row.delivery_order.date).format('L') : '-'}}</q-td>
