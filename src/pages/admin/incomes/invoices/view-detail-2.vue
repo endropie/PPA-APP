@@ -82,7 +82,7 @@
           <q-tr>
             <q-td :colspan="LEFTCOL" class="text-right"> {{ $tc('label.price') }}</q-td>
             <q-td v-for="(col, indexCol) in cols" :key="indexCol" class="text-center">
-              <span class="text-medium" v-if="ITEMS[col].item">{{ $app.number_format(ITEMS[col].item.price) }}</span>
+              <span class="text-medium" v-if="ITEMS[col].item">{{ $app.number_format(getPrice(ITEMS[col].item)) }}</span>
             </q-td>
             <q-td auto-width class="no-padding bg-transparent" style="border-top:none;border-bottom:none"></q-td>
           </q-tr>
@@ -126,7 +126,7 @@
             <q-td style="width:90%" class="text-right">Grandtotal (Jasa)</q-td>
             <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrandJasa())}} </q-td>
           </q-tr>
-          <q-tr class="text-bold" v-if="rsView.customer.invoice_mode !== 'SEPARATE'">
+          <q-tr class="text-bold" v-if="setting.isTotalOnly || rsView.customer.invoice_mode !== 'SEPARATE'">
             <q-td style="width:90%" class="text-right">Grandtotal</q-td>
             <q-td style="min-width:200px"  class="text-right"> {{$app.number_format(getItemGrand())}} </q-td>
           </q-tr>
@@ -195,13 +195,25 @@ export default {
     getDataCell (data, col) {
       return data.filter(x => x.item_id === Number(col)).reduce((t, rs) => { return t + rs.unit_amount }, 0)
     },
+    getPrice (item) {
+      if (this.rsView.customer.invoice_mode !== 'JOIN' && this.setting.isTotalOnly) {
+        const service = this.rsView.customer.sen_service / 100
+        if (this.setting.separate === 'MATERIAL') {
+          return item.price * (1 - service)
+        }
+        if (this.setting.separate === 'JASA') {
+          return item.price * service
+        }
+      }
+      return item.price
+    },
     getItemSum (col) {
       if (!this.ITEMS[col]) return 0
       return this.ITEMS[col].data.reduce((t, rs) => { return t + rs.unit_amount }, 0)
     },
     getItemSubtotal (col) {
       if (!this.ITEMS[col]) return 0
-      return this.getItemSum(col) * this.ITEMS[col].item.price
+      return this.getItemSum(col) * this.getPrice(this.ITEMS[col].item)
     },
     getItemSubMaterial (col) {
       if (!this.ITEMS[col]) return 0
@@ -219,7 +231,8 @@ export default {
 
       return Object.keys(this.ITEMS).reduce((gt, code) => {
         if (!this.ITEMS[code]) return gt + 0
-        return gt + (this.ITEMS[code].item.price * this.ITEMS[code].data.reduce((t, rs) => {
+        const price = this.getPrice(this.ITEMS[code].item)
+        return gt + (price * this.ITEMS[code].data.reduce((t, rs) => {
           return t + rs.unit_amount
         }, 0))
       }, 0)
@@ -229,7 +242,7 @@ export default {
 
       return Object.keys(this.ITEMS).reduce((gt, code) => {
         if (!this.ITEMS[code]) return gt + 0
-        const sen = (this.ITEMS[code].item.sen_service || 10) / 100
+        const sen = (this.rsView.customer.sen_service || 10) / 100
         return gt + ((1 - sen) * this.ITEMS[code].item.price * this.ITEMS[code].data.reduce((t, rs) => {
           return t + rs.unit_amount
         }, 0))
@@ -239,7 +252,7 @@ export default {
       if (!Object.keys(this.ITEMS).length) return 0
       return Object.keys(this.ITEMS).reduce((gt, code) => {
         if (!this.ITEMS[code]) return gt + 0
-        const sen = (this.ITEMS[code].item.sen_service || 10) / 100
+        const sen = (this.rsView.customer.sen_service || 10) / 100
         return gt + (sen * this.ITEMS[code].item.price * this.ITEMS[code].data.reduce((t, rs) => {
           return t + rs.unit_amount
         }, 0))

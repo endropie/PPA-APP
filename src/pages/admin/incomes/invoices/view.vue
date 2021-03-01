@@ -10,6 +10,10 @@
             <div v-if="viewSetting.isPeriod">{{$tc('label.period')}}: {{ $app.moment(rsView.date).format('MMM YYYY') }}</div>
             <div v-else>{{$tc('label.date')}}: {{ $app.moment(rsView.date).format('DD/MM/YYYY') }}</div>
           </span>
+          <span v-if="rsView.customer && rsView.customer.invoice_mode !== 'JOIN' && viewSetting.isTotalOnly" class="text-lg text-bold ">
+            <span v-if="viewSetting.separate === 'MATERIAL'">REKAP MATERIAL</span>
+            <span v-if="viewSetting.separate === 'JASA'">REKAP JASA</span>
+          </span>
         </div>
         <div class="content justify-around q-gutter-y-sm" >
           <div class="row justify justify-between q-gutter-sm" v-if="false">
@@ -86,6 +90,11 @@
                     <q-item clickable>
                       <q-item-section>
                         <q-toggle dense v-model="viewSetting.isTotalOnly" label="TOTAL ONLY" class="q-pl-none" />
+                      </q-item-section>
+                    </q-item>
+                    <q-item clickable v-if="viewSetting.isTotalOnly && (rsView && rsView.customer.invoice_mode !== 'JOIN')">
+                      <q-item-section>
+                        <q-select v-model="viewSetting.separate" :options="['MATERIAL', 'JASA']" clearable filled dense label="Separate" />
                       </q-item-section>
                     </q-item>
                   </q-list>
@@ -172,6 +181,7 @@ export default {
       viewSetting: {
         isPeriod: true,
         isTotalOnly: false,
+        separate: null,
         shows: {
           reference_number: true,
           confirmed_number: true

@@ -79,7 +79,7 @@
               <span v-if="row.item" class="text-bold text-right">{{ $app.number_format(row.data.reduce((t, rs) => t + rs.unit_amount, 0)) }}</span>
             </q-td>
             <q-td v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
-              <span v-if="row.item" class="text-bold text-right">{{$app.number_format(row.item.price)}}</span>
+              <span v-if="row.item" class="text-bold text-right">{{$app.number_format(getPrice(row.item))}}</span>
             </q-td>
             <template v-if="setting.isTotalOnly || rsView.invoice_mode === 'JOIN'">
               <q-td  v-if="COLUMNS.length === indexCols+1" class="text-bold text-right">
@@ -191,13 +191,25 @@ export default {
     getDataCell (data, col) {
       return data.filter(x => x.delivery_order_id === Number(col)).reduce((t, rs) => { return t + rs.unit_amount }, 0)
     },
+    getPrice (item) {
+      if (this.rsView.customer.invoice_mode !== 'JOIN' && this.setting.isTotalOnly) {
+        const service = this.rsView.customer.sen_service / 100
+        if (this.setting.separate === 'MATERIAL') {
+          return item.price * (1 - service)
+        }
+        if (this.setting.separate === 'JASA') {
+          return item.price * service
+        }
+      }
+      return item.price
+    },
     getItemSum (col) {
       if (!this.ROWS[col]) return 0
       return this.ROWS[col].data.reduce((t, rs) => { return t + rs.unit_amount }, 0)
     },
     getItemSubtotal (col) {
       if (!this.ROWS[col]) return 0
-      return this.getItemSum(col) * this.ROWS[col].item.price
+      return this.getItemSum(col) * this.getPrice(this.ROWS[col].item)
     },
     getItemSubMaterial (col) {
       if (!this.ROWS[col]) return 0
@@ -215,7 +227,8 @@ export default {
 
       return Object.keys(this.ROWS).reduce((gt, code) => {
         if (!this.ROWS[code]) return gt + 0
-        return gt + (this.ROWS[code].item.price * this.ROWS[code].data.reduce((t, rs) => {
+        const price = this.getPrice(this.ROWS[code].item)
+        return gt + (price * this.ROWS[code].data.reduce((t, rs) => {
           return t + rs.unit_amount
         }, 0))
       }, 0)
@@ -225,7 +238,7 @@ export default {
 
       return Object.keys(this.ROWS).reduce((gt, code) => {
         if (!this.ROWS[code]) return gt + 0
-        const sen = (this.ROWS[code].item.sen_service || 10) / 100
+        const sen = (this.rsView.customer.sen_service || 10) / 100
         return gt + ((1 - sen) * this.ROWS[code].item.price * this.ROWS[code].data.reduce((t, rs) => {
           return t + rs.unit_amount
         }, 0))
@@ -235,7 +248,7 @@ export default {
       if (!Object.keys(this.ROWS).length) return 0
       return Object.keys(this.ROWS).reduce((gt, code) => {
         if (!this.ROWS[code]) return gt + 0
-        const sen = (this.ROWS[code].item.sen_service || 10) / 100
+        const sen = (this.rsView.customer.sen_service || 10) / 100
         return gt + (sen * this.ROWS[code].item.price * this.ROWS[code].data.reduce((t, rs) => {
           return t + rs.unit_amount
         }, 0))
