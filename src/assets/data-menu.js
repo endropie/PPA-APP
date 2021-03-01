@@ -325,30 +325,6 @@ const deliveries = [
     ]
   },
   {
-    name: '[OLD] Delivery (Internal)',
-    icon: 'assignment',
-    path: 'delivery-internals',
-    // lang: 'general.delivery_internal',
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-internals-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-internals-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'delivery-internals-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-internals-read' } }
-    ]
-  },
-  {
-    name: 'Schedule Board',
-    icon: 'work',
-    path: 'schedule-boards',
-    lang: 'general.schedule_board',
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'schedule-boards-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'schedule-boards-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'schedule-boards-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'schedule-boards-read' } }
-    ]
-  },
-  {
     path: 'incoming-goods/items',
     icon: 'list',
     lang: 'general.incoming_good_items',
