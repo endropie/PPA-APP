@@ -40,7 +40,7 @@
       </div>
     </q-card-section>
     <!-- SINGLE-REVISION -->
-    <q-card-section :class="$app.classDimmed(!rsForm.vehicle_id) ">
+    <q-card-section :class="$app.classDimmed(!rsForm.vehicle_id || rsForm.rute_id) ">
       <!-- COLUMN:: Part items lists -->
       <q-card flat bordered class="q-mb-sm" v-for="(row, rowIndex) in rsForm.delivery_checkout_loads" :key="rowIndex">
         <q-card-section>
@@ -140,17 +140,34 @@
         </q-card-actions>
       </q-card>
       <q-card flat class="q-mb-md">
-        <q-card-section v-if="errors.has('delivery_checkout_loads')">
-          <div class="text-negative text-small">
-            {{errors.first('delivery_checkout_loads')}}
-          </div>
-        </q-card-section>
         <q-card-actions :vertical="$q.screen.lt.sm" class="no-padding">
           <q-btn outline class="" icon="add_circle" color="positive" label="LOADING" @click="addLoadDetail" />
           <q-btn outline class="" icon="add_circle" color="positive" label="INTERNAL" @click="addInternalDetail" />
           <q-btn outline class="" icon="qr_code" color="blue-grey" label="Scan" @click="addLoadScanner()" />
         </q-card-actions>
       </q-card>
+    </q-card-section>
+    <q-card-section class="q-pt-none q-gutter-sm">
+      <div class="hidden">[{{RuteCustomers}}]</div>
+      <q-select filled dense hide-bottom-space
+        input-style="margin-top:-4px"
+        label="RUTE: "
+        v-model="rsForm.rute" clearable
+        :options="RouteOptions"
+        option-value="id"
+        option-label="name"
+        v-validate="RouteOptions.length ? 'required' : ''"
+        data-vv-as="Rute"
+        :name="`rute_id`"
+        :error="errors.has(`rute_id`)"
+        :error-message="errors.first(`rute_id`)"
+        :disable="!Boolean(RuteCustomers.length)"
+        :loading="SHEET.rutes.loading"
+        @input="(v) => {
+          rsForm.rute_id = v ? v.id : null
+          rsForm.rute_amount = v ? v.cost : null
+        }"
+      />
 
       <q-input type="textarea" autogrow
         filled class="q-mb-sm" input-style="min-height:45px"
@@ -197,6 +214,9 @@ export default {
   components: { StreamBarcodeReader },
   data () {
     return {
+      SHEET: {
+        rutes: { api: '/api/v1/common/rutes?mode=all', autoload: false }
+      },
       FORM: {
         resource: {
           api: '/api/v1/incomes/delivery-checkouts',
@@ -239,29 +259,21 @@ export default {
     this.init()
   },
   computed: {
-
-    UnitOptions () {
-      return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
-    },
-    ItemUnitOptions () {
-      // return varItemUnits
-      return this.rsForm.delivery_checkout_loads.map((rsItem, key) => {
-        return this.UnitOptions
-          .filter((unit) => {
-            if (!rsItem.item) return
-            if (rsItem.item.unit_id === unit.value) return true
-
-            const find = rsItem.item.item_units.find((fill) => fill.unit_id === unit.value)
-            if (rsItem.item.item_units && find) return true
-          })
-          .map(unit => {
-            if (rsItem.item.unit_id === unit.value) return { ...unit, rate: 1 }
-            const find = rsItem.item.item_units.find((fill) => fill.unit_id === unit.value)
-            if (rsItem.item.item_units && find) {
-              return { ...unit, rate: find.rate }
-            }
-          })
+    RuteCustomers () {
+      if (!this.rsForm) return []
+      const res = {}
+      this.rsForm.delivery_checkout_loads.map(x => {
+        if (x.delivery_load) res[x.delivery_load.customer_id] = true
       })
+      this.rsForm.delivery_checkout_internals.map(x => {
+        if (x.delivery_order) res[x.delivery_order.customer_id] = true
+      })
+      console.warn('RuteOptions', Object.keys(res))
+      this.SHEET.load('rutes', `customers=${Object.keys(res).join(',')}`)
+      return Object.keys(res).join(',')
+    },
+    RouteOptions () {
+      return this.SHEET.rutes.data
     }
   },
   watch: {

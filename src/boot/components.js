@@ -6,6 +6,7 @@ import AdminAccurate from 'components/AdminAccurate'
 import ListItem from '@/components/ListItem'
 
 import UXModalView from '@/components/UXModalView'
+import Commentable from '@/components/Commentable'
 import UXSelectFilter from '@/components/UXSelectFilter'
 import UXSelect from '@/components/UXSelect'
 import UXBtnSelect from '@/components/UXBtnSelect'
@@ -32,6 +33,7 @@ export default async ({ app, store, router, Vue }) => {
   // Form Components //
   // Vue.component('ux-modal-source', UXModalSource)
   Vue.component('ux-modal-view', UXModalView)
+  Vue.component('commentable', Commentable)
   Vue.component('ux-select-filter', UXSelectFilter)
   Vue.component('ux-select', UXSelect)
   Vue.component('ux-btn-select', UXBtnSelect)

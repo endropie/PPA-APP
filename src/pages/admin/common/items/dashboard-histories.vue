@@ -1,6 +1,5 @@
 <template>
-<div>
-  <q-card dense class="main-box" :dark="LAYOUT.isDark" style="min-width:200px">
+  <q-card dense>
     <q-card-section class="bg-primary text-white q-py-sm" style="opacity: 0.85">
       <q-btn dense flat round
         class="float-right relative-position" style="top:-5px"
@@ -55,19 +54,17 @@
       </q-table>
     </q-card-section>
   </q-card>
-</div>
 </template>
 
 <script>
 import MixPage from '@/mixins/mix-page.vue'
-import { async } from 'q'
 export default {
-  mixins:[MixPage],
+  mixins: [MixPage],
   data () {
     return {
       resource: {
         api: '/api/v1/common/items/stockables',
-        uri: '/admin/common/items',
+        uri: '/admin/common/items'
       },
       show: true,
       loading: false,
@@ -82,14 +79,14 @@ export default {
         {
           name: 'number',
           required: true,
-          label: '', //this.$tc('label.number'),
+          label: '', // this.$tc('label.number'),
           align: 'left',
           style: 'with:25%'
         },
         {
           name: 'date',
           align: 'center',
-          label: '', //this.$tc('label.date'),
+          label: '', // this.$tc('label.date'),
           field: 'date',
           style: 'with:25%'
         },
@@ -102,14 +99,14 @@ export default {
           name: 'amount',
           align: 'right',
           style: 'with:25%'
-        },
+        }
       ],
       data: [],
       original: [],
-      isLoadError: false,
+      isLoadError: false
     }
   },
-  created() {
+  created () {
     // this.init()
     this.onRequest({
       pagination: this.pagination,
@@ -117,59 +114,58 @@ export default {
     })
   },
   computed: {
-    TEXT_BOTTOM() {
-      if(this.textLoadError) return this.isLoadError
+    TEXT_BOTTOM () {
+      if (this.textLoadError) return this.isLoadError
 
-      if(this.data.length > 0) return "Terdapat ("+ this.data.length +") Data untuk Validasi"
+      if (this.data.length > 0) return 'Terdapat (' + this.data.length + ') Data untuk Validasi'
 
-      return "Good Job!. Tidak terdapat Data untuk Validasi"
+      return 'Good Job!. Tidak terdapat Data untuk Validasi'
     }
   },
   methods: {
-    reload() {
+    reload () {
       this.loading = true
       setTimeout(() => {
         this.init()
-      }, 500);
+      }, 500)
     },
-    init() {
+    init () {
       this.loading = true
       let params = ['--with=item.unit']
       this.$axios.get(`${this.resource.api}?${params.join('&')}`)
-      .then((response) => {
-        this.original = JSON.parse(JSON.stringify(response.data.data))
-        let rows = JSON.parse(JSON.stringify(response.data.data))
-        this.data =  rows.slice(0)
+        .then((response) => {
+          this.original = JSON.parse(JSON.stringify(response.data.data))
+          let rows = JSON.parse(JSON.stringify(response.data.data))
+          this.data = rows.slice(0)
 
-        this.isLoadError = false
-        this.textLoadError = null
-      })
-      .catch((error) => {
-        this.isLoadError = true
-        this.textLoadError = error.response ? error.response.statusText : error
-      })
-      .finally(() => {
-        setTimeout(() => {
-          this.loading = false
-        }, 500);
-      })
+          this.isLoadError = false
+          this.textLoadError = null
+        })
+        .catch((error) => {
+          this.isLoadError = true
+          this.textLoadError = error.response ? error.response.statusText : error
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 500)
+        })
     },
 
     onRequest (props) {
       let { page, rowsPerPage, rowsNumber, sortBy, descending } = props.pagination
-      let filter = props.filter
+      // let filter = props.filter
 
       // emulate server
       setTimeout(() => {
-        // get all rows if "All" (0) is selected
-        let fetchCount = rowsPerPage === 0 ? rowsNumber : rowsPerPage
+        // ## get all rows if "All" (0) is selected
+        // let fetchCount = rowsPerPage === 0 ? rowsNumber : rowsPerPage
 
-        // calculate starting row of data
-        let startRow = (page - 1) * rowsPerPage
+        // ## calculate starting row of data
+        // let startRow = (page - 1) * rowsPerPage
 
         // fetch data from "server"
         const callback = (returnedData) => {
-
           this.data.splice(0, this.data.length, ...returnedData)
 
           // don't forget to update local pagination object
@@ -185,35 +181,34 @@ export default {
         this.onServe(callback, { page, rowsPerPage, rowsNumber, sortBy, descending })
         // console.warn('returnedData', returnedData)
         // clear out existing data and add new
-
       }, 500)
     },
 
-    getReqestParams(attrs) {
+    getReqestParams (attrs) {
       let params = ['--with=item.unit']
-      params.push(`page=${attrs.page||this.pagination.page||1}`)
-      params.push(`limit=${attrs.rowsPerPage||this.pagination.rowsPerPage||10}`)
+      params.push(`page=${attrs.page || this.pagination.page || 1}`)
+      params.push(`limit=${attrs.rowsPerPage || this.pagination.rowsPerPage || 10}`)
       return params
     },
 
-    onServe(callback, attrs) {
+    onServe (callback, attrs) {
       this.loading = true
 
       const params = this.getReqestParams(attrs)
       const data = this.$axios.get(`${this.resource.api}?${params.join('&')}`)
-      .then((response) => {
-        if (response.data.total) this.pagination.rowsNumber = Number(response.data.total)
-        callback(response.data.data)
-      })
-      .catch((error) => {
-        console.warn(error.response || error)
-        return []
-      })
-      .finally(() => {
-        setTimeout(() => {
-          this.loading = false
-        }, 500);
-      })
+        .then((response) => {
+          if (response.data.total) this.pagination.rowsNumber = Number(response.data.total)
+          callback(response.data.data)
+        })
+        .catch((error) => {
+          console.warn(error.response || error)
+          return []
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 500)
+        })
 
       return data
     },
@@ -221,43 +216,42 @@ export default {
       let count = this.original.length
       return count
     },
-    redirect(type, data) {
+    redirect (type, data) {
       if (data) {
         let link = null
         switch (type) {
-          case 'App\\Models\\Warehouse\\IncomingGoodItem': link = '/admin/deliveries/incoming-goods/'+ data.id
-          break;
+          case 'App\\Models\\Warehouse\\IncomingGoodItem': link = '/admin/deliveries/incoming-goods/' + data.id
+            break
 
-          case 'App\\Models\\Warehouse\\OutgoingGoodItem': link = '/admin/warehouses/outgoing-goods/'+ data.id
-          break;
+          case 'App\\Models\\Warehouse\\OutgoingGoodItem': link = '/admin/warehouses/outgoing-goods/' + data.id
+            break
 
           case 'App\\Models\\Warehouse\\OutgoingGoodVerification': // link = '/admin/outgoing-goods/'+ data.id
-          break;
+            break
 
-          case 'App\\Models\\Warehouse\\OpnameStockItem': link = '/admin/opname-stocks/'+ data.id
-          break;
+          case 'App\\Models\\Warehouse\\OpnameStockItem': link = '/admin/opname-stocks/' + data.id
+            break
 
-          case 'App\\Models\\Warehouse\\TransferStockItem': link = '/admin/transfer-stocks/'+ data.id
-          break;
+          case 'App\\Models\\Warehouse\\TransferStockItem': link = '/admin/transfer-stocks/' + data.id
+            break
 
-          case 'App\\Models\\Factory\\WorkOrderItem': link = '/admin/factories/work-orders/'+ data.id
-          break;
+          case 'App\\Models\\Factory\\WorkOrderItem': link = '/admin/factories/work-orders/' + data.id
+            break
 
-          case 'App\\Models\\Factory\\WorkProductionItem': link = '/admin/factories/work-productions/'+ data.id
-          break;
+          case 'App\\Models\\Factory\\WorkProductionItem': link = '/admin/factories/work-productions/' + data.id
+            break
 
-          case 'App\\Models\\Factory\\PackingItem': link = '/admin/factories/packings/'+ data.id
-          break;
+          case 'App\\Models\\Factory\\PackingItem': link = '/admin/factories/packings/' + data.id
+            break
 
-          case 'App\\Models\\Income\\RequestOrderItem': link = '/admin/incomes/request-orders/'+ data.id
-          break;
+          case 'App\\Models\\Income\\RequestOrderItem': link = '/admin/incomes/request-orders/' + data.id
+            break
 
-          case 'App\\Models\\Income\\PreDeliveryItem': link = '/admin/deliveries/pre-deliveries/'+ data.id
-          break;
+          case 'App\\Models\\Income\\PreDeliveryItem': link = '/admin/deliveries/pre-deliveries/' + data.id
+            break
 
-          case 'App\\Models\\Income\\DeliveryOrderItem': link = '/admin/deliveries/delivery-orders/'+ data.id
-          break;
-
+          case 'App\\Models\\Income\\DeliveryOrderItem': link = '/admin/deliveries/delivery-orders/' + data.id
+            break
         }
         if (link) this.$router.push(link)
         else {
@@ -265,13 +259,13 @@ export default {
         }
       }
     },
-    getDataLabel(type, data) {
+    getDataLabel (type, data) {
       const others = (id) => {
         switch (type) {
           case 'App\\Models\\Warehouse\\OutgoingGoodVerification': return `OUT VERIFY [#${data.id}]`
 
           default:
-            return `[#${data.id}]`;
+            return `[#${data.id}]`
         }
       }
       return data.fullnumber || data.number || others(data.id)

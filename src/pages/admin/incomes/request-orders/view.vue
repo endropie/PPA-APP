@@ -55,6 +55,7 @@
             <thead>
             <q-tr style="line-height:25px">
               <q-th width="10px">{{ $tc('label.no') }}</q-th>
+              <q-th v-if="IS_LOCKROWS"><q-icon name="lock" size="xs" color="grey" /></q-th>
               <q-th width="30%" v-if="IS_LOTS && !IS_ITEM_SUMMARY">LOTS</q-th>
               <q-th width="30%">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th width="30%">{{ $app.setting('item.subname_label') }}</q-th>
@@ -64,7 +65,8 @@
               <q-th width="10%">{{ $tc('label.balance') }}</q-th>
             </q-tr>
             </thead>
-            <tbody v-if="IS_ITEM_SUMMARY">
+            <template v-if="IS_ITEM_SUMMARY">
+            <tbody>
               <q-tr v-for="(row, index) in SUM_ITEMS" :key="index"  :request-order-item-id="row.id">
                 <q-td>{{index+1}}</q-td>
                 <q-td>{{row.item.part_name}}</q-td>
@@ -82,10 +84,19 @@
                 </q-td>
               </q-tr>
             </tbody>
-            <template  v-if="!IS_ITEM_SUMMARY">
+            </template>
+            <template  v-else>
               <tbody v-for="(row, index) in rsView.request_order_items" :key="index">
                 <q-tr :request-order-item-id="row.id">
                   <q-td>{{index+1}}</q-td>
+                  <td v-if="IS_LOCKROWS">
+                    <q-btn flat dense size="sm" color="blue-grey" icon="lock_open" @click="setLockDetail(row.id)" v-if="!row.is_autoload" >
+                      <q-tooltip>Click to Lock</q-tooltip>
+                    </q-btn>
+                    <q-btn flat dense size="sm" color="blue-grey-10" icon="lock" @click="setLockDetail(row.id, true)" v-else >
+                      <q-tooltip>Click to Open</q-tooltip>
+                    </q-btn>
+                  </td>
                   <td v-if="IS_LOTS">
                     <span v-if="row.lots">
                       {{ row.lots }}
@@ -116,7 +127,7 @@
         </div>
         <div class="col-12">
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
-            <div class="q-my-xs text-weight-light" style="min-height:30px">{{ rsView.description }}</div>
+            <div class="q-my-xs text-weight-light" style="min-height:30px;white-space:pre-line">{{ rsView.description }}</div>
         </div>
         <div class="col-12" v-if="false">
           <q-btn dense flat color="secondary" class="print-hide float-right"
@@ -272,6 +283,12 @@ export default {
       if (this.rsView.order_mode !== 'ACCUMULATE') return false
       return this.show_summary
     },
+    IS_LOCKROWS () {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'OPEN') return false
+      if (this.rsView.order_mode === 'ACCUMULATE') return false
+      return this.$app.can('request-orders-update')
+    },
     SUM_ITEMS () {
       let data = []
       this.rsView.request_order_items.map((detail) => {
@@ -356,7 +373,7 @@ export default {
     setClose () {
       const submit = () => {
         this.VIEW.show = false
-        this.VIEW.loading = true
+        this.$q.loading.show()
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=close&nodata=true`
         this.$axios.put(url)
           .then((response) => {
@@ -368,7 +385,7 @@ export default {
           .finally(() => {
             this.VIEW.show = true
             setTimeout(() => {
-              this.VIEW.loading = false
+              this.$q.loading.hide()
             }, 1000)
           })
       }
@@ -385,7 +402,7 @@ export default {
     setRecalculate () {
       const submit = () => {
         // this.VIEW.show = false
-        this.VIEW.loading = true
+        this.$q.loading.show()
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=calculate&nodata=true`
         this.$axios.put(url)
           .then((response) => {
@@ -397,12 +414,37 @@ export default {
           .finally(() => {
             this.VIEW.show = true
             setTimeout(() => {
-              this.VIEW.loading = false
+              this.$q.loading.hide()
             }, 1000)
           })
       }
 
       submit()
+    },
+    setLockDetail (id, isUnlock = false) {
+      const submit = () => {
+        this.$q.loading.show()
+        let url = `/api/v1/incomes/request-order-items/${id}/${isUnlock ? 'unlock' : 'lock'}`
+        this.$axios.put(url)
+          .then((response) => {
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'LOCK DETAIL')
+          })
+          .finally(() => {
+            this.$q.loading.hide()
+          })
+      }
+
+      this.$q.dialog({
+        title: this.$tc('form.confirm', 1, { v: 'LOCK' }),
+        message: this.$tc('messages.to_sure', 1, { v: 'lock detail' }),
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        submit()
+      })
     }
   }
 }

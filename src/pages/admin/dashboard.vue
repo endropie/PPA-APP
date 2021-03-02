@@ -1,10 +1,23 @@
 <template>
   <q-page padding class="page-admin">
-    <div class="row content-stretch">
-      <item-sample-validation class="col-12 col-md-4 q-pa-xs" style="min-width:200px" />
-      <incoming-validation class="col-12 col-md-4 q-pa-xs" style="min-width:200px" />
-      <work-order-validation class="col-12 col-md-4 q-pa-xs" style="min-width:200px" />
-      <item-histories class="col-12 q-pa-xs" />
+    <div>
+      <div class="row q-col-gutter-sm">
+        <div class="col-12 col-md-4">
+          <incoming-validation />
+        </div>
+        <div class="col-12 col-md-4">
+          <work-order-validation  />
+        </div>
+        <div class="col-12 col-md-4">
+          <item-sample-validation />
+        </div>
+        <div class="col-12">
+          <commentable style="min-height:200px" title="SYSTEM LOG" />
+        </div>
+        <div class="col-12">
+          <item-histories  />
+        </div>
+      </div>
     </div>
   </q-page>
 </template>
@@ -17,7 +30,7 @@ import IncomingValidation from '@/pages/admin/deliveries/incoming-goods/dashboar
 import WorkOrderValidation from '@/pages/admin/factories/work-orders/dashboard-validation'
 
 export default {
-  mixins:[MixPage],
+  mixins: [MixPage],
   components: {
     ItemHistories,
     ItemSampleValidation,
@@ -29,7 +42,7 @@ export default {
     //  values..
     }
   },
-  created() {
+  created () {
     // console.info('This dashboard component created!')
   },
   methods: {

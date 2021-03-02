@@ -1,11 +1,11 @@
 <template>
 <q-page padding class="form-page">
-  <q-card inline class="main-box q-ma-sm" v-if="FORM.show" :dark="LAYOUT.isDark">
+  <q-card inline class="main-box q-ma-sm" v-if="FORM.show">
     <q-card-section>
       <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" >
       </form-header>
     </q-card-section>
-    <q-separator :dark="LAYOUT.isDark" />
+    <q-separator />
     <q-card-section class="row q-col-gutter-x-sm">
       <!-- COLUMN::1st customer Identitity -->
 
@@ -14,12 +14,10 @@
         v-model="rsForm.line_id"
         :label="$tc('items.preline')"
         :disable="IssetWorkOrderItems"
-        :dark="LAYOUT.isDark"
         :options="LineOptions.filter(x => x.row.ismain)" clearable
         v-validate="'required'"
         :error="errors.has('line_id')"
-        :error-message="errors.first('line_id')"
-        @input="(val) => val ? loadItemOptions() : false">
+        :error-message="errors.first('line_id')">
         <q-tooltip v-if="Boolean(IssetWorkOrderItems)" :offset="[0, 10]">To change, Please delete Work-Order items first!</q-tooltip>
       </ux-select-filter>
 
@@ -30,7 +28,6 @@
             v-model="rsForm.date"
             v-validate="`required|date_format:yyyy-MM-dd` + FORM.ifCreate(`|after:${$app.moment().add(-1,'days').format('YYYY-MM-DD')}`,'')"
             :date-options="(date) => FORM.ifCreate(date >= $app.moment().format('YYYY/MM/DD'), true)"
-            :dark="LAYOUT.isDark"
             :error="errors.has('date')"
             :error-message="errors.first('date')">
           </ux-date>
@@ -39,7 +36,6 @@
             name="shift_id"
             :label="$tc('label.shift')" stack-label
             v-model="rsForm.shift_id"
-            :dark="LAYOUT.isDark"
             :options="ShiftOptions" filter
             map-options emit-value
             v-validate="'required'"
@@ -49,13 +45,12 @@
         </div>
       </div>
       <div class="col-12 row q-col-gutter-x-sm">
-        <div class="col-12 col-sm-auto  column q-pb-sm">
+        <div class="col-12 col-sm-auto column q-pb-sm">
           <span class="text-small text-grey">Stockist Material</span>
           <q-btn-toggle spread class="no-shadow text-no-wrap" style="border:1px solid #027be3"
             v-model="rsForm.stockist_from"
             :disable="IssetWorkOrderItems"
             text-color="primary"
-            :dark="LAYOUT.isDark"
             :options="CONFIG.items['stockists'].map(x => ({...x, color:null})).filter(stockist => ['FM','NC','NCR'].indexOf(stockist.value) > -1 )"
           />
         </div>
@@ -65,7 +60,6 @@
             v-model="rsForm.mode_line"
             :disable="IssetWorkOrderItems"
             text-color="primary"
-            :dark="LAYOUT.isDark"
             :options="[
               {label: 'Single', value: 'SINGLE'},
               {label: 'Multiline', value: 'MULTI'},
@@ -74,7 +68,7 @@
           />
         </div>
         <q-space />
-        <div class="col-12 col-sm-auto q-pb-sm column items-center">
+        <div class="items-center col-12 col-sm-auto q-pb-sm column">
           <q-checkbox class="self-center"
             label="FG Direct"
             v-model="rsForm.stockist_direct"
@@ -83,9 +77,9 @@
         </div>
       </div>
       <div class="col-12">
-        <q-markup-table class="main-box no-shadow no-highlight"
-          dense bordered separator="horizontal"
-          :dark="LAYOUT.isDark">
+        <q-markup-table dense bordered separator="horizontal"
+          class="main-box no-shadow no-highlight"
+        >
           <thead>
             <q-tr class="text-uppercase" style="line-height:30px">
               <q-th key="prefix"  style="width:50px"></q-th>
@@ -107,17 +101,19 @@
                   :name="`work_order_items.${index}.item_id`"
                   :disable="!rsForm.line_id"
                   outlined dense hide-bottom-space color="blue-grey-4"
-                  v-model="row.item_id"
+                  v-model="row.item"
                   v-validate="'required'"
-                  filter emit-value map-options
-                  :options="ItemOptions" clearable
+                  filter map-options clearable
+                  :source="`/api/v1/common/items?mode=all&--limit=20&has_stocks=${rsForm.stockist_from}&appends=total_work_order&main_line=${rsForm.line_id}&mode_line=${rsForm.mode_line}`"
+                  option-value="id"
+                  option-label="part_name"
+                  :option-sublabel="item => `[${item.customer_code}] ${item.part_subname}`"
                   popup-content-class="options-striped"
-                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                   :error="errors.has(`work_order_items.${index}.item_id`)"
                   :loading="SHEET.items.loading"
                   @input="(val) => setItemReference(index, val)">
                   <q-tooltip v-if="!rsForm.line_id" :offset="[0, 10]">Select a Pre-Line , first! </q-tooltip>
-                  <small class="absolute-bottom text-weight-light" v-if="row.item_id">
+                  <small class="absolute-bottom text-weight-light" v-if="row.item">
                     [{{row.item.customer_code}}] {{row.item.part_subname || '--'}}
                   </small>
                 </ux-select>
@@ -125,7 +121,6 @@
               <q-td key="unit_id"  width="15%">
                 <q-select
                   :name="`work_order_items.${index}.unit_id`"
-                  :dark="LAYOUT.isDark"
                   v-model="row.unit_id"
                   outlined dense hide-bottom-space color="blue-grey-4"
                   :options="ItemUnitOptions[index]"
@@ -141,7 +136,7 @@
                   :name="`work_order_items.${index}.target`"
                   type="number" :min="0" align="center"
                   v-model="row.target"
-                  :dark="LAYOUT.isDark" color="blue-grey-4"
+                  color="blue-grey-4"
                   outlined dense hide-bottom-space no-error-icon
                   v-validate="`required|gt_value:0`"
                   :error="errors.has(`work_order_items.${index}.target`)"
@@ -152,7 +147,7 @@
                 <q-input  style="min-width:80px"
                   v-model="row.ngratio" type="number" min="0"
                   outlined dense hide-bottom-space no-error-icon align="right" suffix="%"
-                  :dark="LAYOUT.isDark" color="blue-grey-4"
+                  color="blue-grey-4"
                   v-validate="'required'"
                   :name="`work_order_items.${index}.ngratio`" data-vv-as="ngratio"
                   :error="errors.has(`work_order_items.${index}.ngratio`)"
@@ -173,7 +168,7 @@
               <q-td key="quantity"  width="25%">
                 <q-input style="min-width:150px"
                   :name="`work_order_items.${index}.quantity`" type="number"
-                  :dark="LAYOUT.isDark" color="blue-grey-6"
+                  color="blue-grey-6"
                   v-model="row.quantity" disable
                   outlined dense hide-bottom-space no-error-icon align="right"
                   v-validate="`required|gt_value:0|max_value:${unitValueMax(index, row)}`"
@@ -206,15 +201,14 @@
       </div>
       <!-- COLUMN::4th Description -->
       <div class="col-12 cloumn q-mt-md">
-        <q-input name="description" type="textarea" rows="3"
+        <q-input filled name="description" type="textarea" rows="3"
           stack-label :label="$tc('label.description')"
-          filled
-          :dark="LAYOUT.isDark"
-          v-model="rsForm.description"/>
+          v-model="rsForm.description"
+        />
 
       </div>
     </q-card-section>
-    <q-separator :dark="LAYOUT.isDark" />
+    <q-separator />
     <q-card-actions >
       <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()"></q-btn>
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
@@ -223,7 +217,7 @@
       </q-btn>
     </q-card-actions>
   </q-card>
-    <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
+    <q-inner-loading :showing="FORM.loading"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
 </q-page>
 </template>
 
@@ -244,7 +238,8 @@ export default {
       FORM: {
         resource: {
           uri: '/admin/factories/work-orders',
-          api: '/api/v1/factories/work-orders'
+          api: '/api/v1/factories/work-orders',
+          params: '?appends=total_work_order'
         }
       },
       rsForm: {},
@@ -267,12 +262,8 @@ export default {
               unit_id: null,
               unit_rate: 1,
               ngratio: 0,
-              item: {},
-              unit: {},
-              work_order_item_lines: [{
-                line_id: null,
-                ismain: 0
-              }]
+              item: null,
+              unit: null
             }
           ]
         }
@@ -311,7 +302,7 @@ export default {
         if (!item.item_prelines || !item.item_prelines.length) return false
         if (item.item_prelines[0].line_id !== this.rsForm.line_id) return false
         if (!OrKeys.find(x => x === item.id)) {
-          const WOSTOCK = item.totals[stockist] - item.totals['WO' + stockist]
+          const WOSTOCK = item.totals[stockist] - (item.total_work_order[stockist] || 0)
           if (WOSTOCK <= 0) return false
         }
         if (this.rsForm.mode_line === 'SINGLE' && item.item_prelines.length > 1) return false
@@ -351,7 +342,12 @@ export default {
     MaxStock () {
       const stockist = this.rsForm.stockist_from
 
-      let stockItem = JSON.parse(JSON.stringify(this.MAPINGKEY['items']))
+      let stockItem = []
+
+      this.rsForm.work_order_items.map(detail => {
+        if (detail.item && !stockItem[detail.item.id]) stockItem[detail.item.id] = detail.item
+      })
+
       let moveItem = {
         set: function (id, val) {
           let vf = this
@@ -372,7 +368,7 @@ export default {
       let data = {}
       this.rsForm.work_order_items.map((detail, index) => {
         if (stockItem[detail.item_id] && detail.item_id) {
-          const summary = Number(stockItem[detail.item_id].totals[stockist]) - Number(stockItem[detail.item_id].totals['WO' + stockist])
+          const summary = Number(stockItem[detail.item_id].totals[stockist] || 0) - Number(stockItem[detail.item_id].total_work_order[stockist] || 0)
           data[index] = summary - Number(moveItem.get(detail.item_id) || 0)
           moveItem.set(detail.item_id, detail.quantity * detail.unit_rate)
         }
@@ -410,7 +406,7 @@ export default {
     },
     setForm (data) {
       this.rsForm = JSON.parse(JSON.stringify(data))
-      if (data.id) this.loadItemOptions(data)
+      // if (data.id) this.loadItemOptions(data)
       if (data.hasOwnProperty('has_relationship') && data['has_relationship'].length > 0) {
         this.FORM.has_relationship = data.has_relationship
 
@@ -446,7 +442,7 @@ export default {
       return value.toFixed(0)
     },
     loadItemOptions (data = this.rsForm) {
-      let params = ['has_stocks=FM,NC,NCR']
+      let params = ['has_stocks=FM,NC,NCR', 'appends=total_work_order']
 
       if (data.line_id) params.push(`main_line=${data.line_id}`)
 
@@ -460,21 +456,11 @@ export default {
     setItemReference (index, val) {
       if (!val) {
         this.rsForm.work_order_items[index].unit_id = null
-        this.rsForm.work_order_items[index].unit = {}
-        this.rsForm.work_order_items[index].item = {}
+        this.rsForm.work_order_items[index].unit = null
+        this.rsForm.work_order_items[index].item = null
       } else {
-        this.rsForm.work_order_items[index].item = this.MAPINGKEY['items'][val]
-        if (this.rsForm.work_order_items[index].item.item_prelines.length > 0) {
-          const prelines = this.rsForm.work_order_items[index].item.item_prelines
-          this.rsForm.work_order_items[index].work_order_item_lines = []
-
-          for (let i = 0; i < prelines.length; i++) {
-            let ex = this.setDefault().work_order_items[0].work_order_item_lines[0]
-            ex.line_id = prelines[i].line_id
-            this.rsForm.work_order_items[index].work_order_item_lines.push(ex)
-          }
-        }
-        let baseUnitID = this.MAPINGKEY['items'][val].unit_id
+        this.rsForm.work_order_items[index].item_id = val.id
+        let baseUnitID = val.unit_id
         this.rsForm.work_order_items[index].unit_id = baseUnitID
         this.rsForm.work_order_items[index].unit_rate = 1
         this.rsForm.work_order_items[index].unit = this.MAPINGKEY['units'][baseUnitID]
@@ -499,22 +485,12 @@ export default {
     },
     addNewItem () {
       let newEntri = this.setDefault().work_order_items[0]
-      newEntri.work_order_item_lines = []
 
       this.rsForm.work_order_items.push(newEntri)
     },
     removeItem (itemIndex) {
       this.rsForm.work_order_items.splice(itemIndex, 1)
       if (this.rsForm.work_order_items.length < 1) this.addNewItem()
-    },
-    addNewItemLine (itemIndex) {
-      let newEntri = this.setDefault().work_order_items[0].work_order_item_lines[0]
-
-      this.rsForm.work_order_items[itemIndex].work_order_item_lines.push(newEntri)
-    },
-    removeItemLine (itemIndex, lineIndex) {
-      this.rsForm.work_order_items[itemIndex].work_order_item_lines.splice(lineIndex, 1)
-      if (this.rsForm.work_order_items[itemIndex].work_order_item_lines.length < 1) this.addNewItemLine(itemIndex)
     },
     onSave () {
       this.$validator.validate().then(result => {

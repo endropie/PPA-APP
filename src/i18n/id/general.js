@@ -57,6 +57,7 @@ export default {
   request_order: 'Sales Order | Pemesanan Penjualan',
   acc_invoice: 'Invoice Collect | Rekap Faktur',
 
+  rute: 'Rute',
   operator: 'Operator',
   brand: 'Brand',
   specification: 'Spesifikasi',
@@ -66,6 +67,7 @@ export default {
   size: 'Ukuran',
   item_type: 'Tipe Part',
   item_category: 'Kategori Part',
+  category_item_price: 'Kategori Barang (Price)',
   fault: 'Fault',
   type_fault: 'Tipe Fault',
   department: 'Depertemen',

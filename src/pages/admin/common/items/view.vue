@@ -311,6 +311,22 @@
                 </div>
               </div>
             </q-card-section>
+            <q-card-section class="q-py-sm">
+              <div class="text-subtitle2">{{$tc('general.category_item_price')}}</div>
+            </q-card-section>
+            <q-separator inset />
+            <q-card-section class="q-pt-sm q-pb-md">
+              <div class="row">
+                <div class="col-12 col-sm-8">
+                  <div class="text-caption text-grey">Nama Kategori</div>
+                  <div>{{rsView.category_item_price ? rsView.category_item_price.name : '-'}}</div>
+                </div>
+                <div class="col-12 col-sm-4">
+                  <div class="text-caption text-grey">Kategori Price</div>
+                  <div>{{rsView.category_item_price ? $app.number_format(rsView.category_item_price.price) : '-'}}</div>
+                </div>
+              </div>
+            </q-card-section>
           </q-card>
         </q-tab-panel>
 

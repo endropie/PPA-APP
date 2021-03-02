@@ -1,8 +1,8 @@
 <template>
   <q-page padding class="column justify-start items-center"  v-if="VIEW.show">
-    <div class="column q-gutter-y-sm" style="min-width:75%" v-if="VIEW.show">
+    <div class="content" style="min-width:75%" v-if="VIEW.show">
 
-      <q-card :dark="LAYOUT.isDark"
+      <q-card
         class="no-shadow no-margin print-hide modal-hide q-pt-sm"
         style="position:sticky;top:50px">
         <q-card-actions class="q-gutter-xs no-padding" align="right">
@@ -54,7 +54,7 @@
         </q-card-actions>
       </q-card>
 
-      <page-print :dark="LAYOUT.isDark" :class="{'multi-page':getArrayPage(rsView.customer).length > 1}"
+      <page-print :class="{'multi-page':getArrayPage(rsView.customer).length > 1}"
         v-for="(mode, pi) in getArrayPage(rsView.customer)" :key="pi">
         <div slot="header-tags" class="column no-wrap items-end">
           <div class="print-hide no-padding">
@@ -78,7 +78,7 @@
             <q-space/>
             <div class="on-right" style="max-width:50%">
               <div class="column items-start">
-                <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
+                <q-markup-table dense bordered square separator="cell"
                   class="table-print super-dense no-shadow no-highlight th-uppercase"
                 >
                   <tbody>
@@ -139,7 +139,6 @@
           </div>
           <div>
             <q-markup-table dense bordered square separator="cell"
-              :dark="LAYOUT.isDark"
               class="table-print no-shadow no-highlight th-uppercase">
               <thead>
               <q-tr>
@@ -166,10 +165,10 @@
                     <span v-if="row.item"> {{row.item.part_subname}} </span>
                   </q-td>
                   <q-td v-if="isDoubleUnit" key="PCS" class="text-right">
-                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row), row.unit.decimal_in) + ' PCS'}}
+                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row), LEN_PCS) + ' PCS'}}
                   </q-td>
                   <q-td v-if="isDoubleUnit" key="KG" class="text-right">
-                    {{!valKG(row) ? '' : $app.number_format(valKG(row), row.unit.decimal_in) + ' KG'}}
+                    {{!valKG(row) ? '' : $app.number_format(valKG(row), LEN_KG) + ' KG'}}
                   </q-td>
                   <q-td  v-if="!isDoubleUnit" key="quantity" class="text-right">
                     <span v-if="rsView.is_internal && remain_only">
@@ -216,10 +215,10 @@
                     <span v-if="row.item"> {{row.item.part_subname}} </span>
                   </q-td>
                   <q-td  v-if="isDoubleUnit" key="PCS" class="text-right">
-                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row), row.unit.decimal_in) + ' PCS'}}
+                    {{!valPCS(row) ? '' : $app.number_format(valPCS(row), LEN_PCS) + ' PCS'}}
                   </q-td>
                   <q-td v-if="isDoubleUnit" key="KG" class="text-right">
-                    {{!valKG(row) ? '' : $app.number_format(valKG(row), row.unit.decimal_in) + ' KG'}}
+                    {{!valKG(row) ? '' : $app.number_format(valKG(row), LEN_KG) + ' KG'}}
                   </q-td>
                   <q-td v-if="!isDoubleUnit" class="text-right">
                     {{$app.number_format(row.quantity, row.unit.decimal_in)}}
@@ -256,7 +255,7 @@
                 </div>
               </q-card-section>
             </q-card>
-            <q-markup-table v-else dense :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
+            <q-markup-table v-else dense class="no-shadow text-weight-light" style="">
               <tr class="text-center">
                 <td width="21%">
                   <div class="sign-name">Diterima Oleh</div>
@@ -298,6 +297,9 @@ export default {
   components: { PagePrint, ConfigDeliveryOrder },
   data () {
     return {
+      SHEET: {
+        units: { api: '/api/v1/references/units?mode=all' }
+      },
       VIEW: {
         resource: {
           api: '/api/v1/incomes/delivery-orders',
@@ -314,6 +316,14 @@ export default {
     this.init()
   },
   computed: {
+    LEN_KG () {
+      if (!this.SHEET.units.data) return 0
+      return this.SHEET.units.data.find(x => x.code === 'KG').decimal_in || 0
+    },
+    LEN_PCS () {
+      if (!this.SHEET.units.data) return 0
+      return this.SHEET.units.data.find(x => x.code === 'PCS').decimal_in || 0
+    },
     IS_LOTS () {
       return Boolean(this.rsView.customer && this.rsView.customer.order_lots)
     },

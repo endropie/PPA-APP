@@ -307,40 +307,52 @@
         </div>
         <div class="column">
           <q-field borderless hide-bottom-space >
-            <div class="column">
-              <q-checkbox name="order_lots" class="text-faded"
-                label="Lots Order"
-                v-model="rsForm.order_lots"
-                :false-value="0"
-                :true-value="1"
-                v-show="rsForm.order_mode === 'NONE'"
-              />
-              <q-checkbox name="delivery_manual_allowed" class="text-faded"
-                label="SJDO Manual"
-                v-model="rsForm.delivery_manual_allowed"
-                :false-value="0"
-                :true-value="1"
-                v-show="rsForm.order_mode !== 'ACCUMULATE'"
-              />
-              <q-checkbox name="order_manual_allowed" class="text-faded"
-                label="Tambah atau edit PO customer"
-                v-model="rsForm.order_manual_allowed"
-                :false-value="0"
-                :true-value="1"
-              />
-              <q-checkbox name="order_monthly_actived" class="text-faded"
-                label="Tanggal active PO (generate) setiap akhir bulan"
-                v-model="rsForm.order_monthly_actived"
-                :false-value="0"
-                :true-value="1"
-              />
-              <q-checkbox name="invoice_request_required" class="text-faded"
-                label="Invoice by Request Order"
-                v-model="rsForm.invoice_request_required"
-                :false-value="0"
-                :true-value="1"
-                v-show="rsForm.order_mode === 'NONE'"
-              />
+            <div :class="$q.screen.gt.sm ? 'row' : 'coloumn'">
+              <div class="column">
+                <q-checkbox name="order_lots" class="text-faded"
+                  label="Lots Order"
+                  v-model="rsForm.order_lots"
+                  :false-value="0"
+                  :true-value="1"
+                  v-show="rsForm.order_mode === 'NONE'"
+                />
+                <q-checkbox name="delivery_manual_allowed" class="text-faded"
+                  label="SJDO Manual"
+                  v-model="rsForm.delivery_manual_allowed"
+                  :false-value="0"
+                  :true-value="1"
+                  v-show="rsForm.order_mode !== 'ACCUMULATE'"
+                />
+              </div>
+              <div class="column">
+                <q-checkbox name="invoice_request_required" class="text-faded"
+                  label="Invoice by Request Order"
+                  v-model="rsForm.invoice_request_required"
+                  :false-value="0"
+                  :true-value="1"
+                  v-show="rsForm.order_mode === 'NONE'"
+                />
+                <q-checkbox name="invoice_category_price" class="text-faded"
+                  label="Invoice Category Price"
+                  v-model="rsForm.invoice_category_price"
+                  :false-value="0"
+                  :true-value="1"
+                />
+              </div>
+              <div class="column">
+                <q-checkbox name="order_manual_allowed" class="text-faded"
+                  label="Tambah atau edit PO customer"
+                  v-model="rsForm.order_manual_allowed"
+                  :false-value="0"
+                  :true-value="1"
+                />
+                <q-checkbox name="order_monthly_actived" class="text-faded"
+                  label="Tanggal active PO (generate) setiap akhir bulan"
+                  v-model="rsForm.order_monthly_actived"
+                  :false-value="0"
+                  :true-value="1"
+                />
+              </div>
             </div>
           </q-field>
         </div>

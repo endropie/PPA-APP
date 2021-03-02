@@ -242,6 +242,7 @@ export default {
     return {
       FORM: {
         resource: {
+          params: '?--with=customer;request_orders;delivery_orders',
           api: '/api/v1/incomes/invoices',
           uri: '/admin/incomes/invoices'
         }

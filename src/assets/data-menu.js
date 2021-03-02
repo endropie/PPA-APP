@@ -33,6 +33,17 @@ const common = [
     icon: 'style'
   },
   {
+    name: 'Category Price',
+    icon: 'widgets',
+    path: 'category-item-prices',
+    lang: 'general.category_item_price',
+    resources: [
+      { page: 'index', path: '', meta: { permission: 'items-prices;items-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'items-prices;items-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'items-prices;items-update' } }
+    ]
+  },
+  {
     name: 'Employee',
     path: 'employees',
     icon: 'style',
@@ -53,6 +64,17 @@ const common = [
       { page: 'index', path: '', meta: { permission: 'vehicles-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'vehicles-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'vehicles-update' } }
+    ]
+  },
+  {
+    name: 'Rute',
+    icon: 'mdi-car-multiple',
+    path: 'rutes',
+    lang: 'general.rute',
+    resources: [
+      { page: 'index', path: '', meta: { permission: '' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: '' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: '' } }
     ]
   }
 ]
@@ -92,7 +114,8 @@ const incomes = [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'acc-invoices-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'acc-invoices-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'acc-invoices-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'acc-invoices-read' } }
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'acc-invoices-read' } },
+      { page: 'stockcards', path: ':id/stockcards', meta: { mode: 'view', permission: 'acc-invoices-read' } }
 
     ]
   }
@@ -299,30 +322,6 @@ const deliveries = [
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'deportation-goods-update' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'deportation-goods-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'deportation-goods-read' } }
-    ]
-  },
-  {
-    name: '[OLD] Delivery (Internal)',
-    icon: 'assignment',
-    path: 'delivery-internals',
-    // lang: 'general.delivery_internal',
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-internals-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-internals-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'delivery-internals-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-internals-read' } }
-    ]
-  },
-  {
-    name: 'Schedule Board',
-    icon: 'work',
-    path: 'schedule-boards',
-    lang: 'general.schedule_board',
-    resources: [
-      { page: 'index', path: '', icon: 'list', meta: { permission: 'schedule-boards-read' } },
-      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'schedule-boards-create' } },
-      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'schedule-boards-update' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'schedule-boards-read' } }
     ]
   },
   {
