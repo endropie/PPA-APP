@@ -104,7 +104,7 @@
                   v-model="row.item"
                   v-validate="'required'"
                   filter map-options clearable
-                  :source="`/api/v1/common/items?mode=all&--limit=20&has_stocks=FM,NC,NCR&appends=total_work_order&main_line=${rsForm.line_id}`"
+                  :source="`/api/v1/common/items?mode=all&--limit=20&has_stocks=${rsForm.stockist_from}&appends=total_work_order&main_line=${rsForm.line_id}&mode_line=${rsForm.mode_line}`"
                   option-value="id"
                   option-label="part_name"
                   :option-sublabel="item => `[${item.customer_code}] ${item.part_subname}`"
