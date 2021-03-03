@@ -281,8 +281,8 @@ export default {
   computed: {
     IS_REOPEN () {
       if (this.rsView.deleted_at) return false
-      if (this.rsView.main_id) return false
-      if (!['PRODUCTED', 'PACKED'].find(x => x === this.rsView.status)) return false
+      if (this.rsView.status === 'OPEN') return false
+      if (!this.rsView.main_id && !['PRODUCTED', 'PACKED'].find(x => x === this.rsView.status)) return false
       return true
     },
     IS_DIRECTED () {
