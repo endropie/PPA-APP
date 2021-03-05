@@ -39,7 +39,7 @@
             :data="deliveryTable.data"
             :columns="deliveryTable.columns"
             :pagination.sync="deliveryTable.pagination"
-            :rows-per-page-options="[10, 20, 50, 100, 250, 500]"
+            :rows-per-page-options="[10, 25, 50, 100, 200, 500, 'all']"
             :loading="deliveryTable.loading"
             @request="deliveryTable.request"
           >
@@ -144,7 +144,7 @@
             :data="orderTable.data"
             :columns="orderTable.columns"
             :pagination.sync="orderTable.pagination"
-            :rows-per-page-options="[10, 20, 50, 100, 250, 500]"
+            :rows-per-page-options="[10, 25, 50, 100, 200, 500, 'all']"
             :loading="orderTable.loading"
             @request="orderTable.request"
           >
