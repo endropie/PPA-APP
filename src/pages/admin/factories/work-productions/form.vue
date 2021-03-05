@@ -279,6 +279,7 @@ export default {
           if (detail.unit_rate) total = total / detail.unit_rate
           return ({
             label: wo.fullnumber || wo.number,
+            sublabel: `${this.$app.moment(wo.date).format('DD/MM/YYYY')} [SHIFT ${wo.shift_id}]`,
             value: detail.id,
             stamp: this.$app.number_format(total),
             item_id: (detail.item_id || null),
