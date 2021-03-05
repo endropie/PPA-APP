@@ -148,7 +148,7 @@
         <div class="col-12 col-md-6">
           <q-card class="fit">
             <q-card-section horizontal class="bg-secondary text-white q-px-sm q-py-xs">
-              <div class="text-subtitle2 q-py-xs">Enginering information {{ $app.can(['items-sample', 'items-engineer']) ? 'SAMPLE' : 'NON'}}</div>
+              <div class="text-subtitle2 q-py-xs">Enginering information</div>
               <q-space />
               <q-btn flat dense outline icon="edit"
                 @click="rsForm.sample_enginered_at = true"
