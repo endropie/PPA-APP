@@ -167,8 +167,8 @@
               <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.summary_items) ? (rs.row.summary_productions/rs.row.summary_items) : 0">
                 <div class="absolute-full flex flex-center">
                   <q-badge :color="Boolean(rs.row.has_producted) ? 'red' : 'blue-grey-10'" text-color="white" class="text-weight-medium q-pt-xs">
-                    <span>{{$app.number_abbreviate(rs.row.summary_productions)}} </span>
-                    <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.summary_items)}}</span>
+                    <span>{{$app.number_abbreviate(rs.row.summary_productions || 0)}} </span>
+                    <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.summary_items || 0)}}</span>
                   </q-badge>
                 </div>
               </q-linear-progress>
@@ -178,8 +178,8 @@
               <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.summary_productions) ? (rs.row.summary_packings/rs.row.summary_productions) : 0">
                 <div class="absolute-full flex flex-center">
                   <q-badge :color="Boolean(rs.row.has_packed) ? 'red' : 'blue-grey-10'" text-color="white" class="text-weight-medium q-pt-xs">
-                    <span>{{$app.number_abbreviate(rs.row.summary_packings)}} </span>
-                    <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.summary_productions)}}</span>
+                    <span>{{$app.number_abbreviate(rs.row.summary_packings || 0)}} </span>
+                    <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.summary_productions || 0)}}</span>
                   </q-badge>
                 </div>
               </q-linear-progress>
