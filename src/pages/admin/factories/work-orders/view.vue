@@ -237,6 +237,11 @@
                 hidden: !IS_VOID || !$app.can('work-orders-void'),
                 actions: () => VIEW.void(()=> init())
               },
+              {
+                label: 'RE-CALCULATE', color:'grey', icon: 'refresh',
+                hidden: !$app.can('work-orders-read'),
+                actions: () => recalculate()
+              }
             ]">
           </ux-btn-dropdown>
         </div>
@@ -494,6 +499,25 @@ export default {
       }).onOk(() => {
         submit()
       })
+    },
+
+    recalculate () {
+      this.VIEW.show = false
+      this.VIEW.loading = true
+      let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=recalculate&nodata=true`
+      this.$axios.put(url)
+        .then((response) => {
+          this.init()
+        })
+        .catch(error => {
+          this.$app.response.error(error.response, 'RE-CALCULATE')
+        })
+        .finally(() => {
+          this.VIEW.show = true
+          setTimeout(() => {
+            this.VIEW.loading = false
+          }, 1000)
+        })
     },
 
     setDirectValidated () {
