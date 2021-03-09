@@ -148,37 +148,39 @@
         </q-td>
 
         <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
-          <div class="column text-body">
-            <span class="text-uppercase text-grey-8">
-              {{rs.row.created_user ? rs.row.created_user.name : 'undefined'}}
-            </span>
-            <small v-if="rs.row.created_at" class="text-grey">
-              <q-icon name="mdi-calendar-clock"></q-icon>
-              {{ $app.moment(rs.row.created_at).format('DD/MM/YYYY HH:mm') }}
-              <q-tooltip>{{ $app.moment(rs.row.created_at).fromNow() }}</q-tooltip>
-            </small>
-          </div>
+          <q-btn dense flat no-caps @click="onCommentable(rs.row)" >
+            <div class="column text-body">
+              <span class="text-uppercase text-grey-8">
+                {{rs.row.created_user ? rs.row.created_user.name : 'undefined'}}
+              </span>
+              <small v-if="rs.row.created_at" class="text-grey">
+                <q-icon name="mdi-calendar-clock"></q-icon>
+                {{ $app.moment(rs.row.created_at).format('DD/MM/YYYY HH:mm') }}
+                <q-tooltip>{{ $app.moment(rs.row.created_at).fromNow() }}</q-tooltip>
+              </small>
+            </div>
+          </q-btn>
         </q-td>
 
       </q-table>
     </q-pull-to-refresh>
-
 
   </q-page>
 </template>
 
 <script>
 import MixIndex from '@/mixins/mix-index.vue'
+import CommentableDialog from '@/components/CommentableDialog.vue'
 
 export default {
   mixins: [MixIndex],
   data () {
     return {
       SHEET: {
-        lines: {data:[], api:'/api/v1/references/lines?mode=all'},
-        shifts: {data:[], api:'/api/v1/references/shifts?mode=all'},
-        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
-        items: {data:[], api:'/api/v1/common/items?mode=all', autoload: false},
+        lines: { data: [], api: '/api/v1/references/lines?mode=all' },
+        shifts: { data: [], api: '/api/v1/references/shifts?mode=all' },
+        customers: { data: [], api: '/api/v1/incomes/customers?mode=all' },
+        items: { data: [], api: '/api/v1/common/items?mode=all', autoload: false }
       },
       FILTERABLE: {
         fill: {
@@ -211,60 +213,69 @@ export default {
             value: null,
             type: 'integer',
             transform: (value) => { return null }
-          },
+          }
         }
       },
-      TABLE:{
+      TABLE: {
         mode: 'index',
-        resource:{
+        resource: {
           api: '/api/v1/factories/work-productions',
-          uri: '/admin/factories/work-productions',
+          uri: '/admin/factories/work-productions'
         },
         columns: [
-          { name: 'prefix', label: '', align: 'left'},
-          { name: 'date', label: this.$tc('label.date'), field: (rs)=> rs.date, format: (v) => this.$app.moment(v).format('DD/MM/YY'), align: 'center', sortable: true },
+          { name: 'prefix', label: '', align: 'left' },
+          { name: 'date', label: this.$tc('label.date'), field: (rs) => rs.date, format: (v) => this.$app.moment(v).format('DD/MM/YY'), align: 'center', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', align: 'right' },
-          { name: 'line_id', label: this.$tc('general.line'), field: (rs)=> rs.line.name , align: 'left', sortable: true },
-          { name: 'shift_id', label: this.$tc('label.shift'), field: (rs)=> rs.shift.name , align: 'center', sortable: true },
-          { name: 'created_at', label: this.$tc('form.create',2), field: 'created_at', align: 'center'},
+          { name: 'line_id', label: this.$tc('general.line'), field: (rs) => rs.line.name, align: 'left', sortable: true },
+          { name: 'shift_id', label: this.$tc('label.shift'), field: (rs) => rs.shift.name, align: 'center', sortable: true },
+          { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center' }
         ]
-      },
+      }
     }
   },
   created () {
     this.INDEX.load()
   },
   computed: {
-    ShiftOptions() {
-      return (this.SHEET.shifts.data.map(line => ({label: line.name, value: line.id})) || [])
+    ShiftOptions () {
+      return (this.SHEET.shifts.data.map(line => ({ label: line.name, value: line.id })) || [])
     },
-    LineOptions() {
-      return (this.SHEET.lines.data.map(item => ({label: item.name, value: item.id})) || [])
+    LineOptions () {
+      return (this.SHEET.lines.data.map(item => ({ label: item.name, value: item.id })) || [])
     },
-    CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
+    CustomerOptions () {
+      return (this.SHEET.customers.data.map(item => ({ label: [item.code, item.name].join(' - '), value: item.id })) || [])
     },
-    ItemOptions() {
+    ItemOptions () {
       return (this.SHEET.items.data.map(item => ({
         // item: item,
         label: `${item.part_name}`,
-        sublabel:`[${item.customer_code}] ${item.part_subname || '--'}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id
       })) || [])
-    },
+    }
   },
   methods: {
-    isCanUpdate(row){
-      if (row.status != 'OPEN') return false
+    isCanUpdate (row) {
+      if (row.status !== 'OPEN') return false
       if (row.is_relationship) return false
       return this.$app.can('work-productions-update')
     },
-    isCanDelete(row){
-      if (row.status != 'OPEN') return false
+    isCanDelete (row) {
+      if (row.status !== 'OPEN') return false
       if (row.is_relationship) return false
       return this.$app.can('work-productions-delete')
     },
-  },
+    onCommentable (row) {
+      this.$q.dialog({
+        ok: true,
+        component: CommentableDialog,
+        title: `SPK [${row.fullnumber}] - LOG`,
+        model: 'App\\Models\\Factory\\WorkProduction',
+        id: row.id
+      })
+    }
+  }
 }
 </script>

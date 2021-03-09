@@ -97,15 +97,17 @@
         </q-td>
 
         <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
-          <div class="column text-body">
-            <span class="text-uppercase text-grey-8">
-              {{rs.row.created_user ? rs.row.created_user.name : 'undefined'}}
-            </span>
-            <small v-if="rs.row.created_at" class="text-grey">
-              <q-icon name="mdi-earth"></q-icon>
-              {{ $app.moment(rs.row.created_at).fromNow() }}
-            </small>
-          </div>
+          <q-btn dense flat no-caps @click="onCommentable(rs.row)" >
+            <div class="column text-body">
+              <span class="text-uppercase text-grey-8">
+                {{rs.row.created_user ? rs.row.created_user.name : 'undefined'}}
+              </span>
+              <small v-if="rs.row.created_at" class="text-grey">
+                <q-icon name="mdi-earth"></q-icon>
+                {{ $app.moment(rs.row.created_at).fromNow() }}
+              </small>
+            </div>
+          </q-btn>
         </q-td>
       </q-table>
     </q-pull-to-refresh>
@@ -114,6 +116,7 @@
 
 <script>
 import MixIndex from '@/mixins/mix-index.vue'
+import CommentableDialog from '@/components/CommentableDialog.vue'
 
 export default {
   mixins: [MixIndex],
@@ -194,6 +197,15 @@ export default {
       if (row.order_mode !== 'PO') return false
       if (row.status === 'CLOSED') return false
       return row.is_relationship
+    },
+    onCommentable (row) {
+      this.$q.dialog({
+        ok: true,
+        component: CommentableDialog,
+        title: `Invoice Collect [${row.number}] - LOG`,
+        model: 'App\\Models\\Income\\AccInvoice',
+        id: row.id
+      })
     }
   }
 }

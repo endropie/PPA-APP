@@ -1,5 +1,5 @@
 <template>
-  <q-dialog ref="dialog" persistent>
+  <q-dialog ref="dialog">
     <q-card class="" style="min-width:200px;min-height:250px">
       <q-bar align="right">
         <div class="text-subtitle2 text-no-wrap truncate ellipsis">

@@ -140,19 +140,20 @@
         </q-td>
 
         <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
-          <div class="column text-body">
-            <span class="text-uppercase text-grey-8">
-              {{rs.row.created_user ? rs.row.created_user.name : 'undefined'}}
-            </span>
-            <small v-if="rs.row.created_at" class="text-grey">
-              <q-icon name="mdi-earth"></q-icon>
-              {{ $app.moment(rs.row.created_at).fromNow() }}
-            </small>
-          </div>
+          <q-btn dense flat no-caps @click="onCommentable(rs.row)" >
+            <div class="column text-body">
+              <span class="text-uppercase text-grey-8">
+                {{rs.row.created_user ? rs.row.created_user.name : 'undefined'}}
+              </span>
+              <small v-if="rs.row.created_at" class="text-grey">
+                <q-icon name="mdi-earth"></q-icon>
+                {{ $app.moment(rs.row.created_at).fromNow() }}
+              </small>
+            </div>
+          </q-btn>
         </q-td>
       </q-table>
     </q-pull-to-refresh>
-
 
   </q-page>
 </template>
@@ -160,13 +161,14 @@
 <script>
 import MixIndex from '@/mixins/mix-index.vue'
 import MixSheet from '@/mixins/mix-sheet.vue'
+import CommentableDialog from '@/components/CommentableDialog.vue'
 export default {
   mixins: [MixIndex, MixSheet],
   data () {
     return {
       SHEET: {
-        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
-        items: {data:[], api:'/api/v1/common/items?mode=all', autoload: false},
+        customers: { data: [], api: '/api/v1/incomes/customers?mode=all' },
+        items: { data: [], api: '/api/v1/common/items?mode=all', autoload: false }
       },
       FILTERABLE: {
         fill: {
@@ -192,51 +194,60 @@ export default {
       },
       TABLE: {
         mode: 'index',
-        resource:{
+        resource: {
           api: '/api/v1/warehouses/incoming-goods',
-          uri: '/admin/deliveries/incoming-goods',
+          uri: '/admin/deliveries/incoming-goods'
         },
         columns: [
-          { name: 'prefix', label: '', align: 'left'},
-          { name: 'date', label: this.$tc('label.date'), field: 'date', format:(v)=> this.$app.moment(v).format('DD/MM/YYYY'), align: 'center', sortable: true},
+          { name: 'prefix', label: '', align: 'left' },
+          { name: 'date', label: this.$tc('label.date'), field: 'date', format: (v) => this.$app.moment(v).format('DD/MM/YYYY'), align: 'center', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'status', label: '', field: 'status', align: 'left'},
+          { name: 'status', label: '', field: 'status', align: 'left' },
           { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
           { name: 'reference_number', label: this.$tc('warehouses.reference_number'), field: 'reference_number', align: 'left', sortable: true },
           { name: 'reference_date', label: this.$tc('warehouses.reference_date'), field: 'reference_date', align: 'center', sortable: true },
-          { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center', sortable: true },
-        ],
-      },
+          { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center', sortable: true }
+        ]
+      }
     }
   },
   created () {
     this.INDEX.load()
   },
   computed: {
-    isCanUpdate(){
+    isCanUpdate () {
       return this.$app.can('incoming-goods-update')
     },
-    isCanDelete(){
+    isCanDelete () {
       return this.$app.can('incoming-goods-delete')
     },
-    CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: [item.code, item.name].join(' - '), value: item.id})) || [])
+    CustomerOptions () {
+      return (this.SHEET.customers.data.map(item => ({ label: [item.code, item.name].join(' - '), value: item.id })) || [])
     },
-    ItemOptions() {
+    ItemOptions () {
       return (this.SHEET.items.data.map(item => ({
         // item: item,
         label: `${item.part_name} - ${item.part_subname}`,
-        sublabel:`[${item.customer_code}] ${item.part_subname || '--'}`,
+        sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
         value: item.id
       })) || [])
-    },
+    }
   },
-  methods:{
-    isEditable(row) {
-      if(row.deleted_at) return false
-      if(row.status !== 'OPEN') return false
-      if(row.hasOwnProperty('is_relationship') && row.is_relationship) return false
+  methods: {
+    isEditable (row) {
+      if (row.deleted_at) return false
+      if (row.status !== 'OPEN') return false
+      if (row.hasOwnProperty('is_relationship') && row.is_relationship) return false
       return true
+    },
+    onCommentable (row) {
+      this.$q.dialog({
+        ok: true,
+        component: CommentableDialog,
+        title: `Incoming [${row.fullnumber}] - LOG`,
+        model: 'App\\Models\\Warehouse\\IncomingGood',
+        id: row.id
+      })
     }
   }
 }

@@ -165,6 +165,9 @@
                         </q-list>
                       </q-expansion-item>
                     </div>
+                    <div class="col-auto">
+                      <q-btn dense flat color="grey" @click="onCommentable(row)" icon="info" />
+                    </div>
                   </div>
                 </q-td>
               </q-tr>
@@ -239,7 +242,7 @@
               },
               {
                 label: 'RE-CALCULATE', color:'grey', icon: 'refresh',
-                hidden: !$app.can('work-orders-read'),
+                hidden: rsView.deleted_at || !$app.can('work-orders-read'),
                 actions: () => recalculate()
               }
             ]">
@@ -258,6 +261,7 @@
 
 import MixView from '@/mixins/mix-view.vue'
 import PagePrint from '@/components/page-print'
+import CommentableDialog from '@/components/CommentableDialog.vue'
 
 export default {
   mixins: [MixView],
@@ -549,6 +553,16 @@ export default {
         persistent: true
       }).onOk(() => {
         submit()
+      })
+    },
+
+    onCommentable (row) {
+      this.$q.dialog({
+        ok: true,
+        component: CommentableDialog,
+        title: `SPK Detail [${row.part_name}] - LOG`,
+        model: 'App\\Models\\Factory\\WorkOrderItem',
+        id: row.id
       })
     }
   }

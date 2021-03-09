@@ -198,16 +198,18 @@
         </q-td>
 
         <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
-          <div class="column text-body">
-            <span class="text-uppercase text-grey-8">
-              {{rs.row.created_user ? rs.row.created_user.name : 'undefined'}}
-            </span>
-            <small v-if="rs.row.created_at" class="text-grey">
-              <q-icon name="mdi-calendar-clock"></q-icon>
-              {{ $app.moment(rs.row.created_at).format('DD/MM/YYYY HH:mm') }}
-              <q-tooltip>{{ $app.moment(rs.row.created_at).fromNow() }}</q-tooltip>
-            </small>
-          </div>
+          <q-btn dense flat no-caps @click="onCommentable(rs.row)" >
+            <div class="column text-body">
+              <span class="text-uppercase text-grey-8">
+                {{rs.row.created_user ? rs.row.created_user.name : 'undefined'}}
+              </span>
+              <small v-if="rs.row.created_at" class="text-grey">
+                <q-icon name="mdi-calendar-clock"></q-icon>
+                {{ $app.moment(rs.row.created_at).format('DD/MM/YYYY HH:mm') }}
+                <q-tooltip>{{ $app.moment(rs.row.created_at).fromNow() }}</q-tooltip>
+              </small>
+            </div>
+          </q-btn>
         </q-td>
 
       </q-table>
@@ -218,6 +220,7 @@
 
 <script>
 import MixIndex from '@/mixins/mix-index.vue'
+import CommentableDialog from '@/components/CommentableDialog.vue'
 
 export default {
   mixins: [MixIndex],
@@ -333,6 +336,15 @@ export default {
       if (rs.row.summary_productions <= 0) return false
       // if (rs.row.summary_packings <= 0) return false
       return ['OPEN', 'PRODUCTED', 'PACKED', 'CLOSED'].find(x => x === rs.row.status)
+    },
+    onCommentable (row) {
+      this.$q.dialog({
+        ok: true,
+        component: CommentableDialog,
+        title: `SPK [${row.fullnumber}] - LOG`,
+        model: 'App\\Models\\Factory\\WorkOrder',
+        id: row.id
+      })
     }
   }
 }

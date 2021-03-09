@@ -29,7 +29,7 @@
             <q-space />
             <div class="text-no-wrap text-caption text-grey">{{$app.moment(comment.created_at).fromNow()}}</div>
           </div>
-          <div style="white-space:pre" v-text="comment.text"></div>
+          <div class="text-caption text-grey-9" v-text="comment.text"></div>
         </q-item-section>
       </q-item>
       <q-item v-if="!lists.length && fetched">
