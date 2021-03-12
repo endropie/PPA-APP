@@ -313,6 +313,18 @@ const deliveries = [
     ]
   },
   {
+    name: 'Delivery Handovers',
+    icon: 'local_offer',
+    path: 'delivery-handovers',
+    lang: 'general.delivery_handovers',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-loads-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-loads-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'delivery-loads-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-loads-read' } }
+    ]
+  },
+  {
     name: 'DEPORTATIONS',
     icon: 'local_offer',
     path: 'deportation-goods',
