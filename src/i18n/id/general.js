@@ -42,6 +42,7 @@ export default {
   delivery_task: 'Delivery (PDO) | PDO',
   delivery_verify: 'Delivery (Verified) | Verify',
   delivery_load: 'Delivery (Loading) | Load',
+  delivery_handovers: 'Delivery (Serah Terima) | Handovers',
   deportation_goods: 'Delivery (Deportation) | Deportation',
   schedule_board: 'Penjadwalan |Jadwal Pengiriman & Penjemputan',
 
