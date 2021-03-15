@@ -401,7 +401,7 @@ export default {
       this.rsForm = JSON.parse(JSON.stringify(data))
 
       if (this.rsForm.customer_id) {
-        const additonal = this.rsForm.transaction === 'SAMPLE' ? `&sampled=true` : ''
+        const additonal = this.rsForm.transaction === 'SAMPLE' ? `&sample_in=SAMPLE` : ''
         this.SHEET.load('items', `customer_id=${this.rsForm.customer_id}${additonal}`)
       }
 
@@ -433,7 +433,7 @@ export default {
       if (!val) return
 
       if (this.rsForm.customer_id) {
-        const additonal = this.rsForm.transaction === 'SAMPLE' ? `&sampled=true` : ''
+        const additonal = this.rsForm.transaction === 'SAMPLE' ? `&sample_in=SAMPLE` : ''
         this.SHEET.load('items', `customer_id=${this.rsForm.customer_id}${additonal}`)
       }
 

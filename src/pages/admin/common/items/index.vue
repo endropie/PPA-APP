@@ -87,7 +87,6 @@
                 @input="FILTERABLE.submit"
               />
 
-
               <div class="col-12 col-sm-3">
                 <div class="row justify-end no-wrap">
                   <q-checkbox
@@ -190,7 +189,7 @@ export default {
     return {
       stockAll: false,
       SHEET: {
-        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'}
+        customers: { data: [], api: '/api/v1/incomes/customers?mode=all' }
       },
       FILTERABLE: {
         fill: {
@@ -213,38 +212,49 @@ export default {
             value: null,
             type: 'array',
             transform: (value) => { return String(value).split(',') }
-          },
+          }
         }
       },
       TABLE: {
         mode: 'index',
-        resource:{
+        resource: {
           api: '/api/v1/common/items',
-          uri: '/admin/common/items',
+          uri: '/admin/common/items'
         },
         columns: [
-          { name: 'prefix', label: '', align: 'left', required: true,},
+          { name: 'prefix', label: '', align: 'left', required: true },
 
-          { name: 'customer', label: this.$tc('general.cust')+'.', field: 'customer_id', align: 'left', sortable: true},
+          { name: 'customer', label: this.$tc('general.cust') + '.', field: 'customer_id', align: 'left', sortable: true },
           { name: 'part_name', label: this.$tc('items.part_name'), field: 'part_name', align: 'left', sortable: true },
           { name: 'part_subname', label: this.$app.setting('item.subname_label'), field: 'part_subname', align: 'left', sortable: true },
           // { name: 'enable', label:this.$tc('label.active'), field: 'enable', align: 'center', sortable: true },
 
           // Item stocks
-          { name: 'ALL', label: 'ALL', sortable: true, field: (item)=> Number(item.totals['*']), format:(v) => Boolean(v) ? this.$app.number_format(v) : '-', style:'text-weight-medium'},
-          { name: 'FM', label: 'FM', sortable: true, field: (item)=> item.totals['FM'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-' },
-          { name: 'WIP', label: 'WIP', sortable: true, field: (item)=> item.totals['WIP'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'FG', label: 'FG', sortable: true, field: (item)=> item.totals['FG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'NC', label: 'NC', sortable: true, field: (item)=> item.totals['NC'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'NCR', label: 'NCR', sortable: true, field: (item)=> item.totals['NCR'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'NG', label: 'NG', sortable: true, field: (item)=> item.totals['NG'], format:(v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'ALL', label: 'ALL', sortable: true, field: (item) => Number(item.totals['*']), format: (v) => v ? this.$app.number_format(v) : '-', style: 'text-weight-medium' },
+          { name: 'FM', label: 'FM', sortable: true, field: (item) => item.totals['FM'], format: (v) => v ? this.$app.number_format(v) : '-' },
+          { name: 'WIP', label: 'WIP', sortable: true, field: (item) => item.totals['WIP'], format: (v) => v ? this.$app.number_format(v) : '-' },
+          { name: 'FG', label: 'FG', sortable: true, field: (item) => item.totals['FG'], format: (v) => v ? this.$app.number_format(v) : '-' },
+          { name: 'NC', label: 'NC', sortable: true, field: (item) => item.totals['NC'], format: (v) => v ? this.$app.number_format(v) : '-' },
+          { name: 'NCR', label: 'NCR', sortable: true, field: (item) => item.totals['NCR'], format: (v) => v ? this.$app.number_format(v) : '-' },
+          { name: 'NG', label: 'NG', sortable: true, field: (item) => item.totals['NG'], format: (v) => v ? this.$app.number_format(v) : '-' },
 
-          { name: 'WO', label: 'WO', align: 'center', clases:'bg-faded', // hidden: (!process.env.DEV && !this.$route.query.DEV),
-            field: (item)=> (item.totals['WOFM'] + item.totals['WONC'] + item.totals['WONCR']), Xformat: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'PDO', label: 'PDO', align: 'center', clases:'bg-faded', // hidden: (!process.env.DEV && !this.$route.query.DEV),
-            field: (item) => item.totals['PDO.REG'] + item.totals['PDO.RET'], Xformat: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
-          { name: 'VDO', label: 'VDO', sortable: true, // hidden:  (!process.env.DEV && !this.$route.query.DEV),
-            field: (item)=> item.totals['VDO'], format: (v) => Boolean(v) ? this.$app.number_format(v) : '-'},
+          { name: 'WO',
+            label: 'WO',
+            align: 'center',
+            clases: 'bg-faded', // hidden: (!process.env.DEV && !this.$route.query.DEV),
+            field: (item) => (item.totals['WOFM'] + item.totals['WONC'] + item.totals['WONCR']),
+            Xformat: (v) => v ? this.$app.number_format(v) : '-' },
+          { name: 'PDO',
+            label: 'PDO',
+            align: 'center',
+            clases: 'bg-faded', // hidden: (!process.env.DEV && !this.$route.query.DEV),
+            field: (item) => item.totals['PDO.REG'] + item.totals['PDO.RET'],
+            Xformat: (v) => v ? this.$app.number_format(v) : '-' },
+          { name: 'VDO',
+            label: 'VDO',
+            sortable: true, // hidden:  (!process.env.DEV && !this.$route.query.DEV),
+            field: (item) => item.totals['VDO'],
+            format: (v) => v ? this.$app.number_format(v) : '-' },
 
           { name: 'price', label: 'Price', field: 'price', sortable: true, hidden: !this.$app.can('items.price') },
           { name: 'price_dm', label: 'Price in DM', field: 'price', sortable: true, hidden: !this.$app.can('items.price') },
@@ -252,7 +262,7 @@ export default {
           // { name: 'brand', label: this.$tc('general.brand'), field: 'bran_id', align: 'left', sortable: true},
           // { name: 'specification', label: 'Specification', field: 'specification_id', align: 'left', sortable: true},
           // { name: 'part_alias', label: 'Part alias', field: 'part_alias', sortable: true },
-          { name: 'code', field: 'code', label: 'Intern code', align: 'left', sortable: true, required: true, },
+          { name: 'code', field: 'code', label: 'Intern code', align: 'left', sortable: true, required: true }
 
         ],
         hideColumns: ['code']
@@ -263,7 +273,7 @@ export default {
     if (!this.$app.can('items-price')) {
       this.TABLE.visibleColumns = this.TABLE.columns.filter(x => {
         return ['price', 'price_dm', 'price_brl'].indexOf(x.name) < 0
-      }).map(x=>{
+      }).map(x => {
         return x.name
       })
     }
@@ -274,32 +284,32 @@ export default {
     isCanPush () {
       return this.$app.can('items-push')
     },
-    isCanUpdate(){
+    isCanUpdate () {
       return this.$app.can('items-update')
     },
-    isCanDelete(){
+    isCanDelete () {
       return this.$app.can('items-delete')
     },
-    CustomerOptions() {
-      return (this.SHEET.customers.data.map(item => ({label: `${item.code} - ${item.name}`, value: item.id, rowdata:item})) || [])
+    CustomerOptions () {
+      return (this.SHEET.customers.data.map(item => ({ label: `${item.code} - ${item.name}`, value: item.id, rowdata: item })) || [])
     },
-    MAPINGKEY() {
+    MAPINGKEY () {
       let variables = {
-        'itemstocks': {},
+        'itemstocks': {}
       }
       // this.SHEET['itemstocks'].data.map(value => { variables['itemstocks'][value.id] = value.totals })
 
-      return variables;
+      return variables
     }
   },
   methods: {
-    totalStock(id, label) {
-      if(!this.MAPINGKEY['itemstocks'][id]) return 0
+    totalStock (id, label) {
+      if (!this.MAPINGKEY['itemstocks'][id]) return 0
       return Number(this.MAPINGKEY['itemstocks'][id][label])
     },
     push (row) {
       let url = `${this.TABLE.resource.api}/${row.id}/accurate/push`
-      console.warn('pusher', url);
+      console.warn('pusher', url)
       this.$q.loading.show()
       this.$axios.post(url)
         .then((response) => {
@@ -318,7 +328,7 @@ export default {
       this.$q.loading.show()
       this.$axios.post(url)
         .then((response) => {
-          console.warn('OK', response.data.filter(x => x.s === true).length);
+          console.warn('OK', response.data.filter(x => x.s === true).length)
           let arrMsg = []
           if (response.data.filter(x => x.s === true).length) {
             arrMsg.push(response.data.filter(x => x.s === true).length + ' success')
@@ -331,8 +341,8 @@ export default {
           this.$app.response.error(error.response || error)
         }).finally(() => {
           this.$q.loading.hide()
-        });
+        })
     }
-  },
+  }
 }
 </script>

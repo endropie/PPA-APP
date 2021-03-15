@@ -99,7 +99,7 @@ export default {
     },
     init () {
       this.loading = true
-      let params = ['mode=all', '--limit=10', '--with=created_user', 'sampled=SAMPLE:VALIDATE']
+      let params = ['mode=all', '--limit=10', '--with=created_user', 'sample_in=SAMPLE:VALIDATE']
       this.$axios.get(`${this.resource.api}?${params.join('&')}`)
         .then((response) => {
           this.data = JSON.parse(JSON.stringify(response.data))
