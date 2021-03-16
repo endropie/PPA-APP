@@ -80,7 +80,7 @@
               </q-select>
               <q-select class="col-12 col-sm-3" input-class="no-wrap"
                 dense standout="bg-blue-grey-5 text-white"
-                :options="['REGULER','SAMPLE','SAMPLE:DEPICT','SAMPLE:ENGINERY','SAMPLE:PRICE','SAMPLE:VALIDATE']"
+                :options="['REGULER','SAMPLE']"
                 v-model="FILTERABLE.fill.sample_in.value"
                 :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
                 :dark="LAYOUT.isDark"
