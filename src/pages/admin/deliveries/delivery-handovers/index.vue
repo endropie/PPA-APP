@@ -23,7 +23,7 @@
                 detail: $tc('messages.form_new'),
                 icon: 'add',
                 shortcut: true,
-                hidden:!$app.can('request-orders-create'),
+                hidden: !$app.can('delivery-handovers-create'),
                 to: `${TABLE.resource.uri}/create`
               }
             ]">
@@ -147,11 +147,7 @@ export default {
           { name: 'prefix', label: '', align: 'left' },
           { name: 'date', label: this.$tc('label.date'), field: 'date', align: 'center', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'status', label: '', align: 'left', field: 'status' },
           { name: 'customer_id', label: this.$tc('general.customer'), align: 'left', field: (row) => row.customer ? row.customer.name : '- N/A -', sortable: true, style: 'width:50%' },
-          // { name: 'counter_delivered', label: 'Delivery', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.delivered : '-', sortable: true},
-          // { name: 'counter_confirmed', label: 'Confirm', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.confirmed : '-', sortable: true},
-          // { name: 'counter_invoiced', label: 'Invoiced', align: 'center', field: (row) => row.delivery_counter ? row.delivery_counter.invoiced : '-', sortable: true},
           { name: 'created_at', label: this.$tc('form.create', 2), align: 'center', sortable: true, field: 'created_at' }
         ]
       }
@@ -161,12 +157,6 @@ export default {
     this.INDEX.load()
   },
   computed: {
-    isCanUpdate () {
-      return this.$app.can('request-orders-update')
-    },
-    isCanDelete () {
-      return this.$app.can('request-orders-delete')
-    },
     CustomerOptions () {
       return (this.SHEET.customers.data.map(item => ({ label: [item.code, item.name].join(' - '), value: item.id })) || [])
     }
