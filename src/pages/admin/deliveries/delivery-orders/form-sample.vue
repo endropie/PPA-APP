@@ -56,7 +56,19 @@
             :dark="LAYOUT.isDark"
             v-validate="'required'"
             :error="errors.has('date')"
-            :error-message="errors.first('date')"/>
+            :error-message="errors.first('date')"
+          />
+          <ux-select class="coll-12 col-sm-6"
+            name="vehicle_id"
+            :label="$tc('general.vehicle')"  stack-label
+            v-model="rsForm.vehicle_id"
+            source="api/v1/references/vehicles?mode=all&type=DELIVERY"
+            option-label="number"
+            option-value="id"
+            filter emit-value map-options clearable
+            :error="errors.has('vehicle_id')"
+            :error-message="errors.first('vehicle_id')"
+          />
         </div>
       </div>
       <!-- COLUMN::2nd Customer Identity -->
@@ -211,7 +223,7 @@ export default {
         items: { autoload: false, api: '/api/v1/common/items?mode=all' },
         customers: { api: '/api/v1/incomes/customers?mode=all' },
         employees: { api: '/api/v1/common/employees?mode=all' },
-        vehicles: { api: '/api/v1/references/vehicles?mode=all' },
+        vehicles: { api: '/api/v1/references/vehicles?mode=all&type=DELIVERY' },
         units: { api: '/api/v1/references/units?mode=all' }
       },
       FORM: {
@@ -232,6 +244,7 @@ export default {
           customer_phone: null,
           customer_address: null,
 
+          vehicle_id: null,
           revise_id: null,
           revise_number: null,
           description: null,

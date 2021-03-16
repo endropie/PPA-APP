@@ -257,15 +257,19 @@
             </q-card>
             <q-markup-table v-else dense class="no-shadow text-weight-light" style="">
               <tr class="text-center">
-                <td width="30%">
+                <td width="21%">
                   <div class="sign-name">Diterima Oleh</div>
                   <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
                 </td>
-                <td width="30%">
+                <td width="21%">
+                  <div class="sign-name">Outgoing Oleh</div>
+                  <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+                </td>
+                <td width="21%">
                   <div class="sign-name">Security</div>
                   <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
                 </td>
-                <td width="30%" class="text-capitalize">
+                <td width="21%" class="text-capitalize">
                   <div class="sign-name">Hormat Kami</div>
                   <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.created_user">(<q-space/>{{rsView.created_user.name}}<q-space/>)</div>
                   <div class="sign-tag row no-wrap q-mx-lg" v-else>( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
