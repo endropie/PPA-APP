@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="page-index">
     <q-pull-to-refresh @refresh="LIST.load">
-      <q-card class="my-card">
+      <q-card>
         <q-card-section>
           <div class="row q-col-gutter-xs">
             <ux-date
@@ -9,9 +9,7 @@
               dense hide-bottom-space hide-dropdown-icon
               standout="bg-blue-grey-5 text-white"
               :debounce="3000"
-              @change="LIST.load"
             />
-            <q-space />
             <ux-select
               v-model="LIST.filter.customer_id" clearable
               :label="$tc('general.customer')"
@@ -21,8 +19,11 @@
               source="/api/v1/incomes/customers?mode=all&--limit=10"
               option-value = 'id'
               option-label = 'name'
-              @input="LIST.load"
             />
+            <div class="">
+              <q-btn color="primary" icon="search" @click="LIST.load" />
+            </div>
+            <q-space />
             <q-toggle left-label v-model="isFullTime" label="FULL TIME" />
           </div>
         </q-card-section>
@@ -134,6 +135,7 @@ export default {
       },
       LIST: {
         mode: 'index',
+        date: this.$app.moment().format('YYYY-MM-DD'),
         resource: {
           api: '/api/v1/incomes/customers',
           uri: '/admin/deliveries/delivery-trips',
@@ -204,8 +206,8 @@ export default {
       })
     },
     INTDAY () {
-      if (this.LIST.filter.trip_date) {
-        return this.$app.moment(this.LIST.filter.trip_date).day()
+      if (this.LIST.date) {
+        return this.$app.moment(this.LIST.date).day()
       }
       return undefined
     },
@@ -292,6 +294,7 @@ export default {
     },
     load (done = null) {
       if (!this.LIST.filter.trip_date) return console.warn('TRIP UNDEFINED!!!')
+      this.LIST.date = this.LIST.filter.trip_date
       this.getTrip(done)
       this.getTask()
     }
