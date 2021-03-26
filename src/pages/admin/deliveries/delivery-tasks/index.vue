@@ -141,9 +141,12 @@
               </span>
               <small v-if="rs.row.created_at" class="text-grey">
                 <q-icon name="mdi-earth"></q-icon>
-                {{ $app.moment(rs.row.created_at).fromNow() }}
+                {{ $app.moment(rs.row.created_at).format('DD/MM/YYYY HH:mm') }}
               </small>
             </div>
+            <q-tooltip>
+              {{ $app.moment(rs.row.created_at).fromNow() }}
+            </q-tooltip>
           </q-btn>
         </q-td>
 
