@@ -255,23 +255,25 @@
                 </div>
               </q-card-section>
             </q-card>
-            <q-markup-table v-else dense class="no-shadow text-weight-light" style="">
-              <tr class="text-center">
-                <td width="30%">
-                  <div class="sign-name">Diterima Oleh</div>
-                  <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
-                </td>
-                <td width="30%">
-                  <div class="sign-name">Security</div>
-                  <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
-                </td>
-                <td width="30%" class="text-capitalize">
-                  <div class="sign-name">Hormat Kami</div>
-                  <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.created_user">(<q-space/>{{rsView.created_user.name}}<q-space/>)</div>
-                  <div class="sign-tag row no-wrap q-mx-lg" v-else>( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
-                </td>
-              </tr>
-            </q-markup-table>
+            <div v-else class="row justify-center">
+              <q-markup-table dense class="no-shadow text-weight-light" style="min-width:70%">
+                <tr class="text-center">
+                  <td width="30%">
+                    <div class="sign-name">Diterima Oleh</div>
+                    <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+                  </td>
+                  <td width="30%">
+                    <div class="sign-name">Security</div>
+                    <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+                  </td>
+                  <td width="30%" class="text-capitalize">
+                    <div class="sign-name">Hormat Kami</div>
+                    <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.created_user">(<q-space/>{{rsView.created_user.name}}<q-space/>)</div>
+                    <div class="sign-tag row no-wrap q-mx-lg" v-else>( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
+                  </td>
+                </tr>
+              </q-markup-table>
+            </div>
           </div>
         </div>
       </page-print>

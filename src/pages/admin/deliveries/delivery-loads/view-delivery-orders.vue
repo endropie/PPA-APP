@@ -197,27 +197,25 @@
             </div>
             <q-space />
             <div class="page-break-inside" style="break-inside: avoid;">
-              <q-markup-table dense :dark="LAYOUT.isDark" class="no-shadow text-weight-light" style="">
+            <div class="row justify-center">
+              <q-markup-table dense class="no-shadow text-weight-light" style="min-width:70%">
                 <tr class="text-center">
-                  <td width="21%">
+                  <td width="30%">
                     <div class="sign-name">Diterima Oleh</div>
                     <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
                   </td>
-                  <td width="21%">
-                    <div class="sign-name">Outgoing Oleh</div>
-                    <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
-                  </td>
-                  <td width="21%">
+                  <td width="30%">
                     <div class="sign-name">Security</div>
                     <div class="sign-tag row no-wrap q-mx-lg">( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
                   </td>
-                  <td width="21%" class="text-capitalize">
+                  <td width="30%" class="text-capitalize">
                     <div class="sign-name">Hormat Kami</div>
-                    <div class="sign-tag row no-wrap q-mx-lg" v-if="page.data.created_user">(<q-space/>{{page.data.created_user.name}}<q-space/>)</div>
+                    <div class="sign-tag row no-wrap q-mx-lg" v-if="rsView.created_user">(<q-space/>{{rsView.created_user.name}}<q-space/>)</div>
                     <div class="sign-tag row no-wrap q-mx-lg" v-else>( <q-space/>. . . . . . . . . . . . . .<q-space/> )</div>
                   </td>
                 </tr>
               </q-markup-table>
+            </div>
             </div>
           </page-print>
         </template>
