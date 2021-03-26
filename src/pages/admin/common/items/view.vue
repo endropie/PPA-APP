@@ -397,11 +397,10 @@
 <script>
 import { openURL } from 'quasar'
 import MixView from '@/mixins/mix-view.vue'
-import StockTimeline from './stock-timeline.vue'
+// import StockTimeline from './stock-timeline.vue'
 
 export default {
   mixins: [MixView],
-  components: { StockTimeline },
   data () {
     return {
       tab: 'info',

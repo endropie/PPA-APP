@@ -245,17 +245,8 @@
                     </q-item-label>
                   </q-item-section>
 
-
                   <q-item-section top side>
-                    <q-btn
-                      class="gt-xs"
-                      size="12px"
-                      flat
-                      dense
-                      round
-                      icon="clear"
-                      @click="removeDepict(indexFile)"
-                    />
+                    <q-btn class="gt-xs" size="12px" flat dense round icon="clear" @click="removeDepict(indexFile)" />
                   </q-item-section>
                 </q-item>
                 <q-item v-for="file in scope.files" :key="file.name">
@@ -278,7 +269,6 @@
                       {{ file.__sizeLabel }} / {{ file.__progressLabel }}
                     </q-item-label>
                   </q-item-section>
-
 
                   <q-item-section top side>
                     <q-btn
@@ -314,25 +304,16 @@
                 :error="errors.has('estimate_begin_date')"
                 :error-message="errors.first('estimate_begin_date')"
               />
-              <ux-numeric input-style="text-align:left"
-                type="number" color="secondary"
-                name="estimate_price"
-                label="Estimate Price"
-                v-model="rsForm.estimate_price"
-                v-validate="'required'" no-error-icon
-                :error="errors.has('estimate_price')"
-                :error-message="errors.first('estimate_price')"
-              />
               <div class="row q-col-gutter-x-sm">
-                <ux-numeric class="col-12 col-sm-6"
+
+                <ux-numeric  class="col-12 col-sm-6" input-style="text-align:left"
                   type="number" color="secondary"
-                  name="estimate_sadm"
-                  label="Estimate S.A (dm)"
-                  v-model="rsForm.estimate_sadm"
+                  name="estimate_price"
+                  label="Estimate Price"
+                  v-model="rsForm.estimate_price"
                   v-validate="'required'" no-error-icon
-                  :dark="LAYOUT.isDark"
-                  :error="errors.has('estimate_sadm')"
-                  :error-message="errors.first('estimate_sadm')"
+                  :error="errors.has('estimate_price')"
+                  :error-message="errors.first('estimate_price')"
                 />
                 <ux-numeric class="col-12 col-sm-6"
                   type="number"  color="secondary"
@@ -343,6 +324,28 @@
                   :dark="LAYOUT.isDark"
                   :error="errors.has('estimate_monthly_amount')"
                   :error-message="errors.first('estimate_monthly_amount')"
+                />
+
+                <ux-numeric class="col-12 col-sm-6"
+                  type="number" color="secondary"
+                  name="estimate_sadm"
+                  label="Estimate S.A (dm)"
+                  v-model="rsForm.estimate_sadm"
+                  v-validate="'required'" no-error-icon
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has('estimate_sadm')"
+                  :error-message="errors.first('estimate_sadm')"
+                />
+
+                <ux-numeric class="col-12 col-sm-6"
+                  type="number" color="secondary"
+                  name="estimate_load_capacityestimate_load_capacity"
+                  label="Estimate HANGER/BAREL"
+                  v-model="rsForm.estimate_load_capacity"
+                  v-validate="'required'" no-error-icon
+                  :dark="LAYOUT.isDark"
+                  :error="errors.has('estimate_load_capacityestimate_load_capacity')"
+                  :error-message="errors.first('estimate_load_capacityestimate_load_capacity')"
                 />
               </div>
             </q-card-section>
@@ -382,15 +385,16 @@
                   :error-message="errors.first('price')"
                 />
                 <ux-numeric
-                  name="price_area" type="number" readonly
+                  name="price_area"
+                  type="number" readonly
                   label="Price in DM"
                   :value="price_area"
                   outlined align="center" hint=""
                 />
                 <ux-numeric
                   name="price_packaged"
-                  label="Price in BRL"
                   type="number" readonly
+                  label="Price in BRL"
                   :value="price_packaged"
                   outlined align="center" hint=""
                 />
@@ -432,35 +436,35 @@ export default {
   data () {
     return {
       SHEET: {
-        colors: {data:[], api:'/api/v1/references/colors?mode=all'},
-        type_items: {data:[], api:'/api/v1/references/type-items?mode=all'},
-        category_items: {data:[], api:'/api/v1/references/category-items?mode=all'},
-        sizes: {data:[], api:'/api/v1/references/sizes?mode=all'},
-        units: {data:[], api:'/api/v1/references/units?mode=all'},
-        brands: {data:[], api:'/api/v1/references/brands?mode=all'},
-        specifications: {data:[], api:'/api/v1/references/specifications?mode=all'},
-        customers: {data:[], api:'/api/v1/incomes/customers?mode=all'},
-        lines: {data:[], api:'/api/v1/references/lines?mode=all'},
+        colors: { data: [], api: '/api/v1/references/colors?mode=all' },
+        type_items: { data: [], api: '/api/v1/references/type-items?mode=all' },
+        category_items: { data: [], api: '/api/v1/references/category-items?mode=all' },
+        sizes: { data: [], api: '/api/v1/references/sizes?mode=all' },
+        units: { data: [], api: '/api/v1/references/units?mode=all' },
+        brands: { data: [], api: '/api/v1/references/brands?mode=all' },
+        specifications: { data: [], api: '/api/v1/references/specifications?mode=all' },
+        customers: { data: [], api: '/api/v1/incomes/customers?mode=all' },
+        lines: { data: [], api: '/api/v1/references/lines?mode=all' }
 
       },
       FORM: {
-        resource:{
+        resource: {
           uri: '/admin/common/items',
-          api: '/api/v1/common/items',
-        },
+          api: '/api/v1/common/items'
+        }
       },
       rsForm: {},
-      ProjectSampleOptions: [{value: 'NEW', label: 'Project Baru'}, {value:'MIGRATE', label: 'Alih Loading'}],
-      setDefault:()=>{
+      ProjectSampleOptions: [{ value: 'NEW', label: 'Project Baru' }, { value: 'MIGRATE', label: 'Alih Loading' }],
+      setDefault: () => {
         return {
-          code:null,
-          customer_id:null,
-          brand_id:null,
-          specification_id:null,
+          code: null,
+          customer_id: null,
+          brand_id: null,
+          specification_id: null,
 
-          part_name:null,
-          part_alias:null,
-          part_number:null,
+          part_name: null,
+          part_alias: null,
+          part_number: null,
 
           load_type: null,
           load_capacity: null,
@@ -474,17 +478,18 @@ export default {
           unit_id: null,
 
           price: null,
-          item_prelines: [{ id:null, line_id: null, note: null }],
+          item_prelines: [{ id: null, line_id: null, note: null }],
           item_units: [],
           estimate_price: null,
           estimate_sadm: null,
+          estimate_load_capacity: null,
           estimate_monthly_amount: null,
           estimate_begin_date: null,
           enable: 1,
           sample: 1,
           project: 'NEW',
           project_number: null,
-          description:null,
+          description: null,
           depicts: [],
           sample_depicted_at: null,
           sample_enginered_at: null,
@@ -494,62 +499,61 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     // Component Page Mounted!
     this.init()
-
   },
   computed: {
-    LineOptions() {
-      return (this.SHEET.lines.data.map(item => ({...item, label: item.name, value: item.id})) || [])
+    LineOptions () {
+      return (this.SHEET.lines.data.map(item => ({ ...item, label: item.name, value: item.id })) || [])
     },
-    CategoryOptions() {
-      return (this.SHEET.category_items.data.map(item => ({label: item.name, value: item.id})) || [])
+    CategoryOptions () {
+      return (this.SHEET.category_items.data.map(item => ({ label: item.name, value: item.id })) || [])
     },
-    TypeOptions() {
-      return (this.SHEET.type_items.data.map(item => ({label: item.name, value: item.id})) || [])
+    TypeOptions () {
+      return (this.SHEET.type_items.data.map(item => ({ label: item.name, value: item.id })) || [])
     },
-    CustomerOptions() {
+    CustomerOptions () {
       return (this.SHEET.customers.data.map(item => ({
         label: [item.code, item.name].join(' - '),
         value: item.id
       })) || [])
     },
-    BrandOptions() {
+    BrandOptions () {
       return (this.SHEET.brands.data.map(item => ({
         label: [item.code, item.name].join(' - '),
         value: item.id
       })) || [])
     },
-    SpecificationOptions() {
+    SpecificationOptions () {
       return (this.SHEET.specifications.data.map(item => ({
         label: [item.code, item.name].join(' - '),
-        sublabel: item.hasOwnProperty('color') ? `Color: ${item.color.name}` : undefined ,
+        sublabel: item.hasOwnProperty('color') ? `Color: ${item.color.name}` : undefined,
         value: item.id
       })) || [])
     },
-    SizeOptions() {
+    SizeOptions () {
       return (this.SHEET.sizes.data.map(item => ({
         label: item.name,
         value: item.id
       })) || [])
     },
-    UnitOptions() {
+    UnitOptions () {
       return (this.SHEET.units.data.map(item => ({
         label: String(item.code).toUpperCase(),
         value: item.id
       })) || [])
     },
-    price_area() {
-      if(!Number(this.rsForm.price) || !Number(this.rsForm.sa_dm)) return 0
-      return Number(this.rsForm.price) / Number(this.rsForm.sa_dm)
+    price_area () {
+      if (!Number(this.rsForm.price) || !Number(this.rsForm.estimate_sadm)) return 0
+      return Number(this.rsForm.price) / Number(this.rsForm.estimate_sadm)
     },
-    price_packaged() {
-      return Number(this.rsForm.load_capacity|| 0) * Number(this.rsForm.price || 0)
+    price_packaged () {
+      return Number(this.rsForm.estimate_load_capacity || 0) * Number(this.rsForm.price || 0)
     },
-    MAPINGKEY(){
+    MAPINGKEY () {
       let variables = {
-        'brands' : {},
+        'brands': {},
         'customers': {},
         'specifications': {}
       }
@@ -557,14 +561,15 @@ export default {
       this.SHEET['customers'].data.map(item => { variables['customers'][item.id] = item })
       this.SHEET['specifications'].data.map(item => { variables['specifications'][item.id] = item })
 
-      return variables;
+      return variables
     }
   },
-  watch:{
-      '$route' : 'init'
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    fileFactoryFailed (err, files) {
+    fileFactoryFailed (error, files) {
+      if (error) console.error('[PLAY] - factory failed', error)
       files.map(e => this.$refs.depictUploader.removeFile(e))
     },
     urlDepict (file) {
@@ -575,10 +580,10 @@ export default {
       this.$refs.depictUploader.removeUploadedFiles()
       this.rsForm.depicts.push(file)
     },
-    removeDepict(index) {
+    removeDepict (index) {
       if (!this.rsForm.depicts[index]) return
 
-      const path =  this.rsForm.depicts[index].url || null
+      const path = this.rsForm.depicts[index].url || null
       this.rsForm.depicts.splice(index, 1)
 
       this.$axios
@@ -593,7 +598,6 @@ export default {
         .finally(() => {
 
         })
-
     },
     factoryFn (files) {
       // returning a Promise
@@ -601,20 +605,20 @@ export default {
       files.map(file => data.append('file', file))
       return new Promise((resolve, reject) => {
         const urlFile = `/api/v1/uploads/file`
-        const urlExist = `/api/v1/uploads/exist`
-        const token = this.$axios.defaults.headers.common.Authorization
-        const resolver = {
-          url: this.$axios.defaults.baseURL + urlExist,
-          headers: [
-            // {name: 'Content-Type', value: 'multipart/form-data'},
-            { name: 'Accept', value: 'application/json'},
-            { name: 'Content-Type', value: 'application/json-patch+json'},
-            { name: 'Authorization', value: token }
-          ]
-        }
+        // const urlExist = `/api/v1/uploads/exist`
+        // const token = this.$axios.defaults.headers.common.Authorization
+        // const resolver = {
+        //   url: this.$axios.defaults.baseURL + urlExist,
+        //   headers: [
+        //     // {name: 'Content-Type', value: 'multipart/form-data'},
+        //     { name: 'Accept', value: 'application/json' },
+        //     { name: 'Content-Type', value: 'application/json-patch+json' },
+        //     { name: 'Authorization', value: token }
+        //   ]
+        // }
         this.$axios.post(urlFile, data, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          })
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
           .then(response => {
             reject()
             files.map(e => this.addNewDepicts({
@@ -627,21 +631,17 @@ export default {
           })
       })
     },
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
       })
     },
-    setForm(data) {
+    setForm (data) {
       this.rsForm = JSON.parse(JSON.stringify(data))
     },
 
-    setCode() {
-      let brand_id = this.rsForm.brand_id,
-        customer_id = this.rsForm.customer_id,
-        specification_id = this.rsForm.specification_id;
-
-      if (!brand_id || !customer_id || !specification_id) {
+    setCode () {
+      if (!this.rsForm.brand_id || !this.rsForm.customer_id || !this.rsForm.specification_id) {
         this.rsForm['code'] = this.rsForm['id'] || null
         return
       }
@@ -654,52 +654,52 @@ export default {
       this.rsForm['code'] = [CUST.code, BRAND.code, SPEC.code].join('-')
     },
 
-    isNotSample(v) {
+    isNotSample (v) {
       return this.rsForm.sample ? '' : v
     },
-    isPriced(v) {
+    isPriced (v) {
       return !(this.rsForm.sample_priced_at && this.FORM.data.sample) ? '' : v
     },
 
     addNewProduction (autofocus = true) {
-      var newEntri =this.setDefault().item_prelines[0];
+      var newEntri = this.setDefault().item_prelines[0]
 
       this.rsForm.item_prelines.push(newEntri)
     },
 
     removeProduction (index) {
-        this.rsForm.item_prelines.splice(index, 1)
-        if(this.rsForm.item_prelines.length < 1) this.addNewProduction()
+      this.rsForm.item_prelines.splice(index, 1)
+      if (this.rsForm.item_prelines.length < 1) this.addNewProduction()
     },
 
     addNewUnit (autofocus = true) {
-      const newEntri = Object.assign({ id:null, unit_id:null, rate:null })
+      const newEntri = Object.assign({ id: null, unit_id: null, rate: null })
       this.rsForm.item_units.push(newEntri)
     },
 
     removeUnit (index) {
-        this.rsForm.item_units.splice(index, 1)
+      this.rsForm.item_units.splice(index, 1)
     },
 
     onSave () {
       const submit = () => {
-        let {method, mode, apiUrl} = this.FORM.meta()
-        const data =  this.rsForm
+        let { method, apiUrl } = this.FORM.meta()
+        const data = this.rsForm
         this.$q.loading.show()
         this.$axios.set(method, apiUrl, data)
-        .then((response) => {
-          let message = response.data.code + ' - #' + response.data.id
-          this.FORM.response.success({message:message})
-          this.$router.go(-1)
-        })
-        .catch((error) => {
-          console.warn(error)
-          this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error, 'FORM ITEM PART')
-        })
-        .finally(()=>{
-          this.$q.loading.hide()
-        });
+          .then((response) => {
+            let message = response.data.code + ' - #' + response.data.id
+            this.FORM.response.success({ message: message })
+            this.$router.go(-1)
+          })
+          .catch((error) => {
+            console.warn(error)
+            this.FORM.response.fields(error.response)
+            this.FORM.response.error(error.response || error, 'FORM ITEM PART')
+          })
+          .finally(() => {
+            this.$q.loading.hide()
+          })
       }
 
       this.$validator.validate()
@@ -707,12 +707,15 @@ export default {
         this.$validator.validate().then(result => {
           if (!result) {
             return this.$q.notify({
-              color:'negative', icon:'error', position:'top-right', timeout: 3000,
-              message:this.$tc('messages.to_complete_form')
+              color: 'negative',
+              icon: 'error',
+              position: 'top-right',
+              timeout: 3000,
+              message: this.$tc('messages.to_complete_form')
             })
           }
 
-          this.$q.dialog({ message: 'Are sure to submit?', title: 'CONFIRM'})
+          this.$q.dialog({ message: 'Are sure to submit?', title: 'CONFIRM' })
             .onOk(() => {
               submit()
             })
@@ -720,21 +723,21 @@ export default {
       })
     },
 
-    confirmByPass(callback = false) {
-          this.$q.dialog({
-            title: 'PASSWORD CONFIRM',
-            message: 'Price has changed. Enter password is required!',
-            prompt: { type: 'password', model: ''}
-          }).onOk(model => {
-            this.$axios.post('/api/v1/auth/confirm-password', { password: model })
-            .then((response) => {
-              if (response.data.status && callback !== false) callback()
-            })
-            .catch((error) => {
-              this.$app.response.error(error.response || error)
-            });
+    confirmByPass (callback = false) {
+      this.$q.dialog({
+        title: 'PASSWORD CONFIRM',
+        message: 'Price has changed. Enter password is required!',
+        prompt: { type: 'password', model: '' }
+      }).onOk(model => {
+        this.$axios.post('/api/v1/auth/confirm-password', { password: model })
+          .then((response) => {
+            if (response.data.status && callback !== false) callback()
           })
+          .catch((error) => {
+            this.$app.response.error(error.response || error)
+          })
+      })
     }
-  },
+  }
 }
 </script>
