@@ -85,12 +85,8 @@
         </template>
 
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:40px" auto-width>
-          <template>
-            <div v-if="isEditable(rs.row)">
-              <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.delivery_verify_id}`" v-if="rs.row.delivery_verify_id" />
-              <q-btn dense flat color="light" icon="delete" @click="deleteDetail(rs.row)" />
-            </div>
-          </template>
+          <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.delivery_verify_id}`" v-if="rs.row.delivery_verify_id" />
+          <q-btn dense flat color="light" icon="delete" @click="deleteDetail(rs.row)" v-if="isEditable(rs.row)" />
           <q-btn dense flat color="light" icon="clear" disable v-if="rs.row.deleted_at" />
         </q-td>
 
