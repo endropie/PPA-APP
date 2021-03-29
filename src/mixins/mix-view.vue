@@ -24,6 +24,7 @@ export default {
         print: () => window.print(),
         options: {},
         has_relationship: [],
+        getApiUrl: () => this.VIEW.resource.api + '/' + this.ROUTE.params.id + this.VIEW.resource.params,
         resource: {
           api: null,
           uri: null,
@@ -54,7 +55,7 @@ export default {
       this.VIEW.loading = true
 
       const callBase = () => {
-        const api = this.VIEW.resource.api + '/' + this.ROUTE.params.id + this.VIEW.resource.params
+        const api = this.VIEW.getApiUrl()
         if (process.env.DEV) console.info('[PLAY]', 'VIEW LOAD', api)
         this.$axios.get(api)
           .then((response) => {

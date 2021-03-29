@@ -256,9 +256,9 @@ const deliveries = [
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'delivery-verifies-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'delivery-verifies-create' } },
-      { page: 'multi-create', path: 'multi-create', meta: { mode: 'create', permission: 'delivery-verifies-create' } }
+      { page: 'multi-create', path: 'multi-create', meta: { mode: 'create', permission: 'delivery-verifies-create' } },
       // { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'delivery-verifies-update' } },
-      // { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-verifies-read' } }
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'delivery-verifies-read' } }
     ]
   },
   {

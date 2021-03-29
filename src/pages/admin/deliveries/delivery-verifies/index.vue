@@ -85,7 +85,12 @@
         </template>
 
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:40px" auto-width>
-          <q-btn dense flat color="light" icon="delete" @click="TABLE.delete(rs.row)" v-if="isEditable(rs.row)" />
+          <template>
+            <div v-if="isEditable(rs.row)">
+              <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.delivery_verify_id}`" v-if="rs.row.delivery_verify_id" />
+              <q-btn dense flat color="light" icon="delete" @click="deleteDetail(rs.row)" />
+            </div>
+          </template>
           <q-btn dense flat color="light" icon="clear" disable v-if="rs.row.deleted_at" />
         </q-td>
 
@@ -213,6 +218,32 @@ export default {
         title: `VERIFY [#${row.id}] - LOG`,
         model: 'App\\Models\\Income\\DeliveryVerifyItem',
         id: row.id
+      })
+    },
+    deleteDetail (row) {
+      console.warn('DELETED DETAIL')
+      this.$q.dialog({
+        title: 'DELETE',
+        message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.delete', 2) }),
+        preventClose: true,
+        ok: this.$tc('messages.yes_to', 1, { v: this.$tc('form.delete') }),
+        cancel: this.$tc('form.cancel')
+      }).onOk(() => {
+        this.$axios.delete(`${this.TABLE.resource.api}/${row.id}/detail`)
+          .then((response) => {
+            if (response.data.success) {
+              const code = response.data.name || response.data.code || row.id
+              this.$app.notify.success({
+                message: this.$tc('messages.success_deleted'),
+                detail: this.$tc('messages.form_has_deleted', 1, { v: `#${code}` })
+              })
+              this.TABLE__refresh()
+            }
+          })
+          .catch(error => {
+            const title = this.$tc('messages.fail', 1, { v: this.$tc('form.delete') })
+            this.$app.response.error(error.response || error, title)
+          })
       })
     }
   }
