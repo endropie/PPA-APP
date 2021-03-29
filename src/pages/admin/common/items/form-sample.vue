@@ -339,13 +339,13 @@
 
                 <ux-numeric class="col-12 col-sm-6"
                   type="number" color="secondary"
-                  name="estimate_load_capacityestimate_load_capacity"
+                  name="estimate_load_capacity"
                   label="Estimate HANGER/BAREL"
                   v-model="rsForm.estimate_load_capacity"
-                  v-validate="'required'" no-error-icon
+                  v-validate="''" no-error-icon
                   :dark="LAYOUT.isDark"
-                  :error="errors.has('estimate_load_capacityestimate_load_capacity')"
-                  :error-message="errors.first('estimate_load_capacityestimate_load_capacity')"
+                  :error="errors.has('estimate_load_capacity')"
+                  :error-message="errors.first('estimate_load_capacity')"
                 />
               </div>
             </q-card-section>
