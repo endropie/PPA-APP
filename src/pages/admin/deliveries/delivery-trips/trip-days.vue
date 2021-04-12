@@ -55,7 +55,6 @@
                   }"
                   class="no-padding" align="center"
                 >
-                  <!-- :class="getMiniBoxClass(TASKS, cust, cTime)" -->
                   <div v-if="TASKS[cust.id] && TASKS[cust.id][cTime]">
                     <q-icon size="20px"
                       :name="getMiniBoxIcon(TASKS[cust.id], cTime)"
@@ -65,7 +64,7 @@
                   <div v-else-if="LOADS[cust.id] && LOADS[cust.id][cTime]">
                     <q-icon size="20px"
                       :name="getLoadMiniBoxIcon(LOADS[cust.id], cTime)"
-                      color="primary"
+                      :color="getLoadMiniBoxColor(LOADS, cust, cTime)"
                     />
                   </div>
                 </td>
@@ -118,7 +117,7 @@
                   <div class="column q-gutter-xs self-start" v-else-if="LOADS[cust.id] && LOADS[cust.id][cTime]" >
                     <q-btn v-for="(load, iLoad) in LOADS[cust.id][cTime]" :key="iLoad" v-show="iLoad < 2 || LOADS[cust.id][cTime].length === 3"
                       dense unelevated size="12px"
-                      color="primary"
+                      :color="getLoadBoxColor(load)"
                       :text-color="$q.dark.isActive ? 'white' : undefined"
                       :icon="getLoadBoxIcon(load)"
                       :outline="!isTriped(cust, cTime)"
@@ -136,9 +135,9 @@
                             @click="setLoadBoxlink(load)"
                           >
                             <q-item-section avatar>
-                              <q-icon :name="getLoadBoxIcon(load)" color="primary" />
+                              <q-icon :name="getLoadBoxIcon(load)" :color="getLoadBoxColor(load)" />
                             </q-item-section>
-                            <q-item-section :class="`text-primary`" >{{load.fullnumber}}</q-item-section>
+                            <q-item-section :class="`text-${getLoadBoxColor(load)}`" >{{load.fullnumber}}</q-item-section>
                           </q-item>
                         </q-list>
                       </q-menu>
@@ -279,6 +278,10 @@ export default {
       if (load.is_checkout) return 'local_shipping'
       return 'move_to_inbox'
     },
+    getLoadBoxColor (load) {
+      if (load.is_checkout) return 'green-10'
+      return 'indigo'
+    },
     getBoxColor (task) {
       if (task.is_checkout) return 'green-10'
       if (task.is_loaded) return 'indigo'
@@ -297,6 +300,12 @@ export default {
       if (trips.find(x => x.is_loaded)) return 'move_to_inbox'
       if (trips.length) return 'bookmark'
       return 'clear'
+    },
+    getLoadMiniBoxColor (load, cust, time) {
+      if (!load[cust.id] || !load[cust.id][time]) return
+      const trips = load[cust.id][time]
+      if (trips.find(x => x.is_checkout)) return 'green-10'
+      return 'blue-8'
     },
     getMiniBoxColor (task, cust, time) {
       if (!task[cust.id] || !task[cust.id][time]) return
