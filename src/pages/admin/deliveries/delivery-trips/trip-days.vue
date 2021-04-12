@@ -182,7 +182,7 @@ export default {
         rowload: [],
         filter: {
           customer_id: null,
-          trip_date: '2020-11-04' // this.$app.moment().format('YYYY-MM-DD')
+          trip_date: this.$app.moment().format('YYYY-MM-DD')
         },
         load: this.load
       }
