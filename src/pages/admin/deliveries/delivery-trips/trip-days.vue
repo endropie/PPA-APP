@@ -62,6 +62,12 @@
                       :color="getMiniBoxColor(TASKS, cust, cTime)"
                     />
                   </div>
+                  <div v-else-if="LOADS[cust.id] && LOADS[cust.id][cTime]">
+                    <q-icon size="20px"
+                      :name="getLoadMiniBoxIcon(LOADS[cust.id], cTime)"
+                      color="primary"
+                    />
+                  </div>
                 </td>
               </template>
             </tr>
@@ -80,40 +86,69 @@
                     'bg-grey-4 text-white': !$q.dark.isActive && !isTriped(cust, cTime),
                   }"
                 >
-                <div class="column q-gutter-xs self-start" v-if="TASKS[cust.id] && TASKS[cust.id][cTime]" >
-                  <q-btn v-for="(task, iTask) in TASKS[cust.id][cTime]" :key="iTask" v-show="iTask < 2 || TASKS[cust.id][cTime].length === 3"
-                    dense unelevated size="12px"
-                    :color="getBoxColor(task)"
-                    :text-color="$q.dark.isActive ? 'white' : undefined"
-                    :icon="getBoxIcon(task)"
-                    :outline="!isTriped(cust, cTime)"
-                    :label="task.fullnumber"
-                    @click="setBoxlink(task)"
-                  />
-                  <q-btn dense outline color="blue-grey" size="12px"
-                    :label="`${TASKS[cust.id][cTime].length - 2}+`"
-                    v-if="TASKS[cust.id][cTime].length > 3"
-                  >
-                    <q-menu>
-                      <q-list dense bordered>
-                        <q-item v-for="(task, iTask) in TASKS[cust.id][cTime]" :key="iTask" v-show="iTask > 1"
-                          clickable v-ripple
-                          @click="setBoxlink(task)"
-                        >
-                          <q-item-section avatar>
-                            <q-icon :name="getBoxIcon(task)" :color="getBoxColor(task)" />
-                          </q-item-section>
-                          <q-item-section :class="`text-${getBoxColor(task)}`" >{{task.fullnumber}}</q-item-section>
-                        </q-item>
-                      </q-list>
-                    </q-menu>
-                  </q-btn>
-                </div>
-                <div class="column q-gutter-xs self-start" v-else-if="isTriped(cust, cTime)">
-                  <q-icon name="warning" color="orange" class="self-center" size="15px">
-                    <q-tooltip>PDO undefined</q-tooltip>
-                  </q-icon>
-                </div>
+                  <div class="column q-gutter-xs self-start" v-if="TASKS[cust.id] && TASKS[cust.id][cTime]" >
+                    <q-btn v-for="(task, iTask) in TASKS[cust.id][cTime]" :key="iTask" v-show="iTask < 2 || TASKS[cust.id][cTime].length === 3"
+                      dense unelevated size="12px"
+                      :color="getBoxColor(task)"
+                      :text-color="$q.dark.isActive ? 'white' : undefined"
+                      :icon="getBoxIcon(task)"
+                      :outline="!isTriped(cust, cTime)"
+                      :label="task.fullnumber"
+                      @click="setBoxlink(task)"
+                    />
+                    <q-btn dense outline color="blue-grey" size="12px"
+                      :label="`${TASKS[cust.id][cTime].length - 2}+`"
+                      v-if="TASKS[cust.id][cTime].length > 3"
+                    >
+                      <q-menu>
+                        <q-list dense bordered>
+                          <q-item v-for="(task, iTask) in TASKS[cust.id][cTime]" :key="iTask" v-show="iTask > 1"
+                            clickable v-ripple
+                            @click="setBoxlink(task)"
+                          >
+                            <q-item-section avatar>
+                              <q-icon :name="getBoxIcon(task)" :color="getBoxColor(task)" />
+                            </q-item-section>
+                            <q-item-section :class="`text-${getBoxColor(task)}`" >{{task.fullnumber}}</q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-btn>
+                  </div>
+                  <div class="column q-gutter-xs self-start" v-else-if="LOADS[cust.id] && LOADS[cust.id][cTime]" >
+                    <q-btn v-for="(load, iLoad) in LOADS[cust.id][cTime]" :key="iLoad" v-show="iLoad < 2 || LOADS[cust.id][cTime].length === 3"
+                      dense unelevated size="12px"
+                      color="primary"
+                      :text-color="$q.dark.isActive ? 'white' : undefined"
+                      :icon="getLoadBoxIcon(load)"
+                      :outline="!isTriped(cust, cTime)"
+                      :label="load.fullnumber"
+                      @click="setLoadBoxlink(load)"
+                    />
+                    <q-btn dense outline color="blue-grey" size="12px"
+                      :label="`${LOADS[cust.id][cTime].length - 2}+`"
+                      v-if="LOADS[cust.id][cTime].length > 3"
+                    >
+                      <q-menu>
+                        <q-list dense bordered>
+                          <q-item v-for="(load, iLoad) in LOADS[cust.id][cTime]" :key="iLoad" v-show="iLoad > 1"
+                            clickable v-ripple
+                            @click="setLoadBoxlink(load)"
+                          >
+                            <q-item-section avatar>
+                              <q-icon :name="getLoadBoxIcon(load)" color="primary" />
+                            </q-item-section>
+                            <q-item-section :class="`text-primary`" >{{load.fullnumber}}</q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-btn>
+                  </div>
+                  <div class="column q-gutter-xs self-start" v-else-if="isTriped(cust, cTime)">
+                    <q-icon name="warning" color="orange" class="self-center" size="15px">
+                      <q-tooltip>PDO undefined</q-tooltip>
+                    </q-icon>
+                  </div>
                 </td>
               </template>
             </tr>
@@ -144,9 +179,10 @@ export default {
         },
         rowdata: [],
         rowtask: [],
+        rowload: [],
         filter: {
           customer_id: null,
-          trip_date: this.$app.moment().format('YYYY-MM-DD')
+          trip_date: '2020-11-04' // this.$app.moment().format('YYYY-MM-DD')
         },
         load: this.load
       }
@@ -158,13 +194,25 @@ export default {
   computed: {
     TASKS () {
       const result = { CUSTOMER: {} }
-      const ex = this.LIST.rowtask
-      ex.map((item, i) => {
+      const exTask = this.LIST.rowtask
+      exTask.map((item, i) => {
         const timecode = String(item.trip_time).substring(0, 2)
         if (!result[item.customer_id]) result[item.customer_id] = {}
         if (!result[item.customer_id][timecode]) result[item.customer_id][timecode] = []
         result[item.customer_id][timecode].push(item)
       })
+      return result
+    },
+    LOADS () {
+      const result = { CUSTOMER: {} }
+      const exLoad = this.LIST.rowload
+      exLoad.map((item, i) => {
+        const timecode = String(item.trip_time).substring(0, 2)
+        if (!result[item.customer_id]) result[item.customer_id] = {}
+        if (!result[item.customer_id][timecode]) result[item.customer_id][timecode] = []
+        result[item.customer_id][timecode].push(item)
+      })
+
       return result
     },
     CUSTOMERS () {
@@ -188,12 +236,12 @@ export default {
       })
       return result
     },
-    TASK_TIME (task) {
+    TASK_TIME () {
       return this.time24.map(time => {
-        return this.LIST.rowtask
-          .filter(task => {
-            return String(task.trip_time).substring(0, 2) === time // && this.$app.moment(task.date).day() === this.INTDAY
-          })
+        const tasks = this.LIST.rowtask.filter(task => String(task.trip_time).substring(0, 2) === time)
+
+        if (tasks.length) return tasks
+        return this.LIST.rowload.filter(load => String(load.trip_time).substring(0, 2) === time)
       })
     },
     HIDE_TIME () {
@@ -227,10 +275,20 @@ export default {
       if (task.is_loaded) return 'move_to_inbox'
       return 'bookmark'
     },
+    getLoadBoxIcon (load) {
+      if (load.is_checkout) return 'local_shipping'
+      return 'move_to_inbox'
+    },
     getBoxColor (task) {
       if (task.is_checkout) return 'green-10'
       if (task.is_loaded) return 'indigo'
       return 'blue-grey'
+    },
+    getLoadMiniBoxIcon (loadtime, time) {
+      if (!loadtime[time]) return 'clear'
+      const trips = loadtime[time]
+      if (trips.find(x => x.is_checkout)) return 'local_shipping'
+      return 'move_to_inbox'
     },
     getMiniBoxIcon (tasktime, time) {
       if (!tasktime[time]) return 'clear'
@@ -260,16 +318,32 @@ export default {
       if (!cust.customer_trips) return false
       return cust.customer_trips.find(x => String(x.time).substring(0, 2) === time && x.intday === this.INTDAY)
     },
+    setLoadBoxlink (load) {
+      this.$router.push(`/admin/deliveries/delivery-loads/${load.id}`)
+    },
     setBoxlink (task) {
       this.$router.push(`/admin/deliveries/delivery-tasks/${task.id}`)
     },
-    getTask () {
+    getTasks () {
       let customer = this.LIST.filter.customer_id ? `&customer_id=${this.LIST.filter.customer_id}` : ''
       let url = `${this.LIST.resource.delivery_task}?mode=all&sort=created_at&--with=customer&date=${this.LIST.filter.trip_date}${customer}`
-      // console.warn('GET', url)
+      // console.warn('GET TASKS', url)
       this.$axios.get(url)
         .then((response) => {
           this.LIST.rowtask = response.data
+        }).catch((error) => {
+          this.$app.response.error(error.response || error)
+        }).finally(() => {
+          // code..
+        })
+    },
+    getLoads () {
+      let customer = this.LIST.filter.customer_id ? `&customer_id=${this.LIST.filter.customer_id}` : ''
+      let url = `${this.LIST.resource.delivery_load}?mode=all&sort=created_at&--with=customer&date=${this.LIST.filter.trip_date}${customer}`
+      // console.warn('GET LOADS', url)
+      this.$axios.get(url)
+        .then((response) => {
+          this.LIST.rowload = response.data
         }).catch((error) => {
           this.$app.response.error(error.response || error)
         }).finally(() => {
@@ -281,7 +355,7 @@ export default {
       const intday = this.$app.moment(this.LIST.filter.trip_date).day()
       let url = `${this.LIST.resource.api}?mode=all&--with=customer_trips&trip_intday=${intday}${customer}`
       this.$q.loading.show()
-      // console.warn('GET', url)
+      // console.warn('GET TRIPS', url)
       this.$axios.get(url)
         .then((response) => {
           this.LIST.rowdata = response.data
@@ -295,8 +369,9 @@ export default {
     load (done = null) {
       if (!this.LIST.filter.trip_date) return console.warn('TRIP UNDEFINED!!!')
       this.LIST.date = this.LIST.filter.trip_date
+      this.getTasks()
+      this.getLoads()
       this.getTrip(done)
-      this.getTask()
     }
   }
 }
