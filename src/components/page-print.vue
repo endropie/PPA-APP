@@ -19,7 +19,7 @@
                       </slot>
                     </div>
                     <div class="head-brand col-grow text-no-wrap ">
-                      <div  class="title text-weight-bolder text-uppercase ellipsis text-truncate" style="opacity:0.8">
+                      <div  class="title text-weight-bold text-uppercase ellipsis text-truncate">
                         <slot name="header-title">
                           <span>{{ CorporateName || 'MY-CORPORATION' }}</span>
                         </slot>
