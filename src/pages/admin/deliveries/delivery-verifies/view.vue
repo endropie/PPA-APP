@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="column justify-start">
     <page-print v-if="VIEW.show">
-      <div slot="header-title">DELVERY - VERIFY</div>
+      <div slot="header-title">DELIVERY - VERIFY</div>
 
       <div class="row justify-between q-col-gutter-y-sm" >
         <div class="column q-pl-md">
