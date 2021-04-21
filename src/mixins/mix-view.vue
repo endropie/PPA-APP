@@ -95,7 +95,7 @@ export default {
 
     VIEW__void (callback) {
       this.$q.dialog({
-        title: 'Void',
+        title: 'VOID',
         message: this.$tc('messages.to_sure', 1, { v: 'void' }),
         preventClose: true,
         ok: this.$tc('messages.yes_to', 1, { v: this.$tc('label.continue') }),
@@ -125,7 +125,7 @@ export default {
 
     VIEW__delete () {
       this.$q.dialog({
-        title: 'Delete',
+        title: 'DELETE',
         message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.delete', 2) }),
         preventClose: true,
         ok: this.$tc('messages.yes_to', 1, { v: this.$tc('form.delete') }),

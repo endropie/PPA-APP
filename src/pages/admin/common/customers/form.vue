@@ -266,8 +266,8 @@
       </div>
       <!-- COLUMN::4th Reference Mode Picker -->
       <div class="col-12">
-        <div class="row items-start q-col-gutter-md q-mb-md">
-          <q-field class="col-12 col-sm-4"
+        <div class="row items-start q-col-gutter-md q-mb-lg">
+          <q-field class="col-12 col-md-4"
             :error="errors.has('invoice_mode')"
             :error-message="errors.first('invoice_mode')"
             filled
@@ -280,7 +280,7 @@
               :options="CONFIG.options.invoice_mode.map(x => ({...x, label: x.detail}))" />
 
           </q-field>
-          <q-field filled class="col-12 col-sm-4"
+          <q-field filled class="col-12 col-md-4"
             hint="Pick the mode Delivery Type"
             :error="errors.has('delivery_mode')"
             :error-message="errors.first('delivery_mode')">
@@ -292,7 +292,7 @@
               v-validate="'required'"
               :options="CONFIG.options.delivery_mode.map(x => ({...x, label: x.detail}))" />
           </q-field>
-          <q-field class="col-12 col-sm-4"
+          <q-field class="col-12 col-md-4"
             hint="Pick the mode PO Type"
             filled
             :error="errors.has('order_mode')"
@@ -305,56 +305,66 @@
               :options="CONFIG.options.order_mode" />
           </q-field>
         </div>
-        <div class="column">
-          <q-field borderless hide-bottom-space >
-            <div :class="$q.screen.gt.sm ? 'row' : 'coloumn'">
-              <div class="column">
-                <q-checkbox name="order_lots" class="text-faded"
-                  label="Lots Order"
-                  v-model="rsForm.order_lots"
-                  :false-value="0"
-                  :true-value="1"
-                  v-show="rsForm.order_mode === 'NONE'"
-                />
-                <q-checkbox name="delivery_manual_allowed" class="text-faded"
-                  label="SJDO Manual"
-                  v-model="rsForm.delivery_manual_allowed"
-                  :false-value="0"
-                  :true-value="1"
-                  v-show="rsForm.order_mode !== 'ACCUMULATE'"
-                />
+
+        <div class="q-pa-md text-subtitle2 font-underline">
+          {{ $tc('label.others_configuration') }}
+          <q-separator />
+        </div>
+        <div class="row">
+          <div class="col-12 col-md-4 column">
+            <q-checkbox name="order_lots" class="text-faded" v-model="rsForm.order_lots" :false-value="0" :true-value="1"
+              v-show="rsForm.order_mode === 'NONE'"
+            >
+              <div class="column text-caption text-faded" style="line-height:normal">
+                <div class="text-weight-bold">{{ $tc('customers.order_lots') }}</div>
+                <div class="text-small text-grey">{{ $tc('customers.detail.order_lots') }}</div>
               </div>
-              <div class="column">
-                <q-checkbox name="invoice_request_required" class="text-faded"
-                  label="Invoice by Request Order"
-                  v-model="rsForm.invoice_request_required"
-                  :false-value="0"
-                  :true-value="1"
-                  v-show="rsForm.order_mode === 'NONE'"
-                />
-                <q-checkbox name="invoice_category_price" class="text-faded"
-                  label="Invoice Category Price"
-                  v-model="rsForm.invoice_category_price"
-                  :false-value="0"
-                  :true-value="1"
-                />
+            </q-checkbox>
+            <q-checkbox name="delivery_manual_allowed" v-model="rsForm.delivery_manual_allowed" :false-value="0" :true-value="1"
+              v-show="rsForm.order_mode !== 'ACCUMULATE'"
+            >
+              <div class="column text-caption text-faded" style="line-height:normal">
+                <div class="text-weight-bold">{{ $tc('customers.delivery_manual_allowed') }}</div>
+                <div class="text-small text-grey">{{ $tc('customers.detail.delivery_manual_allowed') }}</div>
               </div>
-              <div class="column">
-                <q-checkbox name="order_manual_allowed" class="text-faded"
-                  label="Tambah atau edit PO customer"
-                  v-model="rsForm.order_manual_allowed"
-                  :false-value="0"
-                  :true-value="1"
-                />
-                <q-checkbox name="order_monthly_actived" class="text-faded"
-                  label="Tanggal active PO (generate) setiap akhir bulan"
-                  v-model="rsForm.order_monthly_actived"
-                  :false-value="0"
-                  :true-value="1"
-                />
+            </q-checkbox>
+            <q-checkbox name="partialidate_allowed" v-model="rsForm.partialidate_allowed" :false-value="0" :true-value="1">
+              <div class="column text-caption text-faded" style="line-height:normal">
+                <div class="text-weight-bold">{{ $tc('customers.partialidate_allowed') }}</div>
+                <div class="text-small text-grey">{{ $tc('customers.detail.partialidate_allowed') }}</div>
               </div>
-            </div>
-          </q-field>
+            </q-checkbox>
+          </div>
+          <div class="col-12 col-md-4 column">
+            <q-checkbox name="invoice_request_required" v-model="rsForm.invoice_request_required" :false-value="0" :true-value="1" v-show="rsForm.order_mode === 'NONE'" >
+              <div class="column text-caption text-faded" style="line-height:normal">
+                <div class="text-weight-bold">{{ $tc('customers.invoice_request_required') }}</div>
+                <div class="text-small text-grey">{{ $tc('customers.detail.invoice_request_required') }}</div>
+              </div>
+            </q-checkbox>
+            <q-checkbox name="invoice_category_price" v-model="rsForm.invoice_category_price" :false-value="0" :true-value="1">
+              <div class="column text-caption text-faded" style="line-height:normal">
+                <div class="text-weight-bold">{{ $tc('customers.invoice_category_price') }}</div>
+                <div class="text-small text-grey">{{ $tc('customers.detail.invoice_category_price') }}</div>
+              </div>
+            </q-checkbox>
+          </div>
+          <div class="col-12 col-md-4 column">
+            <q-checkbox name="order_manual_allowed" v-model="rsForm.order_manual_allowed" :false-value="0" :true-value="1">
+              <div class="column text-caption text-faded" style="line-height:normal">
+                <div class="text-weight-bold">{{ $tc('customers.order_manual_allowed') }}</div>
+                <div class="text-small text-grey">{{ $tc('customers.detail.order_manual_allowed') }}</div>
+              </div>
+            </q-checkbox>
+            <q-checkbox name="order_monthly_actived" v-model="rsForm.order_monthly_actived" :false-value="0" :true-value="1">
+              <div class="column text-caption text-faded" style="line-height:normal">
+                <div class="text-weight-bold">{{ $tc('customers.order_monthly_actived') }}</div>
+                <div class="text-small text-grey">{{ $tc('customers.detail.order_monthly_actived') }}</div>
+              </div>
+            </q-checkbox>
+          </div>
+        </div>
+        <div>
         </div>
       </div>
 

@@ -10,7 +10,7 @@
           name="show"
           label="Hide View Columns"
           v-model="rsConfig.hide_view_columns"
-          :options="['part_name', 'part_subname', 'quantity', 'unit', 'encasement']"
+          :options="['part_name', 'part_subname', 'quantity', 'unit', 'note']"
           multiple use-chips
           dense
           :error="errors.has('hide_view_columns')"
@@ -35,36 +35,37 @@ export default {
       },
       rsConfig: {
         hide_view_columns: []
-      },
+      }
     }
   },
-  created() {
+  created () {
     // Component Page Created!
     this.init()
   },
-  watch:{
-      '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    show() {
+    show () {
       this.$refs['dialog'].show()
     },
-    hide() {
+    hide () {
       this.$refs['dialog'].hide()
     },
-    init() {
+    init () {
       const resource = JSON.parse(JSON.stringify(this.$store.state.admin.CONFIG[this.resource.name]))
       this.rsConfig = { ...this.rsConfig, ...resource }
     },
-    onSave() {
-
+    onSave () {
       this.$validator.validateAll().then(result => {
         if (!result) {
-
           return this.$q
             .notify({
-              color:'negative', icon:'error', position:'top-right', timeout: 3000,
-              message:this.$tc('messages.to_complete_form')
+              color: 'negative',
+              icon: 'error',
+              position: 'top-right',
+              timeout: 3000,
+              message: this.$tc('messages.to_complete_form')
             })
         }
 
@@ -73,7 +74,7 @@ export default {
         this.$emit('done')
         this.hide()
       })
-    },
-  },
+    }
+  }
 }
 </script>

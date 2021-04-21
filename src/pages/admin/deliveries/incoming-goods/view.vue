@@ -75,12 +75,13 @@
         <div class="col-12">
           <q-markup-table dense bordered square separator="cell" class="table-print no-shadow no-highlight">
             <thead>
-            <q-tr style="line-height:25px">
+            <q-tr style="line-height:25px;text-transform:uppercase">
               <q-th width="15%" v-if="IS_LOTS">{{ $tc('label.lots') }}</q-th>
               <q-th width="25%" v-if="!isHideColumn('part_name')">{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
               <q-th width="20%" v-if="!isHideColumn('part_subname')">{{ $app.setting('item.subname_label') }}</q-th>
               <q-th width="10%" v-if="!isHideColumn('unit')">{{ $tc('label.unit') }}</q-th>
               <q-th width="10%" v-if="!isHideColumn('quantity')">{{ $tc('label.quantity') }}</q-th>
+              <q-th width="10%" v-if="!isHideColumn('quantity')">VALID</q-th>
               <q-th width="20%" v-if="!isHideColumn('note')">{{ $tc('label.note') }}</q-th>
             </q-tr>
             </thead>
@@ -90,7 +91,8 @@
                 <q-td v-if="!isHideColumn('part_name')">{{row.item.part_name}}</q-td>
                 <q-td v-if="!isHideColumn('part_subname')">{{row.item.part_subname}}</q-td>
                 <q-td v-if="!isHideColumn('unit')" class="text-center">{{row.unit.code}}</q-td>
-                <q-td v-if="!isHideColumn('quantity')" class="text-right">{{$app.number_format(row.quantity, row.unit.decimal_in)}}</q-td>
+                <q-td v-if="!isHideColumn('quantity')" class="text-right">{{$app.number_format(row.quantity, row.unit.decimal_in) }}</q-td>
+                <q-td v-if="!isHideColumn('quantity')" class="text-right">{{$app.number_format(row.valid, row.unit.decimal_in) }}</q-td>
                 <q-td v-if="!isHideColumn('note')" style="width:180px"> {{row.note}} </q-td>
               </q-tr>
             </tbody>
@@ -124,10 +126,17 @@
               }
             },
             { label: $tc('form.validation').toUpperCase(), color:'teal', icon: 'check',
-              hidden: !IS_EDITABLE || !this.$app.can('incoming-goods-validation'),
+              hidden: !IS_EDITABLE || !this.$app.can('incoming-goods-validation') || rsView.customer.partialidate_allowed,
               detail:$tc('messages.process_validation'),
               actions: () => {
                 setValidation()
+              }
+            },
+            { label: 'PARTIAL - VALIDATION', color:'teal', icon: 'check',
+              hidden: !IS_PARTIALIDATE || !this.$app.can('incoming-goods-validation') || !rsView.customer.partialidate_allowed,
+              detail:$tc('messages.process_validation'),
+              actions: () => {
+                setMultiValidation()
               }
             },
             { label: (`${$tc('form.revision')}`).toUpperCase(), color:'orange', icon: 'edit',
@@ -161,6 +170,13 @@
           ]"/>
       </div>
     </page-print>
+    <div class="column fit">
+      <div class="row justify-end print-hide fit">
+        <div class="col-12 col-md-4">
+          <view-validation v-if="rsView" :record="rsView" @reload="init" />
+        </div>
+      </div>
+    </div>
     <q-inner-loading :showing="VIEW.loading">
       <q-spinner-dots size="50px" color="primary" />
     </q-inner-loading>
@@ -172,10 +188,11 @@
 import MixView from '@/mixins/mix-view.vue'
 import PagePrint from '@/components/page-print'
 import ConfigPage from './config.vue'
+import ViewValidation from './view-validation'
 
 export default {
   mixins: [MixView],
-  components: { PagePrint, ConfigPage },
+  components: { PagePrint, ConfigPage, ViewValidation },
   data () {
     return {
       VIEW: {
@@ -208,15 +225,19 @@ export default {
       if (!this.rsView.customer) return false
       return this.rsView.customer.order_lots
     },
-    IS_REVISE () {
-      if (this.IS_EDITABLE) return false
+    IS_PARTIALIDATE () {
       if (this.rsView.deleted_at) return false
+      return Boolean(['PARTIAL-VALIDATED', 'OPEN'].find(x => x === this.rsView.status))
+    },
+    IS_REVISE () {
+      if (this.rsView.deleted_at) return false
+      if (this.IS_EDITABLE) return false
       if (['VOID', 'OPEN'].find(x => x === this.rsView.status)) return false
       return true
     },
     IS_VOID () {
-      if (this.IS_EDITABLE) return false
       if (this.rsView.deleted_at) return false
+      if (this.IS_EDITABLE) return false
       if (!this.$app.can('incoming-goods-void')) return false
       if (['VOID'].find(x => x === this.rsView.status)) return false
       return true
@@ -246,6 +267,9 @@ export default {
     },
     setValidation () {
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/validation`)
+    },
+    setMultiValidation () {
+      this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/partial-validation`)
     },
     init () {
       this.VIEW.load((data) => {

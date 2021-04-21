@@ -39,6 +39,7 @@ export default {
   note: 'Catatan',
   number: 'Nomor {v}',
   others: 'Lainnya',
+  others_configuration: 'Konfigurasi lainnya',
   only: 'Hanya {v}',
   owner: 'Pemilik | Dimiliki | Kepemilikan',
   outgoing: 'Keluar',
