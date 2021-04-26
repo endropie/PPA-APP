@@ -140,7 +140,7 @@
               }
             },
             { label: (`${$tc('form.revision')}`).toUpperCase(), color:'orange', icon: 'edit',
-              hidden: !IS_REVISE || rsView.status !== 'VALIDATED' || !this.$app.can('incoming-goods-revision'),
+              hidden: !IS_REVISE || rsView.status !== 'VALIDATED' || rsView.customer.partialidate_allowed || !this.$app.can('incoming-goods-revision'),
               detail:$tc('messages.process_revise'),
               actions: () => {
                 setRevision()
