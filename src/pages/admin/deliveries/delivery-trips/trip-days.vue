@@ -5,7 +5,7 @@
         <q-card-section>
           <div class="row q-col-gutter-xs">
             <ux-date
-              v-model="LIST.filter.trip_date"
+              v-model.lazy="LIST.filter.trip_date"
               dense hide-bottom-space hide-dropdown-icon
               standout="bg-blue-grey-5 text-white"
               :debounce="3000"
@@ -73,7 +73,7 @@
           </tbody>
           <tbody v-else>
             <tr v-for="(cust, index) in CUSTOMERS" :key="index">
-              <td class="q-pa-none text-left">
+              <td class="text-left q-pa-none">
                 <div class=" q-py-xs">{{cust.code}}</div>
               </td>
               <template v-for="(cTime, iTime) in time24">
@@ -85,7 +85,7 @@
                     'bg-grey-4 text-white': !$q.dark.isActive && !isTriped(cust, cTime),
                   }"
                 >
-                  <div class="column q-gutter-xs self-start" v-if="TASKS[cust.id] && TASKS[cust.id][cTime]" >
+                  <div class="self-start column q-gutter-xs" v-if="TASKS[cust.id] && TASKS[cust.id][cTime]" >
                     <q-btn v-for="(task, iTask) in TASKS[cust.id][cTime]" :key="iTask" v-show="iTask < 2 || TASKS[cust.id][cTime].length === 3"
                       dense unelevated size="12px"
                       :color="getBoxColor(task)"
@@ -114,7 +114,7 @@
                       </q-menu>
                     </q-btn>
                   </div>
-                  <div class="column q-gutter-xs self-start" v-else-if="LOADS[cust.id] && LOADS[cust.id][cTime]" >
+                  <div class="self-start column q-gutter-xs" v-else-if="LOADS[cust.id] && LOADS[cust.id][cTime]" >
                     <q-btn v-for="(load, iLoad) in LOADS[cust.id][cTime]" :key="iLoad" v-show="iLoad < 2 || LOADS[cust.id][cTime].length === 3"
                       dense unelevated size="12px"
                       :color="getLoadBoxColor(load)"
@@ -143,7 +143,7 @@
                       </q-menu>
                     </q-btn>
                   </div>
-                  <div class="column q-gutter-xs self-start" v-else-if="isTriped(cust, cTime)">
+                  <div class="self-start column q-gutter-xs" v-else-if="isTriped(cust, cTime)">
                     <q-icon name="warning" color="orange" class="self-center" size="15px">
                       <q-tooltip>PDO undefined</q-tooltip>
                     </q-icon>
@@ -248,7 +248,7 @@ export default {
         if (this.isFullTime) return false
         if (this.TASK_TIME && this.TASK_TIME[i].length) return false
         return Boolean(!this.LIST.rowdata.find(cust => {
-          return cust.customer_trips.find(x => x.intday === this.INTDAY && String(x.time).substring(0, 2) === time)
+          return this.getCustomerTrips(cust).find(x => x.intday === this.INTDAY && String(x.time).substring(0, 2) === time)
         }))
       })
     },
@@ -257,6 +257,9 @@ export default {
         return this.$app.moment(this.LIST.date).day()
       }
       return undefined
+    },
+    FUTURED () {
+      return !this.$app.moment(this.$app.moment().format('YYYY-MM-DD')).isAfter(this.LIST.date)
     },
     isCanPush () {
       return this.$app.can('items-push')
@@ -269,6 +272,9 @@ export default {
     }
   },
   methods: {
+    getCustomerTrips (cust) {
+      return cust[this.FUTURED ? 'customer_trips' : 'date_trips'] || []
+    },
     getBoxIcon (task) {
       if (task.is_checkout) return 'local_shipping'
       if (task.is_loaded) return 'move_to_inbox'
@@ -317,15 +323,15 @@ export default {
     getMiniBoxClass (task, cust, time) {
       if (!task[cust.id] || !task[cust.id][time]) return ''
       const trips = task[cust.id][time]
-      const background = Boolean(cust.customer_trips && cust.customer_trips.find(x => String(x.time).substring(0, 2) === time))
+      const background = Boolean(this.getCustomerTrips(cust).find(x => String(x.time).substring(0, 2) === time))
 
       if (trips.find(x => x.is_checkout)) return `${background ? 'bg-green-10 text-white' : 'bg-grey-4 text-green-10'}`
       if (trips.find(x => x.is_loaded)) return `${background ? 'bg-blue-8 text-white' : 'bg-grey-4 text-blue-8'}`
       return `${background ? 'bg-blue-grey text-white' : 'bg-grey-4 text-blue-grey'}`
     },
     isTriped (cust, time) {
-      if (!cust.customer_trips) return false
-      return cust.customer_trips.find(x => String(x.time).substring(0, 2) === time && x.intday === this.INTDAY)
+      if (!this.getCustomerTrips(cust)) return false
+      return this.getCustomerTrips(cust).find(x => String(x.time).substring(0, 2) === time && x.intday === this.INTDAY)
     },
     setLoadBoxlink (load) {
       this.$router.push(`/admin/deliveries/delivery-loads/${load.id}`)
@@ -335,8 +341,8 @@ export default {
     },
     getTasks () {
       let customer = this.LIST.filter.customer_id ? `&customer_id=${this.LIST.filter.customer_id}` : ''
-      let url = `${this.LIST.resource.delivery_task}?mode=all&sort=created_at&--with=customer&date=${this.LIST.filter.trip_date}${customer}`
-      // console.warn('GET TASKS', url)
+      let url = `${this.LIST.resource.delivery_task}?mode=all&sort=created_at&--with=customer&date=${this.LIST.date}${customer}`
+
       this.$axios.get(url)
         .then((response) => {
           this.LIST.rowtask = response.data
@@ -349,7 +355,7 @@ export default {
     getLoads () {
       let customer = this.LIST.filter.customer_id ? `&customer_id=${this.LIST.filter.customer_id}` : ''
       let url = `${this.LIST.resource.delivery_load}?mode=all&sort=created_at&--with=customer&date=${this.LIST.filter.trip_date}${customer}`
-      // console.warn('GET LOADS', url)
+
       this.$axios.get(url)
         .then((response) => {
           this.LIST.rowload = response.data
@@ -360,11 +366,14 @@ export default {
         })
     },
     getTrip (done = null) {
-      let customer = this.LIST.filter.customer_id ? `&id=${this.LIST.filter.customer_id}` : ''
-      const intday = this.$app.moment(this.LIST.filter.trip_date).day()
-      let url = `${this.LIST.resource.api}?mode=all&--with=customer_trips&trip_intday=${intday}${customer}`
+      const parameters = [
+        `id=${this.LIST.filter.customer_id || ''}`,
+        `trip_date=${this.LIST.filter.trip_date}`,
+        `trip_futured=${this.FUTURED ? 1 : ''}`
+      ]
+
+      let url = `${this.LIST.resource.api}?mode=all&--with=customer_trips&--appends=date_trips&${parameters.join('&')}`
       this.$q.loading.show()
-      // console.warn('GET TRIPS', url)
       this.$axios.get(url)
         .then((response) => {
           this.LIST.rowdata = response.data
@@ -376,7 +385,7 @@ export default {
         })
     },
     load (done = null) {
-      if (!this.LIST.filter.trip_date) return console.warn('TRIP UNDEFINED!!!')
+      if (!this.LIST.filter.trip_date) return this.$q.notify({ message: 'DATE REQUIRED!' })
       this.LIST.date = this.LIST.filter.trip_date
       this.getTasks()
       this.getLoads()
