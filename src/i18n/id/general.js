@@ -55,6 +55,7 @@ export default {
   packing: 'Input Packing | Inspeksi Packing',
 
   forecast: 'Forecast',
+  forecast_load: 'Forecast Collect',
   request_order: 'Sales Order | Pemesanan Penjualan',
   acc_invoice: 'Invoice Collect | Rekap Faktur',
 

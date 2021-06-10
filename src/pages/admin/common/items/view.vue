@@ -62,7 +62,7 @@
             <q-separator inset />
             <q-card-section>
               <div class="row">
-                <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
+                <q-list class="col-12 col-sm-6 col-md-3">
                   <q-item>
                     <q-item-section avatar>
                       <q-icon name="code" color="primary"/>
@@ -88,7 +88,7 @@
                   </q-item>
                 </q-list>
 
-                <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
+                <q-list class="col-12 col-sm-6 col-md-3">
                   <q-item>
                     <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
                     <q-item-section>
@@ -112,7 +112,7 @@
                   </q-item>
                 </q-list>
 
-                <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
+                <q-list class="col-12 col-sm-6 col-md-3">
                   <q-item>
                     <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
                     <q-item-section>
@@ -129,7 +129,7 @@
                   </q-item>
                 </q-list>
 
-                <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
+                <q-list class="col-12 col-sm-6 col-md-3">
                   <q-item>
                     <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
                     <q-item-section>
@@ -164,7 +164,7 @@
             <q-card-section>
               <div class="row">
 
-                <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
+                <q-list class="col-12 col-sm-6 col-md-3">
                   <q-item>
                     <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
                     <q-item-section>
@@ -188,7 +188,7 @@
                   </q-item>
                 </q-list>
 
-                <q-list :dark="LAYOUT.isDark" class="col-12 col-sm-6 col-md-3">
+                <q-list class="col-12 col-sm-6 col-md-3">
                   <q-item>
                     <q-item-section avatar><q-icon name="code" color="primary"/></q-item-section>
                     <q-item-section>
@@ -215,6 +215,7 @@
                       <q-chip outline square :label="rsView.item_prelines.length - i" color="blue-grey" />
                       {{ preline.line ? preline.line.name : '-' }}
                       <q-chip dense square label="MAIN" color="primary" text-color="white" v-if="preline.ismain" />
+                      <span class="float-right">{{ preline.load_amount }} / {{ rsView.load_type || 'Hanger/Barel' }}</span>
                     </div>
                   </q-card-section>
                 </q-card>

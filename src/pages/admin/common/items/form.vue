@@ -234,24 +234,43 @@
                   <q-list dense class="column reverse">
                     <q-item v-for="(item, index) in rsForm.item_prelines" :key="index" class="no-padding">
                       <q-item-section>
-                        <ux-select-filter
-                          :ref="`pre-line`"
-                          :name="`pre-line-${index}`"
-                          v-model="rsForm.item_prelines[index].line_id"
-                          inverted dense
-                          color="primary"
-                          :prefix="`${rsForm.item_prelines.length - index}. `"
-                          :options="LineOptions"
-                          :inject-filter="(line) => { if(index === 0 && !line.ismain) return false}"
-                          v-validate="isEnginered(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
-                          :error="errors.has(`pre-line-${index}`)"
-                          :error-message="errors.first(`pre-line-${index}`)"
-                        >
-                          <q-badge slot="append" color="teal" label="main" v-if="index === 0"/>
-                        </ux-select-filter>
+                        <div class="row q-gutter-sm">
+                          <div class="col">
+                            <ux-select
+                              :ref="`pre-line`"
+                              :name="`prelines.${index}.line_id`"
+                              :error="errors.has(`prelines.${index}.line_id`)"
+                              :error-message="errors.first(`prelines.${index}.line_id`)"
+                              v-model="rsForm.item_prelines[index].line_id"
+                              inverted dense
+                              color="primary"
+                              :prefix="`${rsForm.item_prelines.length - index}. `"
+                              :options="LineOptions"
+                              filter map-options emit-value
+                              :inject-filter="(line) => { if(index === 0 && !line.ismain) return false}"
+                              v-validate="isEnginered(`required`) + (index  === 0 ? `|included: ${LineOptions.filter(x=> x.ismain === 1).map(x => x.id)}` : '')"
+                            >
+                              <q-badge slot="append" color="teal" label="main" v-if="index === 0"/>
+                            </ux-select>
+                          </div>
+                          <div class="col" style="max-width:170px">
+                            <q-input
+                              type="number" min="0"
+                              :name="`prelines.${index}.line_id`"
+                              :error="errors.has(`prelines.${index}.load_amount`)"
+                              :error-message="errors.first(`prelines.${index}.load_amount`)"
+                              inverted dense
+                              v-model="rsForm.item_prelines[index].load_amount"
+                            >
+                              <div slot="append" class="text-caption">
+                                {{ rsForm.load_type || 'Hanger/Barel'}}
+                              </div>
+                            </q-input>
+                          </div>
+                        </div>
                       </q-item-section>
                       <q-item-section side class="no-padding">
-                        <q-btn :class="{'invisible':!index}" dense flat round icon="clear" color="red-5" @click="removeProduction(index)"/>
+                        <q-btn :class="{'invisible':!index}" class="q-mb-md" dense flat round icon="clear" color="red-5" @click="removeProduction(index)"/>
                       </q-item-section>
                     </q-item>
                   </q-list>

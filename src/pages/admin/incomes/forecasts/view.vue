@@ -4,39 +4,46 @@
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark'/>
       </div>
-      <div class="row justify-around q-gutter-y-sm" >
-        <div class="text-center">
-          <div class="q-headline">FORECAST ORDER</div>
+      <div class="row justify-between q-gutter-y-sm" >
+        <div class="col q-pl-lg q-py-lg">
+          <div class="text-subtitle2">
+            <div class="">FORECAST ORDER</div>
+            <div class="text-sm">{{ rsView.customer.name }} ({{ rsView.customer.code }})</div>
+          </div>
         </div>
         <div class="text-center">
           <table class="q-table table table-bordered" style="width:300px">
-            <tr class="bg-grey-3"><th> Number </th><th> Date</th></tr>
-            <tr><td> {{ rsView.number }} </td>
-                <td> {{ $app.date_format(rsView.created_at) }} </td></tr>
+            <tr class="bg-grey-3 text-uppercase">
+              <th>{{ $tc('label.number') }}</th>
+              <th>{{ $tc('label.period') }}</th>
+            </tr>
+            <tr>
+              <td> {{ rsView.number }} </td>
+              <td>{{ rsView.period ? $app.moment(rsView.period.period).format('MMMM YYYY') : '-' }}</td>
+            </tr>
           </table>
         </div>
         <div class="col-12">
-            <table class="q-table table table-vertical table-dense ">
-              <tr><td class="text-right text-weight-light"> Customer </td><td class="">{{ rsView.customer.name }} ({{ rsView.customer.code }})</td></tr>
-              <tr><td class="text-right text-weight-light"> Period </td><td class="">
-                {{ rsView.begin_date ? $app.moment(rsView.begin_date).format('DD/MM/YYYY') : '' }} - {{ rsView.until_date ? $app.moment(rsView.until_date).format('DD/MM/YYYY') : '' }}
-              </td></tr>
-            </table>
-        </div>
-        <div class="col-12">
-          <q-table ref="table" class="d-grid bordered no-shadow" color="secondary" separator="vertical" dense hide-bottom
-            :data="rsView.forecast_items"
-            no-data-label = "No Production"
-            :columns="[
-              { name: 'code', label: 'code', align: 'left', field: (v)=> v.item.code},
-              { name: 'part_name', label: this.$tc('label.name', 1, {v:this.$tc('label.part')}), align: 'left', field: (v)=> v.item.part_name},
-              { name: 'part_subname', label: this.$app.setting('item.subname_label'), align: 'left', field: (v)=> v.item.part_subname},
-              { name: 'quantity', label: $tc('label.quantity'), align: 'right', field: (v)=> v.quantity},
-              { name: 'unit_id', label: $tc('label.unit'), align: 'center', field: (v)=> v.unit.code},
-            ]"
-          >
-
-          </q-table>
+          <q-markup-table dense flat bordered separator="cell" class="no-highlight">
+            <thead>
+              <tr class="text-uppercase" style="line-height:1.5rem">
+                <th name="code" class="text-left"> code </th>
+                <th name="part_name" class="text-left"> partname </th>
+                <th name="part_subname" class="text-left"> subname </th>
+                <th name="quantity" class="text-right"> quantity </th>
+                <th name="unit_id" class="text-left"> uni </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(row, rowKey) in rsView.forecast_items" :key="rowKey" style="line-height:1.5rem">
+                <td class="text-left">{{ row.item.code }}</td>
+                <td class="text-left">{{ row.item.part_name }}</td>
+                <td class="text-left">{{ row.item.part_subname }}</td>
+                <td class="text-right">{{ row.quantity }}</td>
+                <td class="text-left">{{ row.unit.code }}</td>
+              </tr>
+            </tbody>
+          </q-markup-table>
         </div>
         <div class="col-12">
             <div class="q-my-xs text-italic">{{$tc('label.description')}}:</div>
@@ -58,40 +65,39 @@
 
 import MixView from '@/mixins/mix-view.vue'
 import PagePrint from '@/components/page-print'
-import PagePrintBreak from '@/components/page-print-break'
 
 export default {
   mixins: [MixView],
-  components: { PagePrint, PagePrintBreak },
+  components: { PagePrint },
   data () {
     return {
       VIEW: {
         data: {},
-        resource:{
+        resource: {
           api: '/api/v1/incomes/forecasts',
-          uri: '/admin/incomes/forecasts',
+          uri: '/admin/incomes/forecasts'
         }
       },
       rsView: {},
-      count: 0,
+      count: 0
     }
   },
-  created() {
+  created () {
     this.init()
   },
-  watch:{
-      '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   computed: {
-    IS_EDITABLE() {
+    IS_EDITABLE () {
       if (this.rsView.revise_id) return false
       if (this.rsView.hasOwnProperty('has_relationship') && Object.keys(this.rsView.has_relationship).length > 0) return false
 
       return true
-    },
+    }
   },
   methods: {
-    init() {
+    init () {
       this.VIEW.load((data) => {
         this.setView(data || {})
       })
@@ -99,15 +105,15 @@ export default {
     btnIcon (str) {
       return !this.$q.screen.lt.sm ? str : ''
     },
-    print() {
+    print () {
       window.print()
     },
-    getBaseUnit(detail) {
-      if(detail.unit_rate == 1) return ''
+    getBaseUnit (detail) {
+      if (detail.unit_rate === 1) return ''
       return `(${detail.unit_amount} ${detail.item.unit.code})`
     },
-    setView(data) {
-      this.rsView =  data
+    setView (data) {
+      this.rsView = data
     }
   }
 }

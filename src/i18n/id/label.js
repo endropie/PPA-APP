@@ -38,6 +38,7 @@ export default {
   no: 'No. {v} ',
   note: 'Catatan',
   number: 'Nomor {v}',
+  once: 'Setiap {v}',
   others: 'Lainnya',
   others_configuration: 'Konfigurasi lainnya',
   only: 'Hanya {v}',

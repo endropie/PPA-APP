@@ -118,6 +118,16 @@ const incomes = [
       { page: 'stockcards', path: ':id/stockcards', meta: { mode: 'view', permission: 'acc-invoices-read' } }
 
     ]
+  },
+  {
+    name: 'Forecast Collect',
+    icon: 'timeline',
+    path: 'forecast-loads',
+    lang: 'general.forecast_load',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'forecasts-read' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'forecasts-read' } }
+    ]
   }
 ]
 

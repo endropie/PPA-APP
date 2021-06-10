@@ -1,6 +1,6 @@
 <template>
 <q-page padding class="form-page row justify-center">
-  <q-card inline class="main-box self-start" :dark="LAYOUT.isDark" v-if="FORM.show">
+  <q-card inline class="main-box self-start" v-if="FORM.show">
     <q-card-section>
       <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" >
         <template slot="menu-item">
@@ -15,16 +15,23 @@
           :label="$tc('label.name')"
           v-model="rsForm.name"
           v-validate="'required'"
-          :dark="LAYOUT.isDark"
           :error="errors.has('name')"
           :error-message="errors.first('name')">
-          <q-toggle slot="append"
+          <q-toggle slot="append" class="text-subtitle2"
             name="ismain"
             label="Main" left-label
             v-model="rsForm.ismain"
             :true-value="1" :false-value="0"
-            :dark="LAYOUT.isDark" />
+          />
         </q-input>
+        <q-input
+          name="load capacity"
+          :label="$tc('label.capacity') + ' (Hanger/Barel) '+  $tc('label.once', 1, {v: 'Shift'})"
+          v-model="rsForm.load_capacity"
+          v-validate="'required'"
+          :error="errors.has('load capacity')"
+          :error-message="errors.first('load capacity')"
+        />
 
         <q-input
           :label="$tc('label.description')" stack-label
@@ -32,17 +39,19 @@
           v-model="rsForm.description"
           type="textarea"
           rows="3"
-          :dark="LAYOUT.isDark"/>
+        />
       </form>
     </q-card-section>
-    <q-separator :dark="LAYOUT.isDark" />
+    <q-separator />
     <q-card-actions class="group">
       <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()"></q-btn>
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="FORM.reset()"></q-btn>
       <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()"></q-btn>
     </q-card-actions>
   </q-card>
-    <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
+    <q-inner-loading :showing="FORM.loading">
+      <q-spinner-dots size="70px" color="primary" />
+    </q-inner-loading>
 </q-page>
 </template>
 
@@ -53,74 +62,72 @@ export default {
   mixins: [MixForm],
   data () {
     return {
-      FORM:{
-        resource:{
+      FORM: {
+        resource: {
           uri: '/admin/references/lines',
-          api: '/api/v1/references/lines',
+          api: '/api/v1/references/lines'
         },
-        options:{
-          colors: {data:[], api:'/api/v1/references/lines?mode=all'},
-        },
+        options: {
+          colors: { data: [], api: '/api/v1/references/lines?mode=all' }
+        }
       },
-      rsForm:{},
-      setDefault:()=>{
+      rsForm: {},
+      setDefault: () => {
         return {
-          name:null,
+          name: null,
           ismain: 0,
-          description:null,
+          load_capacity: 0,
+          description: null
         }
       }
     }
   },
-  mounted(){
+  mounted () {
     // Component Page Mounted!
     this.init()
-
   },
-  watch:{
-      '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
       })
     },
-    setForm(data) {
+    setForm (data) {
       this.rsForm = JSON.parse(JSON.stringify(data))
     },
-    onSave() {
+    onSave () {
       this.$validator.validate().then(result => {
         if (!result) {
           this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
-          });
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
+          })
 
-          return;
+          return
         }
         this.FORM.loading = true
-        let {method, mode, apiUrl} = this.FORM.meta();
+        let { method, apiUrl } = this.FORM.meta()
         this.$axios.set(method, apiUrl, this.rsForm)
-        .then((response) => {
-          let message = response.data.name + ' - #' + response.data.id
-          this.FORM.response.success({message:message})
-          this.FORM.toIndex()
-        })
-        .catch((error) => {
-
-          this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error, 'Submit')
-        })
-        .finally(()=>{
-          setTimeout(() => {
-            this.FORM.loading = false
-          }, delayInms)
-
-        });
-
-      });
-    },
-  },
+          .then((response) => {
+            let message = response.data.name + ' - #' + response.data.id
+            this.FORM.response.success({ message: message })
+            this.FORM.toIndex()
+          })
+          .catch((error) => {
+            this.FORM.response.fields(error.response)
+            this.FORM.response.error(error.response || error, 'Submit')
+          })
+          .finally(() => {
+            setTimeout(() => this.FORM.loading = false, 500)
+          })
+      })
+    }
+  }
 }
 </script>

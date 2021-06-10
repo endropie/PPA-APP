@@ -35,12 +35,12 @@
       @click.capture="leftDrawerCapture"
       show-if-above
       v-if="!NODRAWER">
-      <q-scroll-area :class="LAYOUT.isDark ? 'bg-black text-primary' : 'bg-white text-primary'" style="width: 100%; height: 100%;">
+      <q-scroll-area :class="$q.dark.isActive ? 'bg-black text-primary' : 'bg-white text-primary'" style="width: 100%; height: 100%; overflow-y: hidden">
         <div :style="{'height': miniState ? '50px': '115px'}"
           class="row flex-center opacity-1"
           :class="{
-            'bg-primary text-white' : LAYOUT.isDark,
-            'bg-grey-2 text-primary': !LAYOUT.isDark,
+            'bg-primary text-white' : $q.dark.isActive,
+            'bg-grey-2 text-primary': !$q.dark.isActivek,
           }" >
           <!-- <img alt="Quasar logo" src="~assets/quasar-logo.svg" style="height: 75px; width 75px;"> -->
           <q-icon name="widgets" :class="miniState ? 'text-h4' : 'text-h3'"  />
@@ -84,10 +84,9 @@
 
 <script>
 import { openURL } from 'quasar'
-import { mapState, mapActions } from 'vuex'
+import { mapState } from 'vuex'
 import MixPage from '@/mixins/mix-page.vue'
-import DataMenu from "@/assets/data-menu"
-import { type } from 'os';
+import DataMenu from '@/assets/data-menu'
 
 export default {
   mixins: [MixPage],
@@ -95,27 +94,26 @@ export default {
     return {
       DataMenu,
       miniState: false,
-      PANELTAB:'messages'
+      PANELTAB: 'messages'
     }
   },
-  created() {
+  created () {
     this.$q.loading.show()
     this.$axios.validToken((response) => {
       this.$q.loading.hide()
-      if(response.status >= 200 && response.status <= 300) {
-        return
-      }
-      else if(response.status === 401) {
+      if (response.status >= 200 && response.status <= 300) {
+
+      } else if (response.status === 401) {
         this.setLogoff()
-      }
-      else if(response.status >= 400) {
+      } else if (response.status >= 400) {
         console.error('APA', response)
+      } else {
+        this.$q.dialog({
+          message: 'Netwok error!',
+          ok: 'redirect',
+          cancel: 'skip'
+        }).onOk(() => { this.$router.push('/') })
       }
-      else this.$q.dialog({
-        message: 'Netwok error!',
-        ok: 'redirect',
-        cancel: 'skip'
-      }).onOk(() => { this.$router.push('/') })
     })
   },
   computed: {
@@ -125,8 +123,8 @@ export default {
       'AUTH',
       'USER'
     ]),
-    NODRAWER() {
-      return ['view','print','edit','create'].some(x => x === this.$route.meta.mode)
+    NODRAWER () {
+      return ['view', 'print', 'edit', 'create'].some(x => x === this.$route.meta.mode)
     }
   },
   methods: {
@@ -143,24 +141,23 @@ export default {
         this.miniState = false
         e.stopPropagation()
       }
-
     },
     setLogoff () {
       this.$axios.setHeader([
-        {key: 'Accept', value: 'application/json'},
-        {key: 'Authorization', value: null}
+        { key: 'Accept', value: 'application/json' },
+        { key: 'Authorization', value: null }
       ])
-      this.$store.commit('admin/setLogoff');
+      this.$store.commit('admin/setLogoff')
       setTimeout(() => {
         this.$router.push('/auth')
       }, 500)
     },
     setLogout () {
       this.$axios.setHeader([
-        {key: 'Accept', value: 'application/json'},
-        {key: 'Authorization', value: null}
+        { key: 'Accept', value: 'application/json' },
+        { key: 'Authorization', value: null }
       ])
-      this.$store.commit('admin/setLogoff');
+      this.$store.commit('admin/setLogoff')
       setTimeout(() => {
         this.$router.push('/')
       }, 500)
@@ -183,5 +180,3 @@ aside.q-drawer
   .q-loading-bar
     display none
 </style>
-
-

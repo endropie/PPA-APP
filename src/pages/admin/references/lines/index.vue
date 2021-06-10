@@ -51,21 +51,22 @@ export default {
   mixins: [MixIndex],
   data () {
     return {
-      TABLE:{
-        show:false,
-        resource:{
+      TABLE: {
+        show: false,
+        resource: {
           api: '/api/v1/references/lines',
-          uri: '/admin/references/lines',
+          uri: '/admin/references/lines'
         },
         columns: [
-          { name: 'prefix', label: '', align: 'left'},
-          { name: 'name', field: 'name', label: 'Line name', align: 'left', sortable: true},
-          { name: 'ismain', field: 'ismain', label: 'Main line', align: 'left', sortable: true},
-          { name: 'description', field: 'description', label: this.$tc('label.description'), align: 'left'},
+          { name: 'prefix', label: '', align: 'left' },
+          { name: 'name', field: 'name', label: 'Line name', align: 'left', sortable: true, style: 'width:40%' },
+          { name: 'load_capacity', field: 'load_capacity', label: 'Load capacity', align: 'center', sortable: true },
+          { name: 'ismain', field: 'ismain', label: 'Main line', align: 'center' },
+          { name: 'description', field: 'description', label: this.$tc('label.description'), align: 'left', style: 'width:40%' }
         ],
-        rowData:[],
-        resData:[],
-        pagination : {
+        rowData: [],
+        resData: [],
+        pagination: {
           page: 1,
           rowsPerPage: 10,
           rowsNumber: 10 // specifying this determines pagination is server-side,
@@ -74,8 +75,8 @@ export default {
         selected: [
           // initial selection => { id: 5 }
         ],
-        loading: false,
-      },
+        loading: false
+      }
     }
   },
   created () {
@@ -84,12 +85,12 @@ export default {
   },
   computed: {
 
-    isCanUpdate(){
+    isCanUpdate () {
       return this.$app.can('lines-update')
     },
-    isCanDelete(){
+    isCanDelete () {
       return this.$app.can('lines-delete')
-    },
+    }
   }
 }
 </script>
