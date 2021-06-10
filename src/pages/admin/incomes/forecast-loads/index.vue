@@ -192,6 +192,7 @@ export default {
     },
     saveLoad () {
       const submit = () => {
+        this.$q.loading.show()
         this.$axios.post(this.TABLE.resource.api, Object.assign(this.newLoad))
           .then((response) => {
             this.$refs.dialogNewLoad.hide()
@@ -201,13 +202,15 @@ export default {
             console.error(this.$validator, error.response || error)
 
             this.$app.response.error(error.response || error)
-            this.$app.response.fields(error.response || error)
 
             if (this.$validator && error.response && error.response.status === 422) {
               for (const field in error.response.data.errors || {}) {
                 this.$validator.errors.add(Object.assign({ field: field, msg: error.response.data.errors[field][0] }))
               }
             }
+          })
+          .finally(() => {
+            this.$q.loading.hide()
           })
       }
 
