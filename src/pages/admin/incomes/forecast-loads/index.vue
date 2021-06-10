@@ -199,7 +199,7 @@ export default {
             this.INDEX.load()
           })
           .catch((error) => {
-            console.error(this.$validator, error.response || error)
+            console.error(error.response || error)
 
             this.$app.response.error(error.response || error)
 
