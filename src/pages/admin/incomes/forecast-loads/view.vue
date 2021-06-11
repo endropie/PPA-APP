@@ -1,7 +1,10 @@
 <template>
   <q-page padding class="row justify-center" >
     <page-print v-if="VIEW.show" class="q-pa-md q-pr-lg shadow-2">
-      <div class="row justify-end q-gutter-y-sm" >
+      <div class="row justify-between q-gutter-y-sm" >
+        <div class="self-end">
+          <div class="q-pa-lg text-h6 text-uppercase">Forecast Loading</div>
+        </div>
         <div class="text-subtitle2">
           <q-markup-table dense flat bordered separator="none" class="no-highlight" style="width:300px">
             <tbody>
@@ -13,6 +16,10 @@
                 <td width="30%" class="text-uppercase">{{ $tc('label.period') }}</td>
                 <td width="70%" class="">{{ rsView.period ? $app.moment(rsView.period.period).format('MMMM YYYY') : '-' }}</td>
               </tr>
+              <tr>
+                <td width="30%" class="text-uppercase">{{ $tc('label.estimate') }}</td>
+                <td width="70%" class="">{{ rsView.period ? `${rsView.period.days} ${$tc('label.day')}`  : '-' }} </td>
+              </tr>
             </tbody>
           </q-markup-table>
         </div>
@@ -21,8 +28,8 @@
             <thead class="bg-grey-4">
               <tr class="text-uppercase" style="line-height:1.8rem">
                 <th width="50%" name="code" class="text-left"> Line </th>
-                <th width="10%" name="amount" class="text-right"> Amount </th>
-                <th width="10%" name="capacity" class="text-right"> Capacity </th>
+                <th width="10%" name="capacity" class="text-right">{{ $tc('label.capacity') }}</th>
+                <th width="10%" name="amount" class="text-right">{{ $tc('label.amount') }}</th>
                 <th width="10%" name="1-shift" class="text-center"> 1-shift </th>
                 <th width="10%" name="2-shift" class="text-center"> 2-shift </th>
                 <th width="10%" name="3-shift" class="text-center"> 3-shift </th>
@@ -32,11 +39,11 @@
             <tbody v-for="(line, lineKey) in LINE_ROWS" :key="lineKey" style="line-height:1.5rem">
               <tr class="row-line text-subtitle2" style="line-height:1.8rem">
                 <td class="text-left">{{ line.line_name }}</td>
-                <td class="text-right">{{ $app.number_format(LINE_AMOUNTS[lineKey], 0) }}</td>
                 <td class="text-right">{{ $app.number_format(line.capacity, 0) }}</td>
-                <td class="text-center">{{ line.capacity ? `${Number.parseFloat(LINE_AMOUNTS[lineKey]/line.capacity/1).toFixed(2) * 100}%` : '-' }}</td>
-                <td class="text-center">{{ line.capacity ? `${Number.parseFloat(LINE_AMOUNTS[lineKey]/line.capacity/2).toFixed(2) * 100}%` : '-' }}</td>
-                <td class="text-center">{{ line.capacity ? `${Number.parseFloat(LINE_AMOUNTS[lineKey]/line.capacity/3).toFixed(2) * 100}%` : '-' }}</td>
+                <td class="text-right">{{ $app.number_format(LINE_AMOUNTS[lineKey], 0) }}</td>
+                <td class="text-center">{{ line.capacity ? `${$app.number_format(LINE_AMOUNTS[lineKey] / line.capacity / 1 * 100, 0)}%` : '-' }}</td>
+                <td class="text-center">{{ line.capacity ? `${$app.number_format(LINE_AMOUNTS[lineKey] / line.capacity / 2 * 100, 0)}%` : '-' }}</td>
+                <td class="text-center">{{ line.capacity ? `${$app.number_format(LINE_AMOUNTS[lineKey] / line.capacity / 3 * 100, 0)}%` : '-' }}</td>
                 <td class="no-padding">
                   <!-- [{{ mores }}] -->
                   <div class="print-hide">
@@ -53,9 +60,10 @@
                         <th width="10%" class="text-left">code</th>
                         <th width="35%" class="text-left">Part name</th>
                         <th width="35%" class="text-left">Part subname</th>
-                        <th width="20%" class="text-right">Amount</th>
+                        <th width="20%" class="text-right">{{ $tc('label.amount') }}</th>
                         <th width="10%" class="text-left">Unit</th>
-                        <th width="20%" colspan="2" class="text-center">Load</th>
+                        <th width="30%" colspan="2" class="text-center">Load</th>
+                        <th width="10%" class="text-left">Unit</th>
                       </tr>
                     </thead>
                     <tbody class="bg-grey-1">
@@ -65,7 +73,14 @@
                         <td class="text-left">{{ item.item_part_subname }}</td>
                         <td class="text-right">{{ $app.number_format(item.amount, 0) }}</td>
                         <td class="text-left">{{ item.unit_code }}</td>
-                        <td class="text-right">{{ $app.number_format(item.amount_load, 0) }}</td>
+                        <td class="text-right">
+                            {{ $app.number_format(item.amount_load, 0) }}
+                            <span class="text-small text-light">/{{ $tc('label.month') }}</span>
+                        </td>
+                        <td class="text-right">
+                          {{ $app.number_format(item.amount_load/(rsView.period.days || 1), 0) }}
+                          <span class="text-small text-light">/{{ $tc('label.day') }}</span>
+                        </td>
                         <td class="text-left">{{ item.item_load_type }}</td>
                       </tr>
                     </tbody>
