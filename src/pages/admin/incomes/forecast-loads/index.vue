@@ -75,8 +75,8 @@
         <!-- slot name syntax: body-cell-<column_name> -->
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
           <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" />
+          <q-btn dense flat color="light" icon="contact_page" :to="`${TABLE.resource.uri}/${rs.row.id}/man-power`" />
           <q-btn v-if="isCanDelete" dense flat color="light" icon="delete" @click.native="TABLE.delete(rs.row)" :class="{'hidden':  !isEditable(rs.row)}"/>
-
         </q-td>
 
         <q-td slot="body-cell-created" slot-scope="rs" :props="rs">

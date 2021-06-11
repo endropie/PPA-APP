@@ -126,7 +126,8 @@ const incomes = [
     lang: 'general.forecast_load',
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'forecasts-read' } },
-      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'forecasts-read' } }
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'forecasts-read' } },
+      { page: 'view-mp', path: ':id/man-power', meta: { mode: 'view', permission: 'forecasts-read' } }
     ]
   }
 ]
