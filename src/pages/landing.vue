@@ -26,14 +26,6 @@
             no-ripple
           />
 
-          <q-btn no-wrap outline
-            label="Schedule Board"
-            to="/schedule-boards"
-            color="primary"
-            class="full-width"
-            no-ripple
-          />
-
           <div class="fit row justify-center q-mt-lg" :class="{'justify-between': $q.screen.gt.xs}">
 
             <q-btn no-ripple
@@ -54,7 +46,6 @@
               class="q-mt-sm" />
           </div>
 
-
           <privacy-policy ref="privacy" />
         </div>
       </div>
@@ -74,7 +65,7 @@
             :options="servers">
             <q-btn slot="before" flat dense icon="edit" color="blue-grey">
               <q-popup-edit v-model="baseURL" :offset="[0, 10]" >
-                <template  v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
+                <template  v-slot="{ set, cancel }">
                   <q-input v-model="baseURL" dense autofocus>
                     <template v-slot:prepend>
                       <q-icon name="device_hub" color="blue-grey" />
@@ -113,11 +104,11 @@ import PrivacyPolicy from 'components/PrivacyPolicy'
 
 export default {
   components: {
-    PrivacyPolicy,
+    PrivacyPolicy
   },
   data () {
     return {
-      servers:['http://localhost:8000', 'http://localhost:8001', 'http://ppa.virmata.com'],
+      servers: ['http://localhost:8000', 'http://localhost:8001', 'http://ppa.virmata.com'],
       baseURL: null
     }
   },
@@ -154,11 +145,11 @@ export default {
     saveBaseURL () {
       this.$q.loading.show()
       this.$q.localStorage.set('BASE_URL', this.baseURL)
-      this.$axios.setHeader([{ key:'baseURL', value: this.baseURL }])
+      this.$axios.setHeader([{ key: 'baseURL', value: this.baseURL }])
       window.location.reload()
       setTimeout(() => {
         this.$q.loading.hide()
-      }, 2000);
+      }, 2000)
     },
     addBaseURL (val) {
       this.baseURL = val

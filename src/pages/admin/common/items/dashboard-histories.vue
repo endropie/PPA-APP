@@ -223,12 +223,6 @@ export default {
           case 'App\\Models\\Warehouse\\IncomingGoodItem': link = '/admin/deliveries/incoming-goods/' + data.id
             break
 
-          case 'App\\Models\\Warehouse\\OutgoingGoodItem': link = '/admin/warehouses/outgoing-goods/' + data.id
-            break
-
-          case 'App\\Models\\Warehouse\\OutgoingGoodVerification': // link = '/admin/outgoing-goods/'+ data.id
-            break
-
           case 'App\\Models\\Warehouse\\OpnameStockItem': link = '/admin/opname-stocks/' + data.id
             break
 
@@ -245,9 +239,6 @@ export default {
             break
 
           case 'App\\Models\\Income\\RequestOrderItem': link = '/admin/incomes/request-orders/' + data.id
-            break
-
-          case 'App\\Models\\Income\\PreDeliveryItem': link = '/admin/deliveries/pre-deliveries/' + data.id
             break
 
           case 'App\\Models\\Income\\DeliveryOrderItem': link = '/admin/deliveries/delivery-orders/' + data.id

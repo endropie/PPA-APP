@@ -1,11 +1,7 @@
 
-// import GuestLayout from 'layouts/GuestLayout'
-import ScheduleBoards from '@/pages/schedule-boards'
+// import TestPage from '@/pages/test'
 const routes = [
-  {
-    path: '/schedule-boards',
-    component: ScheduleBoards
-  }
+  // { path: '/test-page', component: TestPage }
 ]
 
 export default routes

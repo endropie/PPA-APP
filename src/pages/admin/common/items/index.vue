@@ -149,18 +149,6 @@
             :icon="rs.row.enable ? 'mdi-check-outline' : 'block'" />
           </div>
 
-          <div v-else-if="rs.col.name === 'WO'">
-            <span v-if="Boolean(rs.value !== 0)">
-              {{rs.value}}
-              <q-tooltip>
-                FM({{$app.number_format(rs.row.totals['WOFM'])}})
-                NC({{$app.number_format(rs.row.totals['WONC'])}})
-                NCR({{$app.number_format(rs.row.totals['WONCR'])}})
-              </q-tooltip>
-            </span>
-            <span v-else v-text="'-'" />
-          </div>
-
           <div v-else-if="rs.col.name === 'PDO'">
             <span v-if="Boolean(rs.value !== 0)">
               {{rs.value}}
@@ -237,13 +225,6 @@ export default {
           { name: 'NC', label: 'NC', sortable: true, field: (item) => item.totals['NC'], format: (v) => v ? this.$app.number_format(v) : '-' },
           { name: 'NCR', label: 'NCR', sortable: true, field: (item) => item.totals['NCR'], format: (v) => v ? this.$app.number_format(v) : '-' },
           { name: 'NG', label: 'NG', sortable: true, field: (item) => item.totals['NG'], format: (v) => v ? this.$app.number_format(v) : '-' },
-
-          { name: 'WO',
-            label: 'WO',
-            align: 'center',
-            clases: 'bg-faded', // hidden: (!process.env.DEV && !this.$route.query.DEV),
-            field: (item) => (item.totals['WOFM'] + item.totals['WONC'] + item.totals['WONCR']),
-            Xformat: (v) => v ? this.$app.number_format(v) : '-' },
           { name: 'PDO',
             label: 'PDO',
             align: 'center',
