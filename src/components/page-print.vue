@@ -1,5 +1,5 @@
 <template>
-  <div class="page-print shadow-2" :class="{'bg-dark': $q.dark.isActive}">
+  <div class="column page-print shadow-2" :class="{'bg-dark': $q.dark.isActive}">
     <div class="page-print-layout">
       <table style="width:100%">
         <thead>
@@ -7,8 +7,8 @@
             <td :class="{'header-line': true}">
               <div class="page-print-header header">
                 <slot name="header">
-                  <div class="row items-center" >
-                    <div class="head-icon self-center">
+                  <div class="items-center row" >
+                    <div class="self-center head-icon">
                       <slot name="'header-icon'">
                         <q-avatar color="transparent" text-color="primary" rounded class="q-mr-sm">
                           <img src="/statics/icons/ppa-icon.png" width="100%" />
@@ -31,7 +31,7 @@
                       </div>
                     </div>
                     <q-space />
-                    <div class="col-auto self-end items-end">
+                    <div class="items-end self-end col-auto">
                       <slot name="header-tags"></slot>
                     </div>
                   </div>
@@ -56,6 +56,10 @@
         </tfoot>
       </table>
     </div>
+    <q-space />
+    <div class="page-print-actions">
+      <slot name="actions"></slot>
+    </div>
   </div>
 </template>
 
@@ -76,9 +80,10 @@ export default {
 </script>
 <style lang="stylus">
 .page-print
-  display block
   .page-print-layout
     padding 0 10px
+  .page-print-actions
+    padding 10px
   .header-line
     border-bottom-width 1px
     border-bottom-style solid
@@ -132,6 +137,7 @@ export default {
     align-items normal
 
   .page-print
+    display block
     padding 0 !important
     // margin 0 !important
     box-shadow none
