@@ -51,8 +51,9 @@ export default {
   work_order_lines: 'SPK Lines | SPK Lines',
   work_order_hanger_lines: 'SPK Hanger Lines | SPK Hanger Lines',
   work_process: 'SPK Konfirmasi | Konfirmasi Perintah Kerja',
-  work_production: 'Input Produksi | Pengerjaan Produksi',
-  packing: 'Input Packing | Inspeksi Packing',
+  work_production: 'Proses Produksi | Pengerjaan Produksi',
+  packing: 'Inpeksi Packing | Inspeksi Packing',
+  packing_load: 'Serah-Terima Packing | Serah Terima',
 
   forecast: 'Forecast',
   forecast_load: 'Forecast Collect',

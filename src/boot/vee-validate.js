@@ -1,4 +1,5 @@
 import VeeValidate from 'vee-validate'
+import _ from 'lodash'
 
 VeeValidate.Validator.extend('eq', (value, [paramValue]) => {
   return value === paramValue
@@ -8,6 +9,16 @@ VeeValidate.Validator.extend('phone', (value) => {
   // eslint-disable-next-line camelcase
   let phone_regex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\\./0-9]*$/g
   return phone_regex.test(value)
+}, { hasTarget: true, computesRequired: true })
+
+VeeValidate.Validator.extend('excluded_value', (value, [paramField, ...paramValue]) => {
+  const v = value && paramField ? _.get(value, paramField) : value
+  return (paramValue || []).indexOf(String(v)) === -1
+}, { hasTarget: true, computesRequired: true })
+
+VeeValidate.Validator.extend('included_value', (value, [paramField, ...paramValue]) => {
+  const v = value && paramField ? _.get(value, paramField) : value
+  return (paramValue || []).indexOf(String(v)) > -1
 }, { hasTarget: true, computesRequired: true })
 
 VeeValidate.Validator.extend('lt_value', (value, [paramValue]) => {
