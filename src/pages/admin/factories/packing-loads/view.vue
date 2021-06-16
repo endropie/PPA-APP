@@ -1,12 +1,15 @@
 <template>
   <q-page padding class="content-center justify-start column">
     <page-print v-if="rsView && VIEW.show" style="width:75%;min-width:210mm;min-height:85vh">
+      <div slot="header-tags" class="print-hide">
+        <ux-chip-status :row="rsView" tag outline small square icon='bookmark'/>
+      </div>
       <span slot="header-subtitle">Planing & Production Control Division</span>
 
       <div class="column q-gutter-md" >
         <div class="row q-col-gutter-sm" >
           <div class="self-end col-stretch text-no-wrap text-truncate">
-            <span class="q-pa-lg text-h6 text-uppercase">{{$tc('general.packing', 2)}}</span>
+            <span class="q-pa-lg text-h6 text-uppercase">{{$tc('general.packing_load')}}</span>
           </div>
           <q-space />
           <div class="col-auto">
