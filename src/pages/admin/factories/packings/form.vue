@@ -154,7 +154,7 @@
                   :label="$tc('general.work_order')"
                   :data-vv-as="$tc('general.item')"
                   v-model="rowOrder.work_order_item" clearable
-                  v-validate=""
+                  v-validate="`excluded_value:id,${rsForm.packing_items.packing_item_orders.filter((x,i) => i !== orderKey).map(x => x.work_order_item_id).join(',')}`"
                   popup-content-class="options-striped"
                   filter map-options
                   :source="`/api/v1/factories/work-orders/items?mode=all&has_amount_packing=true&item_id=${rsForm.packing_items.item_id}&or_detail_ids=${rowOrder.work_order_item_id}`"
@@ -177,7 +177,7 @@
                   :data-vv-as="$tc('label.quantity')"
                   v-model="rowOrder.quantity" type="number" :min="0"
                   @input="rsForm.packing_items.quantity = rsForm.packing_items.packing_item_orders.reduce((sum, dtl) => Number(dtl.quantity) + sum,0)"
-                  v-validate="`${rowOrder.work_order_item ? 'required' : ''}|${MinValidate}|max_value:${$app.number_format(MaxOrderUnit[orderKey],0)}`"
+                  v-validate="`${rowOrder.work_order_item ? 'required' : ''}|gt_value:0|max_value:${$app.number_format(MaxOrderUnit[orderKey],0)}`"
                   :error="errors.has(`packing_items.packing_item_orders.${orderKey}.quantity`)"
                   :error-message="errors.first(`packing_items.packing_item_orders.${orderKey}.quantity`)"
                 />
