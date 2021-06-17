@@ -119,14 +119,6 @@
               </div>
               <div class="row">
                 <q-space/>
-                <div v-if="rsView.is_internal">
-                  <q-checkbox left-label color="blue-grey" label="REMAINIG"
-                    v-model="remain_only"
-                    :true-value="true" :false-value="false"
-                    class="print-hide align-end"
-                  />
-                  <span class="text-weight-medium print-only" v-if="remain_only">(REMAINIG)</span>
-                </div>
                 <div>
                   <q-checkbox left-label color="blue-grey" label="UNIT [PCS-KG]"
                     v-model="isDoubleUnit"
@@ -153,8 +145,7 @@
               </q-tr>
               </thead>
               <tbody v-for="(row, index) in rsView.delivery_order_items" :key="index">
-                <q-tr :delivery-order-item-id="row.id"
-                  v-show="isRowMain(row)" >
+                <q-tr :delivery-order-item-id="row.id" >
                   <q-td v-if="IS_LOTS"> {{row.number_lots}} </q-td>
                   <q-td key="part_name">
                     <span class="text-weight-medium" v-if="Boolean(mode)">{{mode}}:&nbsp;</span>
@@ -171,10 +162,7 @@
                     {{!valKG(row) ? '' : $app.number_format(valKG(row), LEN_KG) + ' KG'}}
                   </q-td>
                   <q-td  v-if="!isDoubleUnit" key="quantity" class="text-right">
-                    <span v-if="rsView.is_internal && remain_only">
-                      {{$app.number_format(Number(row.quantity) - (row.amount_reconcile / (row.unit_rate||1)), row.unit.decimal_in)}}
-                    </span>
-                    <span v-else>{{$app.number_format(row.quantity, row.unit.decimal_in)}}</span>
+                    <span>{{$app.number_format(row.quantity, row.unit.decimal_in)}}</span>
                   </q-td>
                   <q-td v-if="!isDoubleUnit" key="unit"  class="text-left">
                     {{row.unit.code}}
@@ -203,9 +191,7 @@
                     </div>
                   </q-td>
                 </q-tr>
-                <q-tr :delivery-order-item-id="row.id"
-                  v-show="isRowMain(row)"
-                  v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
+                <q-tr :delivery-order-item-id="row.id" v-if="['DETAIL', 'UNIT_DETAIL'].find(x => x === rsView.customer.delivery_mode)">
                   <q-td v-if="IS_LOTS"> {{row.number_lots}} </q-td>
                   <q-td>
                     <span class="text-weight-medium">Jasa:&nbsp;</span>
@@ -226,13 +212,6 @@
                   <q-td v-if="!isDoubleUnit" class="text-left">{{row.unit.code}}</q-td>
                   <q-td></q-td>
                 </q-tr>
-              </tbody>
-              <tbody >
-                <tr v-if="rsView.is_internal && remain_only && !rsView.delivery_order_items.filter(x => isRowMain(x)).length">
-                  <td colspan="100%" class="text-italic text-grey text-center" style="height: 42px !important">
-                    <span>NO REMAIN RECORD.</span>
-                  </td>
-                </tr>
               </tbody>
             </q-markup-table>
           </div>
@@ -306,7 +285,6 @@ export default {
         }
       },
       rsView: {},
-      remain_only: true,
       isDoubleUnit: false
     }
   },
@@ -324,9 +302,6 @@ export default {
     },
     IS_LOTS () {
       return Boolean(this.rsView.customer && this.rsView.customer.order_lots)
-    },
-    IS_MAINROW () {
-      return Boolean(!this.rsView.is_internal || !this.remain_only)
     },
     IS_CONFIRM () {
       if (this.rsView.deleted_at) return false
@@ -374,22 +349,8 @@ export default {
       const config = this.$store.state.admin.CONFIG.sj_delivery['hide_view_columns'] || []
       return Boolean(config.some(v => val === v))
     },
-    isRowMain (row) {
-      return this.IS_MAINROW || Math.round(row.unit_amount) !== Math.round(row.amount_reconcile)
-    },
-    getOrderLot (row) {
-      // return
-      console.warn('LOT', row.number_lots)
-    },
     valQrCode (data) {
       return `/delivery-orders/${data.id}`
-      // return `${window.location.origin}/#/admin/deliveries/delivery-orders/${data.id}`
-      // return {
-      //   model: '\\App\\Models\\Income\\DeliveryOrder',
-      //   id: data.id,
-      //   number: data.fullnumber,
-      //   url: `${window.location.origin}/#/admin/deliveries/delivery-loads/${data.id}`
-      // }
     },
     valPCS (row) {
       if (row.unit_id === 1) {

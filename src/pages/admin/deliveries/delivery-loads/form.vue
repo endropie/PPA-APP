@@ -455,10 +455,10 @@ export default {
       if (!this.rsForm.delivery_load_items.length) this.addNewDetail()
     },
     onSave () {
-      const submit = () => {
+      const submit = (overload = 0) => {
         this.FORM.loading = true
         const { apiUrl, method } = this.FORM.meta()
-        this.$axios.set(method, apiUrl, this.rsForm)
+        this.$axios.set(method, apiUrl, Object.assign(this.rsForm, { overload }))
           .then((response) => {
             let message = response.data.number + ' - #' + response.data.id
             this.FORM.response.success({ message: message })
@@ -466,12 +466,24 @@ export default {
           })
           .catch((error) => {
             this.FORM.response.fields(error.response)
+
+            if (typeof error === 'object' && error.response.status === 428) {
+              return this.$q.dialog({
+                title: 'OVER STOCK BY PO',
+                message: 'NEXT, to overload as SJDO internal!',
+                cancel: { color: 'red-2', textColor: 'red-5' },
+                ok: { label: 'NEXT', textColor: 'white', flat: true },
+                focus: 'cancel',
+                class: 'bg-red-5 text-white'
+              }).onOk(() => submit(1))
+            }
             this.FORM.response.error(error.response || error, 'SUBMIT LOAD FAILED')
           })
           .finally(() => {
             this.FORM.loading = false
           })
       }
+
       this.$validator.validate().then(result => {
         if (!result) {
           return this.$q.notify({
