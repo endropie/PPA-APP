@@ -7,6 +7,23 @@
     </q-card-section>
     <q-separator />
     <q-card-section class="q-py-none">
+      <div class="">
+          <ux-select
+          :disable="Boolean(rsForm.id) || Boolean(rsForm.packing_load_items.find(x => x.item))"
+          filter clearable
+          v-model="rsForm.customer"
+          v-validate="'required'" data-vv-as="customer"
+          :label="$tc('general.customer')" stack-label
+          :source="`/api/v1/incomes/customers?mode=all&--limit=50`"
+          :option-label="(opt) => opt.name"
+          :name="`customer_id`"
+          :error="errors.has(`customer_id`)"
+          :error-message="errors.first(`customer_id`)"
+          @input="(v) => {
+            rsForm.customer_id = v ? v.id : null
+          }"
+        />
+      </div>
       <q-markup-table dense flat>
         <thead>
           <tr class="text-uppercase">
@@ -23,13 +40,14 @@
             </q-th>
             <q-td width="60%">
               <ux-select dense outlined hide-bottom-space autofocus
+                :disable="!Boolean(rsForm.customer)"
                 :name="`packing_load_items.${rowIndex}.item_id`"
                 :data-vv-as="$tc('general.item')"
                 v-model="row.item" clearable
                 v-validate="`required|excluded_value:id,${rsForm.packing_load_items.filter((x,i) => i !== rowIndex).map(x => x.item_id).join(',')}`"
                 popup-content-class="options-striped"
                 filter
-                :source="`/api/v1/common/items?mode=all&has_stocks=PFG&or_ids=${ORID[rowIndex] || ''}&--with=item_units`"
+                :source="`/api/v1/common/items?mode=all&has_stocks=PFG&customer_id=${rsForm.customer_id}&or_ids=${ORID[rowIndex] || ''}&--with=item_units`"
                 option-value="id"
                 :option-label="(opt) => opt.part_name"
                 :option-sublabel="(opt) => `[${opt.customer_code}] ${opt.part_subname}`"
@@ -44,6 +62,7 @@
             </q-td>
             <q-td width="30%">
               <q-input dense outlined hide-bottom-space
+                :disable="!Boolean(row.item)"
                 :name="`packing_load_items.${rowIndex}.quantity`"
                 :data-vv-as="$tc('label.quantity')"
                 v-model="row.quantity" type="number" :min="0"
@@ -55,6 +74,7 @@
             </q-td>
             <q-td width="10%">
               <q-select dense outlined hide-bottom-space style="min-width:100px"
+                :disable="!Boolean(row.item)"
                 :name="`packing_load_items.${rowIndex}.unit_id`"
                 :data-vv-as="$tc('label.unit')"
                 no-error-icon
@@ -77,7 +97,10 @@
 
             </q-td>
             <q-td colspan="100%">
-              <q-btn dense outline color="blue-grey" icon-right="add_circle" :label="$tc('form.add_new')" class="fit" @click="addNewItem" />
+              <q-btn dense outline color="blue-grey" icon-right="add_circle" :label="$tc('form.add_new')" class="fit"
+                :disable="!Boolean(rsForm.customer)"
+                @click="addNewItem"
+              />
             </q-td>
           </q-tr>
         </tbody>
@@ -128,7 +151,8 @@ export default {
       setDefault: () => {
         return {
           number: null,
-          // customer_id: null,
+          customer_id: null,
+          customer: null,
           packing_load_items: [{
             item_id: null,
             unit_id: null,

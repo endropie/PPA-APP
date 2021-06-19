@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="page-index" >
     <q-pull-to-refresh @refresh="TABLE.refresh" inline>
-      <q-table ref="table" inline class="table-index table-striped th-uppercase" color="primary" :dark="LAYOUT.isDark"
+      <q-table ref="table" inline class="table-index table-striped th-uppercase" color="primary"
         :title="TABLE.getTitle()"
         :data="TABLE.rowData"
         :columns="TABLE.columns"
@@ -40,52 +40,39 @@
 
             <template slot="default">
               <div class="row q-col-gutter-xs" >
-                <ux-select-filter class="col-8 col-sm-4"
+                <ux-select-filter class="col-12 col-sm-6"
                   v-model="FILTERABLE.fill.customer_id.value" clearable
                   :label="$tc('general.customer')" stack-label
                   :placeholder="$tc('form.select_a', null, {v:$tc('general.customer')})"
                   dense hide-bottom-space hide-dropdown-icon
                   standout="bg-blue-grey-5 text-white"
-                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                  :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
                   :options="CustomerOptions"
                   @input="[
                     FILTERABLE.fill.item_id.value=null,
                     SHEET.load('items', `customer_id=${FILTERABLE.fill.customer_id.value}`),
                     FILTERABLE.submit()
-                  ]"/>
+                  ]"
+                />
 
-                <ux-select-filter class="col-8 col-sm-4"
-                  v-model="FILTERABLE.fill.item_id.value" clearable
-                  :label="$tc('general.item')" stack-label
-                  :placeholder="$tc('form.select_a', null, {v:$tc('general.item')})"
-                  dense hide-bottom-space hide-dropdown-icon
-                  standout="bg-blue-grey-5 text-white"
-                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                  :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
-                  :options="ItemOptions"
-                  @input="FILTERABLE.submit"
-                  :loading="SHEET['items'].loading"/>
-
-                <ux-date class="col-8 col-sm-4"
+                <!-- <ux-date class="col-8 col-sm-4"
                   stack-label :label="$tc('label.date')"
                   v-model="FILTERABLE.fill.date.value" type="date"  clearable
                   dense hide-bottom-space
                   standout="bg-blue-grey-5 text-white"
-                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                  :dark="LAYOUT.isDark"
-                  @input="FILTERABLE.submit"/>
+                  :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
+                  @input="FILTERABLE.submit"
+                /> -->
 
-                <q-select class="col-12" autocomplete="off"
+                <q-select class="col-12 col-sm-6" autocomplete="off"
                   multiple use-chips use-input new-value-mode="add"
                   dense hide-dropdown-icon
                   v-model="FILTERABLE.search" emit-value
                   :placeholder="`${$tc('form.search',2)}...`"
                   standout="bg-blue-grey-5 text-white"
-                  :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                  :dark="LAYOUT.isDark"
-                @input="FILTERABLE.submit">
-
+                  :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
+                  @input="FILTERABLE.submit"
+                >
                   <template slot="append">
                     <q-btn flat dense icon="search" color="blue-grey-10" @click="FILTERABLE.submit"/>
                   </template>
@@ -103,38 +90,9 @@
         </q-td>
 
         <q-td slot="body-cell-customer_id" slot-scope="rs" :props="rs">
-          <div v-if="rs.row.customer"> {{ rs.row.customer.code }}</div>
+          <div v-if="rs.row.customer">[{{ rs.row.customer.code }}] {{ rs.row.customer.name }}</div>
           <div v-else>- undefined -</div>
         </q-td>
-        <q-td slot="body-cell-item" slot-scope="rs" :props="rs">
-          <div class="column" v-if="rs.row.packing_items && rs.row.packing_items.item">
-            <span>{{ rs.row.packing_items.item.part_name }}</span>
-            <span class="text-weight-light">{{ rs.row.packing_items.item.part_subname || '--' }}</span>
-          </div>
-        </q-td>
-        <q-td slot="body-cell-item_number" slot-scope="rs" :props="rs">
-          <div v-if="rs.row.packing_items.item">
-            {{ rs.row.packing_items.item.part_subname }}
-          </div>
-        </q-td>
-        <q-td slot="body-cell-item_name" slot-scope="rs" :props="rs">
-          <div v-if="rs.row.packing_items.item" class="text-body2">
-            {{ rs.row.packing_items.item.part_name }}
-          </div>
-        </q-td>
-        <q-td slot="body-cell-shift_id" slot-scope="rs" :props="rs">
-          <div v-if="rs.row.shift"> {{ rs.row.shift.name }}</div>
-          <div v-else class="text-center">-</div>
-        </q-td>
-        <q-td slot="body-cell-worktime" slot-scope="rs" :props="rs">
-          <div v-if="rs.row.worktime"> {{ rs.row.worktime }}</div>
-          <div v-else class="text-center">-</div>
-        </q-td>
-        <q-td slot="body-cell-date" slot-scope="rs" :props="rs">
-          <div v-if="rs.row.date"> {{ $app.moment(rs.row.date).format('DD/MM/YYYY') }}</div>
-          <div v-else class="text-center">-</div>
-        </q-td>
-
         <q-td slot="body-cell-created_at" slot-scope="rs" :props="rs" class="no-padding">
           <q-btn dense flat no-caps @click="onCommentable(rs.row)" >
             <div class="column text-body">
@@ -174,11 +132,6 @@ export default {
             type: 'integer',
             transform: (value) => { return null }
           },
-          item_id: {
-            value: null,
-            type: 'integer',
-            transform: (value) => { return null }
-          },
           date: {
             value: null,
             type: 'string',
@@ -195,7 +148,7 @@ export default {
         columns: [
           { name: 'prefix', label: '', align: 'left' },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          // { name: 'customer_id', label: this.$tc('general.customer'), align: 'left' },
+          { name: 'customer_id', label: this.$tc('general.customer'), align: 'left' },
           { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center' }
         ]
       }

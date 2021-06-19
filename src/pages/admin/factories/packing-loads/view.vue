@@ -8,8 +8,11 @@
 
       <div class="column q-gutter-md" >
         <div class="row q-col-gutter-sm" >
-          <div class="self-end col-stretch text-no-wrap text-truncate">
-            <span class="q-pa-lg text-h6 text-uppercase">{{$tc('general.packing_load')}}</span>
+          <div class="self-end col-stretch">
+            <div class=" q-pa-lg text-no-wrap text-truncate">
+              <div class="text-h6 text-uppercase">{{$tc('general.packing_load')}}</div>
+              <div class="text-uppercase" v-if="rsView.customer">{{ rsView.customer.name }} [{{ rsView.customer.code }}]</div>
+            </div>
           </div>
           <q-space />
           <div class="col-auto">
