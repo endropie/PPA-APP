@@ -328,7 +328,7 @@ const deliveries = [
     name: 'DEPORTATIONS',
     icon: 'local_offer',
     path: 'deportation-goods',
-    lang: 'general.deportation_goods',
+    lang: 'general.deportation_good',
     resources: [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'deportation-goods-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'deportation-goods-update' } },

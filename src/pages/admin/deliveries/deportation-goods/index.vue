@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="page-index" >
     <q-pull-to-refresh @refresh="TABLE.refresh" inline>
-      <q-table ref="table" inline class="table-index table-striped th-uppercase" color="primary" :dark="LAYOUT.isDark"
+      <q-table ref="table" inline class="table-index table-striped th-uppercase" color="primary"
         :title="TABLE.getTitle()"
         :data="TABLE.rowData"
         :columns="TABLE.columns"
@@ -48,8 +48,7 @@
                     :placeholder="$tc('form.select', 1, {v:$tc('general.customer')})"
                     dense hide-bottom-space hide-dropdown-icon
                     standout="bg-blue-grey-5 text-white"
-                    :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                    :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                    :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
                     :options="CustomerOptions"
                     filter emit-value map-options
                     @input="[
@@ -64,8 +63,7 @@
                     :placeholder="$tc('form.select', 1, {v:$tc('general.item')})"
                     dense hide-bottom-space hide-dropdown-icon
                     standout="bg-blue-grey-5 text-white"
-                    :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                    :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
+                    :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
                     :options="ItemOptions"
                     @input="FILTERABLE.submit"
                     :loading="SHEET['items'].loading"/>
@@ -77,18 +75,18 @@
                 :label=" $tc('label.state')"
                 dense hide-bottom-space hide-dropdown-icon
                 standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark"
-                @input="FILTERABLE.submit" />
+                :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
+                @input="FILTERABLE.submit"
+              />
 
               <ux-date class="col-8 col-sm-4"
                 stack-label :label="$tc('label.date')"
                 v-model="FILTERABLE.fill.date.value" type="date"  clearable
                 dense hide-bottom-space
                 standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark"
-                @input="FILTERABLE.submit"/>
+                :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
+                @input="FILTERABLE.submit"
+              />
 
               <q-select class="col-12" autocomplete="off"
                 multiple use-chips use-input new-value-mode="add"
@@ -96,8 +94,7 @@
                 v-model="FILTERABLE.search" emit-value
                 :placeholder="`${$tc('form.search',2)}...`"
                 standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark"
+                :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
                 @input="FILTERABLE.submit">
 
                 <template slot="before">
@@ -122,13 +119,10 @@
           </div>
         </q-td>
 
-        <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding" style="100px">
+        <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding" align="center">
           <div class="row q-gutter-xs no-wrap">
             <ux-chip-status dense square :row="rs.row"/>
-            <q-chip dense square label="NCR"
-              color="blue-grey" text-color="white"
-              v-if="rs.row.transaction == 'RETURN'"
-            />
+            <q-chip dense square label="CHECKOUT" color="blue-grey" text-color="white" v-if="rs.row.delivery_checkout_id" />
           </div>
         </q-td>
 
@@ -202,8 +196,8 @@ export default {
           { name: 'prefix', label: '', align: 'left' },
           { name: 'date', label: this.$tc('label.date'), field: 'date', format: (v) => this.$app.moment(v).format('DD/MM/YYYY'), align: 'center', style: 'width:120px', sortable: true },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
-          { name: 'status', label: '', field: 'status', align: 'left' },
           { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
+          { name: 'status', label: '', field: 'status', align: 'left' },
           { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center', sortable: true }
         ]
       }

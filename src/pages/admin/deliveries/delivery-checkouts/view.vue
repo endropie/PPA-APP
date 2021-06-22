@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="column items-center justify-start">
+  <q-page padding class="items-center justify-start column">
     <page-print v-if="rsView" :style="{'min-width': $q.screen.gt.sm ? '70%' : '100%'}">
       <div slot="header-title">DELIVERY CHECKOUT <span v-if="rsView">#{{rsView.fullnumber}}</span> </div>
       <div slot="header-tags" class="print-hide">
@@ -7,7 +7,7 @@
       </div>
 
       <div class="column" style="min-height:3.25in;height:auto">
-        <div class="row justify-between q-col-gutter-y-sm" >
+        <div class="justify-between row q-col-gutter-y-sm" >
           <div class="profile self-bottom">
             <q-markup-table dense class="super-dense no-shadow no-highlight text-weight-medium">
               <!-- <tbody></tbody> -->
@@ -46,6 +46,11 @@
                   <q-td>{{ row.customer ? row.customer.name : `#${row.customer_id}`  }}</q-td>
                   <q-td>{{ row.fullnumber }} <span class="text-weight-medium on-right">[INTERNAL]</span></q-td>
                   <q-td align="center">{{ row.transaction }}</q-td>
+                </tr>
+                <tr v-for="(row, index) in rsView.deportation_goods" :key="`deportation-${index}`">
+                  <q-td>{{ row.customer ? row.customer.name : `#${row.customer_id}`  }}</q-td>
+                  <q-td>{{ row.fullnumber }}</q-td>
+                  <q-td align="center" class="text-uppercase">{{ $tc('general.deportation_good', 2) }}</q-td>
                 </tr>
               </tbody>
             </q-markup-table>

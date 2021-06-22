@@ -43,7 +43,7 @@ export default {
   delivery_verify: 'Delivery (Verified) | Verify',
   delivery_load: 'Delivery (Loading) | Load',
   delivery_handovers: 'Bukti Serah Terima | Proof of Handovers',
-  deportation_goods: 'Delivery (Deportation) | Deportation',
+  deportation_good: 'Delivery (Deportation) | Deportation',
   schedule_board: 'Penjadwalan |Jadwal Pengiriman & Penjemputan',
 
   work_order: 'SPK | Surat Perintah Kerja',

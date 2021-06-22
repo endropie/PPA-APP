@@ -1,5 +1,5 @@
 <template>
-<q-page padding class="form-page justify-center">
+<q-page padding class="justify-center form-page">
   <q-card inline class="main-box" v-if="FORM.show && rsForm">
     <q-card-section class="q-py-xs">
       <form-header :title="FORM.title()" :subtitle="`# ` + (rsForm.fullnumber || rsForm.number || FORM.subtitle())" hide-menu>
@@ -9,7 +9,7 @@
       </form-header>
     </q-card-section>
     <q-separator />
-    <q-card-section class="q-pb-none">
+    <q-card-section :class="$app.classDimmed(rsForm.rute_id) + ' q-pb-none'">
       <div class="row q-col-gutter-x-md">
         <ux-select class="col-12 col-sm-6" autofocus
           name="vehicle_id"
@@ -40,7 +40,7 @@
       </div>
     </q-card-section>
     <!-- SINGLE-REVISION -->
-    <q-card-section :class="$app.classDimmed(!rsForm.vehicle_id || rsForm.rute_id) ">
+    <q-card-section :class="$app.classDimmed(!rsForm.vehicle || rsForm.rute_id) ">
       <!-- COLUMN:: Part items lists -->
       <q-card flat bordered class="q-mb-sm" v-for="(row, rowIndex) in rsForm.delivery_checkout_loads" :key="rowIndex">
         <q-card-section>
@@ -108,6 +108,7 @@
           </div>
         </q-card-section>
       </q-card>
+      <!-- DELIVERY INTERNAL -->
       <q-card flat bordered class="q-mb-sm" v-for="(row, rowIndex) in rsForm.delivery_checkout_internals" :key="`internal-${rowIndex}`">
         <q-card-section>
           <ux-select dense hide-bottom-space
@@ -115,7 +116,7 @@
             prefix="INTERNAL: "
             v-model="row.delivery_order"
             filter
-            :source="`/api/v1/incomes/delivery-orders?mode=all&--limit=5&--with=customer&is_internal=1&has_checkout=0&vehicle_id=${rsForm.vehicle_id}&date=${rsForm.date}`"
+            :source="`/api/v1/incomes/delivery-orders?mode=all&--limit=5&--with=customer&is_internal=1&has_load=0&has_checkout=0&vehicle_id=${rsForm.vehicle_id}&date=${rsForm.date}`"
             :source-key="['number', 'description', 'customer']"
             :option-disable="(opt) => opt"
             option-label="fullnumber"
@@ -139,16 +140,49 @@
           <q-btn outline class="" icon="qr_code" color="blue-grey" label="Scan" @click="addInternalScanner()" />
         </q-card-actions>
       </q-card>
+      <!-- DELIVERY DEPORTATION -->
+        <q-card flat bordered class="q-mb-sm" v-for="(row, rowIndex) in rsForm.delivery_checkout_deportations" :key="`deportation-${rowIndex}`">
+        <q-card-section>
+          <ux-select dense hide-bottom-space
+            input-style="margin-top:-4px"
+            prefix="DEPORTATION: "
+            v-model="row.deportation_good"
+            filter
+            :source="`/api/v1/warehouses/deportation-goods?mode=all&--limit=5&--with=customer&has_checkout=0&date=${rsForm.date}`"
+            :source-key="['number', 'description', 'customer']"
+            :option-disable="(opt) => opt"
+            option-label="fullnumber"
+            :option-sublabel="(opt) => `[${opt.customer.code}]`"
+            v-validate="`required`"
+            data-vv-as="Delivery Load"
+            :name="`delivery_checkout_deportations.${rowIndex}.delivery_order_id`"
+            :error="errors.has(`delivery_checkout_deportations.${rowIndex}.delivery_order_id`)"
+            :error-message="errors.first(`delivery_checkout_deportations.${rowIndex}.delivery_order_id`)"
+            :disable="Boolean(row.deportation_good)"
+            @input="(v) => {
+              row.deportation_good_id = v ? v.id : null
+            }"
+            @abort="() => false"
+          >
+            <q-btn slot="after" dense flat color="blue-grey" icon="clear" @click="removeDeportationDetail(rowIndex)" tabindex="100" />
+          </ux-select>
+        </q-card-section>
+        <q-card-actions :vertical="$q.screen.lt.sm" class="q-pt-none" v-if="false">
+          <q-btn outline class="" icon="add_circle" color="positive" :label="$tc('form.add', 2)" @click="addInternalDetail" />
+          <q-btn outline class="" icon="qr_code" color="blue-grey" label="Scan" @click="addInternalScanner()" />
+        </q-card-actions>
+      </q-card>
+      <!-- ACTION -->
       <q-card flat class="q-mb-md">
         <q-card-actions :vertical="$q.screen.lt.sm" class="no-padding">
           <q-btn outline class="" icon="add_circle" color="positive" label="LOADING" @click="addLoadDetail" />
           <q-btn outline class="" icon="add_circle" color="positive" label="INTERNAL" @click="addInternalDetail" />
+          <q-btn outline class="" icon="add_circle" color="positive" label="DEPORTATION" @click="addDeporationDetail" />
           <q-btn outline class="" icon="qr_code" color="blue-grey" label="Scan" @click="addLoadScanner()" />
         </q-card-actions>
       </q-card>
     </q-card-section>
     <q-card-section class="q-pt-none q-gutter-sm">
-      <div class="hidden">[{{RuteCustomers}}]</div>
       <q-select filled dense hide-bottom-space
         input-style="margin-top:-4px"
         label="RUTE: "
@@ -161,7 +195,7 @@
         :name="`rute_id`"
         :error="errors.has(`rute_id`)"
         :error-message="errors.first(`rute_id`)"
-        :disable="!Boolean(RuteCustomers.length)"
+        :disablexx="!Boolean(RuteCustomers.length)"
         :loading="SHEET.rutes.loading"
         @input="(v) => {
           rsForm.rute_id = v ? v.id : null
@@ -182,12 +216,12 @@
       <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()"></q-btn>
     </q-card-actions>
   </q-card>
-  <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark">
+  <q-inner-loading :showing="FORM.loading">
     <q-spinner-dots size="70px" color="primary" />
   </q-inner-loading>
   <q-dialog ref="dialogScanner">
     <q-card>
-      <q-card-section class="row items-center">
+      <q-card-section class="items-center row">
         <q-avatar icon="qr_code" color="primary" text-color="white" />
         <span class="q-ml-sm text-h6">Scaninng code...</span>
       </q-card-section>
@@ -235,12 +269,17 @@ export default {
           operator_id: null,
           description: null,
           delivery_checkout_loads: [],
-          delivery_checkout_internals: []
+          delivery_checkout_internals: [],
+          delivery_checkout_deportations: []
         }
       },
       setInternalDefault: () => ({
         delivery_order_id: null,
         delivery_order: null
+      }),
+      setDeportationDefault: () => ({
+        deportation_good_id: null,
+        deportation_good: null
       }),
       setLoadDefault: () => ({
         delivery_load_id: null,
@@ -268,7 +307,10 @@ export default {
       this.rsForm.delivery_checkout_internals.map(x => {
         if (x.delivery_order) res[x.delivery_order.customer_id] = true
       })
-      console.warn('RuteOptions', Object.keys(res))
+      this.rsForm.delivery_checkout_deportations.map(x => {
+        if (x.deportation_good) res[x.deportation_good.customer_id] = true
+      })
+
       this.SHEET.load('rutes', `customers=${Object.keys(res).join(',')}`)
       return Object.keys(res).join(',')
     },
@@ -299,6 +341,14 @@ export default {
       const model = n[n.length - 2]
 
       switch (model) {
+        case 'deportation-goods':
+          if (this.scanner.key !== null) {
+            this.scanner.key = null
+            return this.$q.notify({ message: `DELIVERY DEPORTATION INVALID`, type: 'negative' })
+          }
+          this.scannedDeportationGood(id)
+          break
+
         case 'internals':
           if (this.scanner.key !== null) {
             this.scanner.key = null
@@ -346,6 +396,32 @@ export default {
       this.$axios.get(`/api/v1/incomes/delivery-orders?mode=all&--with=customer&has_checkout=0&vehicle_id=${this.rsForm.vehicle_id}&date=${this.rsForm.date}&id=${id}`)
         .then(response => {
           if (!response.data.length) this.$q.notify({ message: `DELIVERY INTERNAL [${id}] INVALID!`, type: 'warning' })
+          else added(response.data[0])
+        })
+        .catch(error => {
+          this.$q.notify(`DELIVERY INTERNAL FETCH ERROR ${String(error)}`)
+          console.warn(error.response || error)
+        })
+    },
+    scannedDeportationGood (id) {
+      const added = (data) => {
+        const len = this.rsForm.delivery_checkout_deportations.length
+        const newitem = Object.assign(this.setDeportationDefault())
+        if (this.rsForm.delivery_checkout_deportations[len - 1]) {
+          if (!this.rsForm.delivery_checkout_deportations[len - 1].deportation_good_id) {
+            this.rsForm.delivery_checkout_deportations.splice(len - 1, 1)
+          }
+        }
+        this.rsForm.delivery_checkout_deportations.push({ ...newitem, deportation_good: data, deportation_good_id: data.id })
+      }
+
+      if (this.rsForm.delivery_checkout_deportations.find(x => x.deportation_good_id === parseInt(id))) {
+        return this.$q.notify({ message: 'DELIVERY DEPORTATION HAS ADDED!', type: 'warning' })
+      }
+
+      this.$axios.get(`/api/v1/warehouses/deportation-goods?mode=all&has_checkout=0&date=${this.rsForm.date}&id=${id}`)
+        .then(response => {
+          if (!response.data.length) this.$q.notify({ message: `DELIVERY DEPORTATION [#${id}] INVALID!`, type: 'warning' })
           else added(response.data[0])
         })
         .catch(error => {
@@ -417,10 +493,19 @@ export default {
       this.rsForm.delivery_checkout_internals.splice(index, 1)
       // if (!this.rsForm.delivery_checkout_loads.length) this.addLoadDetail()
     },
+    addDeporationDetail () {
+      const newitem = Object.assign(this.setDeportationDefault())
+      this.rsForm.delivery_checkout_deportations.push(newitem)
+    },
+    removeDeportationDetail (index) {
+      this.rsForm.delivery_checkout_deportations.splice(index, 1)
+      // if (!this.rsForm.delivery_checkout_deportations.length) this.addLoadDetail()
+    },
     onSave () {
       const submit = () => {
         this.FORM.loading = true
         const { apiUrl, method } = this.FORM.meta()
+        console.warn(this.rsForm)
         this.$axios.set(method, apiUrl, this.rsForm)
           .then((response) => {
             let message = this.rsForm.vehicle.number + ' - #' + response.data.fullnumber
