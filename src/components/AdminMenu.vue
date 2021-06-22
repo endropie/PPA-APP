@@ -1,5 +1,5 @@
- 
-<template id="main">    
+
+<template id="main">
   <q-list class="menu">
     <template v-for="(node, index) in AdminMenus">
       <admin-menu-item :node="node" :isIndent="false" :prefix="`/admin/${node.path}`" :key="index" />
@@ -9,23 +9,23 @@
 
 <script>
 import MixPage from '@/mixins/mix-page.vue'
-import AdminMenus from "@/assets/data-menu";
-import AdminMenuItem from "./AdminMenuItem";
+import AdminMenus from '@/assets/data-menu'
+import AdminMenuItem from './AdminMenuItem'
 export default {
   mixins: [MixPage],
   components: {
     'admin-menu-item': AdminMenuItem
   },
-  data() {
+  data () {
     return {
       AdminMenus
     }
-  },
+  }
 }
 </script>
 <style lang="stylus">
 
-.menu 
+.menu
   .q-expansion-item
     .q-expansion-item__content .q-item
       min-height 42px
@@ -41,7 +41,7 @@ export default {
     // padding 2px 0
 
     .q-item
-      // min-height unset 
+      // min-height unset
       // border-radius 0 10px 10px 0
       // margin-right 12px
       // margin-top 1px

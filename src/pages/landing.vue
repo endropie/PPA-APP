@@ -19,12 +19,16 @@
           <br>
 
           <q-btn no-wrap
-            label="ADMINSTRATION SYSTEM"
             to="/admin"
             color="primary"
             class="full-width"
             no-ripple
-          />
+          >
+            <div>
+              MANUPLAY SYSTEM
+              <div class="text-caption self-end">VERSION {{ version }}</div>
+            </div>
+          </q-btn>
 
           <div class="fit row justify-center q-mt-lg" :class="{'justify-between': $q.screen.gt.xs}">
 
@@ -108,6 +112,7 @@ export default {
   },
   data () {
     return {
+      version: process.env.APP_VERSION,
       servers: ['http://localhost:8000', 'http://localhost:8001', 'http://ppa.virmata.com'],
       baseURL: null
     }

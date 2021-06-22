@@ -65,7 +65,8 @@ module.exports = function (ctx) {
     build: {
       env: {
         APP_NAME: JSON.stringify(pkg.productName),
-        APP_DESCRIPTION: JSON.stringify(pkg.description)
+        APP_DESCRIPTION: JSON.stringify(pkg.description),
+        APP_VERSION: JSON.stringify(pkg.version)
       },
       scopeHoisting: true,
       // vueRouterMode: 'history',

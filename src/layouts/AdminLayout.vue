@@ -14,7 +14,8 @@
         <q-icon v-else
           :name="$route.meta.icon"
           style="font-size:28px; margin-right: 5px;"
-          v-show="$route.meta.icon" />
+          v-show="$route.meta.icon"
+        />
         <!-- <q-btn v-else class="cordova-only electron-only" icon="arrow_back" aria-label="Back" flat rounded dense v-go-back.single="PAGEMETA.backRoute" /> -->
         <q-toolbar-title>
           <!-- <q-avatar v-show="$route.meta.icon" :icon="$route.meta.icon" size="24px"  color="red" /> -->
@@ -40,18 +41,18 @@
           class="row flex-center opacity-1"
           :class="{
             'bg-primary text-white' : $q.dark.isActive,
-            'bg-grey-2 text-primary': !$q.dark.isActivek,
+            'bg-grey-2 text-primary': !$q.dark.isActive,
           }" >
           <!-- <img alt="Quasar logo" src="~assets/quasar-logo.svg" style="height: 75px; width 75px;"> -->
           <q-icon name="widgets" :class="miniState ? 'text-h4' : 'text-h3'"  />
           <div class="column q-ml-md"  :class="{'hidden' : miniState}">
             <span class="text-h6">{{$app.setting('general.app_brand') || $app.name}}</span>
-            <span class="caption text-small text-weight-light">MANUPLAY V.2</span>
+            <span class="caption text-small text-weight-light">MANUPLAY {{ version }}</span>
           </div>
         </div>
         <q-list class="menu" :class="{'dimmed' : miniState}">
           <template v-for="(node, index) in DataMenu">
-            <admin-menu-item :node="node" :isIndent="false" :prefix="`/admin/${node.path}`" :key="index" :dark="LAYOUT.isDark"/>
+            <admin-menu-item :node="node" :isIndent="false" :prefix="`/admin/${node.path}`" :key="index" :dark="$q.dark.isActive"/>
           </template>
         </q-list>
       </q-scroll-area>
@@ -61,12 +62,6 @@
           />
         </div>
     </q-drawer>
-    <!-- <q-drawer class="hidden print-hide " side="right"
-      content-class="bg-lime-2"
-      v-model="RIGHTDRAWER"
-      :width="300" bordered
-      v-if="!NODRAWER" >
-    </q-drawer> -->
 
     <q-page-container>
       <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeIn"
@@ -92,6 +87,7 @@ export default {
   mixins: [MixPage],
   data () {
     return {
+      version: process.env.APP_VERSION,
       DataMenu,
       miniState: false,
       PANELTAB: 'messages'
