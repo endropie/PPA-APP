@@ -86,108 +86,179 @@
         :error-message="errors.first('until_datetime')"
       />
     </q-card-section>
-    <q-card-section>
-      <div class="q-pa-md bordered">
-        <!-- COLUMN::2.1th Items Part -->
-        <div class="row q-col-gutter-x-md">
-          <ux-select class="col-12 col-sm-6"
-            name="packing_items.item_id"
-            :label="$tc('general.item')"
-            :data-vv-as="$tc('general.item')"
-            v-model="rsForm.packing_items.item_id" clearable
+    <q-separator spaced />
+    <q-card-section class="q-py-none">
+      <div class="row q-col-gutter-x-md">
+        <ux-select dense outlined class="col-12 col-sm-9"
+          :disable="Boolean(!rsForm.customer_id) || Boolean(rsForm.packing_items.packing_item_orders.find(x => x.work_order_item))"
+          name="packing_items.item_id"
+          :label="$tc('general.item')"
+          :data-vv-as="$tc('general.item')"
+          v-model="rsForm.packing_items.item" clearable
+          v-validate="'required'"
+          popup-content-class="options-striped"
+          filter
+          :source="`/api/v1/common/items?mode=all&has_stocks=WIP&customer_id=${rsForm.customer_id}&--with=item_units`"
+          option-value="id"
+          :option-label="(opt) => opt.part_name"
+          :error="errors.has('packing_items.item_id')"
+          :error-message="errors.first('packing_items.item_id')"
+          @input="(v) => {
+            this.rsForm.packing_items.unit = v ? v.unit : null
+            this.rsForm.packing_items.item_id = v ? v.id : null
+            this.rsForm.packing_items.unit_id = v ? v.unit_id : null
+            this.rsForm.packing_items.unit_rate = 1
+          }" >
+
+          <q-select slot="after" class="no-padding" style="min-width:100px"
+            :disable="Boolean(!rsForm.packing_items.item) || Boolean(rsForm.packing_items.packing_item_orders.find(x => x.work_order_item))"
+            name="packing_items.unit_id"
+            :label="$tc('label.unit')" stack-label
+            :data-vv-as="$tc('label.unit')"
+            no-error-icon
+            v-model="rsForm.packing_items.unit"
+            :options="ItemUnitOptions"
+            option-value="id"
+            option-label="code"
             v-validate="'required'"
-            popup-content-class="options-striped"
-            filter emit-value map-options
-            :options="ItemOptions"
-            :error="errors.has('packing_items.item_id')"
-            :error-message="errors.first('packing_items.item_id')"
-            :loading="SHEET['items'].loading || SHEET['work_order_items'].loading"
-            @input="setItemReference" />
-
-          <q-input class="col-12 col-sm-6"
-            name="packing_items.quantity"
-            :label="$tc('label.quantity')" stack-label
-            :data-vv-as="$tc('label.quantity')"
-            v-model="rsForm.packing_items.quantity" type="number" :min="0"
-            v-validate="`required|${MinValidate}|max_value:${MaxUnit}`"
-            :suffix="rsForm.packing_items.item_id ? `/ ${$app.number_format(MaxUnit)}` : ''"
-            :error="errors.has(`packing_items.quantity`)"
-            :error-message="errors.first(`packing_items.quantity`)" >
-
-            <q-select slot="after" class="no-padding" style="min-width:80px"
-              name="packing_items.unit_id"
-              :label="$tc('label.unit')" stack-label
-              :data-vv-as="$tc('label.unit')"
-              no-error-icon
-              v-model="rsForm.packing_items.unit_id"
-              :options="ItemUnitOptions"
-              map-options emit-value
-              v-validate="'required'"
-              @input="setUnitReference"
-              :error="errors.has('packing_items.unit_id')"
-            />
-
-          </q-input>
-        </div>
-
-        <!-- COLUMN::2.1th Items faults lists -->
-        <div class="column">
-          <q-select name="type_fault_id"
-            label="Type of Faulty"
-            v-model="rsForm.packing_items.type_fault_id"
-            v-validate="''"
-            :options="TypeFaultOptions" clearable
-            map-options emit-value
-            :error="errors.has('type_fault_id')"
-            :error-message="errors.first('type_fault_id')"
-            :disable="rsForm.packing_items.packing_item_faults.some(x => Boolean(x.fault_id))" />
-
-          <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
-            dense separator="horizontal"
-            v-show="rsForm.packing_items.type_fault_id">
-            <q-tr>
-              <q-th key="prefix" width="50px"></q-th>
-              <q-th key="quantity" width="35%">{{$tc('label.quantity')}}</q-th>
-              <q-th key="fault_id">{{$tc('items.fault')}}</q-th>
-            </q-tr>
-            <q-tr v-for="(row, index) in rsForm.packing_items.packing_item_faults" :key="index">
-              <q-td key="prefix">
-                <q-btn dense flat  icon="clear" color="red" @click="removeItemFault(index)"/>
-              </q-td>
-              <q-td key="quantity">
-                <q-input autofocus input-class="text-center WWW"
-                  :name="`packing_items.packing_item_faults.${index}.quantity`"
-                  type="number" min="0" align="center"
-                  outlined dense hide-bottom-space no-error-icon color="blue-grey"
-                  v-model="row.quantity"
-                  v-validate="row.fault_id ? 'required|gt_value:0' : ''"
-                  :data-vv-as="$tc('label.quantity')"
-                  :error="errors.has(`packing_items.packing_item_faults.${index}.quantity`)"
-                  />
-              </q-td>
-              <q-td key="fault_id">
-                <ux-select-filter
-                  :name="`packing_items.packing_item_faults.${index}.fault_id`"
-                  outlined style="min-width:150px"
-                  dense hide-bottom-space no-error-icon color="blue-grey"
-                  v-model="row.fault_id"
-                  :options="FaultOptions" clearable
-                  :disable="!row.quantity"
-                  v-validate="row.quantity ? 'required' : ''"
-                  data-vv-as="fault"
-                  :error="errors.has(`packing_items.packing_item_faults.${index}.fault_id`)"
+            :error="errors.has('packing_items.unit_id')"
+            @input="(v) => {
+              rsForm.packing_items.unit_id = v ? v.id : null
+              rsForm.packing_items.unit_rate = v ? v.rate : 1
+            }"
+          />
+        </ux-select>
+        <q-input readonly dense outlined class="col-12 col-sm-3"
+          name="packing_items.quantity"
+          :label="$tc('label.quantity')" stack-label
+          :data-vv-as="$tc('label.quantity')"
+          v-model="rsForm.packing_items.quantity" type="number" :min="0"
+          v-validate="`required|${MinValidate}|max_value:${MaxUnit}`"
+          :suffix="rsForm.packing_items.item_id ? `/ ${$app.number_format(MaxUnit)}` : ''"
+          :error="errors.has(`packing_items.quantity`)"
+          :error-message="errors.first(`packing_items.quantity`)"
+        />
+      </div>
+      <div class="text-h6">OK</div>
+      <div class="q-mb-md">
+        <q-markup-table dense flat>
+          <tbody>
+            <tr v-for="(rowOrder, orderKey) in rsForm.packing_items.packing_item_orders" :key="orderKey">
+              <td class="text-center no-padding">
+                <q-btn dense outline color="blue-grey" icon="clear" @click="removeItemOrder(orderKey)" />
+              </td>
+              <td class="text-left">
+                <ux-select dense outlined hide-bottom-space
+                  :disable="!rsForm.packing_items.item"
+                  :name="`packing_items.packing_item_orders.${orderKey}.work_order_item_id`"
+                  :label="$tc('general.work_order')"
+                  :data-vv-as="$tc('general.item')"
+                  v-model="rowOrder.work_order_item" clearable
+                  v-validate="`excluded_value:id,${rsForm.packing_items.packing_item_orders.filter((x,i) => i !== orderKey).map(x => x.work_order_item_id).join(',')}`"
+                  popup-content-class="options-striped"
+                  filter map-options
+                  :source="`/api/v1/factories/work-orders/items?mode=all&has_amount_packing=true&item_id=${rsForm.packing_items.item_id}&or_detail_ids=${rowOrder.work_order_item_id}`"
+                  option-value="id"
+                  :option-label="(opt) => `${opt.work_order_number} (#${opt.id})`"
+                  :option-sublabel="(opt) => `Qty: ${opt.quantity}`"
+                  :error="errors.has(`packing_items.packing_item_orders.${orderKey}.work_order_item_id`)"
+                  :error-message="errors.first(`packing_items.packing_item_orders.${orderKey}.work_order_item_id`)"
+                  @input="(v) => {
+                    rowOrder.work_order_item_id = v ? v.id : null
+                  }"
                 />
-              </q-td>
-            </q-tr>
-
-            <q-tr>
-              <q-td></q-td>
-              <q-td colspan="100%">
-                <q-btn dense outline :label="$tc('form.add')" icon="add_circle_outline" color="blue-grey" class="full-width" @click="addNewItemFault()" />
-              </q-td>
-            </q-tr>
-          </q-markup-table>
+              </td>
+              <td class="text-right">
+                <q-input dense outlined hide-bottom-space
+                  :disable="!rowOrder.work_order_item"
+                  :name="`packing_items.packing_item_orders.${orderKey}.quantity`"
+                  :label="$tc('label.quantity')" stack-label
+                  :suffix="`/ ${$app.number_format(MaxOrderUnit[orderKey],0)}`"
+                  :data-vv-as="$tc('label.quantity')"
+                  v-model="rowOrder.quantity" type="number" :min="0"
+                  @input="rsForm.packing_items.quantity = rsForm.packing_items.packing_item_orders.reduce((sum, dtl) => Number(dtl.quantity) + sum,0)"
+                  v-validate="`${rowOrder.work_order_item ? 'required' : ''}|gt_value:0|max_value:${$app.number_format(MaxOrderUnit[orderKey],0)}`"
+                  :error="errors.has(`packing_items.packing_item_orders.${orderKey}.quantity`)"
+                  :error-message="errors.first(`packing_items.packing_item_orders.${orderKey}.quantity`)"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td class="no-padding"></td>
+              <td colspan="100%">
+                <q-btn outline color="blue-grey" icon="add" :label="$tc('form.add_new')" @click="addNewItemOrder()" class="fit" />
+              </td>
+            </tr>
+          </tbody>
+        </q-markup-table>
+      </div>
+    </q-card-section>
+    <q-separator spaced />
+    <q-card-section class="q-py-none">
+      <div class="column ">
+        <div class="row">
+          <span class="col-grow text-h6">
+            FAULTY
+          </span>
+          <div class="" style="min-width:200px">
+            <q-select dense outlined name="type_fault_id"
+              label="Type of Faulty"
+              v-model="rsForm.packing_items.type_fault_id"
+              v-validate="''"
+              :options="TypeFaultOptions" clearable
+              map-options emit-value
+              :error="errors.has('type_fault_id')"
+              :error-message="errors.first('type_fault_id')"
+              :disable="rsForm.packing_items.packing_item_faults.some(x => Boolean(x.fault_id))"
+            />
+          </div>
         </div>
+
+        <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
+          dense separator="horizontal"
+          v-show="rsForm.packing_items.type_fault_id">
+          <q-tr>
+            <q-th key="prefix" width="50px"></q-th>
+            <q-th key="quantity" width="35%">{{$tc('label.quantity')}}</q-th>
+            <q-th key="fault_id">{{$tc('items.fault')}}</q-th>
+          </q-tr>
+          <q-tr v-for="(row, index) in rsForm.packing_items.packing_item_faults" :key="index">
+            <q-td key="prefix">
+              <q-btn dense flat  icon="clear" color="red" @click="removeItemFault(index)"/>
+            </q-td>
+            <q-td key="quantity">
+              <q-input autofocus input-class="text-center WWW"
+                :name="`packing_items.packing_item_faults.${index}.quantity`"
+                type="number" min="0" align="center"
+                outlined dense hide-bottom-space no-error-icon color="blue-grey"
+                v-model="row.quantity"
+                v-validate="row.fault_id ? 'required|gt_value:0' : ''"
+                :data-vv-as="$tc('label.quantity')"
+                :error="errors.has(`packing_items.packing_item_faults.${index}.quantity`)"
+                />
+            </q-td>
+            <q-td key="fault_id">
+              <ux-select-filter
+                :name="`packing_items.packing_item_faults.${index}.fault_id`"
+                outlined style="min-width:150px"
+                dense hide-bottom-space no-error-icon color="blue-grey"
+                v-model="row.fault_id"
+                :options="FaultOptions" clearable
+                :disable="!row.quantity"
+                v-validate="row.quantity ? 'required' : ''"
+                data-vv-as="fault"
+                :error="errors.has(`packing_items.packing_item_faults.${index}.fault_id`)"
+              />
+            </q-td>
+          </q-tr>
+
+          <q-tr>
+            <q-td></q-td>
+            <q-td colspan="100%">
+              <q-btn dense outline :label="$tc('form.add')" icon="add_circle_outline" color="blue-grey" class="full-width" @click="addNewItemFault()" />
+            </q-td>
+          </q-tr>
+        </q-markup-table>
       </div>
 
     </q-card-section>
@@ -240,9 +311,7 @@ export default {
           api: '/api/v1/factories/packings'
         }
       },
-      rsForm: {
-        packing_items: {}
-      },
+      rsForm: null,
       rsData: {},
       setDefault: () => {
         return {
@@ -261,11 +330,17 @@ export default {
             item_id: null,
             unit_id: null,
             unit_rate: 1,
-            item: {},
-            unit: {},
-            quantity: null,
-            work_order_item_id: null,
+            item: null,
+            unit: null,
+            quantity: 0,
             type_fault_id: null,
+            packing_item_orders: [
+              {
+                work_order_item: null,
+                work_order_item_id: null,
+                quantity: null
+              }
+            ],
             packing_item_faults: [
               {
                 id: null,
@@ -308,8 +383,6 @@ export default {
       return data.map(item => {
         item.amount_packing -= hasold(item.id)
         let total = (Number(item.amount_process) - Number(item.amount_packing))
-        // console.warn('TEST', UnitRate)
-        // if (item.id === this.rsForm.packing_items.item_id) total = total / UnitRate
         return ({
           label: item.work_order.fullnumber || item.work_order.number,
           value: item.id,
@@ -373,49 +446,38 @@ export default {
       })) || [])
     },
     ItemUnitOptions () {
-      let vars = []
-
       let rsItem = this.rsForm.packing_items
-      vars = (this.UnitOptions || [])
-      vars = vars.filter((unit) => {
-        if (!rsItem.item_id) return false
+      return this.UnitOptions.map((unit) => {
+        unit.rate = null
         if (rsItem.item) {
-          if (rsItem.item.unit_id === unit.value) return true
-          if (rsItem.item.item_units) {
-            let filters = rsItem.item.item_units.filter((fill) => fill.unit_id === unit.value)
-            if (filters.length > 0) return true
+          if (rsItem.item.unit_id === unit.value) unit.rate = 1
+          else if (rsItem.item.item_units) {
+            let find = rsItem.item.item_units.find((fill) => fill.unit_id === unit.value)
+            if (find) unit.rate = find.rate
           }
         }
-        return false
-      })
-      return vars
+        return unit
+      }).filter(x => x.rate) || []
     },
     MaxUnit () {
       let rsItem = this.rsForm.packing_items
-      if (!rsItem.item_id) return 0
-      if (this.WorkOrderItemOptions.length === 0) return 0
+      if (!rsItem.item) return 0
+      const stock = rsItem.item.totals['WIP'] / (rsItem.unit_rate || 1)
+      const faults = rsItem.packing_item_faults.reduce((sum, item) => Number(item.quantity) + sum, 0)
+      return (rsItem.id ? (rsItem.quantity + rsItem.faulty) : 0) + (stock || 0) - faults
+    },
+    MaxOrderUnit () {
+      let rsItem = this.rsForm.packing_items
+      if (!rsItem.item_id) return []
 
-      const UnitRate = this.rsForm.packing_items.unit_rate || 1
+      // const UnitRate = this.rsForm.packing_items.unit_rate || 1
 
-      let total = this.WorkOrderItemOptions.reduce((total, opt) => {
-        return (opt.rowdata.item_id !== rsItem.item_id)
-          ? total
-          : total += (Number(opt.rowdata.amount_process) - Number(opt.rowdata.amount_packing)) / UnitRate
-      }, 0)
-
-      if (this.FORM.data.packing_items.unit_total) {
-        total += Number(this.FORM.data.packing_items.unit_total)
-      }
-
-      let faults = 0
-      if (this.rsForm.packing_items && this.rsForm.packing_items.packing_item_faults) {
-        faults = this.rsForm.packing_items.packing_item_faults.reduce((calc, item) => {
-          return Number(calc) + Number(item.quantity)
-        }, 0)
-      }
-
-      total -= faults
-      return total
+      return rsItem.packing_item_orders.map((orderDetail, orderDetailKey) => {
+        if (!orderDetail.work_order_item) return 0
+        return Number(orderDetail.work_order_item.amount_process / (rsItem.unit_rate || 1)) -
+              Number(orderDetail.work_order_item.amount_packing / (rsItem.unit_rate || 1)) +
+              Number(orderDetail.id ? orderDetail.quantity : 0)
+      })
     },
     MAPINGKEY () {
       let variables = {
@@ -475,34 +537,14 @@ export default {
         this.SHEET.load('work_order_items', params.join('&'))
       }
     },
-    setItemReference (val) {
-      if (!val) {
-        this.rsForm.packing_items.unit_id = null
-        this.rsForm.packing_items.work_order_item_id = null
-        this.rsForm.packing_items.unit = {}
-        this.rsForm.packing_items.item = {}
-      } else {
-        let baseUnitID = this.MAPINGKEY['items'][val].unit_id
-        this.rsForm.packing_items.unit_id = baseUnitID
-        this.rsForm.packing_items.unit_rate = 1
-
-        this.rsForm.packing_items.item = this.MAPINGKEY['items'][val]
-        this.rsForm.packing_items.unit = this.MAPINGKEY['units'][baseUnitID]
-
-        this.rsForm.packing_items.work_order_item_id = null
-      }
+    addNewItemOrder (autofocus = true) {
+      let newEntri = this.setDefault().packing_items.packing_item_orders[0]
+      this.rsForm.packing_items.packing_item_orders.push(newEntri)
     },
-    setUnitReference (val) {
-      if (!val) return undefined
-      else if (this.rsForm.packing_items.item.unit_id === val) {
-        this.rsForm.packing_items.unit_rate = 1
-      } else {
-        if (this.rsForm.packing_items.item.item_units) {
-          this.rsForm.packing_items.item.item_units.map((unitItem) => {
-            if (unitItem.unit_id === val) this.rsForm.packing_items.unit_rate = unitItem.rate
-          })
-        }
-      }
+    removeItemOrder (index) {
+      this.rsForm.packing_items.packing_item_orders.splice(index, 1)
+      this.rsForm.packing_items.quantity = this.rsForm.packing_items.packing_item_orders.reduce((sum, dtl) => Number(dtl.quantity) + sum, 0)
+      if (this.rsForm.packing_items.packing_item_orders.length < 1) this.addNewItemOrder()
     },
 
     addNewItemFault (autofocus = true) {
@@ -521,8 +563,6 @@ export default {
         let { method, apiUrl } = this.FORM.meta()
         this.$axios.set(method, apiUrl, this.rsForm)
           .then(response => {
-            console.warn('response', response)
-
             let message = response.data.number + ' - #' + response.data.id
             this.FORM.response.success({ message: message })
             this.FORM.toView(response.data.id)

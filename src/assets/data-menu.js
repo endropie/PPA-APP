@@ -407,7 +407,7 @@ const factories = [
     ]
   },
   {
-    name: 'Packing Goods',
+    name: 'Inspection Packing',
     icon: 'move_to_inbox',
     path: 'packings',
     lang: 'general.packing',
@@ -417,6 +417,18 @@ const factories = [
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'packings-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'packings-update' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'packings-read' } }
+    ]
+  },
+  {
+    name: 'Packing Handover',
+    icon: 'move_to_inbox',
+    path: 'packing-loads',
+    lang: 'general.packing_load',
+    resources: [
+      { page: 'index', path: '', icon: 'list', meta: { permission: 'packing-loads-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'packing-loads-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'packing-loads-update' } },
+      { page: 'view', path: ':id', meta: { mode: 'view', permission: 'packing-loads-read' } }
     ]
   },
   {
