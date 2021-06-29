@@ -101,6 +101,7 @@
           :source="`/api/v1/common/items?mode=all&has_stocks=WIP&customer_id=${rsForm.customer_id}&--with=item_units`"
           option-value="id"
           :option-label="(opt) => opt.part_name"
+          :option-sublabel="(opt) => opt.part_subname"
           :error="errors.has('packing_items.item_id')"
           :error-message="errors.first('packing_items.item_id')"
           @input="(v) => {
@@ -110,6 +111,11 @@
             this.rsForm.packing_items.unit_rate = 1
           }" >
 
+          <q-field slot="after" label="Subname" readonly>
+            <div slot="control" v-if="this.rsForm.packing_items.item" class="self-center align-center text-caption">
+              [{{ this.rsForm.packing_items.item.customer_code }}] {{ this.rsForm.packing_items.item.part_subname }}
+            </div>
+          </q-field>
           <q-select slot="after" class="no-padding" style="min-width:100px"
             :disable="Boolean(!rsForm.packing_items.item) || Boolean(rsForm.packing_items.packing_item_orders.find(x => x.work_order_item))"
             name="packing_items.unit_id"
