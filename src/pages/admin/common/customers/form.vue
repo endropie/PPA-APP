@@ -334,6 +334,14 @@
                 <div class="text-small text-grey">{{ $tc('customers.detail.partialidate_allowed') }}</div>
               </div>
             </q-checkbox>
+            <q-checkbox name="delivery_over_allowed" v-model="rsForm.delivery_over_allowed" :false-value="0" :true-value="1"
+              v-show="rsForm.order_mode !== 'ACCUMULATE'"
+            >
+              <div class="column text-caption text-faded" style="line-height:normal">
+                <div class="text-weight-bold">{{ $tc('customers.delivery_over_allowed') }}</div>
+                <div class="text-small text-grey">{{ $tc('customers.detail.delivery_over_allowed') }}</div>
+              </div>
+            </q-checkbox>
           </div>
           <div class="col-12 col-md-4 column">
             <q-checkbox name="invoice_request_required" v-model="rsForm.invoice_request_required" :false-value="0" :true-value="1" v-show="rsForm.order_mode === 'NONE'" >
@@ -454,6 +462,7 @@ export default {
           customer_trips: [],
 
           delivery_manual_allowed: 0,
+          delivery_over_allowed: 0,
           order_manual_allowed: 0,
           order_monthly_actived: 0,
           order_lots: 0

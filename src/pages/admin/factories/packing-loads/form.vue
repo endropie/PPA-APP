@@ -28,9 +28,10 @@
         <thead>
           <tr class="text-uppercase">
             <q-th auto-width  class="no-padding"></q-th>
-            <q-th width="60%">Part</q-th>
+            <q-th width="35%">Partname</q-th>
+            <q-th width="35%">Subname</q-th>
             <q-th width="20%">Quantity</q-th>
-            <q-th width="20%">unit</q-th>
+            <q-th width="10%">unit</q-th>
           </tr>
         </thead>
         <tbody>
@@ -38,7 +39,7 @@
             <q-th auto-width  class="no-padding">
               <q-btn dense outline color="blue-grey" icon="clear" @click="removeItem(rowIndex)" />
             </q-th>
-            <q-td width="60%">
+            <q-td width="35%">
               <ux-select dense outlined hide-bottom-space autofocus
                 :disable="!Boolean(rsForm.customer)"
                 :name="`packing_load_items.${rowIndex}.item_id`"
@@ -60,7 +61,12 @@
                   row.unit_rate = 1
                 }"  />
             </q-td>
-            <q-td width="30%">
+            <q-td width="35%">
+              <q-field dense outlined hide-bottom-space readonly >
+                <div v-if="row.item" class="self-center">[{{ row.item.customer_code }}] {{ row.item.part_subname }}</div>
+              </q-field>
+            </q-td>
+            <q-td width="20%">
               <q-input dense outlined hide-bottom-space
                 :disable="!Boolean(row.item)"
                 :name="`packing_load_items.${rowIndex}.quantity`"

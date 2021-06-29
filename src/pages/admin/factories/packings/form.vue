@@ -177,7 +177,7 @@
                   :data-vv-as="$tc('label.quantity')"
                   v-model="rowOrder.quantity" type="number" :min="0"
                   @input="rsForm.packing_items.quantity = rsForm.packing_items.packing_item_orders.reduce((sum, dtl) => Number(dtl.quantity) + sum,0)"
-                  v-validate="`${rowOrder.work_order_item ? 'required' : ''}|gt_value:0|max_value:${$app.number_format(MaxOrderUnit[orderKey],0)}`"
+                  v-validate="`${rowOrder.work_order_item ? 'required' : ''}|gt_value:0|max_value:${(MaxOrderUnit[orderKey])}`"
                   :error="errors.has(`packing_items.packing_item_orders.${orderKey}.quantity`)"
                   :error-message="errors.first(`packing_items.packing_item_orders.${orderKey}.quantity`)"
                 />
