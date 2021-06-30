@@ -81,13 +81,13 @@
                   {{ rsView.packing_items.unit.code }}
                 </q-td>
                 <q-td key="quantity" class="text-right">
-                  {{ rsView.packing_items.quantity }}
+                  {{ $app.number_format(rsView.packing_items.quantity, rsView.packing_items.unit.decimal_in) }}
                 </q-td>
                 <q-td key="faulty" class="text-right">
                   {{ rsView.packing_items.faulty }}
                 </q-td>
                 <q-td key="total" class="text-right">
-                  {{ Number(rsView.packing_items.quantity) + Number(rsView.packing_items.faulty) }}
+                  {{ $app.number_format(Number(rsView.packing_items.quantity) + Number(rsView.packing_items.faulty), rsView.packing_items.unit.decimal_in) }}
                 </q-td>
               </q-tr>
               <tr v-if="PACKING_ITEM_ORDERS.length">
@@ -113,7 +113,7 @@
                     <span class="text-upprecase text-subtitle1">FAULTY:</span>
                     <template v-for="(item_fault, index) in rsView.packing_items.packing_item_faults">
                       <q-chip :key="index" class="bg-grey-3 bordered" square dense>
-                        <q-avatar color="faded" text-color="white">{{item_fault.quantity}}</q-avatar>
+                        <q-avatar color="faded" text-color="white">{{ $app.number_format(item_fault.quantity) }}</q-avatar>
                         {{item_fault.fault.name}}
                       </q-chip>
                     </template>

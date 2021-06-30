@@ -68,7 +68,7 @@
                   {{row.unit.code}}
                 </q-td>
                 <q-td key="quantity" class="text-right">
-                  {{row.quantity}}
+                  {{ $app.number_format(row.quantity, row.unit.decimal_in) }}
                 </q-td>
               </q-tr>
             </tbody>
@@ -131,57 +131,55 @@
 
 import MixView from '@/mixins/mix-view.vue'
 import PagePrint from '@/components/page-print'
-import PagePrintBreak from '@/components/page-print-break'
 
 export default {
   mixins: [MixView],
-  components: { PagePrint, PagePrintBreak },
+  components: { PagePrint },
   data () {
     return {
       VIEW: {
-        resource:{
+        resource: {
           api: '/api/v1/factories/work-productions',
           uri: '/admin/factories/work-productions',
           params: '?mode=view'
         }
       },
       rsView: {},
-      count: 0,
+      count: 0
     }
   },
-  created() {
+  created () {
     this.init()
   },
   computed: {
-    IS_EDITABLE() {
+    IS_EDITABLE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
       if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
 
       return true
-    },
+    }
   },
   methods: {
-    init() {
+    init () {
       this.VIEW.load((data) => {
         this.setView(data || {})
       })
     },
-    print() {
+    print () {
       window.print()
     },
-    getStockistFrom(val) {
+    getStockistFrom (val) {
       const stockist = [
-        {value: 'FM', label: 'FRESH MATERIAL'},
-        {value: 'NC', label: 'NOT GOOD',  color: 'warning' },
-        {value: 'NCR', label: 'REPAIR',  color: 'orange-8' },
+        { value: 'FM', label: 'FRESH MATERIAL' },
+        { value: 'NC', label: 'NOT GOOD', color: 'warning' },
+        { value: 'NCR', label: 'REPAIR', color: 'orange-8' }
       ]
       const v = stockist.find(x => x.value === val)
       return v ? v.label : 'N/A'
-
     },
-    setView(data) {
-      this.rsView =  data
+    setView (data) {
+      this.rsView = data
     }
   }
 }
