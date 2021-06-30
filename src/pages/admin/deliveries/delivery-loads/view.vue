@@ -20,7 +20,7 @@
                 <q-btn dense class="q-ma-xs" :key="index"
                   color="secondary" icon="open_in_new"
                   :label="`${link.fullnumber}`"
-                  @click="showDO(link.id)"
+                  @click="showDO(link.id, link.is_internal)"
                 />
               </template>
             </div>
@@ -117,8 +117,8 @@
               <q-tr v-for="(row, index) in rsView.delivery_load_items" :key="index">
                 <q-td>{{row.item.part_name}}</q-td>
                 <q-td>{{row.item.part_subname}}</q-td>
-                <q-td class="text-center">{{row.unit.code}}</q-td>
-                <q-td class="text-right">{{$app.number_format(row.quantity, $app.get(row, 'unit.decimal_in') || 0)}}</q-td>
+                <q-td class="text-center">{{ row.unit.code }}</q-td>
+                <q-td class="text-right">{{ $app.number_format(row.quantity, $app.get(row, 'unit.decimal_in') || 0) }}</q-td>
                 <q-td>{{row.encasement || '-'}}</q-td>
               </q-tr>
               </tbody>
@@ -131,8 +131,8 @@
           <div>
             <div class="text-black text-weight-medium">
               SJDO:
-              <span v-for="(link, i) in rsView.delivery_orders" :key="i" @click="showDO(link.id)" class="cursor-pointer">
-                ({{i+1}}) {{link.fullnumber}}
+              <span v-for="(link, i) in rsView.delivery_orders" :key="i" @click="showDO(link.id, link.is_internal)" class="cursor-pointer">
+                ({{ i+1 }}) {{ link.fullnumber }}
               </span>
             </div>
           </div>
@@ -199,9 +199,13 @@ export default {
       return `/delivery-loads/${data.id}`
       // return `${window.location.origin}/#/admin/deliveries/delivery-loads/${data.id}`
     },
-    showDO (id) {
+    showDO (id, internal = false) {
+      const path = internal
+        ? '/admin/deliveries/delivery-order-internals/view'
+        : '/admin/deliveries/delivery-orders/view'
+
       let mode = {
-        path: '/admin/deliveries/delivery-orders/view',
+        path,
         params: { id: id },
         meta: { mode: 'view' },
         actions: {
