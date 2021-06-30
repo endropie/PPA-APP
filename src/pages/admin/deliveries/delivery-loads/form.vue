@@ -467,15 +467,36 @@ export default {
           .catch((error) => {
             this.FORM.response.fields(error.response)
 
-            if (typeof error === 'object' && error.response.status === 428) {
-              return this.$q.dialog({
-                title: 'OVER STOCK BY PO',
-                message: 'NEXT, to overload as SJDO internal!',
-                cancel: { color: 'red-2', textColor: 'red-5' },
-                ok: { label: 'NEXT', textColor: 'white', flat: true },
-                focus: 'cancel',
-                class: 'bg-red-5 text-white'
-              }).onOk(() => submit(1))
+            if (typeof error === 'object') {
+              let message = ''
+              if (error.response.data.over && error.response.data.over.length) {
+                message += error.response.data.over.map(item => `<br>${item.name} [${item.subname}] => ${item.amount} ${item.unit}`).join(' ')
+              }
+
+              if (error.response.status === 428) {
+                message = 'NEXT, to overload as SJDO internal!<br>' + message
+                return this.$q.dialog({
+                  title: 'OVER STOCK BY PO',
+                  message: message,
+                  html: true,
+                  cancel: { color: 'red-2', textColor: 'red-5' },
+                  ok: { label: 'NEXT', textColor: 'white', flat: true },
+                  focus: 'cancel',
+                  class: 'bg-red-5 text-white'
+                }).onOk(() => submit(1))
+              }
+
+              if (error.response.status === 430) {
+                message = 'Delivery loading is Failed!<br>' + message
+                return this.$q.dialog({
+                  title: 'OVER STOCK BY PO',
+                  message: message,
+                  html: true,
+                  cancel: { color: 'blue-grey' },
+                  ok: false,
+                  focus: 'cancel'
+                })
+              }
             }
             this.FORM.response.error(error.response || error, 'SUBMIT LOAD FAILED')
           })

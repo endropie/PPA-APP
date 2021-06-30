@@ -570,13 +570,14 @@ export default {
 
     onSaved () {
       if (!this.$app.can('customers-push')) return this.FORM.toIndex()
-      this.$q.dialog({ title: 'ACCURATE', message: 'are push to accurate?', cancel: true })
-        .onOk(() => {
-          this.onPush()
-        })
-        .onCancel(() => {
-          this.FORM.toIndex()
-        })
+      this.$q.dialog({
+        title: 'ACCURATE',
+        message: 'are push to accurate?',
+        cancel: true,
+        focus: 'cancel'
+      })
+        .onOk(() => this.onPush())
+        .onCancel(() => this.FORM.toIndex())
     },
 
     onPush () {
