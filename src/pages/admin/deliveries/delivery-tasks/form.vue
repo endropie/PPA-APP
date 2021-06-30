@@ -92,7 +92,8 @@
         <thead>
           <q-tr class="text-uppercase" style="line-height:30px">
             <q-th key="prefix" width="50px"></q-th>
-            <q-th key="part" width="40%">{{$tc('items.part_name')}}</q-th>
+            <q-th key="part" width="30%">{{$tc('items.part_name')}}</q-th>
+            <q-th key="part" width="30%">{{$tc('items.part_number')}}</q-th>
             <q-th key="quantity" width="15%">{{$tc('label.quantity')}}</q-th>
             <q-th key="unit" width="15%">{{$tc('label.unit')}}</q-th>
             <q-th key="encasement" width="25%">{{$tc('label.encasement')}}</q-th>
@@ -103,7 +104,7 @@
             <q-td name="prefix">
               <q-btn dense flat outline tabindex="1000" color="negative" icon="clear" @click="removeDetail(rowIndex)" />
             </q-td>
-            <q-td name="part">
+            <q-td name="name">
               <ux-select dense outlined hide-bottom-space
                 v-model="row.item"
                 filter clearable
@@ -123,6 +124,11 @@
                   row.unit = v ? { value: v.unit.id, label: v.unit.code, rate:1 } : null
                 }"
               />
+            </q-td>
+            <q-td name="subname">
+              <q-field dense outlined hide-bottom-space readonly v-if="row.item">
+                <div slot="control" class="self-center">[{{ row.item.customer_code }}] {{ row.item.part_subname }}</div>
+              </q-field>
             </q-td>
             <q-td name="quantity">
               <q-input type="number" dense outlined hide-bottom-space

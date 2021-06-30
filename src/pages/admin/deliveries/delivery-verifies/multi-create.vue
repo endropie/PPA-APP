@@ -57,7 +57,8 @@
         <thead>
           <q-tr class="text-uppercase" style="line-height:30px">
             <q-th key="prefix" width="50px"></q-th>
-            <q-th key="item" width="40%">{{$tc('items.part_name')}}</q-th>
+            <q-th key="item" width="30%">{{$tc('items.part_name')}}</q-th>
+            <q-th key="item_subname" width="30%">{{$tc('items.part_number')}}</q-th>
             <q-th key="quantity" width="15%">{{$tc('label.quantity')}}</q-th>
             <q-th key="unit" width="15%">{{$tc('label.unit')}}</q-th>
             <q-th key="encasement" width="25%">{{$tc('label.encasement')}}</q-th>
@@ -87,6 +88,11 @@
                   row.unit = v ? { value: v.unit.id, label: v.unit.code, rate:1 } : null
                 }"
               />
+            </q-td>
+            <q-td key="item_subname">
+              <q-field dense outlined hide-bottom-space readonly>
+                <div slot="control"  v-if="row.item" class="self-center">[{{ row.item.customer_code }}] {{ row.item.part_subname }}</div>
+              </q-field>
             </q-td>
             <q-td key="quantity">
               <q-input type="number" dense outlined no-error-icon hide-bottom-space

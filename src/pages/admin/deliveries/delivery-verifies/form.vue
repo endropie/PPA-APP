@@ -72,6 +72,10 @@
         }"
       />
 
+      <q-field dense outlined readonly v-if="rsForm.item" class="q-mb-md">
+        <div slot="control" class="self-center">[{{ rsForm.item.customer_code }}] {{ rsForm.item.part_subname }}</div>
+      </q-field>
+
       <div class="row">
 
         <q-input type="number" dense outlined

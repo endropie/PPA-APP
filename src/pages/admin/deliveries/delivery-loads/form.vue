@@ -83,15 +83,6 @@
                       </q-item-section>
                     </q-item>
                     <q-separator inset />
-                    <!-- <q-item clickable v-for="(ct, indexCT) in rsForm.customer.customer_trips.filter(x => x.intday === $app.moment(rsForm.date).day()) || []"
-                      :key="`ct-${indexCT}`"
-                      @click="rsForm.trip_time = trip"
-                    >
-                      <q-item-section>{{String(ct.time).substring(0,5)}}</q-item-section>
-                      <q-item-section avatar>
-                        <q-icon color="primary" name="timer" />
-                      </q-item-section>
-                    </q-item> -->
                   </q-list>
                 </q-menu>
               </q-btn>
@@ -186,7 +177,8 @@
         <thead>
           <q-tr class="text-uppercase" style="line-height:30px">
             <q-th key="prefix" width="50px"></q-th>
-            <q-th key="part" width="40%">{{$tc('items.part_name')}}</q-th>
+            <q-th key="part" width="30%">{{$tc('items.part_name')}}</q-th>
+            <q-th key="part_subname" width="30%">{{$tc('items.part_number')}}</q-th>
             <q-th key="quantity" width="15%">{{$tc('label.quantity')}}</q-th>
             <q-th key="unit" width="15%">{{$tc('label.unit')}}</q-th>
             <q-th key="note" width="25%">{{$tc('label.encasement')}}</q-th>
@@ -217,12 +209,7 @@
                   row.unit_id = v ? v.item.unit.id : null
                   row.unit = v ? { value: v.item.unit.id, label: v.item.unit.code, rate:1 } : null
                 }"
-              >
-                <small v-if="row.item" class="absolute-bottom text-blue-grey">
-                  [{{row.item.customer_code}}]
-                  {{row.item.part_subname}}
-                </small>
-              </ux-select>
+              />
               <ux-select dense outlined hide-bottom-space
                 class="field-native-top"
                 v-show="!rsForm.request_order"
@@ -243,12 +230,12 @@
                   row.unit_rate = v ? 1 : null
                   row.unit = v ? { value: v.unit.id, label: v.unit.code, rate:1 } : null
                 }"
-              >
-                <small v-if="row.item" class="absolute-bottom text-blue-grey">
-                  [{{row.item.customer_code}}]
-                  {{row.item.part_subname}}
-                </small>
-              </ux-select>
+              />
+            </q-td>
+            <q-td name="part_subname">
+              <q-field dense outlined hide-bottom-space readonly>
+                <div slot="control"  v-if="row.item" class="self-center">[{{ row.item.customer_code }}] {{ row.item.part_subname }}</div>
+              </q-field>
             </q-td>
             <q-td name="quantity">
               <q-input type="number" dense outlined hide-bottom-space no-error-icon
