@@ -63,11 +63,12 @@
             </q-td>
             <q-td width="35%">
               <q-field dense outlined hide-bottom-space readonly >
-                <div v-if="row.item" class="self-center">[{{ row.item.customer_code }}] {{ row.item.part_subname }}</div>
+                <div slot="control" v-if="row.item" class="self-center">[{{ row.item.customer_code }}] {{ row.item.part_subname }}</div>
               </q-field>
             </q-td>
             <q-td width="20%">
-              <q-input dense outlined hide-bottom-space
+              <ux-numeric dense outlined hide-bottom-space
+                :options="{ decimalPlaces: row.unit ? row.unit.decimal_in : 0 }"
                 :disable="!Boolean(row.item)"
                 :name="`packing_load_items.${rowIndex}.quantity`"
                 :data-vv-as="$tc('label.quantity')"

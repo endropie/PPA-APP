@@ -113,7 +113,7 @@
                       outlined hide-bottom-space color="blue-grey-5"
                     />
 
-                    <q-input dense type="number" class="col-12 col-sm-8 col-md-4" style="min-width:120px"
+                    <ux-numeric dense class="col-12 col-sm-8 col-md-4" style="min-width:120px"
                       :name="`work_production_items.${index}.quantity`"
                       :label="$tc('label.quantity')" stack-label
                       color="blue-grey-6"

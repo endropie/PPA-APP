@@ -175,7 +175,8 @@
                 />
               </td>
               <td class="text-right">
-                <q-input dense outlined hide-bottom-space
+                <ux-numeric dense outlined hide-bottom-space
+                  :options="{ decimalPlaces: DecimalPlaces }"
                   :disable="!rowOrder.work_order_item"
                   :name="`packing_items.packing_item_orders.${orderKey}.quantity`"
                   :label="$tc('label.quantity')" stack-label
@@ -368,6 +369,12 @@ export default {
         return 'min:0'
       }
       return 'gt_value:0'
+    },
+    DecimalPlaces () {
+      if (!this.rsForm) return 0
+      if (!this.rsForm.packing_items.unit) return 0
+
+      return this.rsForm.packing_items.unit.decimal_in || 0
     },
     IssetItemID () {
       if (!this.rsForm.hasOwnProperty('packing_items')) return false
