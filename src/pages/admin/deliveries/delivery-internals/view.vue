@@ -169,7 +169,6 @@ export default {
         }
       },
       rsView: null,
-      remain_only: true,
       isDoubleUnit: false
     }
   },

@@ -268,7 +268,7 @@ export default {
       },
       rsView: {},
       rsPage: [],
-      remain_only: true,
+      remain_only: false,
       isDoubleUnit: false
     }
   },
