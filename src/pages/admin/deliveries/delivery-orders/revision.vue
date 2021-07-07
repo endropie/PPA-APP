@@ -801,27 +801,36 @@ export default {
       }
     },
     onSubmit () {
-      this.FORM.loading = true
-      const method = 'PUT'
-      const mode = this.isPartition ? 'multi-revision' : 'revision'
-      let data = this.isPartition
-        ? { ...this.rsForm, partitions: this.rsPartitions } : this.rsForm
-      data = { ...data, ...this.dialog_reason }
-      const apiUrl = `${this.FORM.resource.api}/${this.ROUTE.params.id}?mode=${mode}`
-      this.$q.loading.show()
-      this.$axios.set(method, apiUrl, data)
-        .then((response) => {
-          let message = response.data.number + ' - #' + response.data.id
-          this.FORM.response.success({ message: message })
-          this.FORM.toView(response.data.id)
-        })
-        .catch((error) => {
-          this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error, 'REVISION FAILED')
-        })
-        .finally(() => {
-          this.$q.loading.hide()
-        })
+      const submit = () => {
+        this.FORM.loading = true
+        const method = 'PUT'
+        const mode = this.isPartition ? 'multi-revision' : 'revision'
+        let data = this.isPartition
+          ? { ...this.rsForm, partitions: this.rsPartitions } : this.rsForm
+        data = { ...data, ...this.dialog_reason }
+        const apiUrl = `${this.FORM.resource.api}/${this.ROUTE.params.id}?mode=${mode}`
+        this.$q.loading.show()
+        this.$axios.set(method, apiUrl, data)
+          .then((response) => {
+            let message = response.data.number + ' - #' + response.data.id
+            this.FORM.response.success({ message: message })
+            this.FORM.toView(response.data.id)
+          })
+          .catch((error) => {
+            this.FORM.response.fields(error.response)
+            this.FORM.response.error(error.response || error, 'REVISION FAILED')
+          })
+          .finally(() => {
+            this.$q.loading.hide()
+          })
+      }
+
+      this.$q.dialog({
+        title: this.$tc('form.confirm'),
+        message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.save') }),
+        cancel: true,
+        focus: 'cancel'
+      }).onOk(() => submit())
     },
     onSave () {
       this.$validator.validate().then(result => {
