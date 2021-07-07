@@ -8,7 +8,7 @@ const config = {
     state_colors: {
       OPEN: 'blue',
       VALIDATED: 'green',
-      PRODUCTED : 'teal',
+      PRODUCTED: 'teal',
       PACKED: 'teal',
       CONFIRMED: 'green-10',
       CLOSED: 'red',
@@ -51,15 +51,12 @@ const config = {
   },
   items: {
     stockists: [
-      { value: 'FM', code:'FM', label: 'FRESH' },
-      { value: 'WO', code: 'WO', label: 'WORK ORDER' },
-      { value: 'WIP', code:'WIP', label: 'WORK PROCESS' },
-      { value: 'FG', code:'FG', label: 'FINISH GOOD' },
-      { value: 'NC', code:'NC', label: 'NC-REPAIR', color: 'warning' },
-      { value: 'NCR', code:'NCR', label: 'NCR-REPAIR', color: 'orange-8' },
-      { value: 'PDO.REG', code:'PDO REGULER', label: 'DELIVERY'},
-      { value: 'PDO.RET', code:'PDO REPAIR', label: 'DELIVERY REPAIR'},
-      { value: 'VDO', code:'VERIFICATION', label: 'VERIFICATION'},
+      { value: 'FM', code: 'FM', label: 'FRESH' },
+      { value: 'WIP', code: 'WIP', label: 'WORK PROCESS' },
+      { value: 'FG', code: 'FG', label: 'FINISH GOOD' },
+      { value: 'PFG', code: 'PFG', label: 'PRE-FINISH GOOD' },
+      { value: 'NC', code: 'NC', label: 'NC-REPAIR', color: 'warning' },
+      { value: 'NCR', code: 'NCR', label: 'NCR-REPAIR', color: 'orange-8' }
     ]
   },
   incoming_good: {
