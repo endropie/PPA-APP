@@ -54,7 +54,7 @@
             <template v-for="(row, index) in rsForm.work_production_items" >
               <div class="q-pa-xs col-12 col-sm-12" :key="index">
                 <q-card class="main-box">
-                  <q-card-section class="row items-center no-wrap q-py-xs">
+                  <q-card-section class="items-center row no-wrap q-py-xs">
                       <div class="col">
                         <div class="text-subtitle2">{{$tc('general.item')}}
                           <q-badge :label="index+1" color="blue-grey" v-if="index>0" />
@@ -114,6 +114,7 @@
                     />
 
                     <ux-numeric dense class="col-12 col-sm-8 col-md-4" style="min-width:120px"
+                      :options="{ decimalPlaces: row.unit ? row.unit.decimal_in : 0 }"
                       :name="`work_production_items.${index}.quantity`"
                       :label="$tc('label.quantity')" stack-label
                       color="blue-grey-6"
