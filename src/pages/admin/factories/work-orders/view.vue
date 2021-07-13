@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="column items-center">
+  <q-page padding class="items-center column">
     <page-print v-if="VIEW.show" class="q-ma-md shadow-2" >
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
@@ -8,8 +8,8 @@
 
       <div class="row q-col-gutter-xs" >
         <div class="col-12">
-          <div class="row justify-between q-col-gutter-sm" >
-            <div class="col-auto self-end">
+          <div class="justify-between row q-col-gutter-sm" >
+            <div class="self-end col-auto">
               <span class="text-h6 text-uppercase">{{$tc('general.work_order', 2)}}</span>
 
               <q-markup-table bordered dense square class="no-shadow transparent">
@@ -42,7 +42,7 @@
                   <td>{{rsView.shift ? rsView.shift.name : '-'}}</td>
                 </tr>
               </q-markup-table>
-              <div class="print-hide float-right">
+              <div class="float-right print-hide">
                 <q-chip square color="grey" text-color="white"
                   :label="`DIRECT [${rsView.stockist_direct}]`"
                   v-if="rsView.stockist_direct" />
@@ -100,7 +100,7 @@
                         :class="$q.dark.isActive ? `bg-grey-9` : `bg-grey-2`"
                         :header-class="$q.dark.isActive ? `bg-blue-grey-10` : `bg-blue-grey-1`"
                       >
-                        <div slot="header" class="q-item__section column q-item__section--main justify-center">
+                        <div slot="header" class="justify-center q-item__section column q-item__section--main">
                           <span v-if="rsView" >
                             {{rsView.line.name}}
                             <q-badge
@@ -127,7 +127,7 @@
                               </span>
                             </q-item-section>
                           </q-item>
-                          <q-item-label header v-if="!Boolean(row.work_production_items.length)" class="q-pa-sm text-italic text-center">No data</q-item-label>
+                          <q-item-label header v-if="!Boolean(row.work_production_items.length)" class="text-center q-pa-sm text-italic">No data</q-item-label>
                         </q-list>
                       </q-expansion-item>
                     </div>
@@ -136,7 +136,7 @@
                         :class="$q.dark.isActive ? `bg-grey-9` : `bg-grey-2`"
                         :header-class="$q.dark.isActive ? `bg-blue-grey-10` : `bg-blue-grey-1`"
                       >
-                        <div slot="header" class="q-item__section column q-item__section--main justify-center">
+                        <div slot="header" class="justify-center q-item__section column q-item__section--main">
                           <span>
                             {{$tc('general.packing')}}
                             <q-badge
@@ -156,12 +156,12 @@
                             </q-item-section>
                             <q-item-section  side>
                               <span v-if="MAPINGKEY['units'][packing_item_order.packing_item.unit_id]" >
-                                {{$app.number_format(packing_item_order.unit_total / (packing_item_order.packing_item.unit_rate || 1))}}
+                                {{$app.number_format(packing_item_order.unit_amount / (packing_item_order.packing_item.unit_rate || 1))}}
                                 {{MAPINGKEY['units'][packing_item_order.packing_item.unit_id].code}}
                               </span>
                             </q-item-section>
                           </q-item>
-                          <q-item-label header v-if="!Boolean(row.packing_item_orders.length)" class="q-pa-sm text-italic text-center">No data</q-item-label>
+                          <q-item-label header v-if="!Boolean(row.packing_item_orders.length)" class="text-center q-pa-sm text-italic">No data</q-item-label>
                         </q-list>
                       </q-expansion-item>
                     </div>
