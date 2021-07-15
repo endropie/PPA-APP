@@ -28,16 +28,24 @@
               >
                 <tbody>
                   <tr>
-                    <td>{{$tc('label.number')}}</td>
+                    <td>{{ $tc('label.number') }}</td>
                     <td>{{ rsView.fullnumber || rsView.number }}</td>
                   </tr>
                   <tr>
-                    <td>{{$tc('label.date')}}</td>
-                    <td>{{$app.date_format(rsView.date)}}</td>
+                    <td>{{ $tc('label.date')}}</td>
+                    <td>{{ $app.date_format(rsView.date) }}</td>
+                  </tr>
+                  <tr v-if="rsView.indexed_number">
+                    <td>Indexed</td>
+                    <td>{{ rsView.indexed_number }}</td>
                   </tr>
                   <tr v-if="rsView.revised_number">
-                    <td>REVISED</td>
-                    <td>{{rsView.revised_number}}</td>
+                    <td>Revised</td>
+                    <td>{{ rsView.revised_number }}</td>
+                  </tr>
+                  <tr v-if="rsView.delivery_load" class="print-hide">
+                    <td>Loading</td>
+                    <td>{{ rsView.delivery_load.fullnumber }}</td>
                   </tr>
                 </tbody>
               </q-markup-table>
