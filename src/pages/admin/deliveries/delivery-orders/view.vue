@@ -61,7 +61,7 @@
             <ux-chip-status :row="rsView" tag outline dense square icon='bookmark' class="no-margin" />
           </div>
           <div class="text-subtitle2 text-weight-bold text-uppercase text-center on-right">
-            <span v-if="page.data.is_internal">{{ $tc('general.sj_internal', 2) }} </span>
+            <span v-if="rsView.is_internal">{{ $tc('general.sj_internal', 2) }} </span>
             <span v-else>{{ $tc('general.sj_delivery',2) }} {{ page.data.transaction }}</span>
           </div>
         </div>
