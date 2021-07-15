@@ -59,10 +59,9 @@
         <div slot="header-tags" class="column no-wrap items-end">
           <div class="print-hide no-padding">
             <ux-chip-status :row="rsView" tag outline dense square icon='bookmark' class="no-margin" />
-            <!-- <q-chip tag outline small square color="orange-10" class="text-uppercase" :label="$tc('form.temporary')" v-if="rsView.is_internal" /> -->
           </div>
           <div class="text-subtitle2 text-weight-bold text-uppercase text-center on-right">
-            <span>{{$tc('general.sj_delivery',2)}} {{rsView.transaction}}</span>
+            <span>{{ $tc('general.sj_delivery', 2) }} {{ rsView.is_internal ? 'INTERNAL' : rsView.transaction }}</span>
           </div>
         </div>
         <div class="column" style="min-height:11cm;height:auto">
@@ -73,7 +72,6 @@
               <address class="text-normal" style="font-style: normal">{{rsView.customer_address}}</address>
               <div class="text-weight-medium" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
               <div class="text-weight-medium" v-if="rsView.vehicle">{{$tc('label.transport')}}: {{rsView.vehicle.number}}</div>
-              <!-- <div class="text-weight-medium" v-if="rsView.indexed_number">{{$tc('label.no',1, {v:'Index'})}}: {{rsView.indexed_number}}</div> -->
             </div>
             <q-space/>
             <div class="on-right" style="max-width:50%">
@@ -100,18 +98,18 @@
                         {{ rsView.request_order ? (rsView.request_order.fullnumber || rsView.request_order.number) : '-' }}
                       </td>
                     </tr>
-                    <tr v-if="rsView.reconcile_number">
-                      <td>{{$tc('form.reconciliation')}}</td>
-                      <td  colspan="100%">
-                        {{rsView.reconcile_number}}
-                      </td>
-                    </tr>
-                    <tr v-if="!Boolean(rsView.is_internal || rsView.transaction == 'SAMPLE')">
-                      <td>PO/SJ</td>
-                      <td colspan="100%">
+                    <tr v-if="Boolean(rsView.request_order || rsView.delivery_load)">
+                      <td v-if="rsView.request_order">PO/SJ</td>
+                      <td v-if="rsView.request_order" colspan="100%">
                         <div class="ellipsis-3-lines" style="white-space:normal;">
                           {{ rsView.request_order ? rsView.request_order.reference_number : '-' }}
                         </div>
+                      </td>
+                    </tr>
+                    <tr v-if="rsView.delivery_load" class="print-hide">
+                      <td>Loading</td>
+                      <td colspan="100%">
+                        {{ rsView.delivery_load.fullnumber }}
                       </td>
                     </tr>
                   </tbody>

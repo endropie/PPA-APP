@@ -8,14 +8,12 @@
       <div v-for="(page, pageIndex) in rsPage" :key="pageIndex">
         <template v-if="page.data">
           <page-print class="multi-page" v-for="(pageMode, pi) in getArrayPage(page.data.customer)" :key="pi">
-          <!-- <page-print v-if="page.data" :class="{'multi-page': pageIndex > 0 }"> -->
-            <!-- <div slot="header-title" class="text-uppercase">{{$tc('general.sj_delivery')}}</div> -->
             <div slot="header-tags" class="column no-wrap items-end">
               <div class="print-hide no-padding">
                 <ux-chip-status :row="page.data" tag outline dense square icon='bookmark' class="no-margin" />
               </div>
               <div class="text-subtitle2 text-weight-bold text-uppercase text-center on-right">
-                <span>{{$tc('general.sj_delivery',2)}} {{page.data.transaction}}</span>
+                <span>{{$tc('general.sj_delivery',2)}} {{ page.data.is_internal ? 'INTERNAL' : page.data.transaction }}</span>
               </div>
             </div>
             <div class="column" style="min-height:3.25in;height:auto">
