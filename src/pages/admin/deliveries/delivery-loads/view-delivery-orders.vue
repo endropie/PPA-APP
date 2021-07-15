@@ -13,7 +13,8 @@
                 <ux-chip-status :row="page.data" tag outline dense square icon='bookmark' class="no-margin" />
               </div>
               <div class="text-subtitle2 text-weight-bold text-uppercase text-center on-right">
-                <span>{{$tc('general.sj_delivery',2)}} {{ page.data.is_internal ? 'INTERNAL' : page.data.transaction }}</span>
+                <span v-if="page.data.is_internal">{{ $tc('general.sj_internal', 2) }} </span>
+                <span v-else>{{ $tc('general.sj_delivery',2) }} {{ page.data.transaction }}</span>
               </div>
             </div>
             <div class="column" style="min-height:3.25in;height:auto">
@@ -24,7 +25,6 @@
                   <address class="text-normal" style="font-style: normal">{{page.data.customer_address}}</address>
                   <div class="text-weight-medium" v-if="page.data.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{page.data.customer_note}}</div>
                   <div class="text-weight-medium" v-if="page.data.vehicle">{{$tc('label.transport')}}: {{page.data.vehicle.number}}</div>
-                  <!-- <div class="text-weight-medium" v-if="page.data.indexed_number">{{$tc('label.no',1, {v:'Index'})}}: {{page.data.indexed_number}}</div> -->
                 </div>
                 <q-space/>
                 <div class="on-right" style="max-width:50%">
