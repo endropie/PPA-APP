@@ -119,7 +119,7 @@ export default async ({ app, store, router, Vue }) => {
             mode.html = true
             mode.message += `<br><smal style="font-size:80%">${mode.detail}</small>`
           }
-          if (mode.message) Notify.create(Object.assign({}, mode))
+          if (mode.message) Notify.create(Object.assign({ classes: 'print-hide' }, mode))
         }
       }
     },
@@ -140,16 +140,16 @@ export default async ({ app, store, router, Vue }) => {
         return Object.assign(this.prevent, values)
       },
       error: function (values = {}, desc) {
-        Notify.create({ ...this.getMode(values, desc), color: 'red-10', icon: 'error' })
+        Notify.create({ ...this.getMode(values, desc), color: 'red-10', icon: 'error', classes: 'print-hide' })
       },
       warning: function (values = {}, desc) {
-        Notify.create({ ...this.getMode(values, desc), color: 'orange-7', icon: 'warning' })
+        Notify.create({ ...this.getMode(values, desc), color: 'orange-7', icon: 'warning', classes: 'print-hide' })
       },
       info: function (values = {}, desc) {
-        Notify.create({ ...this.getMode(values, desc), color: 'cyan-7', icon: 'info' })
+        Notify.create({ ...this.getMode(values, desc), color: 'cyan-7', icon: 'info', classes: 'print-hide' })
       },
       success: function (values = {}, desc) {
-        Notify.create({ ...this.getMode(values, desc), color: 'green-7', icon: 'check_circle' })
+        Notify.create({ ...this.getMode(values, desc), color: 'green-7', icon: 'check_circle', classes: 'print-hide' })
       }
     },
     number_abbreviate (num, fixed) {
