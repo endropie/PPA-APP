@@ -63,7 +63,9 @@
             </q-td>
             <q-td width="35%">
               <q-field dense outlined hide-bottom-space readonly >
-                <div slot="control" v-if="row.item" class="self-center">[{{ row.item.customer_code }}] {{ row.item.part_subname }}</div>
+                <div slot="control" v-if="row.item" class="self-center">
+                  [{{ row.item.customer_code }}] {{ row.item.part_subname }}
+                </div>
               </q-field>
             </q-td>
             <q-td width="20%">
@@ -196,12 +198,31 @@ export default {
         }).filter(x => x.rate) || []
       })
     },
+    ItemStockLoaded () {
+      return this.FORM.data.packing_load_items?.reduce((stocked, detail) => {
+        const sum = (stocked[detail.item_id] || 0) + (detail.quantity * detail.unit_rate)
+        return { ...stocked, [detail.item_id]: sum }
+      }, {}) || {}
+    },
     MaxUnit () {
       if (!this.rsForm) return []
-      return this.rsForm.packing_load_items.map(detail => {
+
+      const itemLoaded = this.ItemStockLoaded
+      const itemUsed = Object.assign({})
+      const stockLoaded = ({
+        use (detail) {
+          if (!itemUsed.hasOwnProperty(detail.item_id)) itemUsed[detail.item_id] = 0
+          const result = (itemLoaded[detail.item_id] || 0) - itemUsed[detail.item_id]
+          itemUsed[detail.item_id] += (detail.quantity * (detail.unit_rate || 1))
+          return result
+        }
+      })
+      return this.rsForm.packing_load_items.map((detail, index) => {
         if (!detail.item) return 0
         const stock = (detail.item.totals['PFG'] || 0) / (detail.unit_rate || 1)
-        return (detail.id ? detail.quantity : 0) + stock
+        const loaded = Number(stockLoaded.use(detail))
+
+        return loaded + stock
       })
     },
     ORID () {

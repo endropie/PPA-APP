@@ -40,19 +40,16 @@
 
             <template slot="default">
               <div class="row q-col-gutter-xs" >
-                <ux-select-filter class="col-12 col-sm-6"
+                <ux-select class="col-12 col-sm-6"
                   v-model="FILTERABLE.fill.customer_id.value" clearable
                   :label="$tc('general.customer')" stack-label
-                  :placeholder="$tc('form.select_a', null, {v:$tc('general.customer')})"
+                  :placeholder="$tc('form.select_a', null, { v: $tc('general.customer') })"
                   dense hide-bottom-space hide-dropdown-icon
                   standout="bg-blue-grey-5 text-white"
                   :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
                   :options="CustomerOptions"
-                  @input="[
-                    FILTERABLE.fill.item_id.value=null,
-                    SHEET.load('items', `customer_id=${FILTERABLE.fill.customer_id.value}`),
-                    FILTERABLE.submit()
-                  ]"
+                  filter
+                  @input="FILTERABLE.submit()"
                 />
 
                 <!-- <ux-date class="col-8 col-sm-4"
