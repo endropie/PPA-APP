@@ -233,7 +233,7 @@ export default {
           customer_address: null,
 
           revise_id: null,
-          revise_number: null,
+          revise_number: 0,
           description: null,
           delivery_order_items: [{
             id: null,

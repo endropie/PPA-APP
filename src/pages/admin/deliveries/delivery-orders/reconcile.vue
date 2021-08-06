@@ -292,23 +292,24 @@
 </template>
 
 <script>
+/* eslint-disable vue/no-side-effects-in-computed-properties */
 import MixForm from '@/mixins/mix-form.vue'
 
 export default {
   mixins: [MixForm],
   data () {
     return {
-      SHEET:{
-        request_orders: {autoload: false, api:'/api/v1/incomes/request-orders?mode=all'},
-        items: {autoload:false, api:'/api/v1/common/items?mode=all'},
-        customers: {api:'/api/v1/incomes/customers?mode=all'},
-        employees: {api:'/api/v1/common/employees?mode=all'},
-        units: {api:'/api/v1/references/units?mode=all'},
+      SHEET: {
+        request_orders: { autoload: false, api: '/api/v1/incomes/request-orders?mode=all' },
+        items: { autoload: false, api: '/api/v1/common/items?mode=all' },
+        customers: { api: '/api/v1/incomes/customers?mode=all' },
+        employees: { api: '/api/v1/common/employees?mode=all' },
+        units: { api: '/api/v1/references/units?mode=all' }
       },
-      FORM:{
-        resource:{
+      FORM: {
+        resource: {
           api: '/api/v1/incomes/delivery-orders',
-          uri: '/admin/deliveries/delivery-orders',
+          uri: '/admin/deliveries/delivery-orders'
         }
       },
       showRequestOrder: false,
@@ -316,7 +317,7 @@ export default {
       request_order: null,
       reconcile: null,
       rsForm: {},
-      setDefault:()=>{
+      setDefault: () => {
         return {
           number: null,
           date: null,
@@ -326,7 +327,7 @@ export default {
           customer_phone: null,
           customer_address: null,
           revise_id: 0,
-          revise_number: null,
+          revise_number: 0,
           description: null,
           delivery_order_items: [],
           exclude_items: []
@@ -334,64 +335,64 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     // Component Page Created!
     this.init()
   },
   computed: {
-    IS_EDITABLE() {
+    IS_EDITABLE () {
       if (this.rsForm.deleted_at) return false
       return true
     },
-    ISTO_RECONCILED() {
+    ISTO_RECONCILED () {
       if (this.reconcile || !this.reconcile.delivery_order_items.length) return false
 
       return !this.reconcile.delivery_order_items.find(x => Math.round(x.unit_amount) > Math.round(x.amount_reconcile))
     },
-    EmployeeOptions() {
-      return (this.SHEET.employees.data.map(item => ({label: `[${item.code}] ${item.name}`, value: item.id})) || [])
+    EmployeeOptions () {
+      return (this.SHEET.employees.data.map(item => ({ label: `[${item.code}] ${item.name}`, value: item.id })) || [])
     },
-    UnitOptions() {
-      return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
+    UnitOptions () {
+      return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
-    ItemOptions() {
+    ItemOptions () {
       let ITEM = this.SHEET.items.data.filter((item) => item.customer_id === this.rsForm.customer_id)
-      return (ITEM.map(item => ({label: `${item.part_name}`, sublabel:`${item.code} - ${item.part_subname}`, value: item.id})) || [])
+      return (ITEM.map(item => ({ label: `${item.part_name}`, sublabel: `${item.code} - ${item.part_subname}`, value: item.id })) || [])
     },
-    ItemUnitOptions() {
+    ItemUnitOptions () {
       let vars = []
       for (const i in this.rsForm.delivery_order_items) {
         if (this.rsForm.delivery_order_items.hasOwnProperty(i)) {
           let rsItem = this.rsForm.delivery_order_items[i]
-          vars[i] = ( this.UnitOptions || [])
-          vars[i] = vars[i].filter((unit)=> {
-            if(!rsItem.item_id) return false
-            if(rsItem.item) {
-              if(rsItem.item.unit_id === unit.value) return true
-              if(rsItem.item.item_units) {
-                let filtered = rsItem.item.item_units.filter((fill)=> fill.unit_id == unit.value)
-                if(filtered.length > 0) return true
+          vars[i] = (this.UnitOptions || [])
+          vars[i] = vars[i].filter((unit) => {
+            if (!rsItem.item_id) return false
+            if (rsItem.item) {
+              if (rsItem.item.unit_id === unit.value) return true
+              if (rsItem.item.item_units) {
+                let filtered = rsItem.item.item_units.filter((fill) => fill.unit_id === unit.value)
+                if (filtered.length > 0) return true
               }
             }
-            return false;
+            return false
           })
         }
       }
       return vars
     },
-    MaxMount() {
+    MaxMount () {
       let maxitem = {}
       let moveItem = {
         set: function (id, val) {
           if (!this.hasOwnProperty(id)) this[id] = 0
-            this[id] += Number(val)
+          this[id] += Number(val)
         },
         get: function (id) {
           return this.hasOwnProperty(id) ? this[id] : 0
         }
       }
 
-      if(this.reconcile) {
+      if (this.reconcile) {
         this.reconcile.delivery_order_items.map(detail => {
           if (!maxitem[detail.item_id]) maxitem[detail.item_id] = 0
           maxitem[detail.item_id] += Number(detail.unit_amount) - Number(detail.amount_reconcile)
@@ -399,98 +400,55 @@ export default {
       }
 
       let data = []
-      if(this.rsForm.delivery_order_items) {
+      if (this.rsForm.delivery_order_items) {
         data = this.rsForm.delivery_order_items.map((detail, index) => {
-          let use = 0;
+          let use = 0
           if (maxitem[detail.item_id] && detail.item_id) {
             use = Number(moveItem.get(detail.item_id) || 0)
-            moveItem.set(detail.item_id, (Number(detail.quantity) * Number(detail.unit_rate)) )
+            moveItem.set(detail.item_id, (Number(detail.quantity) * Number(detail.unit_rate)))
           }
           const max = Number(maxitem[detail.item_id] || 0) - use
           const req = (detail.max_request || 0)
           return max > req ? req : max
-
         })
       }
 
       return data
     },
-    MaxRequest() {
-      let maxitem = {}
-      let moveItem = {
-        set: function (id, val) {
-          if (!this.hasOwnProperty(id)) this[id] = 0
-            this[id] += Number(val)
-        },
-        get: function (id) {
-          return this.hasOwnProperty(id) ? this[id] : 0
-        }
-      }
-
-      if(this.request_order) {
-        this.request_order.request_order_items.map(detail => {
-          if (!maxitem[detail.item_id]) maxitem[detail.item_id] = 0
-          maxitem[detail.item_id] += Number(detail.unit_amount) - Number(detail.amount_delivery)
-        })
-      }
-
-      if (this.FORM.data.request_order && this.FORM.data.request_order.id == this.rsForm.request_order.id) {
-        this.FORM.data.delivery_order_items.map(detail => {
-          if (!maxitem[detail.item_id]) maxitem[detail.item_id] = 0
-          maxitem[detail.item_id] += Number(detail.unit_amount)
-        })
-      }
-
-      let data = []
-      if(this.rsForm.delivery_order_items) {
-        data = this.rsForm.delivery_order_items.map((detail, index) => {
-          let use = 0;
-          if (maxitem[detail.item_id] && detail.item_id) {
-            use = Number(moveItem.get(detail.item_id) || 0)
-            moveItem.set(detail.item_id, (Number(detail.quantity) * Number(detail.unit_rate)) )
-          }
-          return Number(maxitem[detail.item_id] || 0) - use
-
-        })
-      }
-
-      return data
-    },
-    MAPINGKEY(){
+    MAPINGKEY () {
       let variables = {
         'units': {},
-        'items': {},
+        'items': {}
       }
       this.SHEET['units'].data.map(value => { variables['units'][value.id] = value })
       this.SHEET['items'].data.map(value => { variables['items'][value.id] = value })
 
-      return variables;
+      return variables
     }
   },
-  watch:{
-      '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.setForm(data)
       })
     },
-    numUnitConvertion(row, val = 0) {
+    numUnitConvertion (row, val = 0) {
       return Number(val) / Number(row.unit_rate || 1)
     },
-    setRequestOrder(val) {
+    setRequestOrder (val) {
       if (val) {
         this.loadRequestOrder(val.id)
       }
     },
-    setItemReference(index, val) {
-      if(!val){
+    setItemReference (index, val) {
+      if (!val) {
         this.rsForm.delivery_order_items[index].unit_id = null
         this.rsForm.delivery_order_items[index].unit = {}
         this.rsForm.delivery_order_items[index].item = {}
-      }
-      else{
+      } else {
         this.rsForm.delivery_order_items[index].item = this.MAPINGKEY['items'][val]
 
         let baseUnitID = this.MAPINGKEY['items'][val].unit_id
@@ -499,68 +457,64 @@ export default {
         this.rsForm.delivery_order_items[index].unit = this.MAPINGKEY['units'][baseUnitID]
       }
     },
-    setUnitReference(index, val) {
-      if(!val) return;
+    setUnitReference (index, val) {
+      if (!val) return null
       else if (this.rsForm.delivery_order_items[index].item.unit_id === val) {
         this.rsForm.delivery_order_items[index].unit_rate = 1
-      }
-      else {
-        if(this.rsForm.delivery_order_items[index].item.item_units) {
-          this.rsForm.delivery_order_items[index].item.item_units.map((itemUnit)=> {
-            if (itemUnit.unit_id == val) this.rsForm.delivery_order_items[index].unit_rate = itemUnit.rate
+      } else {
+        if (this.rsForm.delivery_order_items[index].item.item_units) {
+          this.rsForm.delivery_order_items[index].item.item_units.map((itemUnit) => {
+            if (itemUnit.unit_id === val) this.rsForm.delivery_order_items[index].unit_rate = itemUnit.rate
           })
         }
       }
     },
-    loadRequestOrder(id) {
-      if(id) {
-
+    loadRequestOrder (id) {
+      if (id) {
         const find = (row) => {
           if (!this.reconcile) return null
           return this.reconcile.delivery_order_items.find(x => x.item_id === row.item_id)
         }
         this.$axios.get(`/api/v1/incomes/request-orders/${id}?mode=view`)
-        .then(response => {
-          this.request_order = JSON.parse(JSON.stringify(response.data))
-          setTimeout(() => {
-            this.request_order.request_order_items.map((row, index) => {
-              if (find(row)) this.includeRequest(index)
-            })
-          }, 100);
-        })
-        .catch(error => {
-          this.$app.response.error(error.response || error)
-        })
-
+          .then(response => {
+            this.request_order = JSON.parse(JSON.stringify(response.data))
+            setTimeout(() => {
+              this.request_order.request_order_items.map((row, index) => {
+                if (find(row)) this.includeRequest(index)
+              })
+            }, 100)
+          })
+          .catch(error => {
+            this.$app.response.error(error.response || error)
+          })
       }
     },
-    setForm(data) {
-
-      this.reconcile = Object.assign({},this.setDefault(), data)
+    setForm (data) {
+      this.reconcile = Object.assign({}, this.setDefault(), data)
 
       this.rsForm = Object.assign({}, {
         ...data,
         id: null,
         number: null,
-        revise_number: null,
+        revise_number: 0,
         reconcile_id: data.id,
         is_internal: 0,
-        delivery_order_items : [],
+        delivery_order_items: []
       })
 
       this.SHEET.load('items', `customer_id=${this.rsForm.customer_id}`)
     },
-    addNewItem() {
+    addNewItem () {
       let newEntri = this.setDefault().delivery_order_items[0]
       this.rsForm.delivery_order_items.push(newEntri)
     },
-    removeItem(index) {
+    removeItem (index) {
       // if (this.rsForm.delivery_order_items[index].id) {
       //   this.rsForm.exclude_items.push(Object.assign({},this.rsForm.delivery_order_items[index]))
       // }
       this.rsForm.delivery_order_items.splice(index, 1)
     },
-    includeRequest(index) {
+    includeRequest (index) {
       if (this.request_order.request_order_items[index]) {
         let detail = this.request_order.request_order_items[index]
         this.rsForm.delivery_order_items.push({
@@ -570,10 +524,9 @@ export default {
           max_request: (detail.unit_amount - detail.amount_delivery),
           quantity: null
         })
-      }
-      else this.$q.notify('Index of list undefined!')
+      } else this.$q.notify('Index of list undefined!')
     },
-    onSave() {
+    onSave () {
       const submit = () => {
         this.FORM.loading = true
         // const {method, mode, apiUrl} = this.FORM.meta();
@@ -581,38 +534,41 @@ export default {
         const apiUrl = `${this.FORM.resource.api}/${this.ROUTE.params.id}?mode=reconciliation&nodata`
 
         this.$axios.set(method, apiUrl, this.rsForm)
-        .then((response) => {
-          let message = response.data.number + ' - #' + response.data.id
-          this.FORM.response.success({ message: message})
-          this.FORM.toView(response.data.id)
-        })
-        .catch((error) => {
-          this.FORM.response.fields(error.response)
-          this.FORM.response.error(error.response || error, 'REVISION FAILED')
-        })
-        .finally(()=>{
-          this.FORM.loading = false
-        });
+          .then((response) => {
+            let message = response.data.number + ' - #' + response.data.id
+            this.FORM.response.success({ message: message })
+            this.FORM.toView(response.data.id)
+          })
+          .catch((error) => {
+            this.FORM.response.fields(error.response)
+            this.FORM.response.error(error.response || error, 'REVISION FAILED')
+          })
+          .finally(() => {
+            this.FORM.loading = false
+          })
       }
       this.$validator.validate().then(result => {
         if (!result) {
           console.warn('error', this.$validator)
           return this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
           })
         }
 
         this.$q.dialog({
           title: this.$tc('form.confirm'),
-          message: this.$tc('messages.to_sure', 1, {v: this.$tc('form.revision')}),
+          message: this.$tc('messages.to_sure', 1, { v: this.$tc('form.revision') }),
           cancel: true,
           persistent: true
         }).onOk(() => {
           submit()
         })
       })
-    },
-  },
+    }
+  }
 }
 </script>
