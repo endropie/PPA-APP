@@ -180,7 +180,7 @@
             <q-th key="part" width="30%">{{$tc('items.part_name')}}</q-th>
             <q-th key="part_subname" width="30%">{{$tc('items.part_number')}}</q-th>
             <q-th key="quantity" width="15%">{{$tc('label.quantity')}}</q-th>
-            <q-th key="unit" width="15%">{{$tc('label.unit')}}</q-th>
+            <q-th key="unit" width="10%">{{$tc('label.unit')}}</q-th>
             <q-th key="note" width="25%">{{$tc('label.encasement')}}</q-th>
           </q-tr>
         </thead>
@@ -228,7 +228,7 @@
                   row.item_id = v ? v.id : null
                   row.unit_id = v ? v.unit_id : null
                   row.unit_rate = v ? 1 : null
-                  row.unit = v ? { value: v.unit.id, label: v.unit.code, rate:1 } : null
+                  row.unit = v ? { ...v.unit, value: v.unit.id, label: v.unit.code, rate:1 } : null
                 }"
               />
             </q-td>
@@ -238,19 +238,17 @@
               </q-field>
             </q-td>
             <q-td name="quantity">
-              <q-input type="number" dense outlined hide-bottom-space no-error-icon
-                v-model="row.quantity"
-                v-validate="`required|gt_value:0|max_value:${UnitMax[rowIndex]}`"
+              <ux-numeric dense outlined hide-bottom-space
+                :options="{ decimalPlaces: row.unit ? row.unit.decimal_in : 0 }"
+                :disable="!Boolean(row.item)"
                 :name="`delivery_load_items.${rowIndex}.quantity`"
                 :data-vv-as="$tc('label.quantity')"
+                v-model="row.quantity" type="number" :min="0"
+                v-validate="`required|max_value:${UnitMax[rowIndex]}`"
+                :suffix="row.item ? `/ ${$app.number_format(UnitMax[rowIndex])}` : ''"
                 :error="errors.has(`delivery_load_items.${rowIndex}.quantity`)"
                 :error-message="errors.first(`delivery_load_items.${rowIndex}.quantity`)"
-              >
-                <span slot="append" class="text-subtitle2" >
-                  <span v-if="UnitMax[rowIndex] > 0">/ {{$app.number_format(UnitMax[rowIndex])}}</span>
-                  <span v-else>[~]</span>
-                </span>
-              </q-input>
+              />
             </q-td>
             <q-td name="satuan">
               <q-select type="text" dense outlined hide-bottom-space no-error-icon
