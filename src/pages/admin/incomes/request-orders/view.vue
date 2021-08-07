@@ -156,6 +156,7 @@
       <div class="row q-gutter-xs print-hide " style="padding-top:50px">
         <q-btn :label="$tc('form.back')" icon="cancel" color="dark" :class="{'full-width': $q.screen.lt.sm}" :to="`${VIEW.resource.uri}?return`" />
         <q-btn :label="$tc('form.edit')" icon="edit" color="positive" :class="{'full-width': $q.screen.lt.sm}" v-if="IS_EDITABLE" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit`"  />
+        <q-btn :label="$tc('label.reference')" icon="edit" color="positive" :class="{'full-width': $q.screen.lt.sm}" v-if="IS_REFERENCE" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/edit-reference`"  />
         <q-btn :label="$tc('form.print')" icon="print" color="grey" :class="{'full-width': $q.screen.lt.sm}" @click.native="print()" />
         <q-space />
         <ux-btn-dropdown  color="blue-grey" :class="{'full-width': $q.screen.lt.sm}"
@@ -271,6 +272,7 @@ export default {
       return true
     },
     IS_EDITABLE () {
+      if (!this.$app.can('request-orders-update')) return false
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'OPEN') return false
       if (this.rsView.order_mode === 'ACCUMULATE') return false
@@ -278,6 +280,14 @@ export default {
       if (this.rsView.order_mode === 'NONE' && !this.rsView.customer.order_manual_allowed) return false
 
       return true
+    },
+    IS_REFERENCE () {
+      if (!this.$app.can('request-orders-update')) return false
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status === 'CLOSED') return false
+      return (this.rsView.order_mode === 'PO')
+        ? this.rsView.is_relationship
+        : true
     },
     IS_ITEM_SUMMARY () {
       if (this.rsView.order_mode !== 'ACCUMULATE') return false

@@ -96,26 +96,13 @@
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="q-py-none" style="width:35px">
           <ux-chip-status dense square :row="rs.row" class="" />
-          <span v-if="false && !rs.row.deleted_at && Number(rs.row.total_unit_delivery) > 0 && ['OPEN','CLOSED'].some(x => x === rs.row.status)">
-            <q-chip dense square icon="mdi-truck-check"
-              color="orange-10" text-color="white"
-              v-if="Math.round(rs.row.total_unit_amount) === Math.round(rs.row.total_unit_delivery)" />
-            <q-chip dense square icon="mdi-truck"
-              color="orange" text-color="white"
-              v-else />
-
-            <q-tooltip>
-              {{$tc('label.total')}}: {{$app.number_format(rs.row.total_unit_amount)}} |
-              {{$tc('label.shipping', 2)}}: {{$app.number_format(rs.row.total_unit_delivery)}}
-            </q-tooltip>
-          </span>
         </q-td>
 
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
           <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`"/>
-          <q-btn v-if="isCanUpdate && isEditable(rs.row)" dense flat color="light" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" />
-          <q-btn v-if="isCanUpdate && isEditRef(rs.row)" flat dense color="light" icon="mdi-link-plus" :to="`${TABLE.resource.uri}/${rs.row.id}/edit-reference`" />
-          <q-btn v-if="isCanUpdate && isEditRefExpired(rs.row)" flat dense color="light" icon="mdi-link" :to="`${TABLE.resource.uri}/${rs.row.id}/edit-reference`" />
+          <!-- <q-btn v-if="isCanUpdate && isEditable(rs.row)" dense flat color="light" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" /> -->
+          <!-- <q-btn v-if="isCanUpdate && isEditRef(rs.row)" flat dense color="light" icon="mdi-link-plus" :to="`${TABLE.resource.uri}/${rs.row.id}/edit-reference`" />
+          <q-btn v-if="isCanUpdate && isEditRefExpired(rs.row)" flat dense color="light" icon="mdi-link" :to="`${TABLE.resource.uri}/${rs.row.id}/edit-reference`" /> -->
         </q-td>
 
         <q-td slot="body-cell-date" slot-scope="rs" :props="rs" class="text-uppercase">
@@ -219,25 +206,25 @@ export default {
     }
   },
   methods: {
-    isEditable (row) {
-      if (row.deleted_at) return false
-      if (row.order_mode !== 'PO') return false
-      if (row.status !== 'OPEN') return false
-      if (row.hasOwnProperty('is_relationship') && row.is_relationship) return false
-      return true
-    },
-    isEditRef (row) {
-      if (row.deleted_at) return false
-      if (row.order_mode === 'PO') return false
-      if (row.status === 'CLOSED') return false
-      return true
-    },
-    isEditRefExpired (row) {
-      if (row.deleted_at) return false
-      if (row.order_mode !== 'PO') return false
-      if (row.status === 'CLOSED') return false
-      return row.is_relationship
-    }
+    // isEditable (row) {
+    //   if (row.deleted_at) return false
+    //   if (row.order_mode !== 'PO') return false
+    //   if (row.status !== 'OPEN') return false
+    //   if (row.hasOwnProperty('is_relationship') && row.is_relationship) return false
+    //   return true
+    // }
+    // isEditRef (row) {
+    //   if (row.deleted_at) return false
+    //   if (row.order_mode === 'PO') return false
+    //   if (row.status === 'CLOSED') return false
+    //   return true
+    // },
+    // isEditRefExpired (row) {
+    //   if (row.deleted_at) return false
+    //   if (row.order_mode !== 'PO') return false
+    //   if (row.status === 'CLOSED') return false
+    //   return row.is_relationship
+    // }
   }
 }
 </script>
