@@ -15,6 +15,7 @@
           v-validate="'required'" data-vv-as="customer"
           :label="$tc('general.customer')" stack-label
           :source="`/api/v1/incomes/customers?mode=all&--limit=50`"
+          :source-keys="['name', 'code']"
           :option-label="(opt) => opt.name"
           :name="`customer_id`"
           :error="errors.has(`customer_id`)"
