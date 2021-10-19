@@ -166,7 +166,8 @@
                   :source="`/api/v1/factories/work-orders/items?mode=all&has_amount_packing=true&item_id=${rsForm.packing_items.item_id}&or_detail_ids=${rowOrder.work_order_item_id}`"
                   option-value="id"
                   :option-label="(opt) => `${opt.work_order_number} (#${opt.id})`"
-                  :option-sublabel="(opt) => `Qty: ${opt.quantity}`"
+                  :option-sublabel="(opt) => `Date: ${$app.date_format(opt.work_order_date)} [${opt.work_order_shift}]`"
+                  :option-stamp="(opt) => `QTY: ${opt.quantity}`"
                   :error="errors.has(`packing_items.packing_item_orders.${orderKey}.work_order_item_id`)"
                   :error-message="errors.first(`packing_items.packing_item_orders.${orderKey}.work_order_item_id`)"
                   @input="(v) => {
