@@ -16,6 +16,7 @@ export default {
   cost: 'Biaya',
   category: 'Kategori {v}',
   color: 'Warna',
+  delivery_date: 'Tanggal Kirim',
   delivery_note: 'Delivery note',
   date: 'Tanggal',
   day: 'Hari',

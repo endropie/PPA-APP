@@ -45,17 +45,16 @@
         </div>
         <div class="col-12 col-md-6" >
           <div class="row q-gutter-xs">
-            <ux-date type="date"
+            <ux-date type="date" class="col"
               name="date"
-              :label="$tc('label.date')" stack-label
+              :label="$tc('label.delivery_date')" stack-label
               :disable="!Boolean(rsForm.transaction) || Boolean(rsForm.trip_time) || Boolean(rsForm.delivery_task_items.find(i => i.item_id))"
               v-model="rsForm.date"
               v-validate="'required'"
               :error="errors.has('date')"
               :error-message="errors.first('date')"
             />
-            <q-space/>
-            <q-input type="time" input-style="min-width:75px" no-error-icon
+            <q-input type="time" class="col" no-error-icon
               name="trip_time"
               :label="$tc('label.time')" stack-label
               v-model="rsForm.trip_time"
