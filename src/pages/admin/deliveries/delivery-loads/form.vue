@@ -31,6 +31,7 @@
             v-model="rsForm.customer"
             filter clearable
             source="api/v1/incomes/customers?mode=all&--with=customer_trips"
+            :source-keys="['name', 'code']"
             :option-label="(item) => `[${item.code}] ${item.name}`"
             :disable="Boolean(!rsForm.transaction) || Boolean(rsForm.trip_time) || Boolean(rsForm.delivery_load_items.find(i => i.item_id))"
             v-validate="'required'"

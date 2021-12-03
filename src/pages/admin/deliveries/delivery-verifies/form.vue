@@ -13,6 +13,7 @@
           v-model="rsForm.customer"
           filter clearable
           source="api/v1/incomes/customers?mode=all"
+          :source-keys="['name', 'code']"
           :option-label="(item) => `[${item.code}] ${item.name}`"
           option-value="id"
           :disable="Boolean(rsForm.item_id)"
