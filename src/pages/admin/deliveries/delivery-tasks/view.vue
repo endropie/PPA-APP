@@ -1,12 +1,12 @@
 <template>
-  <q-page padding class="column justify-start">
+  <q-page padding class="justify-start column">
     <page-print v-if="VIEW.show">
       <div slot="header-title">PRE - DELIVERY</div>
       <div slot="header-tags" class="print-hide">
         <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
       </div>
 
-      <div class="row justify-between q-col-gutter-y-sm" >
+      <div class="justify-between row q-col-gutter-y-sm" >
         <div class="profile self-bottom">
           <q-markup-table dense class="super-dense no-shadow no-highlight text-weight-medium">
             <tr>
@@ -30,7 +30,7 @@
                 <td>{{ rsView.fullnumber || rsView.number }}</td>
               </tr>
               <tr>
-                <td class="text-weight-medium">{{$tc('label.date')}}</td>
+                <td class="text-weight-medium">{{$tc('label.delivery_date')}}</td>
                 <td>{{$app.date_format(rsView.date)}}</td>
               </tr>
               <tr>

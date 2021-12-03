@@ -195,7 +195,7 @@ export default {
         },
         columns: [
           { name: 'prefix', label: '', align: 'left' },
-          { name: 'date', label: this.$tc('label.date'), field: 'date', format: (v) => v ? this.$app.moment(v).format('DD/MM/YYYY') : '-', sortable: true, classes: 'text-uppercase', align: 'center', width: '50px' },
+          { name: 'date', label: this.$tc('label.delivery_date'), field: 'date', format: (v) => v ? this.$app.moment(v).format('DD/MM/YYYY') : '-', sortable: true, classes: 'text-uppercase', align: 'center', width: '50px' },
           { name: 'trip_time', label: 'time', field: 'trip_time', format: (v) => v ? String(v).substring(0, 5) : '-', sortable: true, align: 'center', width: '50px' },
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left' },
           { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
