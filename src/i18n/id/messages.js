@@ -11,6 +11,7 @@ export default {
   form_has_void: 'Form {v} Telah di-void!',
 
   input_min_character: 'Input minimal {v} karakter',
+  input_notes: 'Masukan catatan',
 
   no_results: 'Tidak ada hasil.',
   no_details: 'Tidak ada detail.',

@@ -416,11 +416,11 @@ export default {
     },
 
     setProducted () {
-      const submit = () => {
+      const submit = (data) => {
         this.VIEW.show = false
         this.VIEW.loading = true
         let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=producted&nodata=true`
-        this.$axios.put(url)
+        this.$axios.put(url, { producted_notes: data })
           .then((response) => {
             this.init()
           })
@@ -435,13 +435,24 @@ export default {
           })
       }
 
+      const message = this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_producted') }) +
+                      '\n' +
+                      this.$tc('messages.yes_to', 0, { v: this.$tc('messages.input_notes') })
+
       this.$q.dialog({
         title: this.$tc('form.confirm', 1, { v: 'PRODUCTED' }),
-        message: this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_producted') }),
+        message,
+        prompt: {
+          model: '',
+          type: 'textarea',
+          isValid: val => val.length > 0
+        },
+        ok: { color: 'primary' },
         cancel: true,
+        focus: 'cancel',
         persistent: true
-      }).onOk(() => {
-        submit()
+      }).onOk((data) => {
+        submit(data)
       })
     },
 
