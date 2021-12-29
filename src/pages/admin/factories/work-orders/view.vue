@@ -93,7 +93,7 @@
               </q-tr>
               <q-tr v-if="!rsView.stockist_direct && show_preline">
                 <q-td colspan="100%" style="padding:2px">
-                  <div class="row q-col-gutter-sm">
+                  <div class="row q-col-gutter-sm q-mb-sm">
                     <div class="col">
                       <q-expansion-item dense expand-separator default-opened
                         :work-order-line-id="rsView.line_id"
@@ -168,6 +168,10 @@
                     <div class="col-auto">
                       <q-btn dense flat color="grey" @click="onCommentable(row)" icon="info" />
                     </div>
+                  </div>
+                  <div class="column bg-yellow-1 q-px-sm q-py-xs">
+                    <div class="text-italic"><span class="text-weight-bold">Note: </span>{{ row.note || '-' }}</div>
+                    <div class="text-italic"><span class="text-weight-bold">Producted Note: </span>{{ row.producted_notes || '-' }}</div>
                   </div>
                 </q-td>
               </q-tr>
@@ -251,6 +255,32 @@
       </div>
     </page-print>
 
+    <q-dialog ref="dialogProducted" persistent v-if="rsView && rsView.work_order_items">
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-avatar icon="rule" font-size="32px" color="blue" text-color="white" />
+          <div class="q-ml-sm text-blue">
+            <div class="text-h6">PRODUCTED NOTES</div>
+            <div>Please input producted notes of details</div>
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <div class="" v-for="(detail) in rsView.work_order_items.filter(x => Math.round(x.unit_amount) > Math.round(x.amount_process))" :key="detail.id">
+            <q-input stack-label
+              :label="`Note: ${detail.item.part_name} (${$app.number_format(detail.amount_process)}/${$app.number_format(detail.unit_amount)})`"
+              v-model="detail.producted_notes"
+            />
+          </div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Submit" color="primary" @click="submitProducted"
+            :disable="rsView.work_order_items.some(x => Math.round(x.unit_amount) > Math.round(x.amount_process) && !x.producted_notes)"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
     <q-inner-loading :showing="VIEW.loading">
         <q-spinner-dots size="50px" color="primary" />
     </q-inner-loading>
@@ -281,7 +311,7 @@ export default {
         }
       },
       rsView: {},
-      count: 0
+      productedNotes: {}
     }
   },
   created () {
@@ -416,44 +446,29 @@ export default {
     },
 
     setProducted () {
-      const submit = (data) => {
-        this.VIEW.show = false
-        this.VIEW.loading = true
-        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=producted&nodata=true`
-        this.$axios.put(url, { producted_notes: data })
-          .then((response) => {
-            this.init()
-          })
-          .catch(error => {
-            this.$app.response.error(error.response, 'FORM PRODUCTED')
-          })
-          .finally(() => {
-            this.VIEW.show = true
-            setTimeout(() => {
-              this.VIEW.loading = false
-            }, 1000)
-          })
-      }
+      this.$refs.dialogProducted.show()
+    },
 
-      const message = this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_producted') }) +
-                      '\n' +
-                      this.$tc('messages.yes_to', 0, { v: this.$tc('messages.input_notes') })
+    submitProducted () {
+      this.VIEW.show = false
+      this.VIEW.loading = true
+      let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=producted&nodata=true`
+      const data = this.rsView.work_order_items.filter(x => x.producted_notes)
 
-      this.$q.dialog({
-        title: this.$tc('form.confirm', 1, { v: 'PRODUCTED' }),
-        message,
-        prompt: {
-          model: '',
-          type: 'textarea',
-          isValid: val => val.length > 0
-        },
-        ok: { color: 'primary' },
-        cancel: true,
-        focus: 'cancel',
-        persistent: true
-      }).onOk((data) => {
-        submit(data)
-      })
+      this.$axios.put(url, { work_order_items: data })
+        .then((response) => {
+          this.$refs.dialogProducted.hide()
+          this.init()
+        })
+        .catch(error => {
+          this.$app.response.error(error.response, 'FORM PRODUCTED')
+        })
+        .finally(() => {
+          this.VIEW.show = true
+          setTimeout(() => {
+            this.VIEW.loading = false
+          }, 1000)
+        })
     },
 
     setPacked () {
