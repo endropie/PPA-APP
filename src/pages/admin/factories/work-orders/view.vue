@@ -265,12 +265,31 @@
           </div>
         </q-card-section>
         <q-card-section>
-          <div class="" v-for="(detail) in rsView.work_order_items.filter(x => Math.round(x.unit_amount) > Math.round(x.amount_process))" :key="detail.id">
-            <q-input stack-label
-              :label="`Note: ${detail.item.part_name} (${$app.number_format(detail.amount_process)}/${$app.number_format(detail.unit_amount)})`"
-              v-model="detail.producted_notes"
-            />
-          </div>
+          <q-markup-table dense flat bordered>
+            <thead>
+              <tr class="text-uppercase">
+                <th class="text-left">Part</th>
+                <th class="text-center">Qty</th>
+                <th class="text-center">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(detail) in rsView.work_order_items.filter(x => Math.round(x.unit_amount) > Math.round(x.amount_process))" :key="detail.id">
+                <td class="text-left">
+                  <div>{{ detail.item.part_name }}</div>
+                  <div class="text-caption text-grey" style="line-height:normal">{{ detail.item.part_number }}</div>
+                </td>
+                <td class="text-right">
+                  {{$app.number_format(detail.amount_process)}} / {{ $app.number_format(detail.unit_amount) }}
+                </td>
+                <td>
+                  <q-input dense outlined
+                    v-model="detail.producted_notes"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </q-markup-table>
         </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="Cancel" color="primary" v-close-popup />
@@ -450,7 +469,6 @@ export default {
     },
 
     submitProducted () {
-      this.VIEW.show = false
       this.VIEW.loading = true
       let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=producted&nodata=true`
       const data = this.rsView.work_order_items.filter(x => x.producted_notes)
@@ -464,7 +482,6 @@ export default {
           this.$app.response.error(error.response, 'FORM PRODUCTED')
         })
         .finally(() => {
-          this.VIEW.show = true
           setTimeout(() => {
             this.VIEW.loading = false
           }, 1000)
