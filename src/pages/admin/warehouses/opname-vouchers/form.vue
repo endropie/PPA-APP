@@ -54,7 +54,6 @@
           :data-vv-as="$tc('items.stockist')"
           v-model="rsForm.stockist"
           :disable="!Boolean(rsForm.item_id)"
-          :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
           :options="StockistOptions"
           option-label="code"
           option-value="value"
@@ -109,53 +108,59 @@ export default {
   mixins: [MixForm],
   data () {
     return {
-      SHEET:{
-        units: {api:'/api/v1/references/units?mode=all'},
+      SHEET: {
+        units: { api: '/api/v1/references/units?mode=all' }
       },
-      FORM:{
-        resource:{
+      FORM: {
+        resource: {
           uri: '/admin/warehouses/opname-vouchers',
-          api: '/api/v1/warehouses/opname-vouchers',
-        },
+          api: '/api/v1/warehouses/opname-vouchers'
+        }
       },
       rsForm: {},
-      setDefault:()=>{
+      setDefault: () => {
         return {
           number: null,
           stockist: null,
-          item_id: null, item: null,
+          item_id: null,
+          item: null,
           quantity: null,
           unit_id: null,
-          unit_rate: 1,
+          unit_rate: 1
         }
       }
     }
   },
-  created(){
+  created () {
     // Component Page Mounted!
     this.init()
-
   },
   computed: {
-    IS_EDITABLE() {
+    IS_EDITABLE () {
       if (Object.keys(this.FORM.data.has_relationship || {}).length > 0) return false
       return this.$app.can('opname-vouchers-update')
     },
-    FinalAmount() {
+    FinalAmount () {
       const total = this.rsForm.opname_vouchers.reduce((sum, item) => {
         return sum + (item.quantity * item.unit_rate)
-      }, 0);
+      }, 0)
       return Number(total)
     },
-    StockistOptions() {
-      let include = ['FM', 'WIP', 'FG', 'NC', 'NCR', 'NG']
-      return this.$store.state['admin'].CONFIG.items.stockists
-        .filter(x => include.some(e => e === x.value))
+    StockistOptions () {
+      return [
+        { value: 'FM', code: 'FM', label: 'FRESH' },
+        { value: 'WIP', code: 'WIP', label: 'WORK PROCESS' },
+        { value: 'PFG', code: 'PFG', label: 'PRE-FINISH GOOD' },
+        { value: 'FG', code: 'FG', label: 'FINISH GOOD' },
+        { value: 'NC', code: 'NC', label: 'NC-REPAIR', color: 'warning' },
+        { value: 'NCR', code: 'NCR', label: 'NCR-REPAIR', color: 'orange-8' },
+        { value: 'NG', code: 'NG', label: 'NG', color: 'red' }
+      ]
     },
-    UnitOptions() {
-      return (this.SHEET.units.data.map(item => ({label: item.code, value: item.id})) || [])
+    UnitOptions () {
+      return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
     },
-    ItemUnitOptions() {
+    ItemUnitOptions () {
       if (!this.UnitOptions) return []
       if (!this.rsForm.item) return []
 
@@ -166,20 +171,19 @@ export default {
       })
     }
   },
-  watch:{
-      '$route' : 'init',
+  watch: {
+    '$route': 'init'
   },
   methods: {
-    init() {
+    init () {
       this.FORM.load((data) => {
         this.setForm(data || this.setDefault())
       })
     },
-    setForm(data) {
+    setForm (data) {
       this.rsForm = JSON.parse(JSON.stringify(data))
 
-      if(Object.keys(data['has_relationship'] || {}).length > 0) {
-
+      if (Object.keys(data['has_relationship'] || {}).length > 0) {
         this.FORM.response.relationship({
           title: 'Stock Opname has relations!',
           messages: data['has_relationship'],
@@ -187,7 +191,7 @@ export default {
         })
       }
     },
-    setItemReference(val, opt) {
+    setItemReference (val, opt) {
       this.rsForm.init_amount = 0
       this.rsForm.item = (val) ? opt : null
 
@@ -198,70 +202,70 @@ export default {
         if (this.rsForm.stockist) this.setStockistReference(this.rsForm.stockist)
       }
     },
-    setStockistReference(val) {
+    setStockistReference (val) {
       const totals = this.rsForm.item.totals || {}
       this.rsForm.init_amount = Number(totals[val] || 0)
     },
-    setUnitReference(val) {
-      if(!val) return;
+    setUnitReference (val) {
+      if (!val) return false
       else if (this.rsForm.item.unit_id === val) {
         this.rsForm.unit_rate = 1
-      }
-      else {
-        if(this.rsForm.item.item_units) {
-          this.rsForm.item.item_units.map((unitItem)=> {
-            if (unitItem.unit_id == val) this.rsForm.unit_rate = unitItem.rate
-            console.warn('rate', this.rsForm.unit_rate);
+      } else {
+        if (this.rsForm.item.item_units) {
+          this.rsForm.item.item_units.map((unitItem) => {
+            if (unitItem.unit_id === val) this.rsForm.unit_rate = unitItem.rate
+            console.warn('rate', this.rsForm.unit_rate)
           })
         }
       }
     },
-    addNewItem(autofocus){
+    addNewItem (autofocus) {
       autofocus = autofocus || false
       let newEntri = this.setDefault().opname_vouchers[0] // {id:null, item_id: null, quantity: null};
       if (this.rsForm.item) newEntri.unit_id = this.rsForm.item.unit_id
 
       this.rsForm.opname_vouchers.push(newEntri)
     },
-    removeItem(index) {
+    removeItem (index) {
       this.rsForm.opname_vouchers.splice(index, 1)
-      if(this.rsForm.opname_vouchers.length < 1) this.addNewItem()
+      if (this.rsForm.opname_vouchers.length < 1) this.addNewItem()
     },
 
-    onSave() {
-
+    onSave () {
       const submit = () => {
         this.FORM.loading = true
-        let {method, mode, apiUrl} = this.FORM.meta();
+        let { method, apiUrl } = this.FORM.meta()
         this.$axios.set(method, apiUrl, this.rsForm)
-        .then((response) => {
-          let message = `${this.$tc('label.no',1,{v:'voucher'})} ${response.data.number}  [#${response.data.id}]`
-          this.FORM.response.success({message:message})
-          this.FORM.toView(response.data.id)
-        })
-        .catch((error) => {
-          this.FORM.response.error(error.response || error, 'UPDATE FAILED');
-          this.FORM.response.fields(error.response);
-        })
-        .finally(()=>{
-          setTimeout(() => {
-            this.FORM.loading = false
-          }, 2000)
-
-        })
+          .then((response) => {
+            let message = `${this.$tc('label.no', 1, { v: 'voucher' })} ${response.data.number}  [#${response.data.id}]`
+            this.FORM.response.success({ message: message })
+            this.FORM.toView(response.data.id)
+          })
+          .catch((error) => {
+            this.FORM.response.error(error.response || error, 'UPDATE FAILED')
+            this.FORM.response.fields(error.response)
+          })
+          .finally(() => {
+            setTimeout(() => {
+              this.FORM.loading = false
+            }, 2000)
+          })
       }
 
       this.$validator.validate().then(result => {
         if (!result) {
           return this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
           })
         }
 
         submit()
       })
-    },
-  },
+    }
+  }
 }
 </script>

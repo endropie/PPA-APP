@@ -53,10 +53,11 @@ const config = {
     stockists: [
       { value: 'FM', code: 'FM', label: 'FRESH' },
       { value: 'WIP', code: 'WIP', label: 'WORK PROCESS' },
-      { value: 'FG', code: 'FG', label: 'FINISH GOOD' },
       { value: 'PFG', code: 'PFG', label: 'PRE-FINISH GOOD' },
+      { value: 'FG', code: 'FG', label: 'FINISH GOOD' },
       { value: 'NC', code: 'NC', label: 'NC-REPAIR', color: 'warning' },
-      { value: 'NCR', code: 'NCR', label: 'NCR-REPAIR', color: 'orange-8' }
+      { value: 'NCR', code: 'NCR', label: 'NCR-REPAIR', color: 'orange-8' },
+      { value: 'NG', code: 'NG', label: 'NG', color: 'red' }
     ]
   },
   incoming_good: {
