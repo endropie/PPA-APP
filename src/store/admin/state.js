@@ -17,9 +17,9 @@ function getData () {
 
 export default {
   NOW: new Date(),
+  CONFIG: Object.assign({}, config),
   AUTH: Object.assign({}, JSON.parse(LocalStorage.getItem('AUTH'))),
   USER: Object.assign({}, JSON.parse(LocalStorage.getItem('USER'))),
-  CONFIG: Object.assign({}, config, JSON.parse(LocalStorage.getItem('CONFIG'))),
   SETTING: Object.assign({}, JSON.parse(LocalStorage.getItem('SETTING'))),
   ACCURATE: Object.assign({}, JSON.parse(LocalStorage.getItem('ACCURATE'))),
   PAGEMETA: {},

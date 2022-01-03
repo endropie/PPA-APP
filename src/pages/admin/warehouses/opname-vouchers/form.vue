@@ -147,15 +147,9 @@ export default {
       return Number(total)
     },
     StockistOptions () {
-      return [
-        { value: 'FM', code: 'FM', label: 'FRESH' },
-        { value: 'WIP', code: 'WIP', label: 'WORK PROCESS' },
-        { value: 'PFG', code: 'PFG', label: 'PRE-FINISH GOOD' },
-        { value: 'FG', code: 'FG', label: 'FINISH GOOD' },
-        { value: 'NC', code: 'NC', label: 'NC-REPAIR', color: 'warning' },
-        { value: 'NCR', code: 'NCR', label: 'NCR-REPAIR', color: 'orange-8' },
-        { value: 'NG', code: 'NG', label: 'NG', color: 'red' }
-      ]
+      let include = ['FM', 'WIP', 'PFG', 'FG', 'NC', 'NCR', 'NG']
+      return this.$store.state['admin'].CONFIG.items.stockists
+        .filter(x => include.some(e => e === x.value))
     },
     UnitOptions () {
       return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
