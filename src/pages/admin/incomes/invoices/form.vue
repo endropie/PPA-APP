@@ -17,7 +17,7 @@
             :error="errors.has('customer_id')"
             :error-message="errors.first('customer_id')"
             @input="setCustomer"
-            :hint="rsForm.order_mode ? `[${rsForm.order_mode}]` : undefined"
+            :hint="rsForm.order_mode ? `[${rsForm.order_mode}]` : ''"
           />
 
           <ux-date
@@ -76,8 +76,8 @@
                         slot="control"
                         class="no-padding"
                         dense
-                        left-label label="CONFIRMED"
-                        v-model="deliveryTable.isConfirmed"
+                        left-label label="VALIDATED"
+                        v-model="deliveryTable.isValidated"
                         @input="loadDelivery"
                       />
                     </q-field>
@@ -123,19 +123,19 @@
             <q-th slot="header-cell-action">
               <q-checkbox dense keep-color :value="ValCheckDeliveryTable" @input="setAllDeliveryTable" />
             </q-th>
-            <q-td slot="body-cell-date" slot-scope="rs" :props="rs" align="center">
+            <q-th slot="body-cell-date" slot-scope="rs" :props="rs" align="center">
               {{$app.moment(rs.row.date).format('DD/MM/YYYY')}}
-            </q-td>
-            <q-td slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
+            </q-th>
+            <q-th slot="body-cell-action" slot-scope="rs" :props="rs" class="q-pa-xs" auto-width>
               <q-checkbox dense
-                :disable="rs.row.status !== 'CONFIRMED'"
+                :disable="rs.row.status !== 'VALIDATED'"
                 :value="Boolean(rsForm.delivery_orders.find(e => e.id === rs.row.id))"
                 @input="!Boolean(rsForm.delivery_orders.find(e => e.id === rs.row.id))
                   ? rsForm.delivery_orders.push(rs.row)
                   : rsForm.delivery_orders = rsForm.delivery_orders.filter(e => e.id !== rs.row.id)
                 "
               />
-            </q-td>
+            </q-th>
           </q-table>
           <q-table v-else title="Sales Order"
             flat dense bordered separator='cell'
@@ -278,7 +278,7 @@ export default {
         },
         request_order_id: null,
         hideChecked: true,
-        isConfirmed: false,
+        isValidated: false,
         begin_date: this.$app.moment().startOf('month').format('YYYY-MM-DD'),
         until_date: this.$app.moment().endOf('month').format('YYYY-MM-DD'),
         filters: null,
@@ -367,7 +367,7 @@ export default {
       })
     },
     setAllDeliveryTable (checkAll) {
-      this.deliveryTable.data.filter(x => x.status === 'CONFIRMED').map(row => {
+      this.deliveryTable.data.filter(x => x.status === 'VALIDATED').map(row => {
         const found = this.rsForm.delivery_orders.find(e => e.id === row.id)
         if (checkAll === true && !found) {
           this.rsForm.delivery_orders.push(row)
@@ -384,7 +384,7 @@ export default {
       const paginate = request.pagination || {}
       const limit = paginate.rowsPerPage || this.deliveryTable.pagination.rowsPerPage
       const page = Number(paginate.rowsPerPage) === Number(this.deliveryTable.pagination.rowsPerPage) ? paginate.page : 1
-      const status = this.deliveryTable.isConfirmed ? '&status=CONFIRMED' : ''
+      const status = this.deliveryTable.isValidated ? '&status=VALIDATED' : ''
       const begin = this.deliveryTable.begin_date ? `&begin_date=${this.deliveryTable.begin_date}` : ''
       const until = this.deliveryTable.until_date ? `&until_date=${this.deliveryTable.until_date}` : ''
       const filters = this.deliveryTable.filters ? `&search=${this.deliveryTable.filters.join('+')}` : ''

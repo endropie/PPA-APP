@@ -18,6 +18,20 @@
                   setConfirmation()
                 }
               },
+              { label: $tc('form.validation').toUpperCase(), color:'green', icon: 'done_all',
+                detail: $tc('messages.process_validation'),
+                hidden: !IS_VALIDATION || !$app.can('sj-delivery-orders-validation'),
+                actions: () => {
+                  setValidation()
+                }
+              },
+              { label: $tc('form.reopen').toUpperCase(), color:'blue-grey', icon: 'chevron_left',
+                detail: $tc('messages.process_reopen'),
+                hidden: !IS_REOPEN || !$app.can('sj-delivery-orders-reopen'),
+                actions: () => {
+                  setReopen()
+                }
+              },
               { label: $tc('form.edit').toUpperCase(), color:'orange', icon: 'save',
                 detail: $tc('messages.process_update'),
                 hidden: !IS_EDITABLE || !$app.can('sj-delivery-orders-update'),
@@ -307,6 +321,16 @@ export default {
       if (this.rsView.status !== 'OPEN') return false
       return true
     },
+    IS_VALIDATION () {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'CONFIRMED') return false
+      return true
+    },
+    IS_REOPEN () {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'CONFIRMED') return false
+      return true
+    },
     IS_RECON () {
       if (this.rsView.deleted_at) return false
       if (!this.rsView.is_internal) return false
@@ -316,16 +340,19 @@ export default {
     IS_REVISE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.transaction === 'SAMPLE') return false
+      if (this.rsView.status === 'VALIDATED') return false
       if (this.rsView.status !== 'OPEN' && this.rsView.is_internal) return false
       if (this.rsView.status !== 'OPEN' && this.rsView.reconcile_id) return false
       return true
     },
     IS_VOID () {
       if (this.rsView.deleted_at) return false
+      if (this.rsView.status === 'VALIDATED') return false
       return true
     },
     IS_EDITABLE () {
       if (this.rsView.deleted_at) return false
+      if (this.rsView.status === 'VALIDATED') return false
       if (this.rsView.status !== 'OPEN') return false
       if (this.rsView.transaction !== 'SAMPLE') return false
       if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
@@ -394,10 +421,11 @@ export default {
     setConfirmation () {
       const submit = (val) => {
         this.$q.loading.show()
-        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=confirmation&nodata=true`
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/confirmation?nodata=true`
         this.$axios.put(url, val)
           .then((response) => {
             const data = response.data
+            this.$app.notify.success('CONFIRMATION SUCCESS')
             this.setView(data)
           })
           .catch(error => {
@@ -422,7 +450,7 @@ export default {
         }
 
         this.$q.dialog({
-          title: this.$tc('form.confirm'),
+          title: String(this.$tc('form.confirm')).toUpperCase(),
           message: 'Input Confirmed number',
           prompt: {
             model: '',
@@ -436,6 +464,89 @@ export default {
         })
       })
     },
+    setValidation () {
+      const submit = () => {
+        this.$q.loading.show()
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/validation?nodata=true`
+        this.$axios.put(url)
+          .then((response) => {
+            const data = response.data
+            this.$app.notify.success('VALIDATION SUCCESS')
+            this.setView(data)
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'VALIDATED FAILED')
+          })
+          .finally(() => {
+            setTimeout(() => {
+              this.$q.loading.hide()
+            }, 1000)
+          })
+      }
+
+      this.$validator.validate().then(result => {
+        if (!result) {
+          return this.$q.notify({
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
+          })
+        }
+
+        this.$q.dialog({
+          title: String(this.$tc('form.validation')).toUpperCase(),
+          message: this.$t('messages.to_sure', { v: this.$tc('form.validation') }),
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          submit()
+        })
+      })
+    },
+    setReopen () {
+      const submit = () => {
+        this.$q.loading.show()
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/reopen?nodata=true`
+        this.$axios.put(url)
+          .then((response) => {
+            const data = response.data
+            this.$app.notify.success('RE-OPEN SUCCESS')
+            this.setView(data)
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'RE-OPEN FAILED')
+          })
+          .finally(() => {
+            setTimeout(() => {
+              this.$q.loading.hide()
+            }, 1000)
+          })
+      }
+
+      this.$validator.validate().then(result => {
+        if (!result) {
+          return this.$q.notify({
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
+          })
+        }
+
+        this.$q.dialog({
+          title: String(this.$tc('form.confirm')).toUpperCase(),
+          message: this.$t('messages.to_sure', { v: this.$tc('form.reopen') }),
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          submit()
+        })
+      })
+    },
+
     setEncasement (index, val, init) {
       const save = () => this.rsView.delivery_order_items[index].encasement = val
       const cancel = () => this.rsView.delivery_order_items[index].encasement = init
