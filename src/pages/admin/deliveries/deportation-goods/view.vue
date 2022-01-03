@@ -205,7 +205,8 @@ export default {
     setValidation () {
       const submit = () => {
         this.$q.loading.show()
-        const apiUrl = `${this.VIEW.resource.api}/${this.rsView.id}?mode=validation&nodata`
+        const apiUrl = `${this.VIEW.resource.api}/${this.rsView.id}/validation?nodata`
+
         this.$axios.set('PUT', apiUrl, this.rsForm)
           .then((response) => {
             let message = response.data.number + ' - #' + response.data.id
@@ -216,6 +217,7 @@ export default {
             let message = error.response
               ? (error.response.data.message || undefined) : undefined
             this.$app.notify.error('VALIDATION FAILED', message)
+            console.error('ERROR', error.response || error)
           })
           .finally(() => {
             this.$q.loading.hide()

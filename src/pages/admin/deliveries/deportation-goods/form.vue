@@ -82,7 +82,7 @@
             <q-td width="15%" style="min-width:150px">
               <q-select
                 map-options emit-value
-                :options="CONFIG.items.stockists.filter(x => ['FM', 'FG', 'NC', 'NCR'].indexOf(x.value) >= 0)"
+                :options="CONFIG.items.stockists.filter(x => ['FM', 'PFG', 'FG', 'NC', 'NCR', 'NG'].indexOf(x.value) >= 0)"
                 v-model="row.stockist_from"
                 outlined dense hide-bottom-space color="blue-grey-5"
               />
