@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="page-index" >
     <q-pull-to-refresh @refresh="TABLE.refresh" inline>
-      <q-table ref="table" class="table-index th-uppercase" color="primary" :dark="LAYOUT.isDark"
+      <q-table ref="table" class="table-index th-uppercase" color="primary"
         :title="TABLE.getTitle()"
         subtitle="cskc"
         :data="TABLE.rowData"
@@ -27,6 +27,15 @@
                 hidden:!$app.can('sj-delivery-orders-create'),
                 to: `${TABLE.resource.uri}/create-sample`
               },
+              { label: $tc('form.validation'),
+                detail: $tc('messages.process_validation'),
+                icon: 'check_box',
+                shortcut: true,
+                hidden:!$app.can('sj-delivery-orders-validation'),
+                actions: () => {
+                  newMultiValidation()
+                }
+              },
               { label: $tc('label.trash'),
                 detail:  $tc('messages.show_deleted'),
                 shortcut: true,
@@ -46,19 +55,15 @@
                 :label="$tc('general.customer')"
                 dense hide-bottom-space hide-dropdown-icon
                 standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                 :options="CustomerOptions"
                 @input="FILTERABLE.submit" />
 
               <q-select class="col-12 col-sm-3 "
                 v-model="FILTERABLE.fill.status.value" clearable
-                :options="['OPEN', 'CONFIRMED','RECONCILIATION', 'RECONCILED']"
+                :options="['OPEN', 'CONFIRMED', 'VALIDATED', 'RECONCILIATION', 'RECONCILED']"
                 :label=" $tc('label.state')"
                 dense hide-bottom-space hide-dropdown-icon
                 standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark"
                 @input="FILTERABLE.submit" />
 
               <ux-date class="col-12 col-sm-3"
@@ -66,8 +71,6 @@
                 v-model="FILTERABLE.fill.date.value" type="date"  clearable
                 dense hide-bottom-space
                 standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark"
                 @input="FILTERABLE.submit"/>
 
               <q-select class="col-12" autocomplete="off"
@@ -76,8 +79,6 @@
                 v-model="FILTERABLE.search" emit-value
                 :placeholder="`${$tc('form.search',2)}...`"
                 standout="bg-blue-grey-5 text-white"
-                :bg-color="LAYOUT.isDark ? 'blue-grey-9' : 'blue-grey-1'"
-                :dark="LAYOUT.isDark"
                 @input="FILTERABLE.submit">
 
                 <template slot="append">
@@ -90,6 +91,20 @@
 
         <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:40px">
           <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" />
+          <span v-if="multiValidation.show && rs.row.status === 'CONFIRMED'">
+            <q-btn dense flat
+              color="light"
+              icon="check_box_outline_blank"
+              v-if="!multiValidation.data.some(x => x.id === rs.row.id)"
+              @click="addItemValidation(rs.row)"
+            />
+            <q-btn v-else dense flat
+              color="light"
+              icon="check_box"
+              @click="clearItemValidationByID(rs.row.id)"
+            />
+            <q-tooltip> The selected to validation </q-tooltip>
+          </span>
         </q-td>
 
         <q-td slot="body-cell-customer_id" slot-scope="rs" :props="rs">
@@ -163,6 +178,50 @@
 
       </q-table>
     </q-pull-to-refresh>
+    <q-dialog persistent seamless
+      v-model="multiValidation.show"
+      :position="multiValidation.minimize ? 'bottom' : 'right'"
+      @hide="unsetMultiValidation"
+    >
+    <!-- <div class="column "> -->
+      <q-card v-if="multiValidation.show" style="min-width:250px">
+        <q-card-section class="q-pb-none">
+          <q-bar class="bg-primary text-white text-uppercase shadow-2">
+            <q-icon size="25px" color="white" name="check_box" class="q-mr-sm"/>
+            <span> SJDO Validation</span>
+            <q-space />
+            <q-btn flat dense icon="remove" @click="multiValidation.minimize = !multiValidation.minimize" />
+          </q-bar>
+        </q-card-section>
+        <q-card-section class="q-py-none" v-if="!multiValidation.minimize">
+        <q-markup-table dense flat bordered style="max-height:250px;min-height:200px">
+          <tbody>
+            <tr v-if="multiValidation.data.length === 0">
+              <td colspan="100%" class="text-center text-grey text-caption text-italic q-py-md">
+                Please selected SJDO to validation
+              </td>
+            </tr>
+            <tr  v-for="(item, index) in multiValidation.data" :key="index">
+              <td>
+                <q-btn dense flat color="negative" icon="clear" @click="clearItemValidation(index)" />
+              </td>
+              <td class="text-left">{{ item.fullnumber }}</td>
+              <td class="text-right">{{ $app.moment(item.date).format('DD/MM/YYYY') }}</td>
+            </tr>
+          </tbody>
+        </q-markup-table>
+        </q-card-section>
+        <q-space />
+        <q-card-actions align="right" v-if="!multiValidation.minimize">
+          <q-btn flat label="Cancel" color="faded" v-close-popup />
+          <q-btn label="Validation" color="positive"
+            :disable="!multiValidation.data.length"
+            @click="setMultiValidation"
+          />
+        </q-card-actions>
+      </q-card>
+    <!-- </div> -->
+    </q-dialog>
   </q-page>
 </template>
 
@@ -173,6 +232,11 @@ export default {
   mixins: [MixIndex],
   data () {
     return {
+      multiValidation: {
+        show: false,
+        minimize: false,
+        data: []
+      },
       SHEET: {
         customers: { data: [], api: '/api/v1/incomes/customers?mode=all' }
       },
@@ -245,6 +309,65 @@ export default {
       if (row.status !== 'OPEN') return false
       if (row.is_relationship) return false
       return true
+    },
+    unsetMultiValidation () {
+      this.multiValidation.show = false
+    },
+    newMultiValidation () {
+      this.multiValidation.show = true
+      this.multiValidation.minimize = false
+      this.multiValidation.data = []
+    },
+    addItemValidation (item) {
+      this.multiValidation.data.push(item)
+    },
+    clearItemValidation (index) {
+      this.multiValidation.data.splice(index, 1)
+    },
+    clearItemValidationByID (id) {
+      const index = this.multiValidation.data.findIndex(x => x.id === id)
+      if (typeof index !== 'undefined') this.clearItemValidation(index)
+    },
+    setMultiValidation () {
+      const submit = () => {
+        this.$q.loading.show()
+        let url = `${this.TABLE.resource.api}/multi-validation?nodata=true`
+        this.$axios.post(url, { data: this.multiValidation.data })
+          .then(() => {
+            this.$app.notify.success('VALIDATION SUCCESS')
+            this.multiValidation.show = false
+            this.TABLE.refresh()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'VALIDATED FAILED')
+          })
+          .finally(() => {
+            setTimeout(() => {
+              this.$q.loading.hide()
+            }, 1000)
+          })
+      }
+
+      this.$validator.validate().then(result => {
+        if (!result) {
+          return this.$q.notify({
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
+          })
+        }
+
+        this.$q.dialog({
+          title: String(this.$tc('form.validation')).toUpperCase(),
+          message: this.$t('messages.to_sure', { v: this.$tc('form.validation') }),
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          submit()
+        })
+      })
     },
     onCommentable (row) {
       this.$q.dialog({
