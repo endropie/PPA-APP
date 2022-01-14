@@ -4,7 +4,7 @@
     <div class="content" :style="{'min-width': $q.screen.gt.sm ? '70%' : '100%'}">
       <div class="row q-gutter-xs print-hide q-mb-sm"  v-if="rsView">
         <q-btn :label="$tc('form.back')" icon="cancel"  color="dark" :to="`${VIEW.resource.uri}?return`" />
-        <q-btn :label="$tc('form.print')" icon="print" color="grey" @click.native="VIEW.print()" />
+        <q-btn :label="$tc('form.print')" icon="print" color="grey" @click="setPrint()" />
         <q-btn :label="$tc('general.sj_delivery')" icon="print"  color="dark" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/delivery-orders`" />
         <q-space />
         <q-btn-dropdown outline class="no-dropdown-icon"
@@ -194,6 +194,31 @@ export default {
     },
     setView (data) {
       this.rsView = data
+    },
+    setPrint () {
+      const submit = () => {
+        this.VIEW.loading = true
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/print-log`
+        this.$axios.put(url)
+          .then(() => {
+            this.VIEW.print()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'PRINT LOG')
+          })
+          .finally(() => {
+            this.VIEW.loading = false
+          })
+      }
+
+      this.$q.dialog({
+        title: String(this.$tc('form.confirm', 1, { v: 'PRINT LOG' })).toUpperCase(),
+        message: this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_printlog') }),
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        submit()
+      })
     },
     valQrCode (data) {
       return `/delivery-loads/${data.id}`
