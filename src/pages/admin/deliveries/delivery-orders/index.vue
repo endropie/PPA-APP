@@ -50,7 +50,7 @@
             ]">
 
             <div class="row q-col-gutter-xs" >
-              <ux-select-filter class="col-12 col-sm-6"
+              <ux-select-filter class="col-12 col-sm-4"
                 v-model="FILTERABLE.fill.customer_id.value" clearable
                 :label="$tc('general.customer')"
                 dense hide-bottom-space hide-dropdown-icon
@@ -58,7 +58,7 @@
                 :options="CustomerOptions"
                 @input="FILTERABLE.submit" />
 
-              <q-select class="col-12 col-sm-3 "
+              <q-select class="col-12 col-sm-2"
                 v-model="FILTERABLE.fill.status.value" clearable
                 :options="['OPEN', 'CONFIRMED', 'VALIDATED', 'RECONCILIATION', 'RECONCILED']"
                 :label=" $tc('label.state')"
@@ -66,12 +66,29 @@
                 standout="bg-blue-grey-5 text-white"
                 @input="FILTERABLE.submit" />
 
-              <ux-date class="col-12 col-sm-3"
+              <!-- <ux-date class="col-12 col-sm-3"
                 stack-label :label="$tc('label.date')"
                 v-model="FILTERABLE.fill.date.value" type="date"  clearable
                 dense hide-bottom-space
                 standout="bg-blue-grey-5 text-white"
-                @input="FILTERABLE.submit"/>
+                @input="FILTERABLE.submit"
+              /> -->
+
+              <ux-date class="col-12 col-sm-3"
+                stack-label :label="$tc('label.begin')"
+                v-model="FILTERABLE.fill.begin_date.value" type="date"  clearable
+                dense hide-bottom-space
+                standout="bg-blue-grey-5 text-white"
+                @input="FILTERABLE.submit"
+              />
+
+              <ux-date class="col-12 col-sm-3"
+                stack-label :label="$tc('label.until')"
+                v-model="FILTERABLE.fill.until_date.value" type="date"  clearable
+                dense hide-bottom-space
+                standout="bg-blue-grey-5 text-white"
+                @input="FILTERABLE.submit"
+              />
 
               <q-select class="col-12" autocomplete="off"
                 multiple use-chips use-input new-value-mode="add"
@@ -79,7 +96,8 @@
                 v-model="FILTERABLE.search" emit-value
                 :placeholder="`${$tc('form.search',2)}...`"
                 standout="bg-blue-grey-5 text-white"
-                @input="FILTERABLE.submit">
+                @input="FILTERABLE.submit"
+              >
 
                 <template slot="append">
                   <q-btn flat dense icon="search" dark-percentage color="fadded" @click="FILTERABLE.submit"/>
@@ -249,6 +267,16 @@ export default {
             transform: (value) => { return null }
           },
           date: {
+            value: null,
+            type: 'date',
+            transform: (value) => { return null }
+          },
+          begin_date: {
+            value: null,
+            type: 'date',
+            transform: (value) => { return null }
+          },
+          until_date: {
             value: null,
             type: 'date',
             transform: (value) => { return null }
