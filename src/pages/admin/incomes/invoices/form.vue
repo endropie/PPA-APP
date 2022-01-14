@@ -95,6 +95,14 @@
                       @input="loadDelivery()"
                     />
 
+                    <q-select v-model="deliveryTable.poreference"
+                      dense outlined hide-dropdown-icon
+                      multiple use-input use-chips new-value-mode="add"
+                      :max-values="1"
+                      placeholder="PO Reference"
+                      @input="loadDelivery()"
+                    />
+
                     <q-select v-model="deliveryTable.filters"
                       dense outlined hide-dropdown-icon
                       multiple use-input use-chips new-value-mode="add"
@@ -282,6 +290,7 @@ export default {
         begin_date: this.$app.moment().startOf('month').format('YYYY-MM-DD'),
         until_date: this.$app.moment().endOf('month').format('YYYY-MM-DD'),
         filters: null,
+        poreference: null,
         request: this.loadDelivery
       },
       orderTable: {
@@ -387,10 +396,11 @@ export default {
       const status = this.deliveryTable.isValidated ? '&status=VALIDATED' : ''
       const begin = this.deliveryTable.begin_date ? `&begin_date=${this.deliveryTable.begin_date}` : ''
       const until = this.deliveryTable.until_date ? `&until_date=${this.deliveryTable.until_date}` : ''
-      const filters = this.deliveryTable.filters ? `&search=${this.deliveryTable.filters.join('+')}` : ''
+      // const filters = this.deliveryTable.filters ? `&search=${this.deliveryTable.filters.join('+')}` : ''
+      const poreference = this.deliveryTable.poreference ? `&request_reference_number=${this.deliveryTable.poreference.join('+')}` : ''
       const order = this.deliveryTable.request_order_id ? `&request_order_id=${this.deliveryTable.request_order_id}` : ''
 
-      let api = `${this.deliveryTable.api}?invoicing=true&or_acc_invoice_id=${this.rsForm.id}&limit=${limit}&page=${page}&${parameter.join('&')}${status}${filters}${order}${begin}${until}`
+      let api = `${this.deliveryTable.api}?invoicing=true&or_acc_invoice_id=${this.rsForm.id}&limit=${limit}&page=${page}&${parameter.join('&')}${status}${poreference}${order}${begin}${until}`
       console.info('[PLAY] API GET:', api)
       this.deliveryTable.loading = true
       this.$axios.get(api)
