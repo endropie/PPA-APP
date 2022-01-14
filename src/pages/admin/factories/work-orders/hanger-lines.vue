@@ -80,6 +80,13 @@
           <span v-if="rs.row.date"> {{ $app.moment(rs.row.date).format('DD/MM/YY') }}</span>
         </q-td>
 
+        <q-td slot="body-cell-amount" slot-scope="rs" :props="rs">
+          {{ rs.value }}
+          <span class="text-grey">
+            / {{ rs.row.line.load_capacity || '-' }}
+          </span>
+        </q-td>
+
         <q-td slot="body-cell-line_id" slot-scope="rs" :props="rs" style="width:35px">
           <span v-if="rs">
             {{rs.value}}
