@@ -48,7 +48,7 @@
                   standout="bg-blue-grey-5 text-white"
                   :bg-color="$q.dark.isActive ? 'blue-grey-9' : 'blue-grey-1'"
                   :options="CustomerOptions"
-                  filter
+                  filter emit-value map-options
                   @input="FILTERABLE.submit()"
                 />
 
