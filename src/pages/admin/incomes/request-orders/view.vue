@@ -72,8 +72,17 @@
                 <q-td>{{row.item.part_name}}</q-td>
                 <q-td>{{row.item.part_subname}}</q-td>
                 <q-td class="text-center">{{row.item.unit.code}}</q-td>
-                <q-td class="text-right">{{$app.number_format(row.unit_amount, $app.get(row, 'item.unit.decimal_in'))}}</q-td>
-                <q-td class="text-right">{{$app.number_format(row.amount_delivery, $app.get(row, 'item.unit.decimal_in'))}}</q-td>
+                <q-td class="text-right">
+                  {{$app.number_format(row.unit_amount, $app.get(row, 'item.unit.decimal_in'))}}
+                </q-td>
+                <q-td class="text-right">
+                  <span v-if="rsView.transaction === 'REGULER' && rsView.customer.order_mode === 'ACCUMULATE'">
+                    {{$app.number_format(row.unit_amount, $app.get(row, 'item.unit.decimal_in'))}}
+                  </span>
+                  <span v-else>
+                    {{$app.number_format(row.amount_delivery, $app.get(row, 'item.unit.decimal_in'))}}
+                  </span>
+                </q-td>
                 <q-td class="text-right">
                   <div v-if="Math.round(row.unit_amount - row.amount_delivery) > 0">
                     {{$app.number_format((row.unit_amount - row.amount_delivery), $app.get(row, 'item.unit.decimal_in'))}}
@@ -107,7 +116,14 @@
                   <q-td>{{row.item.part_subname}}</q-td>
                   <q-td class="text-center">{{row.unit.code}} </q-td>
                   <q-td class="text-right">{{$app.number_format(row.quantity, row.unit.decimal_in)}}</q-td>
-                  <q-td class="text-right">{{$app.number_format(row.amount_delivery/(row.unit_rate||1), row.unit.decimal_in)}}</q-td>
+                  <q-td class="text-right">
+                    <span v-if="rsView.transaction === 'REGULER' && rsView.customer.order_mode === 'ACCUMULATE'">
+                      {{ $app.number_format(row.quantity, row.unit.decimal_in) }}
+                    </span>
+                    <span v-else>
+                      {{ $app.number_format(row.amount_delivery / (row.unit_rate||1), row.unit.decimal_in) }}
+                    </span>
+                  </q-td>
                   <q-td class="text-right">
                     <div v-if="Math.round(row.quantity - row.amount_delivery/(row.unit_rate||1)) > 0">
                       {{$app.number_format((row.quantity - row.amount_delivery/(row.unit_rate||1)), row.unit.decimal_in)}}

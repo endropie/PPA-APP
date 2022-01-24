@@ -8,28 +8,26 @@
         <q-btn :label="$tc('general.sj_delivery')" icon="print"  color="dark" :to="`${VIEW.resource.uri}/${ROUTE.params.id}/delivery-orders`" />
         <q-space />
         <q-btn-dropdown outline class="no-dropdown-icon"
-          :color="'secondary'" icon="local_shipping"
+          color="primary" icon="local_shipping"
           menu-anchor="bottom left" menu-self="top left">
           <span slot="label" class="on-right">
             {{`SJDO (${rsView.delivery_orders.length})`}}
           </span>
-          <div class="row q-pa-md" :class="{'bg-faded text-white': LAYOUT.isDark}">
-            <div class="column">
-              <div class="text-subtitle2 q-mb-md">SJ-DELIVERY ORDER</div>
-              <template v-for="(link, index) in rsView.delivery_orders">
-                <q-btn dense class="q-ma-xs" :key="index"
-                  color="secondary" icon="open_in_new"
-                  :label="`${link.fullnumber}`"
-                  @click="showDO(link.id, link.is_internal)"
-                />
-              </template>
-            </div>
-
-            <q-separator vertical inset class="q-mx-lg" v-show="false" />
-
-            <div class="column">
-            </div>
-          </div>
+          <q-list bordered>
+            <q-item-label header class="text-subtitle2">
+              SJ-DELIVERY ORDER
+            </q-item-label>
+            <q-separator />
+            <q-item clickable v-ripple
+              v-for="(link, index) in rsView.delivery_orders" :key="index"
+              @click="showDO(link.id, link.is_internal)"
+            >
+              <q-item-section>{{ link.fullnumber }}</q-item-section>
+              <q-item-section side>
+                <q-icon color="primary" name="open_in_new" />
+              </q-item-section>
+            </q-item>
+          </q-list>
         </q-btn-dropdown>
         <ux-btn-dropdown color="blue-grey"
           :options="[
@@ -38,6 +36,13 @@
               hidden: !$app.can('delivery-loads-create'),
               actions: () => {
                 $router.push(`${VIEW.resource.uri}/create`)
+              }
+            },
+            { label: 'RESTORE', color:'green', icon: 'refresh',
+              detail: $tc('messages.process_reopen'),
+              hidden: !IS_RESTORE || !$app.can('delivery-loads-void'),
+              actions: () => {
+                setRestore()
               }
             },
             { label: 'VOID', color:'red', icon: 'block',
@@ -179,6 +184,11 @@ export default {
       if (this.rsView.status !== 'OPEN') return false
       return true
     },
+    IS_RESTORE () {
+      if (!this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'VOID') return false
+      return true
+    },
     IS_EDITABLE () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.revise_id) return false
@@ -194,6 +204,31 @@ export default {
     },
     setView (data) {
       this.rsView = data
+    },
+    setRestore () {
+      const submit = () => {
+        this.VIEW.loading = true
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/restore`
+        this.$axios.put(url)
+          .then(() => {
+            this.init()
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'RESTORE')
+          })
+          .finally(() => {
+            this.VIEW.loading = false
+          })
+      }
+
+      this.$q.dialog({
+        title: String(this.$tc('form.confirm', 1, { v: 'RESTORE' })).toUpperCase(),
+        message: this.$tc('messages.to_sure', 1, { v: this.$tc('messages.process_reopen') }),
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        submit()
+      })
     },
     setPrint () {
       const submit = () => {
