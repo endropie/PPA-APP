@@ -65,7 +65,7 @@
             >
             <q-btn slot="append" icon="arrow_drop_down" :disable="!rsForm.customer" dense flat class="no-padding self-end">
               <q-menu auto-close>
-                <q-list bordered v-if="rsForm.customer">
+                <q-list bordered v-if="rsForm.customer && rsForm.customer.customer_trip">
                   <q-item clickable v-for="(ct, indexCT) in rsForm.customer.customer_trips.filter(x => x.intday === $app.moment(rsForm.date).day()) || []" :key="indexCT"
                     @click="rsForm.trip_time = ct.time"
                   >
@@ -92,8 +92,8 @@
         <thead>
           <q-tr class="text-uppercase" style="line-height:30px">
             <q-th key="prefix" width="50px"></q-th>
-            <q-th key="part" width="30%">{{$tc('items.part_name')}}</q-th>
-            <q-th key="part" width="30%">{{$tc('items.part_number')}}</q-th>
+            <q-th key="part_name" width="30%">{{$tc('items.part_name')}}</q-th>
+            <q-th key="part_number" width="30%">{{$tc('items.part_number')}}</q-th>
             <q-th key="quantity" width="15%">{{$tc('label.quantity')}}</q-th>
             <q-th key="unit" width="15%">{{$tc('label.unit')}}</q-th>
             <q-th key="encasement" width="25%">{{$tc('label.encasement')}}</q-th>
