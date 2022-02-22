@@ -61,7 +61,7 @@
         label="Operator"
         v-model="rsForm.operator"
         filter clearable
-        :source-keys="['name']"
+        :source-keys="['name', 'code']"
         source="/api/v1/common/employees?mode=all&limit=15&sort=name"
         :option-sublabel="(ol) => ol ? `NP: ${ol.code}`  : undefined" option-label="name" option-value="id"
         @selected="(ol) => rsForm.operator_id = (ol ? ol.id : null)"
