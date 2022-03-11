@@ -92,7 +92,7 @@
             <div class="on-right" style="max-width:50%">
               <div class="column items-start">
                 <q-markup-table dense bordered square separator="cell"
-                  class="table-print super-dense no-shadow no-highlight th-uppercase"
+                  class="table-print super-dense no-shadow no-highlight th-uppercase dotted"
                 >
                   <tbody>
                     <tr>
@@ -144,7 +144,7 @@
           </div>
           <div>
             <q-markup-table dense bordered square separator="cell"
-              class="table-print no-shadow no-highlight th-uppercase">
+              class="table-print dotted no-shadow no-highlight th-uppercase">
               <thead>
               <q-tr>
                 <q-th v-if="IS_LOTS">LOTS</q-th>
