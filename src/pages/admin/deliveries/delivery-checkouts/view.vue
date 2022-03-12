@@ -14,7 +14,7 @@
             </q-markup-table>
           </div>
           <div class="info">
-            <q-markup-table dense square bordered class="super-dense no-shadow no-highlight" separator="cell">
+            <q-markup-table dense square bordered class="table-print dotted super-dense no-shadow no-highlight" separator="cell">
               <tbody>
                 <tr>
                   <td class="text-weight-medium">{{$tc('label.date')}}</td>
@@ -28,7 +28,7 @@
             </q-markup-table>
           </div>
           <div class="col-12">
-            <q-markup-table dense bordered class="no-shadow no-highlight th-uppercase" separator="cell">
+            <q-markup-table dense square bordered class="table-print dotted no-shadow no-highlight th-uppercase" separator="cell">
               <thead>
                 <tr>
                   <q-th>{{ $tc('general.customer') }}</q-th>
