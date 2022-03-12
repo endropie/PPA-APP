@@ -160,31 +160,7 @@
           <div v-if="rs.row.stockist_direct">
             <q-chip square color="blue-grey" text-color="white" :label="`DIRECT [${rs.row.stockist_direct}]`" />
           </div>
-          <div class="column q-gutter-xs q-py-xs" style="min-width:205px"
-            v-else-if="filterPersentase(rs)">
-            <div class="row no-wrap items-center text-left">
-              <q-chip dense square color="lime-8" text-color="white" class="q-my-none" style="width:50px">WIP</q-chip>
-              <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.summary_items) ? (rs.row.summary_productions/rs.row.summary_items) : 0">
-                <div class="absolute-full flex flex-center">
-                  <q-badge :color="Boolean(rs.row.has_producted) ? 'red' : 'blue-grey-10'" text-color="white" class="text-weight-medium q-pt-xs">
-                    <span>{{$app.number_abbreviate(rs.row.summary_productions || 0)}} </span>
-                    <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.summary_items || 0)}}</span>
-                  </q-badge>
-                </div>
-              </q-linear-progress>
-            </div>
-            <div class="row no-wrap items-center text-left" v-show="!rs.row.main_id">
-              <q-chip dense square color="lime-8" text-color="white" class="q-my-none" style="width:50px">PAK</q-chip>
-              <q-linear-progress size="22px"  color="blue-grey" :value="Boolean(rs.row.summary_productions) ? (rs.row.summary_packings/rs.row.summary_productions) : 0">
-                <div class="absolute-full flex flex-center">
-                  <q-badge :color="Boolean(rs.row.has_packed) ? 'red' : 'blue-grey-10'" text-color="white" class="text-weight-medium q-pt-xs">
-                    <span>{{$app.number_abbreviate(rs.row.summary_packings || 0)}} </span>
-                    <span>&nbsp;/&nbsp;{{$app.number_abbreviate(rs.row.summary_productions || 0)}}</span>
-                  </q-badge>
-                </div>
-              </q-linear-progress>
-            </div>
-          </div>
+          <work-order-summary v-else-if="filterPersentase(rs)" :record="rs.row"  />
         </q-td>
 
         <q-td slot="body-cell-stockist" slot-scope="rs" :props="rs" style="width:35px">
@@ -221,9 +197,11 @@
 <script>
 import MixIndex from '@/mixins/mix-index.vue'
 import CommentableDialog from '@/components/CommentableDialog.vue'
+import WorkOrderSummary from '@/components/WorkOrderSummary.vue'
 
 export default {
   mixins: [MixIndex],
+  components: { WorkOrderSummary },
   data () {
     return {
       stockist_options: [
@@ -333,7 +311,7 @@ export default {
       return this.$app.can('work-orders-delete')
     },
     filterPersentase (rs) {
-      if (rs.row.summary_productions <= 0) return false
+      // if (rs.row.summary_productions <= 0) return false
       // if (rs.row.summary_packings <= 0) return false
       return ['OPEN', 'PRODUCTED', 'PACKED', 'CLOSED'].find(x => x === rs.row.status)
     },
