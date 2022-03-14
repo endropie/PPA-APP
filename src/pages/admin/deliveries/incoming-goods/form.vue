@@ -1,6 +1,6 @@
 <template>
 <q-page padding class="form-page">
-  <q-card inline class="main-box" :dark="LAYOUT.isDark" v-if="FORM.show">
+  <q-card inline class="main-box" v-if="FORM.show">
     <q-card-section>
       <form-header :title="FORM.title()" :subtitle="FORM.subtitle()" >
         <q-chip slot="optional" v-if="rsForm.status === 'VOID'"
@@ -8,13 +8,12 @@
           label="void" color="negative" outline/>
       </form-header>
     </q-card-section>
-    <q-separator :dark="LAYOUT.isDark"></q-separator>
+    <q-separator />
     <!-- COLUMN::1st Transaction details -->
     <q-card-section class="row q-col-gutter-x-md">
       <q-field class="col-12"
         borderless stack-label hide-bottom-space
         :label="$tc('label.mode',1, {v:$tc('label.transaction')})"
-        :dark="LAYOUT.isDark"
         :disable="Boolean(rsForm.id) || IssetItemDetails"
         :error="errors.has('transaction')">
 
@@ -22,7 +21,6 @@
           name="transaction" type="radio" inline
           v-model="rsForm.transaction"
           v-validate="'required'"
-          :dark="LAYOUT.isDark"
           :disable="Boolean(rsForm.id) || IssetItemDetails"
           :options="CONFIG.options['transaction_mode'].concat({ 'label': 'SAMPLE', 'value': 'SAMPLE' }, { 'label': 'INTERNAL', 'value': 'INTERNAL' })"
           @input="(val) => setTransactionReference(val)"/>
@@ -36,7 +34,6 @@
             :options="CustomerOptions" clearable
             :disable="Boolean(rsForm.id) || IssetItemDetails"
             v-validate="'required'"
-            :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
             :error="errors.has('customer')"
             :error-message="errors.first('customer')"
             @input="(val) => setCustomerReference(val)">
@@ -50,7 +47,6 @@
             v-model="rsForm.date"
             v-validate="`required|date_format:yyyy-MM-dd|before:${$app.moment().add(1,'days').format('YYYY-MM-DD')}`"
             :date-options="(date) => date <= $app.moment().format('YYYY/MM/DD')"
-            :dark="LAYOUT.isDark"
             :error="errors.has('date')"
             :error-message="errors.first('date')"
             @input="setDateReference"/>
@@ -59,7 +55,6 @@
             :label="$tc('label.time')" stack-label
             v-model="rsForm.time"
             v-validate="`required`"
-            :dark="LAYOUT.isDark"
             :error="errors.has('time')"
             :error-message="errors.first('time')" />
 
@@ -67,7 +62,6 @@
             :label="$tc('warehouses.registration')"
             v-model="rsForm.registration"
             v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
             :error="errors.has('registration')"
             :error-message="errors.first('registration')"/>
         </div>
@@ -80,7 +74,6 @@
             stack-label :label="$tc('warehouses.reference_number')"
             v-model="rsForm.reference_number"
             v-validate="isNotSample(`required`)"
-            :dark="LAYOUT.isDark"
             :error="errors.has('reference_number')"
             :error-message="errors.first('reference_number')"/>
 
@@ -90,7 +83,6 @@
             v-model="rsForm.reference_date"
             v-validate="isNotSample(`required|date_format:yyyy-MM-dd|before:${$app.moment().add(1,'days').format('YYYY-MM-DD')}`)"
             :date-options="(date) => date <= $app.moment().format('YYYY/MM/DD')"
-            :dark="LAYOUT.isDark"
             :error="errors.has('reference_date')"
             :error-message="errors.first('reference_date')"/>
 
@@ -100,7 +92,6 @@
             v-model="rsForm.vehicle_id"
             autocomplete="off"
             :options="VehicleOptions"
-            :dark="LAYOUT.isDark"
             :error="errors.has('vehicle_id')"
             :error-message="errors.first('vehicle_id')" >
 
@@ -109,7 +100,6 @@
               v-model="rsForm.rit" clearable
               no-error-icon hide-dropdown-icon
               :options="RitOptions" options-dense
-              :options-dark="LAYOUT.isDark" :dark="LAYOUT.isDark"
               v-validate="'min_value:0'"
               :error="errors.has('rit')" />
           </ux-select-filter>
@@ -121,7 +111,7 @@
     <q-card-section class="q-gutter-sm q-pt-none">
       <q-markup-table flat bordered square class="main-box no-highlight th-uppercase"
         dense separator="horizontal"
-        :dark="LAYOUT.isDark">
+      >
         <thead>
           <q-tr>
             <q-th key="prefix"></q-th>
@@ -130,6 +120,7 @@
             <q-th key="part_subname">{{$app.setting('item.subname_label')}}</q-th>
             <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
             <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+            <q-th key="valid">{{ $t('label.quantity', { v: 'valid' })}}</q-th>
             <q-th key="note">{{$tc('label.note')}}</q-th>
           </q-tr>
         </thead>
@@ -168,7 +159,7 @@
               <q-input readonly
                 :value="row.item ? row.item.part_subname : null"
                 outlined dense hide-bottom-space color="blue-grey-5"
-                :dark="LAYOUT.isDark" />
+              />
             </q-td>
             <q-td width="15%">
               <q-input type="number" min="0" style="min-width:120px"
@@ -177,8 +168,8 @@
                 v-model="row.quantity"
                 v-validate="row.item_id ? 'required|gt_value:0' : ''"
                 dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
-                :dark="LAYOUT.isDark"
-                :error="errors.has(`incoming_good_items.${index}.quantity`)"/>
+                :error="errors.has(`incoming_good_items.${index}.quantity`)"
+              />
             </q-td>
             <q-td width="15%">
               <q-select style="min-width:100px"
@@ -189,16 +180,26 @@
                 @input="(val)=> { setUnitReference(index, val) }"
                 :options="ItemUnitOptions[index]"
                 map-options emit-value
-                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                 v-validate="row.item_id ? 'required' : ''"
-                :error="errors.has(`incoming_good_items.${index}.unit_id`)"/>
+                :error="errors.has(`incoming_good_items.${index}.unit_id`)"
+              />
               <q-input class="hidden" v-model="row.unit_rate" />
+            </q-td>
+            <q-td width="15%">
+              <q-input type="number" min="0" style="min-width:120px"
+                :data-vv-as="$tc('label.quantity', { v: 'valid' })"
+                :name="`incoming_good_items.${index}.valid`"
+                v-model="row.valid"
+                v-validate="row.item_id ? 'required|min:0' : ''"
+                dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
+                :error="errors.has(`incoming_good_items.${index}.valid`)"
+              />
             </q-td>
             <q-td width="20%">
               <q-input
                 v-model="row.note"
                 outlined dense hide-bottom-space color="blue-grey-5"
-                :dark="LAYOUT.isDark" />
+              />
             </q-td>
 
           </q-tr>
@@ -213,14 +214,13 @@
         </tbody>
       </q-markup-table>
       <!-- COLUMN::4th Description -->
-      <q-input
+      <q-input filled
         name="description" type="textarea" rows="3"
-        stack-label :label="$tc('label.description')"
-        filled
-        :dark="LAYOUT.isDark"
+        stack-label
+        :label="$tc('label.description')"
         v-model="rsForm.description"/>
     </q-card-section>
-    <q-separator :dark="LAYOUT.isDark" />
+    <q-separator />
     <q-card-actions class="q-mx-lg">
       <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()"></q-btn>
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
@@ -228,7 +228,7 @@
         :loading="FORM.loading" />
     </q-card-actions>
   </q-card>
-  <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
+  <q-inner-loading :showing="FORM.loading" ><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
 </q-page>
 </template>
 
@@ -275,6 +275,7 @@ export default {
               item_id: null,
               item: {},
               quantity: null,
+              valid: null,
 
               unit_id: null,
               unit_rate: 1,

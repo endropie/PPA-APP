@@ -1,6 +1,6 @@
 <template>
 <q-page padding class="form-page">
-  <q-card inline class="main-box" :dark="LAYOUT.isDark" v-if="FORM.show">
+  <q-card inline class="main-box" v-if="FORM.show">
     <q-card-section>
       <form-header
         :title="`${$tc('form.validation', 1, {v: $tc('general.incoming_good')})}`.toUpperCase()"
@@ -10,22 +10,22 @@
           label="void" color="negative" outline/>
       </form-header>
     </q-card-section>
-    <q-separator :dark="LAYOUT.isDark"></q-separator>
+    <q-separator />
     <!-- COLUMN::1st Transaction details -->
     <q-card-section class="row q-col-gutter-x-md">
       <q-field class="col-12"
         borderless stack-label hide-bottom-space
         :label="$tc('label.mode',1, {v:$tc('label.transaction')})"
-        :dark="LAYOUT.isDark"
-        :error="errors.has('transaction')">
+        :error="errors.has('transaction')"
+      >
 
         <q-option-group slot="control" disable
           name="transaction" type="radio" inline
           v-model="rsForm.transaction"
           v-validate="'required'"
-          :dark="LAYOUT.isDark"
           :options="CONFIG.options['transaction_mode'].concat({ 'label': 'SAMPLE', 'value': 'SAMPLE' })"
-          @input="(val) => setTransactionReference(val)"/>
+          @input="(val) => setTransactionReference(val)"
+        />
 
       </q-field>
       <div class="col-12 col-sm-6" >
@@ -36,7 +36,6 @@
             v-model="rsForm.customer_id"
             :options="CustomerOptions" clearable readonly
             v-validate="'required'"
-            :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
             :error="errors.has('customer')"
             :error-message="errors.first('customer')"
             @input="(val) => setCustomerReference(val)">
@@ -50,28 +49,28 @@
             v-model="rsForm.date" readonly
             v-validate="`required|date_format:yyyy-MM-dd|before:${$app.moment().add(1,'days').format('YYYY-MM-DD')}`"
             :date-options="(date) => date <= $app.moment().format('YYYY/MM/DD')"
-            :dark="LAYOUT.isDark"
             :error="errors.has('date')"
             :error-message="errors.first('date')"
-            @input="setDateReference"/>
+            @input="setDateReference"
+          />
 
            <q-input class="col-4"
             name="time" type="time"
             :label="$tc('label.time')" stack-label
             v-model="rsForm.time" readonly
             v-validate="`required`"
-            :dark="LAYOUT.isDark"
             :error="errors.has('time')"
-            :error-message="errors.first('time')" />
+            :error-message="errors.first('time')"
+          />
 
           <q-input class="col-12"
             name="registration"
             :label="$tc('warehouses.registration')"
             v-model="rsForm.registration" readonly
             v-validate="'required'"
-            :dark="LAYOUT.isDark"
             :error="errors.has('registration')"
-            :error-message="errors.first('registration')"/>
+            :error-message="errors.first('registration')"
+          />
         </div>
       </div>
       <div class="col-12 col-sm-6" >
@@ -82,18 +81,18 @@
             stack-label :label="$tc('warehouses.reference_number')"
             v-model="rsForm.reference_number" readonly
             v-validate="'required'"
-            :dark="LAYOUT.isDark"
             :error="errors.has('reference_number')"
-            :error-message="errors.first('reference_number')"/>
+            :error-message="errors.first('reference_number')"
+          />
 
           <ux-date class="col-12"
             name="reference_date" type="date"
             stack-label :label="$tc('warehouses.reference_date')"
             v-model="rsForm.reference_date" readonly
             v-validate="'required'"
-            :dark="LAYOUT.isDark"
             :error="errors.has('reference_date')"
-            :error-message="errors.first('reference_date')"/>
+            :error-message="errors.first('reference_date')"
+          />
 
           <ux-select-filter class="col-12"
             name="vehicle_id"
@@ -101,7 +100,6 @@
             v-model="rsForm.vehicle_id" readonly
             autocomplete="off"
             :options="VehicleOptions"
-            :dark="LAYOUT.isDark"
             :error="errors.has('vehicle_id')"
             :error-message="errors.first('vehicle_id')" >
             <template slot="after">
@@ -122,13 +120,14 @@
       </div>
     </q-card-section>
     <!-- COLUMN::2nd Request orders -->
-    <q-separator inset spaced :dark="LAYOUT.isDark"></q-separator>
+    <q-separator inset spaced />
     <q-card-section class="row q-col-gutter-sm">
 
       <div class="col-12">
         <q-markup-table class="main-box bordered no-shadow no-highlight th-uppercase"
           dense separator="horizontal"
-          :dark="LAYOUT.isDark">
+      >
+          <tbody>
             <q-tr>
               <q-th key="prefix"></q-th>
               <q-th key="lots" v-if="IS_LOTS">{{$tc('label.lots')}}</q-th>
@@ -136,6 +135,7 @@
               <q-th key="part_subname">{{$app.setting('item.subname_label')}}</q-th>
               <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
               <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
+              <q-th key="valid">{{$t('label.quantity', { v: 'valid' })}}</q-th>
               <q-th key="note">{{$tc('label.note')}}</q-th>
             </q-tr>
 
@@ -143,9 +143,9 @@
               <q-td key="prefix" style="width:50px">
                 <!-- <q-btn dense flat icon="clear" color="red" @click="excludeItem(row, index)" /> -->
                 <q-btn dense flat color="primary"
-                  @click="row.valid = row.valid ? 0 : row.quantity" >
+                  @click="row.isChecked = Boolean(row.isChecked) ? false : true" >
                   <q-tooltip  content-class="bg-primary">set valid</q-tooltip>
-                  <q-icon v-if="row.valid == row.quantity" name="done_all"/>
+                  <q-icon v-if="Boolean(row.isChecked)" name="done_all"/>
                   <q-icon v-else name="done_all" color="light"/>
                 </q-btn>
               </q-td>
@@ -156,25 +156,17 @@
                   color="blue-grey-5"
                 />
               </q-td>
-              <q-td key="item_id" width="35%">
+              <q-td key="item_id" width="30%">
                 <q-input readonly
                   :value="row.item ? row.item.part_name : null"
                   outlined dense hide-bottom-space color="blue-grey-5"
-                  :dark="LAYOUT.isDark" />
+                />
               </q-td>
-              <q-td key="part_subname" width="35%" style="min-width:150px">
+              <q-td key="part_subname" width="30%" style="min-width:150px">
                 <q-input readonly
                   :value="row.item ? row.item.part_subname : null"
                   outlined dense hide-bottom-space color="blue-grey-5"
-                  :dark="LAYOUT.isDark" />
-              </q-td>
-
-              <q-td key="unit_id" width="15%">
-                 <q-input readonly input-style="min-width:50px"
-                  :value="row.unit ? row.unit.code : null"
-                  outlined dense hide-bottom-space color="blue-grey-5"
-                  :dark="LAYOUT.isDark" />
-                <q-input class="hidden" v-model="row.unit_rate" />
+                />
               </q-td>
 
               <q-td key="quantity" width="15%">
@@ -183,17 +175,35 @@
                   v-model="row.quantity" readonly
                   v-validate="row.item_id ? 'required' : ''"
                   dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
-                  :dark="LAYOUT.isDark"
-                  :error="errors.has(`items.${index}.quantity`)"/>
+                  :error="errors.has(`items.${index}.quantity`)"
+                />
+              </q-td>
+
+              <q-td key="unit_id" width="10%">
+                 <q-input readonly input-style="min-width:50px"
+                  :value="row.unit ? row.unit.code : null"
+                  outlined dense hide-bottom-space color="blue-grey-5"
+                />
+                <q-input class="hidden" v-model="row.unit_rate" />
+              </q-td>
+
+              <q-td key="valid" width="15%">
+                <q-input style="min-width:100px"
+                  :name="`items.${index}.valid`" type="number"
+                  v-model="row.valid" readonly
+                  v-validate="row.item_id ? 'required' : ''"
+                  dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
+                  :error="errors.has(`items.${index}.valid`)"/>
               </q-td>
 
               <q-td key="note" width="35%">
                 <q-input autogrow input-style="min-width:150px"
                   v-model="row.note"
                   outlined dense hide-bottom-space color="blue-grey-5"
-                  :dark="LAYOUT.isDark" />
+                />
               </q-td>
             </q-tr>
+          </tbody>
 
           <q-tr slot="bottom-row"
             v-for="(row, index) in (rsForm.exclude_items)" :key="index">
@@ -211,45 +221,49 @@
                   v-text="row.item.part_subname" />
               </q-td>
 
+              <q-td key="quantity" width="20%">
+                <span class="q-px-sm text-strike" v-text="$app.number_format(row.quantity, row.unit.decimal_in)" />
+              </q-td>
+
               <q-td key="unit_id" width="20%">
                 <span class="q-px-sm text-strike"
                   v-if="row.unit"
                   v-text="row.unit.code" />
               </q-td>
 
-              <q-td key="quantity" width="20%">
-                <span class="q-px-sm text-strike" v-text="$app.number_format(row.quantity, row.unit.decimal_in)" />
+              <q-td key="valid" width="20%">
+                <span class="q-px-sm text-strike" v-text="$app.number_format(row.valid, row.unit.decimal_in)" />
               </q-td>
 
               <q-td key="note" width="35%">
                 <q-input autogrow input-style="min-width:150px"
                   v-model="row.note"
                   outlined dense hide-bottom-space color="blue-grey-5"
-                  :dark="LAYOUT.isDark" />
+                />
               </q-td>
           </q-tr>
         </q-markup-table>
       </div>
       <!-- COLUMN::4th Description -->
       <q-input class="col-12"
+        filled
         name="description" type="textarea" rows="3"
         stack-label :label="$tc('label.description')"
-        filled
-        :dark="LAYOUT.isDark"
-        v-model="rsForm.description"/>
+        v-model="rsForm.description"
+      />
     </q-card-section>
-    <q-separator :dark="LAYOUT.isDark" />
+    <q-separator />
     <q-card-actions class="q-mx-lg">
       <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()"></q-btn>
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
       <q-btn :label="$tc('form.reject')" icon="block" color="red-10" @click="onRejection()" v-if="IS_EDITABLE" :loading="FORM.loading" />
       <q-btn :label="$tc('form.validation')" icon="save" color="positive" @click="onSave()"
-        v-if="IS_EDITABLE && !rsForm.incoming_good_items.some(x => x.quantity !== x.valid)"
+        v-if="IS_EDITABLE && !rsForm.incoming_good_items.some(x => !x.isChecked)"
         :loading="FORM.loading"
       />
     </q-card-actions>
   </q-card>
-  <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark"><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
+  <q-inner-loading :showing="FORM.loading" ><q-spinner-dots size="70px" color="primary" /></q-inner-loading>
 </q-page>
 </template>
 
@@ -415,6 +429,8 @@ export default {
     },
     setForm (data) {
       data.exclude_items = []
+
+      data.incoming_good_items = data.incoming_good_items.map(item => ({ ...item, isChecked: false }))
 
       this.rsForm = JSON.parse(JSON.stringify(data))
 
