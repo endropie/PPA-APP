@@ -29,8 +29,8 @@
                 <q-space/>
                 <div class="on-right" style="max-width:50%">
                   <div class="column items-start">
-                    <q-markup-table dense bordered square separator="cell" :dark="LAYOUT.isDark"
-                      class="table-print super-dense no-shadow no-highlight th-uppercase"
+                    <q-markup-table dense bordered square separator="cell"
+                      class="table-print dotted super-dense no-shadow no-highlight th-uppercase"
                     >
                       <tbody>
                         <tr>
@@ -90,8 +90,7 @@
               </div>
               <div>
                 <q-markup-table dense bordered square separator="cell"
-                  :dark="LAYOUT.isDark"
-                  class="table-print no-shadow no-highlight th-uppercase">
+                  class="table-print dotted no-shadow no-highlight th-uppercase">
                   <thead>
                   <q-tr>
                     <q-th v-if="Boolean(page.data.customer.order_lots)">LOTS</q-th>

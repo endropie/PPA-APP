@@ -89,7 +89,7 @@
             </div>
             <q-space />
             <div class="info">
-              <q-markup-table dense square bordered class="super-dense no-shadow no-highlight" separator="cell">
+              <q-markup-table dense square bordered class="table-print dotted super-dense no-shadow no-highlight" separator="cell">
                 <tbody>
                   <tr>
                     <td class="text-weight-medium">{{$tc('label.number')}}</td>
@@ -108,7 +108,7 @@
             </div>
           </div>
           <div>
-            <q-markup-table dense bordered class="no-shadow no-highlight th-uppercase" separator="cell">
+            <q-markup-table square dense bordered class="table-print dotted no-shadow no-highlight th-uppercase" separator="cell">
               <thead>
               <q-tr>
                 <q-th>{{ $tc('label.name', 1, {v: $tc('label.part')}) }}</q-th>
