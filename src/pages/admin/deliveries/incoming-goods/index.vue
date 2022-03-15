@@ -126,7 +126,7 @@
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding" style="width:35px">
           <div class="row q-gutter-xs no-wrap">
-            <ux-chip-status dense square :row="rs.row"/>
+            <ux-chip-status dense square :row="rs.row" :color-options="{STANDARDIZED: 'green-8'}" />
             <q-chip dense square label="NCR"
               color="blue-grey" text-color="white"
               v-if="rs.row.transaction == 'RETURN'"
@@ -207,6 +207,7 @@ export default {
           { name: 'number', label: this.$tc('label.number'), field: 'number', align: 'left', sortable: true },
           { name: 'status', label: '', field: 'status', align: 'left' },
           { name: 'customer_id', label: this.$tc('general.customer'), field: 'customer_id', align: 'left', sortable: true },
+          { name: 'transaction', label: this.$tc('label.transaction'), field: 'transaction', align: 'left' },
           { name: 'reference_number', label: this.$tc('warehouses.reference_number'), field: 'reference_number', align: 'left', sortable: true },
           { name: 'reference_date', label: this.$tc('warehouses.reference_date'), field: 'reference_date', align: 'center', sortable: true },
           { name: 'created_at', label: this.$tc('form.create', 2), field: 'created_at', align: 'center', sortable: true }

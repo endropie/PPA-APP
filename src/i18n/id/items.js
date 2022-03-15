@@ -18,7 +18,6 @@ export default {
   price_area: '@:label.price per area',
   price_loaded: '@:label.price per kanban',
   red_spray: 'Red Spray',
-  reguler_request: 'Permintaan Reguler',
   sa_dm: 'Surface Area (dm)',
   sku: 'SKU',
   specification: 'Spesifikasi',

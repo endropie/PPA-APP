@@ -47,6 +47,7 @@ export default {
   process_packed: 'Tandai Proses Packing telah selesai.',
   process_reopen: 'Proses Pengembalian status "OPEN".',
   process_printlog: 'Tandai telah di cetak [print-log]',
+  process_standardization: 'Tandai telah di standarisasi',
 
   release_customer_order: 'Rilis PO Pelanggan',
   yes_to: 'Ya, {v}!'

@@ -244,6 +244,7 @@ const deliveries = [
       { page: 'restoration', path: ':id/restoration', meta: { mode: 'edit', permission: 'incoming-goods-create' } },
       { page: 'validation', path: ':id/validation', meta: { mode: 'edit', permission: 'incoming-goods-validation' } },
       { page: 'partial-validation', path: ':id/partial-validation', meta: { mode: 'edit', permission: 'incoming-goods-validation' } },
+      { page: 'standardization', path: ':id/standardization', meta: { mode: 'edit', permission: 'incoming-goods-standardization' } },
       { page: 'revision', path: ':id/revision', meta: { mode: 'edit', permission: 'incoming-goods-validation' } },
       { page: 'view', path: ':id', meta: { mode: 'view', permission: 'incoming-goods-read;delivery-tasks-create' } }
     ]

@@ -12,7 +12,7 @@
         <q-chip square outline icon='bookmark'
           color="blue-grey" text-color="white"
           label="INTERNAL" v-if="rsView.transaction === 'INTERNAL'" />
-        <ux-chip-status :row="rsView" tag outline small square icon='bookmark' />
+        <ux-chip-status :row="rsView" tag outline small square icon='bookmark' :color-options="{STANDARDIZED: 'green-8'}" />
 
         <q-btn dense flat round color="blue-grey" icon="settings" @click="$refs['config'].show()" />
         <config-page ref="config" persistent />
@@ -125,6 +125,13 @@
                 VIEW.delete()
               }
             },
+            { label: $tc('form.standardization').toUpperCase(), color:'green-8', icon: 'check',
+              hidden: !IS_STANDARDIZED || !this.$app.can('incoming-goods-standardization'),
+              detail:$tc('messages.process_standardization'),
+              actions: () => {
+                setReguled()
+              }
+            },
             { label: $tc('form.validation').toUpperCase(), color:'teal', icon: 'check',
               hidden: !IS_EDITABLE || !this.$app.can('incoming-goods-validation') || rsView.customer.partialidate_allowed,
               detail:$tc('messages.process_validation'),
@@ -140,7 +147,7 @@
               }
             },
             { label: (`${$tc('form.revision')}`).toUpperCase(), color:'orange', icon: 'edit',
-              hidden: !IS_REVISE || rsView.status !== 'VALIDATED' || rsView.customer.partialidate_allowed || !this.$app.can('incoming-goods-revision'),
+              hidden: !IS_REVISE || !['STANDARDIZED', 'VALIDATED'].some(x => x === rsView.status) || rsView.customer.partialidate_allowed || !this.$app.can('incoming-goods-revision'),
               detail:$tc('messages.process_revise'),
               actions: () => {
                 setRevision()
@@ -242,6 +249,12 @@ export default {
       if (['VOID'].find(x => x === this.rsView.status)) return false
       return true
     },
+    IS_STANDARDIZED () {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.transaction !== 'INTERNAL') return false
+      if (this.rsView.status !== 'VALIDATED') return false
+      return true
+    },
     IS_EDITABLE () {
       if (this.rsView.deleted_at || this.rsView.status !== 'OPEN') return false
       if (Object.keys(this.rsView.has_relationship || {}).length > 0) return false
@@ -267,6 +280,9 @@ export default {
     },
     setValidation () {
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/validation`)
+    },
+    setReguled () {
+      this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/standardization`)
     },
     setMultiValidation () {
       this.$router.push(`${this.VIEW.resource.uri}/${this.ROUTE.params.id}/partial-validation`)

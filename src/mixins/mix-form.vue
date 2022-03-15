@@ -231,7 +231,7 @@ export default {
       this.$app.response.error(ErrRes, title)
     },
 
-    FORM__response_success (params = {}, text) {
+    FORM__response_success (params = {}, text = null) {
       let mode = Object.assign({
         icon: 'check_circle_outline',
         message: (params.mode || this.ROUTE.meta.mode || 'SUBMIT').toUpperCase() + ' SUCCESS',
@@ -240,11 +240,11 @@ export default {
 
       if (typeof params === 'string' & params.length) {
         if (this.ROUTE.meta.mode === 'create') {
-          mode.message = this.$tc('messages.success_created')
+          mode.message = text || this.$tc('messages.success_created')
           mode.detail = this.$tc('messages.form_has_created', { v: params })
         }
         if (this.ROUTE.meta.mode === 'edit') {
-          mode.message = this.$tc('messages.success_updated')
+          mode.message = text || this.$tc('messages.success_updated')
           mode.detail = this.$tc('messages.form_has_updated', { v: params })
         }
       }

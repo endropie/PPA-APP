@@ -34,5 +34,6 @@ export default {
   sync: 'Sinkronisasi {v}',
   update: 'Perubahan | dirubah',
   validation: 'Validasi {v}| Ter-validasi',
+  standardization: 'Standarisasi {v} | Ter-Standarisasi',
   void: 'Pembatal'
 }

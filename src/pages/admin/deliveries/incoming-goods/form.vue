@@ -28,9 +28,10 @@
       </q-field>
       <div class="col-12 col-sm-6" >
         <div class="row q-col-gutter-x-sm">
-          <ux-select-filter name="customer" class="col-12"
+          <ux-select name="customer" class="col-12"
             :label="$tc('general.customer')"
             v-model="rsForm.customer_id"
+            filter emit-value map-options
             :options="CustomerOptions" clearable
             :disable="Boolean(rsForm.id) || IssetItemDetails"
             v-validate="'required'"
@@ -40,7 +41,7 @@
             <q-badge slot="counter"
               :label="String($tc(`customers.order_${rsForm.order_mode}`).toUpperCase())"
               v-if="Boolean(rsForm.customer_id) && rsForm.transaction == 'REGULER'" />
-          </ux-select-filter>
+          </ux-select>
 
           <ux-date name="date" type="date" class="col-8"
             :label="$tc('warehouses.incoming_date')" stack-label
@@ -56,14 +57,29 @@
             v-model="rsForm.time"
             v-validate="`required`"
             :error="errors.has('time')"
-            :error-message="errors.first('time')" />
+            :error-message="errors.first('time')"
+          />
 
-          <q-input name="registration" class="col-12"
-            :label="$tc('warehouses.registration')"
-            v-model="rsForm.registration"
-            v-validate="isNotSample(`required`)"
-            :error="errors.has('registration')"
-            :error-message="errors.first('registration')"/>
+          <ux-select class="col-12"
+            name="vehicle_id"
+            :label="$tc('transports.seri')" stack-label
+            v-model="rsForm.vehicle_id"
+            autocomplete="off"
+            filter emit-value map-options
+            :options="VehicleOptions"
+            :error="errors.has('vehicle_id')"
+            :error-message="errors.first('vehicle_id')" >
+
+            <q-select slot="after" class="no-padding" style="min-width:80px"
+              name="rit" label="RIT"
+              v-model="rsForm.rit" clearable
+              no-error-icon hide-dropdown-icon
+              :options="RitOptions" options-dense
+              v-validate="'min_value:0'"
+              :error="errors.has('rit')"
+            />
+          </ux-select>
+
         </div>
       </div>
       <div class="col-12 col-sm-6" >
@@ -84,26 +100,16 @@
             v-validate="isNotSample(`required|date_format:yyyy-MM-dd|before:${$app.moment().add(1,'days').format('YYYY-MM-DD')}`)"
             :date-options="(date) => date <= $app.moment().format('YYYY/MM/DD')"
             :error="errors.has('reference_date')"
-            :error-message="errors.first('reference_date')"/>
+            :error-message="errors.first('reference_date')"
+          />
 
-          <ux-select-filter class="col-12"
-            name="vehicle_id"
-            :label="$tc('transports.seri')" stack-label
-            v-model="rsForm.vehicle_id"
-            autocomplete="off"
-            :options="VehicleOptions"
-            :error="errors.has('vehicle_id')"
-            :error-message="errors.first('vehicle_id')" >
-
-            <q-select slot="after" class="no-padding" style="min-width:80px"
-              name="rit" label="RIT"
-              v-model="rsForm.rit" clearable
-              no-error-icon hide-dropdown-icon
-              :options="RitOptions" options-dense
-              v-validate="'min_value:0'"
-              :error="errors.has('rit')" />
-          </ux-select-filter>
-
+          <q-input name="registration" class="col-12"
+            :label="$tc('warehouses.registration')"
+            v-model="rsForm.registration"
+            v-validate="isNotSample(`required`)"
+            :error="errors.has('registration')"
+            :error-message="errors.first('registration')"
+          />
         </div>
       </div>
     </q-card-section>
@@ -116,12 +122,12 @@
           <q-tr>
             <q-th key="prefix"></q-th>
             <q-th key="lots" v-if="IS_LOTS">{{$tc('label.lots')}}</q-th>
-            <q-th key="item_id">{{$tc('items.part_name')}}</q-th>
+            <q-th key="item_id">{{ $tc('items.part_name') }}</q-th>
             <q-th key="part_subname">{{$app.setting('item.subname_label')}}</q-th>
-            <q-th key="quantity">{{$tc('label.quantity')}}</q-th>
-            <q-th key="unit_id">{{$tc('label.unit')}}</q-th>
-            <q-th key="valid">{{ $t('label.quantity', { v: 'valid' })}}</q-th>
-            <q-th key="note">{{$tc('label.note')}}</q-th>
+            <q-th key="quantity">QTY</q-th>
+            <q-th key="unit_id">{{ $tc('label.unit')}}</q-th>
+            <q-th key="valid">Actual QTY</q-th>
+            <q-th key="note">{{ $tc('label.note')}}</q-th>
           </q-tr>
         </thead>
         <tbody>
@@ -166,6 +172,9 @@
                 :data-vv-as="$tc('label.quantity')"
                 :name="`incoming_good_items.${index}.quantity`"
                 v-model="row.quantity"
+                @input="(v) => {
+                  if (rsForm.transaction === 'INTERNAL') row.valid = v
+                }"
                 v-validate="row.item_id ? 'required|gt_value:0' : ''"
                 dense outlined hide-bottom-space no-error-icon color="blue-grey-5"
                 :error="errors.has(`incoming_good_items.${index}.quantity`)"
@@ -187,6 +196,7 @@
             </q-td>
             <q-td width="15%">
               <q-input type="number" min="0" style="min-width:120px"
+                :readonly="rsForm.transaction === 'INTERNAL'"
                 :data-vv-as="$tc('label.quantity', { v: 'valid' })"
                 :name="`incoming_good_items.${index}.valid`"
                 v-model="row.valid"
