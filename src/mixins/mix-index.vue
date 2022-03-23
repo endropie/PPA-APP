@@ -200,7 +200,7 @@ export default {
 
           this.TABLE.pagination.page = Number(response.data.current_page)
           this.TABLE.pagination.rowsNumber = Number(response.data.total)
-          this.TABLE.pagination.rowsPerPage = Number(response.data.per_page)
+          // this.TABLE.pagination.rowsPerPage = Number(response.data.per_page)
 
           setTimeout(() => {
             // if (callback !== null) setTimeout(() => { callback() }, 800)
