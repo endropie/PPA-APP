@@ -385,6 +385,7 @@ const factories = [
       { page: 'index', path: '', icon: 'list', meta: { permission: 'work-orders-read' } },
       { page: 'items', path: 'items', icon: 'list', meta: { permission: 'work-orders-read' } },
       { page: 'lines', path: 'lines', icon: 'list', meta: { permission: 'work-orders-read' } },
+      { page: 'packings', path: 'packings', icon: 'list', meta: { permission: 'work-orders-read' } },
       { page: 'hanger-lines', path: 'hanger-lines', icon: 'list', meta: { permission: 'work-orders-read' } },
       { page: 'form', path: 'create', meta: { mode: 'create', permission: 'work-orders-create' } },
       { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'work-orders-update' } },
