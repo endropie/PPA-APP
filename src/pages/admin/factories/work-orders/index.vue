@@ -311,8 +311,6 @@ export default {
       return this.$app.can('work-orders-delete')
     },
     filterPersentase (rs) {
-      // if (rs.row.summary_productions <= 0) return false
-      // if (rs.row.summary_packings <= 0) return false
       return ['OPEN', 'PRODUCTED', 'PACKED', 'CLOSED'].find(x => x === rs.row.status)
     },
     onCommentable (row) {
