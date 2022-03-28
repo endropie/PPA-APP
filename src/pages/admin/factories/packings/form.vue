@@ -71,19 +71,23 @@
       />
 
       <ux-datetime class="col-12 col-sm-6 col-md-3" name="begin_datetime" ref="begin_datetime"
+        :data-vv-as="$tc('label.begin')"
         :label="$tc('label.begin')" stack-label
         v-model="rsForm.begin_datetime"
         v-validate="'required'"
         :error="errors.has('begin_datetime')"
         :error-message="errors.first('begin_datetime')"
+        no-error-icon
       />
 
       <ux-datetime class="col-12 col-sm-6 col-md-3" name="until_datetime" ref="until_datetime"
+        :data-vv-as="$tc('label.until')"
         :label="$tc('label.until')" stack-label
         v-model="rsForm.until_datetime"
         v-validate="`required|after_datetime:${rsForm.begin_datetime}`"
         :error="errors.has('until_datetime')"
         :error-message="errors.first('until_datetime')"
+        no-error-icon
       />
     </q-card-section>
     <q-separator spaced />
@@ -104,6 +108,7 @@
           :option-sublabel="(opt) => opt.part_subname"
           :error="errors.has('packing_items.item_id')"
           :error-message="errors.first('packing_items.item_id')"
+          no-error-icon
           @input="(v) => {
             this.rsForm.packing_items.unit = v ? v.unit : null
             this.rsForm.packing_items.item_id = v ? v.id : null
@@ -143,6 +148,7 @@
           :suffix="rsForm.packing_items.item_id ? `/ ${$app.number_format(MaxUnit)}` : ''"
           :error="errors.has(`packing_items.quantity`)"
           :error-message="errors.first(`packing_items.quantity`)"
+          no-error-icon
         />
       </div>
       <div class="text-h6">OK</div>
@@ -184,7 +190,7 @@
                   :suffix="`/ ${$app.number_format(MaxOrderUnit[orderKey],0)}`"
                   :data-vv-as="$tc('label.quantity')"
                   v-model="rowOrder.quantity" type="number" :min="0"
-                  @input="rsForm.packing_items.quantity = rsForm.packing_items.packing_item_orders.reduce((sum, dtl) => Number(dtl.quantity) + sum,0)"
+                  @input="setPackingItemQuantity"
                   v-validate="`${rowOrder.work_order_item ? 'required' : ''}|gt_value:0|max_value:${(MaxOrderUnit[orderKey])}`"
                   :error="errors.has(`packing_items.packing_item_orders.${orderKey}.quantity`)"
                   :error-message="errors.first(`packing_items.packing_item_orders.${orderKey}.quantity`)"
@@ -218,6 +224,12 @@
               :error="errors.has('type_fault_id')"
               :error-message="errors.first('type_fault_id')"
               :disable="rsForm.packing_items.packing_item_faults.some(x => Boolean(x.fault_id))"
+              @input="(x) => {
+                if (!x) {
+                  rsForm.packing_items.packing_item_faults = []
+                  addNewItemFault()
+                }
+              }"
             />
           </div>
         </div>
@@ -227,27 +239,51 @@
           v-show="rsForm.packing_items.type_fault_id">
           <q-tr>
             <q-th key="prefix" width="50px"></q-th>
+            <q-th key-work_order_id>{{ $t('general.work_order') }}</q-th>
             <q-th key="quantity" width="35%">{{$tc('label.quantity')}}</q-th>
             <q-th key="fault_id">{{$tc('items.fault')}}</q-th>
           </q-tr>
-          <q-tr v-for="(row, index) in rsForm.packing_items.packing_item_faults" :key="index">
+          <q-tr v-for="(row, faultKey) in rsForm.packing_items.packing_item_faults" :key="faultKey">
             <q-td key="prefix">
-              <q-btn dense flat  icon="clear" color="red" @click="removeItemFault(index)"/>
+              <q-btn dense flat  icon="clear" color="red" @click="removeItemFault(faultKey)"/>
+            </q-td>
+            <q-td>
+              <ux-select dense outlined hide-bottom-space
+                :disable="!rsForm.packing_items.type_fault_id"
+                :name="`packing_items.packing_item_faults.${faultKey}.work_order_item_id`"
+                :label="$tc('general.work_order')"
+                :data-vv-as="$tc('general.work_order')"
+                v-model="row.work_order_item" clearable
+                v-validate="`${$route.meta.mode == 'create' ? 'required' : ''}`"
+                popup-content-class="options-striped"
+                filter map-options
+                :source="`/api/v1/factories/work-orders/items?mode=all&has_amount_packing=true&item_id=${rsForm.packing_items.item_id}&or_detail_ids=${row.work_order_item_id}`"
+                option-value="id"
+                :option-label="(opt) => `${opt.work_order_number} (#${opt.id})`"
+                :option-sublabel="(opt) => `Date: ${$app.date_format(opt.work_order_date)} [${opt.work_order_shift}]`"
+                :option-stamp="(opt) => `QTY: ${opt.quantity}`"
+                :error="errors.has(`packing_items.packing_item_faults.${faultKey}.work_order_item_id`)"
+                :error-message="errors.first(`packing_items.packing_item_faults.${faultKey}.work_order_item_id`)"
+                @input="(v) => {
+                  row.work_order_item_id = v ? v.id : null
+                }"
+              />
             </q-td>
             <q-td key="quantity">
-              <q-input autofocus input-class="text-center WWW"
-                :name="`packing_items.packing_item_faults.${index}.quantity`"
+              <q-input autofocus input-class="text-center"
+                :name="`packing_items.packing_item_faults.${faultKey}.quantity`"
                 type="number" min="0" align="center"
+                :suffix="`/ ${$app.number_format(MaxFaultUnit[faultKey],0)}`"
                 outlined dense hide-bottom-space no-error-icon color="blue-grey"
                 v-model="row.quantity"
-                v-validate="row.fault_id ? 'required|gt_value:0' : ''"
+                v-validate="`${row.work_order_item ? 'required' : ''}|gt_value:0|max_value:${(MaxFaultUnit[faultKey])}`"
                 :data-vv-as="$tc('label.quantity')"
-                :error="errors.has(`packing_items.packing_item_faults.${index}.quantity`)"
+                :error="errors.has(`packing_items.packing_item_faults.${faultKey}.quantity`)"
                 />
             </q-td>
             <q-td key="fault_id">
               <ux-select-filter
-                :name="`packing_items.packing_item_faults.${index}.fault_id`"
+                :name="`packing_items.packing_item_faults.${faultKey}.fault_id`"
                 outlined style="min-width:150px"
                 dense hide-bottom-space no-error-icon color="blue-grey"
                 v-model="row.fault_id"
@@ -255,7 +291,7 @@
                 :disable="!row.quantity"
                 v-validate="row.quantity ? 'required' : ''"
                 data-vv-as="fault"
-                :error="errors.has(`packing_items.packing_item_faults.${index}.fault_id`)"
+                :error="errors.has(`packing_items.packing_item_faults.${faultKey}.fault_id`)"
               />
             </q-td>
           </q-tr>
@@ -352,6 +388,8 @@ export default {
             packing_item_faults: [
               {
                 id: null,
+                work_order_item: null,
+                work_order_item_id: null,
                 fault_id: null,
                 quantity: null
               }
@@ -366,7 +404,7 @@ export default {
   },
   computed: {
     MinValidate () {
-      if (this.rsForm.packing_items.packing_item_faults.some(x => Boolean(x.fault_id))) {
+      if (this.rsForm.packing_items.packing_item_faults.some(x => Boolean(x.quantity))) {
         return 'min:0'
       }
       return 'gt_value:0'
@@ -484,13 +522,37 @@ export default {
       let rsItem = this.rsForm.packing_items
       if (!rsItem.item_id) return []
 
-      // const UnitRate = this.rsForm.packing_items.unit_rate || 1
+      const sumUseFault = (id) => {
+        return rsItem.packing_item_faults
+          .filter((x) => x.work_order_item_id === id)
+          .reduce((t, x) => t + Number(x.quantity), 0)
+      }
 
-      return rsItem.packing_item_orders.map((orderDetail, orderDetailKey) => {
+      return rsItem.packing_item_orders.map((orderDetail) => {
         if (!orderDetail.work_order_item) return 0
-        return Number(orderDetail.work_order_item.amount_process / (rsItem.unit_rate || 1)) -
-              Number(orderDetail.work_order_item.amount_packing / (rsItem.unit_rate || 1)) +
-              Number(orderDetail.id ? orderDetail.quantity : 0)
+
+        return Number(orderDetail.id ? orderDetail.quantity : 0) +
+              Number(orderDetail.work_order_item.amount_process / (rsItem.unit_rate || 1)) -
+              Number(orderDetail.work_order_item.amount_packing / (rsItem.unit_rate || 1)) -
+              Number(sumUseFault(orderDetail.work_order_item_id))
+      })
+    },
+    MaxFaultUnit () {
+      let rsItem = this.rsForm.packing_items
+      if (!rsItem.item_id) return []
+
+      const sumOtherUse = (id, key) => {
+        return rsItem.packing_item_faults
+          .filter((x, i) => x.work_order_item_id === id && i !== key)
+          .reduce((t, x) => t + Number(x.quantity), 0)
+      }
+
+      return rsItem.packing_item_faults.map((faultDetail, faultKey) => {
+        if (!faultDetail.work_order_item) return 0
+        return Number(faultDetail.id ? faultDetail.quantity : 0) +
+              Number(faultDetail.work_order_item.amount_process / (rsItem.unit_rate || 1)) -
+              Number(faultDetail.work_order_item.amount_packing / (rsItem.unit_rate || 1)) -
+              Number(sumOtherUse(faultDetail.work_order_item_id, faultKey))
       })
     },
     MAPINGKEY () {
@@ -551,6 +613,7 @@ export default {
         this.SHEET.load('work_order_items', params.join('&'))
       }
     },
+
     addNewItemOrder (autofocus = true) {
       let newEntri = this.setDefault().packing_items.packing_item_orders[0]
       this.rsForm.packing_items.packing_item_orders.push(newEntri)
@@ -569,6 +632,10 @@ export default {
     removeItemFault (index) {
       this.rsForm.packing_items.packing_item_faults.splice(index, 1)
       if (this.rsForm.packing_items.packing_item_faults.length < 1) this.addNewItemFault()
+    },
+
+    setPackingItemQuantity () {
+      this.rsForm.packing_items.quantity = this.rsForm.packing_items.packing_item_orders.reduce((sum, dtl) => Number(dtl.quantity) + sum, 0)
     },
 
     onSave () {
