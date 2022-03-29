@@ -90,24 +90,51 @@
                   {{ $app.number_format(Number(rsView.packing_items.quantity) + Number(rsView.packing_items.faulty), rsView.packing_items.unit.decimal_in) }}
                 </q-td>
               </q-tr>
-              <tr v-if="PACKING_ITEM_ORDERS.length">
-                <td colspan="100%" class="no-padding">
-                  <q-list dense separator>
-                    <q-item v-for="(order, orderIndex) in PACKING_ITEM_ORDERS" :key="orderIndex" :packing-item-order-id="order.id">
-                      <q-item-section>
-                        <q-item-label>{{order.number}}</q-item-label>
-                        <q-item-label caption>
-                          {{$app.moment(order.date).format('D MMMM YYYY')}}
-                        </q-item-label>
-                      </q-item-section>
-                      <q-item-section side class="text-subtitle2 text-weight-medium">
-                        <q-item-label>{{$app.number_format(order.quantity)}} {{ rsView.packing_items.unit.code }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                  </q-list>
+              <tr v-if="PACKING_ITEM_ORDERS.length || PACKING_ITEM_FAULTS.length">
+                <td colspan="100%" >
+                  <div class="row q-gutter-md">
+                    <q-list class="col" dense separator bordered v-if="PACKING_ITEM_ORDERS.length">
+                      <q-item-label header class="q-py-sm bg-blue-grey-1">
+                        PACKING [OK]
+                      </q-item-label>
+                      <q-separator />
+                      <q-item v-for="(order, orderIndex) in PACKING_ITEM_ORDERS" :key="orderIndex" :packing-item-order-id="order.id">
+                        <q-item-section>
+                          <q-item-label>{{order.number}}</q-item-label>
+                          <q-item-label caption>
+                            {{$app.moment(order.date).format('D MMMM YYYY')}}
+                          </q-item-label>
+                        </q-item-section>
+                        <q-item-section side class="text-subtitle2 text-weight-medium">
+                          <q-item-label>{{$app.number_format(order.quantity)}} {{ rsView.packing_items.unit.code }}</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                    </q-list>
+                    <q-list class="col" dense separator bordered v-if="PACKING_ITEM_FAULTS.length">
+                      <q-item-label header class="q-py-sm bg-blue-grey-1">
+                        FAULTY
+                      </q-item-label>
+                      <q-separator />
+                      <q-item v-for="(fault, faultIndex) in PACKING_ITEM_FAULTS" :key="faultIndex" :packing-item-fault-id="fault.id">
+                        <q-item-section>
+                          <q-item-label>{{fault.number}}</q-item-label>
+                          <q-item-label caption>
+                            {{$app.moment(fault.date).format('D MMMM YYYY')}}
+                          </q-item-label>
+                        </q-item-section>
+                        <q-item-section side>
+                          [{{ fault.fault.name || 'undefined' }}]
+                        </q-item-section>
+                        <q-item-section side class="text-subtitle2 text-weight-medium">
+                          <q-item-label>{{$app.number_format(fault.quantity)}} {{ rsView.packing_items.unit.code }}</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                    </q-list>
+
+                  </div>
                 </td>
               </tr>
-              <tr v-if="rsView.packing_items.packing_item_faults.length">
+              <tr v-if="PACKING_ITEM_FAULTS.length == 0 && rsView.packing_items.packing_item_faults.length">
                 <q-td colspan="100%">
                   <div class="q-pb-sm text-caption text-weight-light">
                     <span class="text-upprecase text-subtitle1">FAULTY:</span>
@@ -214,6 +241,17 @@ export default {
         const unitRate = this.rsView.packing_items.unit_rate
         return ({ ...x, number, date, unit_rate: unitRate })
       })
+    },
+    PACKING_ITEM_FAULTS () {
+      if (!this.rsView.packing_items) return []
+      return this.rsView.packing_items.packing_item_faults
+        .filter(x => x.work_order_item_id)
+        .map(x => {
+          const number = x.work_order_item.work_order.number
+          const date = x.work_order_item.work_order.date
+          const unitRate = this.rsView.packing_items.unit_rate
+          return ({ ...x, number, date, unit_rate: unitRate })
+        })
     }
   },
   methods: {
