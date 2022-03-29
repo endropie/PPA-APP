@@ -91,12 +91,12 @@
 
 <script>
 import { openURL } from 'quasar'
-import { mapState, mapActions, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 import MixForm from '@/mixins/mix-form.vue'
 
 export default {
   mixins: [MixForm],
-  data() {
+  data () {
     return {
       userlists: [
         'admin',
@@ -105,23 +105,23 @@ export default {
         'work.production',
         'work.process',
         'packing',
-        'marketing' ,
-        'outgoing.verify' ,
-        'outgoing.good' ,
-        'sj.delivery' ,
-        'pre.delivery' ,
+        'marketing',
+        'outgoing.verify',
+        'outgoing.good',
+        'sj.delivery',
+        'pre.delivery',
         'incoming.good'
       ],
       rsLogin: {
         email: null,
-        password: null,
+        password: null
       },
-      FORM:{
+      FORM: {
         show: true,
         loading: false,
         hasEmail: false,
-        btnLoadingSubmit: false,
-      },
+        btnLoadingSubmit: false
+      }
     }
   },
   computed: {
@@ -137,16 +137,16 @@ export default {
       return name
     }
   },
-  created() {
+  created () {
     // User Lock System
-    if (this.AUTH.hasOwnProperty('user') ) {
+    if (this.AUTH.hasOwnProperty('user')) {
       this.rsLogin.email = (this.AUTH.user.email || null)
-      this.FORM.hasEmail = this.rsLogin.email ? true:false
+      this.FORM.hasEmail = !!this.rsLogin.email
 
       // Auto direct when auth on accessible
-      console.warn('LOGIN', AUTH, USER)
-      if(this.AUTH.isTokenValid && this.USER.email) {
+      if (this.AUTH.isTokenValid && this.USER.email) {
         this.$router.push('/admin')
+        this.$q.localStorage.set('AUTHLOCK', false)
       }
     }
   },
@@ -161,12 +161,12 @@ export default {
       const redirUrl = this.$route.query.redirect || '/admin'
       this.$router.push(redirUrl)
     },
-    onLoginSubmit() {
-      const  setLoginStore = (response) => {
+    onLoginSubmit () {
+      const setLoginStore = (response) => {
         if (response && response.data.success === true) {
           this.$axios.setHeader([
-            {key: 'Accept', value: 'application/json'},
-            {key: 'Authorization', value: `Bearer ${response.data.token}`}
+            { key: 'Accept', value: 'application/json' },
+            { key: 'Authorization', value: `Bearer ${response.data.token}` }
           ])
 
           this.$store.commit('admin/setLogin', {
@@ -184,11 +184,10 @@ export default {
           })
 
           this.$store.commit('admin/setSetting', response.data.settings)
-        }
-        else {
+        } else {
           this.$axios.setHeader([
-            {key: 'Accept', value: 'application/json'},
-            {key: 'Authorization', value: null}
+            { key: 'Accept', value: 'application/json' },
+            { key: 'Authorization', value: null }
           ])
           this.$store.commit('admin/setLocked')
           this.directToLogin()
@@ -198,26 +197,29 @@ export default {
       this.$validator.validate().then(result => {
         if (!result) {
           this.$q.notify({
-            color:'negative', icon:'error', position:'top-right', timeout: 3000,
-            message:this.$tc('messages.to_complete_form')
-          });
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
+          })
 
           return
         }
         this.FORM.btnLoadingSubmit = true
         this.$axios.post('/api/v1/login', this.rsLogin)
-        .then((response) => {
-          setLoginStore(response)
-          setTimeout(() => this.redirectToAdmin(), 800);
-        })
-        .catch(error => {
-          this.$app.response.error(error.response)
-        })
-        .finally(()=>{
-          setTimeout(() => {
-            this.FORM.btnLoadingSubmit = false
-          }, 800);
-        });
+          .then((response) => {
+            setLoginStore(response)
+            setTimeout(() => this.redirectToAdmin(), 800)
+          })
+          .catch(error => {
+            this.$app.response.error(error.response)
+          })
+          .finally(() => {
+            setTimeout(() => {
+              this.FORM.btnLoadingSubmit = false
+            }, 800)
+          })
       })
     }
   }
