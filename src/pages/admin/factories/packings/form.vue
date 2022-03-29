@@ -254,7 +254,7 @@
                 :label="$tc('general.work_order')"
                 :data-vv-as="$tc('general.work_order')"
                 v-model="row.work_order_item" clearable
-                v-validate="`${$route.meta.mode == 'create' ? 'required' : ''}`"
+                v-validate="`${rsForm.packing_items.type_fault_id ? 'required' : ''}`"
                 popup-content-class="options-striped"
                 filter map-options
                 :source="`/api/v1/factories/work-orders/items?mode=all&has_amount_packing=true&item_id=${rsForm.packing_items.item_id}&or_detail_ids=${row.work_order_item_id}`"
@@ -657,7 +657,7 @@ export default {
           })
       }
 
-      this.$validator.validate().then(result => {
+      this.$validator.validate().then((result, items) => {
         if (!result) return this.$q.notify({ color: 'negative', icon: 'error', position: 'top-right', timeout: 3000, message: this.$tc('messages.to_complete_form') })
 
         this.$q.dialog({
