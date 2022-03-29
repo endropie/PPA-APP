@@ -124,7 +124,7 @@ export default {
     return {
       AUTHLOCK: {
         dialog: false,
-        interval: 20,
+        interval: 600,
         interloop: 5,
         counter: 0,
         wait: false,
