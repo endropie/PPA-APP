@@ -808,7 +808,7 @@ export default {
         let data = this.isPartition
           ? { ...this.rsForm, partitions: this.rsPartitions } : this.rsForm
         data = { ...data, ...this.dialog_reason }
-        const apiUrl = `${this.FORM.resource.api}/${this.ROUTE.params.id}?mode=${mode}`
+        const apiUrl = `${this.FORM.resource.api}/${this.ROUTE.params.id}/${mode}`
         this.$q.loading.show()
         this.$axios.set(method, apiUrl, data)
           .then((response) => {
