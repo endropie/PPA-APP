@@ -1,6 +1,6 @@
 {
   "name": "virmata.manufacture",
-  "version": "2.2.10",
+  "version": "2.3.0",
   "description": "Manufacture Management Application",
   "productName": "MANUPLAY",
   "cordovaId": "org.cordova.quasar.app",
