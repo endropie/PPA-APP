@@ -1,6 +1,9 @@
 <template>
-  <q-layout view="lHh LpR lFf" :class="LAYOUT.isDark ? 'bg-grey-10 text-white' : 'bg-white text-dark'">
-    <q-header class="header print-hide" elevated>
+  <q-layout view="lHh LpR lFf" :class="$q.dark.isActive ? 'bg-grey-10 text-white' : 'bg-white text-dark'"
+    @mousemove="AUTHLOCK.event"
+    @keypress="AUTHLOCK.event"
+  >
+    <q-header class="header print-hide" elevated :class="$q.dark.isActive ? 'bg-grey-9' :'bg-primary'">
 
       <q-toolbar color="primary" >
         <q-btn v-if="NODRAWER"
@@ -22,7 +25,7 @@
           <span v-if="$route.meta.lang" class="text-uppercase text-weight-reguler" v-text="$tc($route.meta.lang)" />
           <span v-else class="text-uppercase text-weight-reguler" v-text="$route.meta.title" />
         </q-toolbar-title>
-        <admin-header :class="LAYOUT.isDark ? ' ': ''" />
+        <admin-header />
         <admin-accurate class="q-ml-sm" />
         <!-- <q-btn v-show="false" aria-label="Menu" class="within-iframe-hide" icon="assignment" flat round dense @click="RIGHTDRAWER = !RIGHTDRAWER" /> -->
 
@@ -69,11 +72,43 @@
         <router-view />
       </transition>
       <q-page v-if="!SHOW" >
-        <q-inner-loading :showing="!SHOW" :dark="LAYOUT.isDark">
+        <q-inner-loading :showing="!SHOW">
           <q-spinner-facebook  size="70px" color="primary" />
         </q-inner-loading>
       </q-page>
     </q-page-container>
+
+    <q-dialog v-model="AUTHLOCK.dialog" persistent
+      content-style="background: rgb(69 90 100 / 50%)"
+    >
+      <q-card style="min-width:320px">
+        <q-bar dark class="bg-blue-grey-8 text-white">
+          <div class="col text-center text-weight-bold q-py-md text-uppercase">
+            Authorization Timeout
+          </div>
+        </q-bar>
+        <q-card-section class="row items-center">
+          <div class="q-pl-sm col q-gutter-sm">
+            <q-field outlined tabindex="-1" color="blue-grey">
+              <div class="row no-wrap items-center q-gutter-sm">
+                <q-avatar icon="person" color="blue-grey" text-color="white" size="36px" />
+                <div>
+                  <div class="text-uppercase">{{ USER.name }}</div>
+                  <div class="text-caption text-italic text-weight-medium" style="line-height:normal">{{ USER.email }}</div>
+                </div>
+              </div>
+            </q-field>
+            <q-input autofocus filled color="blue-grey" v-model="AUTHLOCK.form.password" type="password" label="Password" />
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <div class="column q-gutter-sm">
+            <q-btn label="UNLOCK" color="blue-grey" @click="AUTHLOCK.unlocked" />
+            <q-btn label="LOGOUT" color="blue-grey" outline @click="AUTHLOCK.logout" />
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-layout>
 </template>
 
@@ -87,30 +122,89 @@ export default {
   mixins: [MixPage],
   data () {
     return {
+      AUTHLOCK: {
+        dialog: false,
+        interval: 20,
+        interloop: 5,
+        counter: 0,
+        wait: false,
+        timing: null,
+        form: {
+          password: null
+        },
+        isLocked: () => {
+          return Boolean(this.$q.localStorage.getItem('AUTHLOCK'))
+        },
+        unlocked: () => {
+          this.$q.loading.hide()
+          this.$axios.post('/api/v1/auth/confirm-password', this.AUTHLOCK.form)
+            .then(() => {
+              this.$q.localStorage.remove('AUTHLOCK')
+              this.AUTHLOCK.dialog = false
+              this.AUTHLOCK.create()
+            })
+            .catch(error => {
+              this.$app.response.error(error.response || error)
+            })
+            .finally(() => {
+              this.$q.loading.hide()
+            })
+        },
+        locked: () => {
+          clearInterval(window.AUTHLOCKING)
+          this.$q.localStorage.set('AUTHLOCK', true)
+          this.AUTHLOCK.dialog = true
+          this.AUTHLOCK.form = {
+            password: null
+          }
+        },
+        logout: () => {
+          this.$store.commit('admin/setLogoff')
+          this.$q.loading.show()
+          this.$axios.set('POST', '/api/v1/auth/logout')
+            .catch(error => {
+              this.$app.response.error(error.response || error)
+            })
+            .finally(() => {
+              this.$q.loading.hide()
+              this.$q.localStorage.remove('AUTHLOCK')
+
+              setTimeout(() => {
+                this.AUTHLOCK.dialog = false
+                this.$router.push('/')
+              }, 500)
+            })
+        },
+        create: () => {
+          if (this.AUTHLOCK.isLocked()) return this.AUTHLOCK.locked()
+          clearInterval(window.AUTHLOCKING)
+          this.AUTHLOCK.counter = 0
+          window.AUTHLOCKING = setInterval(() => {
+            this.AUTHLOCK.counter += this.AUTHLOCK.interloop
+            if (this.AUTHLOCK.counter >= this.AUTHLOCK.interval) this.AUTHLOCK.locked()
+          }, 1000 * this.AUTHLOCK.interloop)
+        },
+        event: () => {
+          if (this.AUTHLOCK.isLocked()) return undefined
+          if (!this.AUTHLOCK.wait) {
+            this.AUTHLOCK.wait = true
+            this.AUTHLOCK.counter = 0
+            this.AUTHLOCK.create()
+
+            setTimeout(() => {
+              this.AUTHLOCK.wait = false
+            }, 1000)
+          }
+        }
+      },
       version: process.env.APP_VERSION,
       DataMenu,
-      miniState: false,
-      PANELTAB: 'messages'
+      miniState: false
     }
   },
   created () {
-    this.$q.loading.show()
-    this.$axios.validToken((response) => {
-      this.$q.loading.hide()
-      if (response.status >= 200 && response.status <= 300) {
-
-      } else if (response.status === 401) {
-        this.setLogoff()
-      } else if (response.status >= 400) {
-        console.error('APA', response)
-      } else {
-        this.$q.dialog({
-          message: 'Netwok error!',
-          ok: 'redirect',
-          cancel: 'skip'
-        }).onOk(() => { this.$router.push('/') })
-      }
-    })
+    this.fetchValidToken()
+    this.AUTHLOCK.create()
   },
   computed: {
     ...mapState('admin', [
@@ -131,12 +225,29 @@ export default {
       done()
     },
     leftDrawerCapture (e) {
-      // if in "mini" state and user
-      // click on drawer, we switch it to "normal" mode
       if (this.miniState) {
         this.miniState = false
         e.stopPropagation()
       }
+    },
+    fetchValidToken () {
+      this.$q.loading.show()
+      this.$axios.validToken((response) => {
+        this.$q.loading.hide()
+        if (response.status >= 200 && response.status <= 300) {
+
+        } else if (response.status === 401) {
+          this.setLogoff()
+        } else if (response.status >= 400) {
+          console.error('APA', response)
+        } else {
+          this.$q.dialog({
+            message: 'Netwok error!',
+            ok: 'redirect',
+            cancel: 'skip'
+          }).onOk(() => { this.$router.push('/') })
+        }
+      })
     },
     setLogoff () {
       this.$axios.setHeader([
