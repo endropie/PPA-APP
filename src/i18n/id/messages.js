@@ -45,7 +45,8 @@ export default {
   process_void: 'Proses Pembatalan data.',
   process_producted: 'Tandai Proses produksi telah selesai.',
   process_packed: 'Tandai Proses Packing telah selesai.',
-  process_reopen: 'Proses Pengembalian status "OPEN".',
+  process_reopen: 'Pengembalian status "OPEN".',
+  process_reconfirm: 'Pengembalian status "CONFIRMED".',
   process_printlog: 'Tandai telah di cetak [print-log]',
   process_standardization: 'Tandai telah di standarisasi',
 

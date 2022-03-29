@@ -377,7 +377,7 @@ export default {
       const submit = () => {
         this.FORM.loading = true
         const method = 'PUT'
-        const apiUrl = `${this.FORM.resource.api}/${this.ROUTE.params.id}?mode=revision`
+        const apiUrl = `${this.FORM.resource.api}/${this.ROUTE.params.id}/internal-revision`
         const data = { ...this.rsForm, ...this.dialog_reason }
         this.$axios.set(method, apiUrl, data)
           .then((response) => {

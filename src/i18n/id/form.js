@@ -7,6 +7,7 @@ export default {
   clone: 'Salin | Salinan',
   create: 'Buat | Dibuat',
   confirm: 'Konfirmasi {v}|{v} dikonfirmasi',
+  reconfirm: 'Konfirmasi Ulang {v}|{v} dikonfirmasi ulang',
   close: 'Tutup | Ditutup',
   delete: 'Hapus',
   delete_all: 'Hapus All',

@@ -25,6 +25,13 @@
                   setValidation()
                 }
               },
+              { label: $tc('form.reconfirm').toUpperCase(), color:'blue-grey', icon: 'chevron_left',
+                detail: $tc('messages.process_reconfirm'),
+                hidden: !IS_RECONFIRM || !$app.can('sj-delivery-orders-validation'),
+                actions: () => {
+                  setReconfirmation()
+                }
+              },
               { label: $tc('form.reopen').toUpperCase(), color:'blue-grey', icon: 'chevron_left',
                 detail: $tc('messages.process_reopen'),
                 hidden: !IS_REOPEN || !$app.can('sj-delivery-orders-reopen'),
@@ -84,9 +91,16 @@
             <ux-qrcode :value="valQrCode(rsView)" :options="{ width: 96, height: 96, margin: 1 }" />
             <div class="" style="max-width:50%">
               <div class="text-weight-medium uppercase">To: {{rsView.customer_name}}</div>
-              <address class="text-normal" style="font-style: normal">{{rsView.customer_address}}</address>
-              <div class="text-weight-medium" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
+              <address
+                class="text-normal"
+                style="line-height:normal;font-style: normal"
+                v-html="rsView.customer_address"
+              />
               <div class="text-weight-medium" v-if="rsView.vehicle">{{$tc('label.transport')}}: {{rsView.vehicle.number}}</div>
+              <div class="text-weight-medium" v-if="rsView.customer_note">{{$tc('label.no',1, {v:'DN'})}}: {{rsView.customer_note}}</div>
+              <div class="text-weight-medium print-hide" v-if="rsView.confirmed_number">
+                {{ $tc('label.no',1, {v:'Confirm'}) }}: {{ rsView.confirmed_number }}
+              </div>
             </div>
             <q-space/>
             <div class="on-right" style="max-width:50%">
@@ -326,6 +340,11 @@ export default {
       if (this.rsView.status !== 'CONFIRMED') return false
       return true
     },
+    IS_RECONFIRM () {
+      if (this.rsView.deleted_at) return false
+      if (this.rsView.status !== 'VALIDATED') return false
+      return true
+    },
     IS_REOPEN () {
       if (this.rsView.deleted_at) return false
       if (this.rsView.status !== 'CONFIRMED') return false
@@ -505,6 +524,52 @@ export default {
         })
       })
     },
+    setReconfirmation () {
+      const submit = (val) => {
+        this.$q.loading.show()
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/reconfirmation?nodata=true`
+        this.$axios.put(url, val)
+          .then((response) => {
+            const data = response.data
+            this.$app.notify.success('CONFIRMATION SUCCESS')
+            this.setView(data)
+          })
+          .catch(error => {
+            this.$app.response.error(error.response, 'CONFIRMED FAILED')
+          })
+          .finally(() => {
+            setTimeout(() => {
+              this.$q.loading.hide()
+            }, 1000)
+          })
+      }
+
+      this.$validator.validate().then(result => {
+        if (!result) {
+          return this.$q.notify({
+            color: 'negative',
+            icon: 'error',
+            position: 'top-right',
+            timeout: 3000,
+            message: this.$tc('messages.to_complete_form')
+          })
+        }
+
+        this.$q.dialog({
+          title: String(this.$tc('form.confirm')).toUpperCase(),
+          message: 'Input Confirmed number',
+          prompt: {
+            model: '',
+            // isValid: val => val.length > 0,
+            type: 'text' // optional
+          },
+          cancel: true,
+          persistent: true
+        }).onOk((data) => {
+          submit({ confirmed_number: data })
+        })
+      })
+    },
     setReopen () {
       const submit = () => {
         this.$q.loading.show()
@@ -553,7 +618,7 @@ export default {
       if (this.rsView.delivery_order_items[index].id) {
         const row = this.rsView.delivery_order_items[index]
         this.VIEW.loading = true
-        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}?mode=item-encasement&nodata=true`
+        let url = `${this.VIEW.resource.api}/${this.ROUTE.params.id}/item-encasement`
         this.$axios.put(url, { id: row.id, encasement: val })
           .then((response) => {
             save()
