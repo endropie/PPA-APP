@@ -239,7 +239,7 @@
           v-show="rsForm.packing_items.type_fault_id">
           <q-tr>
             <q-th key="prefix" width="50px"></q-th>
-            <q-th key-work_order_id>{{ $t('general.work_order') }}</q-th>
+            <q-th key-work_order_id>{{ $tc('general.work_order') }}</q-th>
             <q-th key="quantity" width="35%">{{$tc('label.quantity')}}</q-th>
             <q-th key="fault_id">{{$tc('items.fault')}}</q-th>
           </q-tr>

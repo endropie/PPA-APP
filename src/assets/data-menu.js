@@ -441,22 +441,28 @@ const factories = [
     // lang: 'label.report',
     children: [
       {
-        name: 'Work Order Items',
+        name: 'SPK Items',
         icon: 'work',
         lang: 'general.work_order_items',
         path: 'work-orders/items'
       },
       {
-        name: 'Work Order Lines',
+        name: 'SPK Lines',
         icon: 'work',
         lang: 'general.work_order_lines',
         path: 'work-orders/lines'
       },
       {
-        name: 'Work Order Hanger Lines',
+        name: 'SPK Hanger Lines',
         icon: 'work',
         lang: 'general.work_order_hanger_lines',
         path: 'work-orders/hanger-lines'
+      },
+      {
+        name: 'SPK Pakings',
+        icon: 'work',
+        lang: 'general.work_order_packings',
+        path: 'work-orders/packings'
       }
     ]
   }
