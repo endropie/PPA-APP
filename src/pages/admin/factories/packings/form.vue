@@ -534,6 +534,7 @@ export default {
         return Number(orderDetail.id ? orderDetail.quantity : 0) +
               Number(orderDetail.work_order_item.amount_process / (rsItem.unit_rate || 1)) -
               Number(orderDetail.work_order_item.amount_packing / (rsItem.unit_rate || 1)) -
+              Number(orderDetail.work_order_item.amount_faulty / (rsItem.unit_rate || 1)) -
               Number(sumUseFault(orderDetail.work_order_item_id))
       })
     },
@@ -552,6 +553,7 @@ export default {
         return Number(faultDetail.id ? faultDetail.quantity : 0) +
               Number(faultDetail.work_order_item.amount_process / (rsItem.unit_rate || 1)) -
               Number(faultDetail.work_order_item.amount_packing / (rsItem.unit_rate || 1)) -
+              Number(faultDetail.work_order_item.amount_faulty / (rsItem.unit_rate || 1)) -
               Number(sumOtherUse(faultDetail.work_order_item_id, faultKey))
       })
     },
