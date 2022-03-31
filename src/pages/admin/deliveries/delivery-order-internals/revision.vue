@@ -483,7 +483,6 @@ export default {
       })
     },
     setDialogRequestOrder (val, partitionIndex) {
-      this.$q.loading.show()
       this.$axios.get(`/api/v1/incomes/request-orders/${val.id}?mode=view`)
         .then(response => {
           this.dialog_request_order = Object.assign({
@@ -495,9 +494,6 @@ export default {
         })
         .catch(error => {
           this.$app.error(error.response || error)
-        })
-        .finally(() => {
-          this.$q.loading.hide()
         })
     },
     setRequestOrder (val, partitionIndex) {
@@ -630,12 +626,11 @@ export default {
     onSubmit () {
       const submit = () => {
         this.FORM.loading = true
-        const method = 'PUT'
         let data = { ...this.rsForm, partitions: this.rsPartitions }
         data = { ...data, ...this.dialog_reason }
         const apiUrl = `${this.FORM.resource.api}/${this.ROUTE.params.id}/revision`
         this.$q.loading.show()
-        this.$axios.set(method, apiUrl, data)
+        this.$axios.put(apiUrl, data)
           .then((response) => {
             let message = response.data.number + ' - #' + response.data.id
             this.FORM.response.success({ message: message })
