@@ -503,6 +503,17 @@ const references = [
     ]
   },
   {
+    name: 'Packareas',
+    icon: 'explore',
+    path: 'packareas',
+    lang: 'general.packarea',
+    resources: [
+      { page: 'index', path: '', meta: { permission: 'packareas-read' } },
+      { page: 'form', path: 'create', meta: { mode: 'create', permission: 'packareas-create' } },
+      { page: 'form', path: ':id/edit', meta: { mode: 'edit', permission: 'packareas-update' } }
+    ]
+  },
+  {
     name: 'Specifications',
     icon: 'view_array',
     path: 'specifications',

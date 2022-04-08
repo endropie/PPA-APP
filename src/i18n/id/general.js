@@ -66,6 +66,7 @@ export default {
   brand: 'Brand',
   specification: 'Spesifikasi',
   line: 'Line produksi',
+  packarea: 'Packing Area',
   color: 'Warna',
   unit: 'Satuan',
   size: 'Ukuran',

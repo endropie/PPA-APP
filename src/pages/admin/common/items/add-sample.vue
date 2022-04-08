@@ -45,7 +45,7 @@
 <script>
 export default {
   props: {
-    dataDefault: { type: Object, default: {} }
+    dataDefault: { type: Object, default: Object.assign({}) }
   },
   data () {
     return {
@@ -63,29 +63,32 @@ export default {
       const submit = () => {
         this.$q.loading.show()
         const apiUrl = '/api/v1/common/items'
-        this.$axios.post(apiUrl, {...this.dataDefault, ...this.rsItem, })
-        .then((response) => {
-          console.warn(response)
-          let message = response.data.part_name + ' - #' + response.data.id
-          this.$app.notify.success({message:message})
-          this.$emit('done', response.data)
-          this.$emit('hide')
-        })
-        .catch((error) => {
-          console.warn(error.response || error)
-          this.$app.notify.error('ADD FAILED');
-        })
-        .finally(()=>{
-          setTimeout(() => {
-            this.$q.loading.hide()
-          }, 500)
-        })
+        this.$axios.post(apiUrl, { ...this.dataDefault, ...this.rsItem })
+          .then((response) => {
+            console.warn(response)
+            let message = response.data.part_name + ' - #' + response.data.id
+            this.$app.notify.success({ message: message })
+            this.$emit('done', response.data)
+            this.$emit('hide')
+          })
+          .catch((error) => {
+            console.warn(error.response || error)
+            this.$app.notify.error('ADD FAILED')
+          })
+          .finally(() => {
+            setTimeout(() => {
+              this.$q.loading.hide()
+            }, 500)
+          })
       }
       this.$validator.validate().then(result => {
         if (result) return submit()
         this.$q.notify({
-          color:'negative', icon:'error', position:'top-right', timeout: 3000,
-          message:this.$tc('messages.to_complete_form')
+          color: 'negative',
+          icon: 'error',
+          position: 'top-right',
+          timeout: 3000,
+          message: this.$tc('messages.to_complete_form')
         })
       })
     }

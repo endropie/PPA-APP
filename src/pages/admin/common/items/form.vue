@@ -190,16 +190,17 @@
                   :error="errors.has('weight')"
                   :error-message="errors.first('weight')"
                 />
-                <q-select class="col-12 col-sm-6"
-                  name="load_type"
-                  :label="$tc('label.mode', 1, {v:'Hanger/Barrel'})"
-                  v-model="rsForm.load_type"
-                  :options="['HANGER', 'BAREL']"
-                  v-validate="isEnginered(`required`)"
-                  :error="errors.has('load_type')"
-                  :error-message="errors.first('load_type')"/>
 
                 <div class="col-12 col-sm-6 row q-col-gutter-sm">
+                  <q-select class="col-12 col-sm-6"
+                    name="load_type"
+                    :label="$tc('label.mode', 1, {v:'Hanger/Barrel'})"
+                    v-model="rsForm.load_type"
+                    :options="['HANGER', 'BAREL']"
+                    v-validate="isEnginered(`required`)"
+                    :error="errors.has('load_type')"
+                    :error-message="errors.first('load_type')"
+                  />
                   <q-input class="col-12 col-sm-6"
                     name="load_capacity"
                     :label="$tc('label.capacity', 1)"
@@ -209,7 +210,21 @@
                     no-error-icon
                     :error="errors.has('load_capacity')"
                   />
+                </div>
 
+                <div class="col-12 col-sm-6 row q-col-gutter-sm">
+
+                  <q-select class="col-12 col-sm-6"
+                    name="packarea_id"
+                    :label="$tc('general.packarea')"
+                    v-model="rsForm.packarea_id"
+                    :options="PackareaOptions"
+                    map-options emit-value
+                    :option-label="(opt) => opt.name"
+                    v-validate="isEnginered(`required`)"
+                    :error="errors.has('packarea')"
+                    :error-message="errors.first('packarea')"
+                  />
                   <q-input class="col-12 col-sm-6"
                     name="packing_duration"
                     label="Packing duration"
@@ -465,6 +480,7 @@ export default {
         brands: { data: [], api: '/api/v1/references/brands?mode=all' },
         specifications: { data: [], api: '/api/v1/references/specifications?mode=all' },
         customers: { data: [], api: '/api/v1/incomes/customers?mode=all' },
+        packareas: { data: [], api: '/api/v1/references/packareas?mode=all' },
         lines: { data: [], api: '/api/v1/references/lines?mode=all' }
 
       },
@@ -488,6 +504,8 @@ export default {
 
           load_type: null,
           load_capacity: null,
+          packarea_id: null,
+          packarea: null,
           packing_duration: null,
           sa_dm: null,
           weight: null,
@@ -521,6 +539,9 @@ export default {
     this.init()
   },
   computed: {
+    PackareaOptions () {
+      return (this.SHEET.packareas.data.map(item => ({ ...item, label: item.name, value: item.id })) || [])
+    },
     LineOptions () {
       return (this.SHEET.lines.data.map(item => ({ ...item, label: item.name, value: item.id })) || [])
     },
