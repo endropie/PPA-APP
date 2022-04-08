@@ -165,6 +165,40 @@
                         </q-list>
                       </q-expansion-item>
                     </div>
+                    <div class="col" v-if="!Boolean(rsView.main_id)">
+                      <q-expansion-item dense expand-separator default-opened
+                        :class="$q.dark.isActive ? `bg-grey-9` : `bg-grey-2`"
+                        :header-class="$q.dark.isActive ? `bg-blue-grey-10` : `bg-blue-grey-1`"
+                      >
+                        <div slot="header" class="justify-center q-item__section column q-item__section--main">
+                          <span>
+                            NG-NC
+                            <q-badge
+                              :label="`${$app.number_format(row.amount_faulty / (row.unit_rate||1),0)} / ${$app.number_format(row.amount_process / (row.unit_rate||1),0)}`"
+                              :color="rsView.has_packed ? 'red-10' : 'primary'"
+                            />
+                          </span>
+                        </div>
+                        <q-list dense separator>
+                          <q-item v-for="(packing_item_fault, index) in row.packing_item_faults" :key="index"
+                            :packing-item-id="packing_item_fault.id"
+                          >
+                            <q-item-section>
+                              <span v-if="packing_item_fault.packing_item && packing_item_fault.packing_item.packing">
+                                {{packing_item_fault.packing_item.packing.number}}
+                              </span>
+                            </q-item-section>
+                            <q-item-section  side>
+                              <span v-if="MAPINGKEY['units'][packing_item_fault.packing_item.unit_id]" >
+                                {{$app.number_format(packing_item_fault.unit_amount / (packing_item_fault.packing_item.unit_rate || 1))}}
+                                {{MAPINGKEY['units'][packing_item_fault.packing_item.unit_id].code}}
+                              </span>
+                            </q-item-section>
+                          </q-item>
+                          <q-item-label header v-if="!Boolean(row.packing_item_faults.length)" class="text-center q-pa-sm text-italic">No data</q-item-label>
+                        </q-list>
+                      </q-expansion-item>
+                    </div>
                     <div class="col-auto">
                       <q-btn dense flat color="grey" @click="onCommentable(row)" icon="info" />
                     </div>
