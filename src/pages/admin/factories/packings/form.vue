@@ -239,9 +239,9 @@
           v-show="rsForm.packing_items.type_fault_id">
           <q-tr>
             <q-th key="prefix" width="50px"></q-th>
-            <q-th key-work_order_id>{{ $tc('general.work_order') }}</q-th>
-            <q-th key="quantity" width="35%">{{$tc('label.quantity')}}</q-th>
-            <q-th key="fault_id">{{$tc('items.fault')}}</q-th>
+            <q-th key="work_order_id" width="40%">{{ $tc('general.work_order') }}</q-th>
+            <q-th key="quantity" width="30%">{{$tc('label.quantity')}}</q-th>
+            <q-th key="fault_id" width="30%">{{$tc('items.fault')}}</q-th>
           </q-tr>
           <q-tr v-for="(row, faultKey) in rsForm.packing_items.packing_item_faults" :key="faultKey">
             <q-td key="prefix">
@@ -512,11 +512,13 @@ export default {
       }).filter(x => x.rate) || []
     },
     MaxUnit () {
-      let rsItem = this.rsForm.packing_items
+      const rsItem = this.rsForm.packing_items
+      const oldItem = this.FORM.data.packing_items
       if (!rsItem.item) return 0
       const stock = rsItem.item.totals['WIP'] / (rsItem.unit_rate || 1)
       const faults = rsItem.packing_item_faults.reduce((sum, item) => Number(item.quantity) + sum, 0)
-      return (rsItem.id ? (rsItem.quantity + rsItem.faulty) : 0) + (stock || 0) - faults
+      console.warn('RS', rsItem, stock)
+      return (rsItem.id ? (oldItem.quantity + oldItem.faulty) : 0) + (stock || 0) - faults
     },
     MaxOrderUnit () {
       let rsItem = this.rsForm.packing_items
@@ -548,9 +550,18 @@ export default {
           .reduce((t, x) => t + Number(x.quantity), 0)
       }
 
+      const sumOldestUse = (id, key) => {
+        return this.FORM.data.packing_items.packing_item_faults
+          .filter((x, i) => x.work_order_item_id === id)
+          .reduce((t, x) => t + Number(x.quantity), 0)
+      }
+
+      console.warn('ini', this.FORM.data)
+
       return rsItem.packing_item_faults.map((faultDetail, faultKey) => {
         if (!faultDetail.work_order_item) return 0
-        return Number(faultDetail.id ? faultDetail.quantity : 0) +
+        return Number(sumOldestUse(faultDetail.work_order_item_id, faultKey)) +
+              // Number(faultDetail.id ? faultDetail.quantity : 0) +
               Number(faultDetail.work_order_item.amount_process / (rsItem.unit_rate || 1)) -
               Number(faultDetail.work_order_item.amount_packing / (rsItem.unit_rate || 1)) -
               Number(faultDetail.work_order_item.amount_faulty / (rsItem.unit_rate || 1)) -
