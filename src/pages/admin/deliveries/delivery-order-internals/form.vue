@@ -156,6 +156,7 @@
                 v-validate="'required'"
                 :name="`delivery_order_items.${rowIndex}.quantity`"
                 :error="errors.has(`delivery_order_items.${rowIndex}.quantity`)"
+                :error-message="errors.first(`delivery_order_items.${rowIndex}.quantity`)"
               />
             </q-td>
             <q-td name="unit">

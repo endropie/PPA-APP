@@ -7,7 +7,6 @@
 
           <q-chip class="text-uppercase" square outline
             :label="$tc('form.temporary')"
-            :dark="LAYOUT.isDark"
             color="orange-10"
             v-if="rsForm.is_internal" />
 
@@ -21,7 +20,6 @@
       <div class="col-12 col-md-6" >
         <q-input disable hint=""
           :label="$tc('general.customer')"
-          :dark="LAYOUT.isDark"
           :value="rsForm.customer ? `${rsForm.customer.code} - ${rsForm.customer.name}` : null"
         />
         <div class="row q-col-gutter-x-sm">
@@ -29,7 +27,6 @@
             name="date" type="date"
             stack-label label="Date"
             v-model="rsForm.date"
-            :dark="LAYOUT.isDark"
             v-validate="'required'"
             :error="errors.has('date')"
             :error-message="errors.first('date')"/>
@@ -41,21 +38,18 @@
           <q-input class="col" name="customer_name"
             :label="$tc('label.name')"  stack-label
             v-model="rsForm.customer_name"
-            :dark="LAYOUT.isDark"
             v-validate="'required'"
             :error="errors.has('customer_name')" />
 
           <q-input class="col-12 col-sm-auto" name="customer_phone"
             :label="$tc('label.phone')"  stack-label
             v-model="rsForm.customer_phone"
-            :dark="LAYOUT.isDark"
             v-validate="''"
             :error="errors.has('customer_phone')"/>
         </div>
         <q-input type="textarea" autogrow rows="3"
           name="customer_address"
           :label="$tc('label.address')"  stack-label
-          :dark="LAYOUT.isDark"
           v-model="rsForm.customer_address"
         />
       </div>
@@ -89,7 +83,6 @@
           :option-label="(item) => item.number"
           :option-sublabel="(item) => 'REF: ' + (item.reference_number || '-')"
           :option-value="(item) => item"
-          :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
           v-validate="'required'"
           :error="errors.has(`request_order`)"
           :error-message="errors.first(`request_order`)"
@@ -105,7 +98,7 @@
       <!-- COLUMN:: Part items lists -->
       <q-markup-table bordered class="main-box no-shadow no-highlight"
         dense separator="horizontal"
-        :dark="LAYOUT.isDark">
+      >
         <thead>
           <q-tr class="text-uppercase" style="line-height:30px">
             <q-th key="prefix" width="50px"></q-th>
@@ -159,25 +152,27 @@
               </q-field>
             </q-td>
             <q-td key="quantity" width="25%">
-              <q-input v-if="rsForm.request_order && rsForm.request_order.order_mode == 'ACCUMULATE'"
+              <q-input
+                v-if="rsForm.request_order && rsForm.request_order.order_mode == 'ACCUMULATE'"
                 type="number" style="min-width:120px"
                 :name="`delivery_order_items.${index}.quantity`"
                 v-model="row.quantity"
                 outlined dense color="blue-grey-5"
                 hide-bottom-space no-error-icon
-                :dark="LAYOUT.isDark"
                 v-validate="`required|gt_value:0`"
-                :error="errors.has(`delivery_order_items.${index}.quantity`)">
-              </q-input>
+                :error="errors.has(`delivery_order_items.${index}.quantity`)"
+                :error-message="errors.first(`delivery_order_items.${index}.quantity`)"
+              />
               <q-input v-else
                 type="number" style="min-width:120px"
                 :name="`delivery_order_items.${index}.quantity`"
                 v-model="row.quantity"
                 outlined dense color="blue-grey-5"
                 hide-bottom-space no-error-icon
-                :dark="LAYOUT.isDark"
                 v-validate="`required|max_value:${Number(MaxMount[index]) / Number(row.unit_rate || 1)}`"
-                :error="errors.has(`delivery_order_items.${index}.quantity`)">
+                :error="errors.has(`delivery_order_items.${index}.quantity`)"
+                :error-message="errors.first(`delivery_order_items.${index}.quantity`)"
+              >
                 <span slot="append" class="text-body2">
                 / <q-badge :label="Number(MaxMount[index]) / Number(row.unit_rate || 1)" />
                 </span>
@@ -191,7 +186,6 @@
                 hide-bottom-space no-error-icon
                 map-options emit-value
                 :options="ItemUnitOptions[index]"
-                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                 v-validate="row.item_id ? 'required' : ''"
                 :error="errors.has(`delivery_order_items.${index}.unit_id`)"
                 @input="(val)=>{ setUnitReference(index, val) }"
@@ -209,7 +203,7 @@
                 name="description"
                 :data-vv-as="$tc('label.description')"
                 :label="$tc('label.description')" stack-label
-                filled :dark="LAYOUT.isDark"
+                filled
                 v-model="rsForm.description"/>
             </q-td>
           </q-tr>
@@ -246,7 +240,6 @@
           :option-label="(item) => item.fullnumber || item.number"
           :option-sublabel="(item) => item.reference_number ? `REF: ${item.reference_number}` : undefined"
           :option-value="(item) => item"
-          :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
           :error="errors.has(`partitions.${partitionIndex}.request_order_id`)"
           :error-message="errors.first(`partitions.${partitionIndex}.request_order_id`)"
           @input="(v) => setRequestOrder(v, partitionIndex)"
@@ -269,7 +262,7 @@
       <!-- COLUMN:: Part items lists -->
       <q-markup-table bordered class="main-box no-shadow no-highlight"
         dense separator="horizontal"
-        :dark="LAYOUT.isDark">
+      >
         <thead>
           <q-tr class="text-uppercase" style="line-height:30px">
             <q-th key="prefix" width="50px"></q-th>
@@ -329,19 +322,20 @@
                 v-model="row.quantity"
                 outlined dense color="blue-grey-5"
                 hide-bottom-space no-error-icon
-                :dark="LAYOUT.isDark"
                 v-validate="`required|gt_value:0`"
-                :error="errors.has(`partitions.${partitionIndex}.delivery_order_items.${index}.quantity`)">
-              </q-input>
+                :error="errors.has(`partitions.${partitionIndex}.delivery_order_items.${index}.quantity`)"
+                :error-message="errors.first(`partitions.${partitionIndex}.delivery_order_items.${index}.quantity`)"
+              />
               <q-input v-else
                 type="number" style="min-width:120px"
                 :name="`partitions.${partitionIndex}.delivery_order_items.${index}.quantity`"
                 v-model="row.quantity"
                 outlined dense color="blue-grey-5"
                 hide-bottom-space no-error-icon
-                :dark="LAYOUT.isDark"
                 v-validate="`required|gt_value:0|max_value:${Number(MaxMultiMount[partitionIndex][index]) / Number(row.unit_rate || 1)}`"
-                :error="errors.has(`partitions.${partitionIndex}.delivery_order_items.${index}.quantity`)">
+                :error="errors.has(`partitions.${partitionIndex}.delivery_order_items.${index}.quantity`)"
+                :error-message="errors.first(`partitions.${partitionIndex}.delivery_order_items.${index}.quantity`)"
+              >
                 <span slot="append" class="text-body2">
                 / <q-badge :label="$app.number_format(Number(MaxMultiMount[partitionIndex][index]) / Number(row.unit_rate || 1), row.unit.decimal_in)" />
                 </span>
@@ -355,7 +349,6 @@
                 hide-bottom-space no-error-icon
                 map-options emit-value
                 :options="ItemUnitMultiOptions[partitionIndex][index]"
-                :dark="LAYOUT.isDark" :options-dark="LAYOUT.isDark"
                 v-validate="'required'"
                 :error="errors.has(`partitions.${partitionIndex}.delivery_order_items.${index}.unit_id`)"
                 @input="(val)=>{ setUnitReference(index, val, partitionIndex) }"
@@ -373,14 +366,13 @@
                 :name="`partitions.${partitionIndex}.description`"
                 :data-vv-as="$tc('label.description')"
                 :label="$tc('label.description')" stack-label
-                filled :dark="LAYOUT.isDark"
                 v-model="partition.description"/>
             </q-td>
           </q-tr>
         </tbody>
       </q-markup-table>
     </q-card-section>
-    <q-separator :dark="LAYOUT.isDark" />
+    <q-separator />
     <q-card-actions class="q-mx-lg">
       <q-checkbox class="on-left" v-model="isPartition" label="MULTI-REVISION" color="positive" @input="setPartition"/>
       <q-btn outline color="positive" icon="add_circle" :label="$tc('form.add')" @click="addPartition" v-if="isPartition" />
@@ -390,7 +382,7 @@
       <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()" v-if="IS_REVISE"></q-btn>
     </q-card-actions>
   </q-card>
-  <q-inner-loading :showing="FORM.loading" :dark="LAYOUT.isDark">
+  <q-inner-loading :showing="FORM.loading">
     <q-spinner-dots size="70px" color="primary" />
   </q-inner-loading>
   <q-dialog ref="dialog-request-order">
@@ -808,9 +800,9 @@ export default {
         let data = this.isPartition
           ? { ...this.rsForm, partitions: this.rsPartitions } : this.rsForm
         data = { ...data, ...this.dialog_reason }
-        const apiUrl = `${this.FORM.resource.api}/${this.ROUTE.params.id}/${mode}`
-        this.$q.loading.show()
-        this.$axios.set(method, apiUrl, data)
+        const url = `${this.FORM.resource.api}/${this.ROUTE.params.id}/${mode}`
+
+        this.$axios.set(method, url, data)
           .then((response) => {
             let message = response.data.number + ' - #' + response.data.id
             this.FORM.response.success({ message: message })
@@ -821,7 +813,7 @@ export default {
             this.FORM.response.error(error.response || error, 'REVISION FAILED')
           })
           .finally(() => {
-            this.$q.loading.hide()
+            this.FORM.loading = false
           })
       }
 
