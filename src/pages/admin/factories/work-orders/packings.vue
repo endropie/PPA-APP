@@ -54,16 +54,17 @@
           {{rs.row.summary_packing}} / {{rs.row.summary_production}}
         </q-td>
 
-        <q-td slot="body-cell-date" slot-scope="rs" :props="rs">
-          <span v-if="rs.row.date"> {{ $app.moment(rs.row.date).format('DD/MM/YY') }}</span>
+        <q-td slot="body-cell-code" slot-scope="rs" :props="rs">
+          <div v-if="rs.row.item">
+            <div class="">{{ rs.row.item.customer_code }}</div>
+          </div>
         </q-td>
 
-        <q-td slot="body-cell-status" slot-scope="rs" :props="rs" style="width:50%">
-          <q-chip
-            :label="`CLOSED ${getTextStatus(rs.row)}`"
-            :color="String(getTextStatus(rs.row)).length ? 'blue-grey' : 'red-10'"
-            text-color="white"
-          />
+        <q-td slot="body-cell-part" slot-scope="rs" :props="rs" style="width:50%">
+          <div v-if="rs.row.item">
+            <div class="">{{ rs.row.item.part_name }}</div>
+            <div class="text-caption">{{ rs.row.item.part_subname }}</div>
+          </div>
         </q-td>
 
         <template v-slot:bottom-row>
@@ -124,8 +125,8 @@ export default {
         },
         columns: [
           { name: 'prefix', label: '', align: 'left' },
-          { name: 'date', label: this.$tc('label.date'), field: (rs) => rs.date, align: 'center', sortable: true },
-          { name: 'shift_id', label: 'Shift', field: (rs) => rs.shift.name, align: 'center', sortable: true },
+          { name: 'code', label: this.$tc('general.cust'), align: 'center' },
+          { name: 'part', label: this.$tc('label.part'), align: 'left' },
           { name: 'status', label: '', align: 'center' },
           { name: 'amount', label: 'Amount', format: (v) => this.$app.number_format(v) }
         ]
