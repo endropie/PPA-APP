@@ -163,7 +163,7 @@ export default {
     },
     onLoginSubmit () {
       const setLoginStore = (response) => {
-        if (response && response.data.success === true) {
+        if (response?.data?.token) {
           this.$axios.setHeader([
             { key: 'Accept', value: 'application/json' },
             { key: 'Authorization', value: `Bearer ${response.data.token}` }
@@ -210,6 +210,7 @@ export default {
         this.$axios.post('/api/v1/login', this.rsLogin)
           .then((response) => {
             setLoginStore(response)
+            this.$q.localStorage.set('AUTHLOCK', false)
             setTimeout(() => this.redirectToAdmin(), 800)
           })
           .catch(error => {
