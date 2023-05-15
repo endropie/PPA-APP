@@ -75,7 +75,7 @@
                 :label="$tc('label.part')"
                 v-model="row.item"
                 filter clearable
-                :source="`/api/v1/common/items?mode=all&--limit=50&enable=1&delivery_date=${rsForm.date}&customer_id=${rsForm.customer_id}`"
+                :source="`/api/v1/common/items?mode=all&--limit=50&enable=1&delivery_date=${rsForm.date}&amount_delivery_to_verify&customer_id=${rsForm.customer_id}`"
                 :source-key="['part_name', 'part_number', 'code']"
                 option-label="part_name"
                 :option-sublabel="(opt) => `[${opt.customer_code}] ${opt.part_number} (${opt.customer_code})`"
@@ -210,8 +210,7 @@ export default {
       })
       return this.rsForm.multi_items.map((detail, i) => {
         if (!detail.item) return 0
-        const amount = detail.item.amount_delivery
-        let available = (amount['TASK.REG'] + amount['TASK.RET'] - amount['VERIFY'])
+        let available = detail.item.amount_delivery
         if (!maximum.total[detail.item.id]) maximum.total[detail.item.id] = 0
         let result = available - maximum.total[detail.item.id]
         maximum.add(detail.item.id, detail.quantity * detail.unit_rate)

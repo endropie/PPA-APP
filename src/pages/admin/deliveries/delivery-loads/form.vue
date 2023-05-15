@@ -216,7 +216,7 @@
                 v-show="!rsForm.request_order"
                 v-model="row.item"
                 filter clearable
-                :source="`/api/v1/common/items?mode=all&--limit=50&delivery_date=${rsForm.date}&customer_id=${rsForm.customer_id}${rsForm.request_order_id ? '&in_request_order_id='+rsForm.request_order_id : '' }`"
+                :source="`/api/v1/common/items?mode=all&--limit=50&delivery_date=${rsForm.date}&amount_delivery_to_load&customer_id=${rsForm.customer_id}${rsForm.request_order_id ? '&in_request_order_id='+rsForm.request_order_id : '' }`"
                 :source-key="['part_name', 'part_number', 'code']"
                 option-label="part_name"
                 :option-sublabel="(opt) => `[${opt.customer_code}] ${opt.part_number}`"
@@ -368,8 +368,7 @@ export default {
       })
       return this.rsForm.delivery_load_items.map((detail, i) => {
         if (!detail.item) return 0
-        const amount = detail.item.amount_delivery
-        let available = (amount['VERIFY'] - amount['LOAD.REG'] + amount['LOAD.RET'])
+        let available = detail.item.amount_delivery
         if (!maximum.total[detail.item.id]) maximum.total[detail.item.id] = 0
         const result = available - maximum.total[detail.item.id]
         maximum.add(detail.item.id, detail.quantity * detail.unit_rate)
