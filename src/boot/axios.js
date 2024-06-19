@@ -7,8 +7,8 @@ export default async ({ app, Vue }) => {
   // axios.defaults.baseURL = 'http://laravel.ppa'
   // axios.defaults.baseURL = 'localhost:8000'
   // axios.defaults.baseURL = 'ppa-laravel'
-  // const devHOST = process.env.DEV ? 'http://localhost:8050' : 'http://localhost:8000'
-  const BASE_URL = LocalStorage.getItem('BASE_URL')
+  const devHOST = process.env.DEV ? 'http://localhost:8050' : null
+  const CUSTOM_BASE_URL = LocalStorage.getItem('BASE_URL') || devHOST
   const CONFIG = app.store.getters['admin/CONFIG']
   const AUTH = app.store.getters['admin/AUTH']
   const ACCURATE = app.store.getters['admin/ACCURATE']
@@ -20,7 +20,7 @@ export default async ({ app, Vue }) => {
     }
   }
 
-  if (BASE_URL) axios.defaults.baseURL = BASE_URL
+  if (CUSTOM_BASE_URL) axios.defaults.baseURL = CUSTOM_BASE_URL
 
   if (AUTH.hasOwnProperty('token')) {
     axios.defaults.headers.common['Accept'] = 'application/json'
