@@ -130,10 +130,10 @@
         </template>
 
         <!-- slot name syntax: body-cell-<column_name> -->
-        <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:35px">
+        <q-td slot="body-cell-prefix" slot-scope="rs" :props="rs" style="width:10px">
           <q-btn dense flat color="light" icon="description" :to="`${TABLE.resource.uri}/${rs.row.id}`" />
-          <q-btn v-if="isCanUpdate(rs.row)" dense flat color="light" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" />
-          <q-btn v-if="isCanDelete(rs.row)" dense flat color="light"  icon="delete" @click.native="TABLE.delete(rs.row)" />
+          <!-- <q-btn v-if="isCanUpdate(rs.row)" dense flat color="light" icon="edit" :to="`${TABLE.resource.uri}/${rs.row.id}/edit`" />
+          <q-btn v-if="isCanDelete(rs.row)" dense flat color="light"  icon="delete" @click.native="TABLE.delete(rs.row)" /> -->
         </q-td>
 
         <q-td slot="body-cell-status" slot-scope="rs" :props="rs" class="no-padding">

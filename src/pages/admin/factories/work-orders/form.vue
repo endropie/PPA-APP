@@ -104,13 +104,12 @@
                   v-model="row.item"
                   v-validate="'required'"
                   filter map-options clearable
-                  :source="`/api/v1/common/items?mode=all&--limit=20&has_stocks=${rsForm.stockist_from}&appends=total_work_order&main_line=${rsForm.line_id}&mode_line=${rsForm.mode_line}`"
+                  :source="`/api/v1/common/items?mode=all&--limit=10&has_stocks=${rsForm.stockist_from}&appends=&main_line=${rsForm.line_id}&mode_line=${rsForm.mode_line}`"
                   option-value="id"
                   option-label="part_name"
                   :option-sublabel="item => `[${item.customer_code}] ${item.part_subname}`"
                   popup-content-class="options-striped"
                   :error="errors.has(`work_order_items.${index}.item_id`)"
-                  :loading="SHEET.items.loading"
                   @input="(val) => setItemReference(index, val)">
                   <q-tooltip v-if="!rsForm.line_id" :offset="[0, 10]">Select a Pre-Line , first! </q-tooltip>
                   <small class="absolute-bottom text-weight-light" v-if="row.item">
@@ -213,7 +212,7 @@
       <q-btn :label="$tc('form.cancel')" icon="cancel" color="dark" @click="FORM.toBack()"></q-btn>
       <q-btn :label="$tc('form.reset')" icon="refresh" color="light" @click="setForm(FORM.data)"></q-btn>
       <q-btn :label="$tc('form.save')" icon="save" color="positive" @click="onSave()"
-        :disabled="FORM.has_relationship.length > 0">
+        :disabled="FORM.data.is_relationship">
       </q-btn>
     </q-card-actions>
   </q-card>
@@ -229,17 +228,16 @@ export default {
   data () {
     return {
       SHEET: {
-        customers: { api: '/api/v1/incomes/customers?mode=all' },
+        // customers: { api: '/api/v1/incomes/customers?mode=all' },
+        // items: { api: '/api/v1/common/items?mode=all', autoload: false },
         units: { api: '/api/v1/references/units?mode=all' },
-        items: { api: '/api/v1/common/items?mode=all', autoload: false },
         lines: { api: '/api/v1/references/lines?mode=all' },
         shifts: { api: '/api/v1/references/shifts?mode=all' }
       },
       FORM: {
         resource: {
           uri: '/admin/factories/work-orders',
-          api: '/api/v1/factories/work-orders',
-          params: '?appends=total_work_order'
+          api: '/api/v1/factories/work-orders'
         }
       },
       rsForm: {},
@@ -290,32 +288,6 @@ export default {
     },
     UnitOptions () {
       return (this.SHEET.units.data.map(item => ({ label: item.code, value: item.id })) || [])
-    },
-    ItemOptions () {
-      if (this.SHEET.items.data.length <= 0) return []
-      if (!this.rsForm.stockist_from) return []
-
-      const stockist = this.rsForm.stockist_from
-      let OrKeys = this.FORM.data.work_order_items.map(x => x.item_id, [])
-
-      return this.SHEET.items.data.filter((item) => {
-        if (!item.item_prelines || !item.item_prelines.length) return false
-        if (item.item_prelines[0].line_id !== this.rsForm.line_id) return false
-        if (!OrKeys.find(x => x === item.id)) {
-          const WOSTOCK = item.totals[stockist] - (item.total_work_order[stockist] || 0)
-          if (WOSTOCK <= 0) return false
-        }
-        if (this.rsForm.mode_line === 'SINGLE' && item.item_prelines.length > 1) return false
-        if (this.rsForm.mode_line === 'MULTI' && item.item_prelines.length < 2) return false
-        else return true
-      })
-        .map(item => ({
-          label: item.part_name,
-          sublabel: `[${item.customer_code}] ${item.part_subname || '--'}`,
-          value: item.id,
-          disable: !item.enable,
-          row: item
-        }))
     },
     ItemUnitOptions () {
       let vars = []
@@ -368,7 +340,7 @@ export default {
       let data = {}
       this.rsForm.work_order_items.map((detail, index) => {
         if (stockItem[detail.item_id] && detail.item_id) {
-          const summary = Number(stockItem[detail.item_id].totals[stockist] || 0) - Number(stockItem[detail.item_id].total_work_order[stockist] || 0)
+          const summary = Number(stockItem[detail.item_id].totals[stockist] || 0) - Number(stockItem[detail.item_id].totals[`WO_${stockist}`] || 0)
           data[index] = summary - Number(moveItem.get(detail.item_id) || 0)
           moveItem.set(detail.item_id, detail.quantity * detail.unit_rate)
         }
@@ -383,14 +355,12 @@ export default {
     },
     MAPINGKEY () {
       let variables = {
-        'customers': {},
-        'units': {},
-        'items': {}
+        'units': {}
       }
 
-      this.SHEET['customers'].data.map(value => { variables['customers'][value.id] = value })
+      // this.SHEET['customers'].data.map(value => { variables['customers'][value.id] = value })
       this.SHEET['units'].data.map(value => { variables['units'][value.id] = value })
-      this.SHEET['items'].data.map(value => { variables['items'][value.id] = value })
+      // this.SHEET['items'].data.map(value => { variables['items'][value.id] = value })
 
       return variables
     }
@@ -406,11 +376,9 @@ export default {
     },
     setForm (data) {
       this.rsForm = JSON.parse(JSON.stringify(data))
-      // if (data.id) this.loadItemOptions(data)
-      if (data.hasOwnProperty('has_relationship') && data['has_relationship'].length > 0) {
-        this.FORM.has_relationship = data.has_relationship
 
-        let message = data['has_relationship'].join('-')
+      if (data.is_relationship) {
+        let message = 'Data has been relationships.'
         this.$q.dialog({
           title: 'Work Order has Related',
           message: message,
@@ -442,7 +410,7 @@ export default {
       return value.toFixed(0)
     },
     loadItemOptions (data = this.rsForm) {
-      let params = ['has_stocks=FM,NC,NCR', 'appends=total_work_order']
+      let params = ['has_stocks=FM,NC,NCR']
 
       if (data.line_id) params.push(`main_line=${data.line_id}`)
 
