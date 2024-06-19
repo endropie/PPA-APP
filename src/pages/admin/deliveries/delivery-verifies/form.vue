@@ -12,7 +12,7 @@
           :label="$tc('general.customer')"  stack-label
           v-model="rsForm.customer"
           filter clearable
-          source="api/v1/incomes/customers?mode=all"
+          source="api/v1/incomes/customers?mode=all&--limit=10"
           :source-keys="['name', 'code']"
           :option-label="(item) => `[${item.code}] ${item.name}`"
           option-value="id"
